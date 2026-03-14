@@ -134,7 +134,7 @@ export default function DashboardPage() {
                 <div key={job.id} className="flex items-center justify-between rounded-lg border border-border bg-background p-4">
                   <div className="flex items-center gap-4">
                     <div className={`flex h-10 w-10 items-center justify-center rounded-lg text-xs font-bold ${
-                      job.type === "FF" ? "bg-primary/10 text-primary" : "bg-accent/20 text-accent-foreground"
+                      job.type === "FF" ? "bg-primary/20 text-primary" : "bg-secondary text-foreground"
                     }`}>
                       {job.type}
                     </div>
@@ -200,14 +200,14 @@ export default function DashboardPage() {
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
             {[
-              { label: "Draft", count: 1, color: "bg-muted" },
-              { label: "Submitted", count: 1, color: "bg-blue-100 dark:bg-blue-900/30" },
-              { label: "Processing", count: 1, color: "bg-yellow-100 dark:bg-yellow-900/30" },
-              { label: "Completed", count: 3, color: "bg-green-100 dark:bg-green-900/30" },
-              { label: "Failed", count: 1, color: "bg-red-100 dark:bg-red-900/30" },
-              { label: "Needs Review", count: 1, color: "bg-orange-100 dark:bg-orange-900/30" },
+              { label: "Draft", count: 1, color: "bg-secondary" },
+              { label: "Submitted", count: 1, color: "bg-blue-900/40" },
+              { label: "Processing", count: 1, color: "bg-yellow-900/40" },
+              { label: "Completed", count: 3, color: "bg-green-900/40" },
+              { label: "Failed", count: 1, color: "bg-red-900/40" },
+              { label: "Needs Review", count: 1, color: "bg-orange-900/40" },
             ].map((status) => (
-              <div key={status.label} className={`rounded-lg ${status.color} p-4 text-center`}>
+              <div key={status.label} className={`rounded-lg ${status.color} border border-border p-4 text-center`}>
                 <div className="text-2xl font-bold text-foreground">{status.count}</div>
                 <div className="text-sm text-muted-foreground">{status.label}</div>
               </div>

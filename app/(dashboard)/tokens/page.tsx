@@ -195,7 +195,7 @@ export default function TokensPage() {
               { label: "Total EE Purchased", value: 20 },
               { label: "EE Tokens Used", value: 8 },
             ].map((stat) => (
-              <div key={stat.label} className="rounded-lg bg-secondary/50 p-4 text-center">
+              <div key={stat.label} className="rounded-lg border border-border bg-secondary p-4 text-center">
                 <p className="text-2xl font-bold text-foreground">{stat.value}</p>
                 <p className="text-sm text-muted-foreground">{stat.label}</p>
               </div>

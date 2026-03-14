@@ -12,7 +12,7 @@ export default function LandingPage() {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-card py-20 sm:py-32">
+        <section className="relative overflow-hidden bg-secondary py-20 sm:py-32">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
               <div className="flex flex-col justify-center">
@@ -52,7 +52,7 @@ export default function LandingPage() {
                           </div>
                           <CheckCircle className="h-5 w-5 text-green-600" />
                         </div>
-                        <div className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+                        <div className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/20 p-3">
                           <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                           <div className="flex-1">
                             <div className="text-sm font-medium text-foreground">Extracting claim data...</div>
@@ -91,7 +91,7 @@ export default function LandingPage() {
               {/* Fast Fill Card */}
               <Card className="relative overflow-hidden border-border bg-card shadow-lg transition-shadow hover:shadow-xl">
                 <CardHeader className="pb-4">
-                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20">
                     <Upload className="h-6 w-6 text-primary" />
                   </div>
                   <CardTitle className="text-2xl text-foreground">Fast Fill</CardTitle>
@@ -114,7 +114,7 @@ export default function LandingPage() {
                       <span className="text-muted-foreground">Results in minutes, not hours</span>
                     </li>
                   </ul>
-                  <div className="rounded-lg bg-secondary/50 p-4">
+                  <div className="rounded-lg border border-border bg-background p-4">
                     <p className="text-sm font-medium text-foreground">Ideal for:</p>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Existing claim files that need quick estimate preparation
@@ -132,7 +132,7 @@ export default function LandingPage() {
               {/* Express Estimate Card */}
               <Card className="relative overflow-hidden border-border bg-card shadow-lg transition-shadow hover:shadow-xl">
                 <CardHeader className="pb-4">
-                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20">
                     <ClipboardList className="h-6 w-6 text-primary" />
                   </div>
                   <CardTitle className="text-2xl text-foreground">Express Estimate</CardTitle>
@@ -155,7 +155,7 @@ export default function LandingPage() {
                       <span className="text-muted-foreground">Autosave keeps your progress safe</span>
                     </li>
                   </ul>
-                  <div className="rounded-lg bg-secondary/50 p-4">
+                  <div className="rounded-lg border border-border bg-background p-4">
                     <p className="text-sm font-medium text-foreground">Ideal for:</p>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Fresh inspections where you capture damage details on-site
@@ -174,7 +174,7 @@ export default function LandingPage() {
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="bg-card py-20 sm:py-24">
+        <section id="how-it-works" className="bg-secondary py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -254,7 +254,7 @@ export default function LandingPage() {
               ].map((feature) => (
                 <Card key={feature.title} className="border-border bg-card text-center">
                   <CardContent className="pt-6">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20">
                       <feature.icon className="h-6 w-6 text-primary" />
                     </div>
                     <h3 className="mb-2 text-lg font-semibold text-foreground">{feature.title}</h3>
@@ -267,7 +267,7 @@ export default function LandingPage() {
         </section>
 
         {/* Pricing Section */}
-        <section className="bg-card py-20 sm:py-24">
+        <section className="bg-secondary py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -279,7 +279,7 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-16 grid gap-8 lg:grid-cols-2">
-              <Card className="border-border bg-background shadow-lg">
+              <Card className="border-border bg-card shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-xl text-foreground">Fast Fill Tokens</CardTitle>
                   <CardDescription className="text-muted-foreground">
@@ -294,7 +294,7 @@ export default function LandingPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-border bg-background shadow-lg">
+              <Card className="border-border bg-card shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-xl text-foreground">Express Estimate Tokens</CardTitle>
                   <CardDescription className="text-muted-foreground">
@@ -311,7 +311,7 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-12 text-center">
-              <Card className="mx-auto inline-block border-primary bg-primary/5 px-8 py-4">
+              <Card className="mx-auto inline-block border-primary bg-primary/20 px-8 py-4">
                 <p className="text-lg font-medium text-foreground">
                   Start Your Free Trial
                 </p>
