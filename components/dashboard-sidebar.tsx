@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Upload, ClipboardList, Coins, Settings, HelpCircle, LogOut, History } from "lucide-react"
+import { LayoutDashboard, Upload, ClipboardList, Coins, Settings, HelpCircle, LogOut, History, Zap } from "lucide-react"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -22,13 +22,13 @@ export function DashboardSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-sidebar">
+    <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-sidebar-border/60 bg-sidebar">
       {/* Logo */}
-      <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
-          <span className="text-sm font-bold text-sidebar-primary-foreground">CF</span>
+      <div className="flex h-16 items-center gap-2.5 border-b border-sidebar-border/60 px-6">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary shadow-md shadow-sidebar-primary/30">
+          <Zap className="h-5 w-5 text-sidebar-primary-foreground" />
         </div>
-        <span className="text-lg font-semibold text-sidebar-foreground">ClaimFlow</span>
+        <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">ClaimFlow</span>
       </div>
 
       {/* Main Navigation */}
@@ -41,13 +41,13 @@ export function DashboardSidebar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    ? "bg-sidebar-primary/15 text-sidebar-primary ring-1 ring-sidebar-primary/20"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                 )}
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className={cn("h-5 w-5", isActive && "text-sidebar-primary")} />
                 {item.name}
               </Link>
             )
@@ -62,20 +62,20 @@ export function DashboardSidebar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    ? "bg-sidebar-primary/15 text-sidebar-primary ring-1 ring-sidebar-primary/20"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                 )}
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className={cn("h-5 w-5", isActive && "text-sidebar-primary")} />
                 {item.name}
               </Link>
             )
           })}
           <Link
             href="/"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
           >
             <LogOut className="h-5 w-5" />
             Log Out
@@ -84,9 +84,9 @@ export function DashboardSidebar() {
       </nav>
 
       {/* User Info */}
-      <div className="border-t border-sidebar-border p-4">
+      <div className="border-t border-sidebar-border/60 p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sidebar-accent text-sm font-medium text-sidebar-accent-foreground">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sidebar-primary/20 text-sm font-medium text-sidebar-primary ring-1 ring-sidebar-primary/20">
             SM
           </div>
           <div className="flex-1 overflow-hidden">

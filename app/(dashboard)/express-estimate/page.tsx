@@ -34,7 +34,7 @@ export default function ExpressEstimatePage() {
           <p className="mt-1 text-muted-foreground">Create structured estimates from on-site inspection data</p>
         </div>
         <Link href="/express-estimate/new">
-          <Button className="gap-2">
+          <Button className="gap-2 shadow-md shadow-primary/20">
             <Plus className="h-4 w-4" />
             New Express Estimate
           </Button>
@@ -42,7 +42,7 @@ export default function ExpressEstimatePage() {
       </div>
 
       {/* Token Balance */}
-      <Card className="border-border bg-card">
+      <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Available Tokens</CardTitle>
           <CardDescription>Each Express Estimate uses 1 token</CardDescription>
@@ -56,7 +56,7 @@ export default function ExpressEstimatePage() {
       </Card>
 
       {/* Jobs Table */}
-      <Card className="border-border bg-card">
+      <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
           <CardTitle className="text-foreground">Express Estimate Jobs</CardTitle>
           <CardDescription>All your Express Estimate submissions</CardDescription>
@@ -65,7 +65,7 @@ export default function ExpressEstimatePage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border">
+                <tr className="border-b border-border/60">
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Job Name</th>
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Date</th>
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Status</th>
@@ -73,12 +73,12 @@ export default function ExpressEstimatePage() {
                   <th className="pb-3 text-right text-sm font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-border/60">
                 {expressEstimateJobs.map((job) => (
-                  <tr key={job.id} className="group">
+                  <tr key={job.id} className="group transition-colors hover:bg-secondary/30">
                     <td className="py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/20">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20">
                           <ClipboardList className="h-4 w-4 text-primary" />
                         </div>
                         <span className="font-medium text-foreground">Claim #{job.id} - {job.name}</span>

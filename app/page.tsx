@@ -3,7 +3,7 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Upload, FileText, Download, Clock, Shield, CheckCircle, Zap, ArrowRight, ClipboardList, Send, FileDown } from "lucide-react"
+import { Upload, FileText, Download, Clock, Shield, CheckCircle, Zap, ArrowRight, ClipboardList, Send, FileDown, Sparkles } from "lucide-react"
 
 export default function LandingPage() {
   return (
@@ -11,11 +11,19 @@ export default function LandingPage() {
       <Header />
       
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-secondary py-20 sm:py-32">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Hero Section - Modern dark gradient background */}
+        <section className="relative overflow-hidden py-20 sm:py-32">
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+          
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
               <div className="flex flex-col justify-center">
+                <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+                  <Sparkles className="h-4 w-4" />
+                  Automated Claims Processing
+                </div>
                 <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl text-balance">
                   Faster Claims Estimating for Insurance Professionals
                 </h1>
@@ -24,42 +32,48 @@ export default function LandingPage() {
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link href="/signup">
-                    <Button size="lg" className="gap-2">
+                    <Button size="lg" className="gap-2 shadow-lg shadow-primary/25">
                       Get Started
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
                   <Link href="#how-it-works">
-                    <Button size="lg" variant="outline">
-                      See How It Works
+                    <Button size="lg" variant="outline" className="border-border/60 bg-card/50 backdrop-blur-sm">
+                      Learn More
                     </Button>
                   </Link>
                 </div>
               </div>
               
-              {/* Animation Preview */}
+              {/* Animation Preview - Enhanced styling */}
               <div className="relative">
-                <Card className="border-border bg-card shadow-xl">
+                <div className="absolute -inset-4 rounded-2xl bg-gradient-to-r from-primary/20 via-primary/10 to-transparent blur-xl" />
+                <Card className="relative border-border/60 bg-card/80 shadow-2xl backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="space-y-4">
-                      <div className="text-sm font-medium text-muted-foreground">Processing Claim #2024-0892</div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm font-medium text-muted-foreground">Processing Claim #2024-0892</div>
+                        <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+                      </div>
                       <div className="space-y-3">
-                        <div className="flex items-center gap-3 rounded-lg border border-border bg-secondary/50 p-3">
+                        <div className="flex items-center gap-3 rounded-lg border border-border/60 bg-secondary/50 p-3 transition-all">
                           <FileText className="h-5 w-5 text-primary" />
                           <div className="flex-1">
                             <div className="text-sm font-medium text-foreground">claim_document.pdf</div>
                             <div className="text-xs text-muted-foreground">Uploaded successfully</div>
                           </div>
-                          <CheckCircle className="h-5 w-5 text-green-600" />
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20">
+                            <CheckCircle className="h-4 w-4 text-primary" />
+                          </div>
                         </div>
-                        <div className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/20 p-3">
+                        <div className="flex items-center gap-3 rounded-lg border border-primary/40 bg-primary/10 p-3">
                           <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                           <div className="flex-1">
                             <div className="text-sm font-medium text-foreground">Extracting claim data...</div>
                             <div className="text-xs text-muted-foreground">AI processing in progress</div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 rounded-lg border border-border bg-secondary/30 p-3 opacity-60">
+                        <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-secondary/20 p-3 opacity-50">
                           <Download className="h-5 w-5 text-muted-foreground" />
                           <div className="flex-1">
                             <div className="text-sm font-medium text-foreground">output.esx</div>
@@ -89,9 +103,10 @@ export default function LandingPage() {
             
             <div className="mt-16 grid gap-8 lg:grid-cols-2">
               {/* Fast Fill Card */}
-              <Card className="relative overflow-hidden border-border bg-card shadow-lg transition-shadow hover:shadow-xl">
-                <CardHeader className="pb-4">
-                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20">
+              <Card className="group relative overflow-hidden border-border/60 bg-card/80 shadow-lg transition-all duration-300 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                <CardHeader className="relative pb-4">
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/20">
                     <Upload className="h-6 w-6 text-primary" />
                   </div>
                   <CardTitle className="text-2xl text-foreground">Fast Fill</CardTitle>
@@ -99,7 +114,7 @@ export default function LandingPage() {
                     Upload PDF + ESX pairs, receive prelim-ready ESX outputs
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="relative space-y-4">
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3">
                       <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
@@ -114,14 +129,14 @@ export default function LandingPage() {
                       <span className="text-muted-foreground">Results in minutes, not hours</span>
                     </li>
                   </ul>
-                  <div className="rounded-lg border border-border bg-background p-4">
+                  <div className="rounded-lg border border-border/60 bg-secondary/40 p-4">
                     <p className="text-sm font-medium text-foreground">Ideal for:</p>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Existing claim files that need quick estimate preparation
                     </p>
                   </div>
                   <Link href="/fast-fill" className="block">
-                    <Button className="w-full gap-2">
+                    <Button className="w-full gap-2 shadow-md shadow-primary/20">
                       Start Using Fast Fill
                       <ArrowRight className="h-4 w-4" />
                     </Button>
@@ -130,9 +145,10 @@ export default function LandingPage() {
               </Card>
 
               {/* Express Estimate Card */}
-              <Card className="relative overflow-hidden border-border bg-card shadow-lg transition-shadow hover:shadow-xl">
-                <CardHeader className="pb-4">
-                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20">
+              <Card className="group relative overflow-hidden border-border/60 bg-card/80 shadow-lg transition-all duration-300 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                <CardHeader className="relative pb-4">
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/20">
                     <ClipboardList className="h-6 w-6 text-primary" />
                   </div>
                   <CardTitle className="text-2xl text-foreground">Express Estimate</CardTitle>
@@ -140,7 +156,7 @@ export default function LandingPage() {
                     Enter site details, receive complete estimate-ready ESX
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="relative space-y-4">
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3">
                       <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
@@ -155,14 +171,14 @@ export default function LandingPage() {
                       <span className="text-muted-foreground">Autosave keeps your progress safe</span>
                     </li>
                   </ul>
-                  <div className="rounded-lg border border-border bg-background p-4">
+                  <div className="rounded-lg border border-border/60 bg-secondary/40 p-4">
                     <p className="text-sm font-medium text-foreground">Ideal for:</p>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Fresh inspections where you capture damage details on-site
                     </p>
                   </div>
                   <Link href="/express-estimate" className="block">
-                    <Button className="w-full gap-2">
+                    <Button className="w-full gap-2 shadow-md shadow-primary/20">
                       Start Using Express Estimate
                       <ArrowRight className="h-4 w-4" />
                     </Button>
@@ -174,7 +190,7 @@ export default function LandingPage() {
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="bg-secondary py-20 sm:py-24">
+        <section id="how-it-works" className="bg-secondary/50 py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -197,7 +213,7 @@ export default function LandingPage() {
                 ].map((item) => (
                   <div key={item.step} className="relative">
                     <div className="flex flex-col items-center text-center">
-                      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-xl font-bold text-primary-foreground">
+                      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-xl font-bold text-primary-foreground shadow-lg shadow-primary/30">
                         {item.step}
                       </div>
                       <h4 className="mb-2 text-lg font-semibold text-foreground">{item.title}</h4>
@@ -220,7 +236,7 @@ export default function LandingPage() {
                 ].map((item) => (
                   <div key={item.step} className="relative">
                     <div className="flex flex-col items-center text-center">
-                      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-xl font-bold text-primary-foreground">
+                      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-xl font-bold text-primary-foreground shadow-lg shadow-primary/30">
                         {item.step}
                       </div>
                       <h4 className="mb-2 text-lg font-semibold text-foreground">{item.title}</h4>
@@ -245,16 +261,16 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 { icon: Clock, title: "Save Time", description: "Generate estimates in minutes instead of hours of manual entry" },
                 { icon: Shield, title: "Reduce Errors", description: "Structured inputs minimize mistakes and omissions" },
                 { icon: CheckCircle, title: "Stay Secure", description: "Your data is encrypted and protected at all times" },
                 { icon: Download, title: "Easy Output", description: "Download ESX files ready for XactAnalysis" },
               ].map((feature) => (
-                <Card key={feature.title} className="border-border bg-card text-center">
+                <Card key={feature.title} className="border-border/60 bg-card/80 text-center transition-all hover:border-primary/30">
                   <CardContent className="pt-6">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/20">
                       <feature.icon className="h-6 w-6 text-primary" />
                     </div>
                     <h3 className="mb-2 text-lg font-semibold text-foreground">{feature.title}</h3>
@@ -267,7 +283,7 @@ export default function LandingPage() {
         </section>
 
         {/* Pricing Section */}
-        <section className="bg-secondary py-20 sm:py-24">
+        <section className="bg-secondary/50 py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -279,7 +295,7 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-16 grid gap-8 lg:grid-cols-2">
-              <Card className="border-border bg-card shadow-lg">
+              <Card className="border-border/60 bg-card/80 shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-xl text-foreground">Fast Fill Tokens</CardTitle>
                   <CardDescription className="text-muted-foreground">
@@ -294,7 +310,7 @@ export default function LandingPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-border bg-card shadow-lg">
+              <Card className="border-border/60 bg-card/80 shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-xl text-foreground">Express Estimate Tokens</CardTitle>
                   <CardDescription className="text-muted-foreground">
@@ -311,7 +327,7 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-12 text-center">
-              <Card className="mx-auto inline-block border-primary bg-primary/20 px-8 py-4">
+              <Card className="mx-auto inline-block border-primary/40 bg-primary/10 px-8 py-4 shadow-lg shadow-primary/10">
                 <p className="text-lg font-medium text-foreground">
                   Start Your Free Trial
                 </p>
@@ -334,7 +350,7 @@ export default function LandingPage() {
             </p>
             <div className="mt-8">
               <Link href="/signup">
-                <Button size="lg" className="gap-2">
+                <Button size="lg" className="gap-2 shadow-lg shadow-primary/25">
                   Create Free Account
                   <ArrowRight className="h-4 w-4" />
                 </Button>

@@ -33,7 +33,7 @@ export default function AccountPage() {
         {/* Main Content */}
         <div className="space-y-6 lg:col-span-2">
           {/* Profile Information */}
-          <Card className="border-border bg-card">
+          <Card className="border-border/60 bg-card/80 shadow-md">
             <CardHeader>
               <CardTitle className="text-foreground">Profile Information</CardTitle>
               <CardDescription>Update your personal information and contact details</CardDescription>
@@ -47,7 +47,7 @@ export default function AccountPage() {
                   id="fullName"
                   value={profileData.fullName}
                   onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -59,7 +59,7 @@ export default function AccountPage() {
                   type="email"
                   value={profileData.email}
                   onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -68,15 +68,15 @@ export default function AccountPage() {
                   id="company"
                   value={profileData.company}
                   onChange={(e) => setProfileData({ ...profileData, company: e.target.value })}
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
-              <Button>Save Changes</Button>
+              <Button className="shadow-md shadow-primary/20">Save Changes</Button>
             </CardContent>
           </Card>
 
           {/* Change Password */}
-          <Card className="border-border bg-card">
+          <Card className="border-border/60 bg-card/80 shadow-md">
             <CardHeader>
               <CardTitle className="text-foreground">Change Password</CardTitle>
               <CardDescription>Update your password to keep your account secure</CardDescription>
@@ -91,7 +91,7 @@ export default function AccountPage() {
                   type="password"
                   value={passwordData.currentPassword}
                   onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -103,7 +103,7 @@ export default function AccountPage() {
                   type="password"
                   value={passwordData.newPassword}
                   onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -115,15 +115,15 @@ export default function AccountPage() {
                   type="password"
                   value={passwordData.confirmPassword}
                   onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
-              <Button>Update Password</Button>
+              <Button className="shadow-md shadow-primary/20">Update Password</Button>
             </CardContent>
           </Card>
 
           {/* Danger Zone */}
-          <Card className="border-destructive/50 bg-card">
+          <Card className="border-destructive/40 bg-card/80 shadow-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-destructive">
                 <AlertTriangle className="h-5 w-5" />
@@ -142,13 +142,13 @@ export default function AccountPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Account Summary */}
-          <Card className="border-border bg-card">
+          <Card className="border-border/60 bg-card/80 shadow-md">
             <CardHeader>
               <CardTitle className="text-foreground">Account Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 text-xl font-bold text-primary">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 text-xl font-bold text-primary ring-2 ring-primary/20">
                   SM
                 </div>
                 <div>
@@ -156,7 +156,7 @@ export default function AccountPage() {
                   <p className="text-sm text-muted-foreground">{profileData.email}</p>
                 </div>
               </div>
-              <div className="space-y-2 pt-4 border-t border-border">
+              <div className="space-y-2 pt-4 border-t border-border/60">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Email:</span>
                   <span className="text-foreground">{profileData.email}</span>
@@ -174,7 +174,7 @@ export default function AccountPage() {
           </Card>
 
           {/* Account Type */}
-          <Card className="border-border bg-card">
+          <Card className="border-border/60 bg-card/80 shadow-md">
             <CardHeader>
               <CardTitle className="text-foreground">Account Type</CardTitle>
             </CardHeader>

@@ -44,14 +44,14 @@ export default function HistoryPage() {
       </div>
 
       {/* Filters */}
-      <Card className="border-border bg-card">
+      <Card className="border-border/60 bg-card/80 shadow-md">
         <CardContent className="pt-6">
           <div className="flex flex-wrap items-center gap-4">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search jobs..." className="border-input bg-background pl-9" />
+              <Input placeholder="Search jobs..." className="border-border/60 bg-secondary/50 pl-9" />
             </div>
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2 border-border/60">
               <Filter className="h-4 w-4" />
               Filter
             </Button>
@@ -60,7 +60,7 @@ export default function HistoryPage() {
       </Card>
 
       {/* Jobs Table */}
-      <Card className="border-border bg-card">
+      <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
           <CardTitle className="text-foreground">All Jobs</CardTitle>
           <CardDescription>Complete history of your Fast Fill and Express Estimate jobs</CardDescription>
@@ -69,7 +69,7 @@ export default function HistoryPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border">
+                <tr className="border-b border-border/60">
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Job Name</th>
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Type</th>
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Date</th>
@@ -77,13 +77,13 @@ export default function HistoryPage() {
                   <th className="pb-3 text-right text-sm font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-border/60">
                 {allJobs.map((job) => (
-                  <tr key={job.id} className="group">
+                  <tr key={job.id} className="group transition-colors hover:bg-secondary/30">
                     <td className="py-4">
                       <div className="flex items-center gap-3">
-                        <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-                          job.type === "FF" ? "bg-primary/10" : "bg-accent/20"
+                        <div className={`flex h-9 w-9 items-center justify-center rounded-lg ring-1 ring-primary/20 ${
+                          job.type === "FF" ? "bg-primary/15" : "bg-primary/15"
                         }`}>
                           {job.type === "FF" ? (
                             <Upload className="h-4 w-4 text-primary" />

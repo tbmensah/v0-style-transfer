@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Zap } from "lucide-react"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -19,16 +20,19 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md border-border bg-card shadow-xl">
+      {/* Subtle gradient background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
+      
+      <div className="relative flex flex-1 items-center justify-center px-4 py-12">
+        <Card className="w-full max-w-md border-border/60 bg-card/90 shadow-2xl backdrop-blur-sm">
           <CardHeader className="space-y-1 text-center">
-            <Link href="/" className="mx-auto mb-4 flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-                <span className="text-lg font-bold text-primary-foreground">CF</span>
+            <Link href="/" className="mx-auto mb-4 flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/30">
+                <Zap className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-2xl font-semibold text-foreground">ClaimFlow</span>
+              <span className="text-2xl font-semibold tracking-tight text-foreground">ClaimFlow</span>
             </Link>
-            <CardTitle className="text-2xl font-bold text-foreground">Log in</CardTitle>
+            <CardTitle className="text-2xl font-bold text-foreground">Welcome back</CardTitle>
             <CardDescription className="text-muted-foreground">
               Enter your credentials to access your account
             </CardDescription>
@@ -44,7 +48,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -60,10 +64,10 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full shadow-md shadow-primary/20">
                 Log in
               </Button>
             </form>

@@ -40,7 +40,7 @@ export default function FastFillPage() {
           <p className="mt-1 text-muted-foreground">Upload PDF + ESX pairs and receive prelim-ready ESX outputs</p>
         </div>
         <Link href="/fast-fill/new">
-          <Button className="gap-2">
+          <Button className="gap-2 shadow-md shadow-primary/20">
             <Plus className="h-4 w-4" />
             New Fast Fill Project
           </Button>
@@ -48,7 +48,7 @@ export default function FastFillPage() {
       </div>
 
       {/* Token Balance */}
-      <Card className="border-border bg-card">
+      <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Available Tokens</CardTitle>
           <CardDescription>Each Fast Fill job uses 1 token</CardDescription>
@@ -62,7 +62,7 @@ export default function FastFillPage() {
       </Card>
 
       {/* Jobs Table */}
-      <Card className="border-border bg-card">
+      <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
           <CardTitle className="text-foreground">Fast Fill Jobs</CardTitle>
           <CardDescription>All your Fast Fill submissions</CardDescription>
@@ -71,7 +71,7 @@ export default function FastFillPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border">
+                <tr className="border-b border-border/60">
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Job Name</th>
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Date</th>
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Status</th>
@@ -79,12 +79,12 @@ export default function FastFillPage() {
                   <th className="pb-3 text-right text-sm font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-border/60">
                 {fastFillJobs.map((job) => (
-                  <tr key={job.id} className="group">
+                  <tr key={job.id} className="group transition-colors hover:bg-secondary/30">
                     <td className="py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/20">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20">
                           <Upload className="h-4 w-4 text-primary" />
                         </div>
                         <span className="font-medium text-foreground">Claim #{job.id} - {job.name}</span>

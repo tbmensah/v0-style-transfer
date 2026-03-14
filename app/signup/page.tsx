@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Zap } from "lucide-react"
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -26,14 +27,17 @@ export default function SignupPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md border-border bg-card shadow-xl">
+      {/* Subtle gradient background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
+      
+      <div className="relative flex flex-1 items-center justify-center px-4 py-12">
+        <Card className="w-full max-w-md border-border/60 bg-card/90 shadow-2xl backdrop-blur-sm">
           <CardHeader className="space-y-1 text-center">
-            <Link href="/" className="mx-auto mb-4 flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-                <span className="text-lg font-bold text-primary-foreground">CF</span>
+            <Link href="/" className="mx-auto mb-4 flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/30">
+                <Zap className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-2xl font-semibold text-foreground">ClaimFlow</span>
+              <span className="text-2xl font-semibold tracking-tight text-foreground">ClaimFlow</span>
             </Link>
             <CardTitle className="text-2xl font-bold text-foreground">Create an account</CardTitle>
             <CardDescription className="text-muted-foreground">
@@ -51,7 +55,7 @@ export default function SignupPage() {
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   required
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -63,7 +67,7 @@ export default function SignupPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -76,7 +80,7 @@ export default function SignupPage() {
                   placeholder="Your company name"
                   value={formData.company}
                   onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -87,7 +91,7 @@ export default function SignupPage() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -98,7 +102,7 @@ export default function SignupPage() {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   required
-                  className="border-input bg-background"
+                  className="border-border/60 bg-secondary/50"
                 />
               </div>
               <div className="flex items-start gap-2">
@@ -119,7 +123,7 @@ export default function SignupPage() {
                   </Link>
                 </Label>
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full shadow-md shadow-primary/20">
                 Create account
               </Button>
             </form>

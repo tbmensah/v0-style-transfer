@@ -40,32 +40,36 @@ export default function TokensPage() {
 
       {/* Token Balances */}
       <div className="grid gap-6 sm:grid-cols-2">
-        <Card className="border-border bg-card">
+        <Card className="border-border/60 bg-card/80 shadow-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Fast Fill Tokens</CardTitle>
-            <Upload className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15">
+              <Upload className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-bold text-foreground">24</span>
               <span className="text-muted-foreground">tokens available</span>
             </div>
-            <Button variant="outline" size="sm" className="mt-4" onClick={() => setSelectedTab("fast-fill")}>
+            <Button variant="outline" size="sm" className="mt-4 border-border/60" onClick={() => setSelectedTab("fast-fill")}>
               Buy More
             </Button>
           </CardContent>
         </Card>
-        <Card className="border-border bg-card">
+        <Card className="border-border/60 bg-card/80 shadow-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Express Estimate Tokens</CardTitle>
-            <ClipboardList className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15">
+              <ClipboardList className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl font-bold text-foreground">12</span>
               <span className="text-muted-foreground">tokens available</span>
             </div>
-            <Button variant="outline" size="sm" className="mt-4" onClick={() => setSelectedTab("express-estimate")}>
+            <Button variant="outline" size="sm" className="mt-4 border-border/60" onClick={() => setSelectedTab("express-estimate")}>
               Buy More
             </Button>
           </CardContent>
@@ -73,7 +77,7 @@ export default function TokensPage() {
       </div>
 
       {/* Purchase Tokens */}
-      <Card className="border-border bg-card">
+      <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
           <CardTitle className="text-foreground">Purchase Tokens</CardTitle>
           <CardDescription>Select a token package to purchase. Volume discounts available.</CardDescription>
@@ -89,12 +93,12 @@ export default function TokensPage() {
                 {fastFillPackages.map((pkg) => (
                   <Card
                     key={pkg.tokens}
-                    className={`relative border-border bg-background transition-shadow hover:shadow-lg ${
-                      pkg.popular ? "ring-2 ring-primary" : ""
+                    className={`relative border-border/60 bg-secondary/50 transition-all hover:bg-secondary/70 hover:shadow-lg ${
+                      pkg.popular ? "ring-2 ring-primary shadow-md shadow-primary/10" : ""
                     }`}
                   >
                     {pkg.popular && (
-                      <Badge className="absolute -top-2 left-1/2 -translate-x-1/2">Popular</Badge>
+                      <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 shadow-md shadow-primary/20">Popular</Badge>
                     )}
                     <CardContent className="pt-6">
                       <div className="text-center">
@@ -106,7 +110,7 @@ export default function TokensPage() {
                         <p className="text-2xl font-bold text-foreground">${pkg.price}</p>
                         <p className="text-sm text-muted-foreground">${pkg.perToken} per token</p>
                       </div>
-                      <Button className="mt-4 w-full">Select</Button>
+                      <Button className="mt-4 w-full shadow-md shadow-primary/20">Select</Button>
                     </CardContent>
                   </Card>
                 ))}
@@ -117,12 +121,12 @@ export default function TokensPage() {
                 {expressEstimatePackages.map((pkg) => (
                   <Card
                     key={pkg.tokens}
-                    className={`relative border-border bg-background transition-shadow hover:shadow-lg ${
-                      pkg.popular ? "ring-2 ring-primary" : ""
+                    className={`relative border-border/60 bg-secondary/50 transition-all hover:bg-secondary/70 hover:shadow-lg ${
+                      pkg.popular ? "ring-2 ring-primary shadow-md shadow-primary/10" : ""
                     }`}
                   >
                     {pkg.popular && (
-                      <Badge className="absolute -top-2 left-1/2 -translate-x-1/2">Popular</Badge>
+                      <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 shadow-md shadow-primary/20">Popular</Badge>
                     )}
                     <CardContent className="pt-6">
                       <div className="text-center">
@@ -134,7 +138,7 @@ export default function TokensPage() {
                         <p className="text-2xl font-bold text-foreground">${pkg.price}</p>
                         <p className="text-sm text-muted-foreground">${pkg.perToken} per token</p>
                       </div>
-                      <Button className="mt-4 w-full">Select</Button>
+                      <Button className="mt-4 w-full shadow-md shadow-primary/20">Select</Button>
                     </CardContent>
                   </Card>
                 ))}
@@ -145,7 +149,7 @@ export default function TokensPage() {
       </Card>
 
       {/* Purchase History */}
-      <Card className="border-border bg-card">
+      <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
           <CardTitle className="text-foreground">Purchase History</CardTitle>
           <CardDescription>Your recent token purchases</CardDescription>
@@ -154,16 +158,16 @@ export default function TokensPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border">
+                <tr className="border-b border-border/60">
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Date</th>
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Type</th>
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Quantity</th>
                   <th className="pb-3 text-right text-sm font-medium text-muted-foreground">Amount</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-border/60">
                 {purchaseHistory.map((purchase, index) => (
-                  <tr key={index}>
+                  <tr key={index} className="transition-colors hover:bg-secondary/30">
                     <td className="py-4 text-sm text-foreground">{purchase.date}</td>
                     <td className="py-4">
                       <Badge variant={purchase.type === "Fast Fill" ? "default" : "secondary"}>
@@ -182,7 +186,7 @@ export default function TokensPage() {
       </Card>
 
       {/* Token Usage Summary */}
-      <Card className="border-border bg-card">
+      <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
           <CardTitle className="text-foreground">Token Usage Summary</CardTitle>
           <CardDescription>Overview of your token consumption</CardDescription>
@@ -195,7 +199,7 @@ export default function TokensPage() {
               { label: "Total EE Purchased", value: 20 },
               { label: "EE Tokens Used", value: 8 },
             ].map((stat) => (
-              <div key={stat.label} className="rounded-lg border border-border bg-secondary p-4 text-center">
+              <div key={stat.label} className="rounded-lg border border-border/40 bg-secondary/50 p-4 text-center transition-colors hover:bg-secondary/70">
                 <p className="text-2xl font-bold text-foreground">{stat.value}</p>
                 <p className="text-sm text-muted-foreground">{stat.label}</p>
               </div>
