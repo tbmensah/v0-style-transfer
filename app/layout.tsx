@@ -11,21 +11,7 @@ export const metadata: Metadata = {
   description: 'Generate accurate NFIP estimates in minutes, not hours. Upload your files or enter site details, and receive estimate-ready ESX outputs powered by intelligent automation.',
   generator: 'v0.app',
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
+    icon: '/icon.svg',
   },
 }
 
