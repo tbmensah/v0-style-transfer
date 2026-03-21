@@ -195,19 +195,16 @@ export default function NewExpressEstimatePage() {
     dumpster: { enabled: false, count: 1, size: "20" },
     insulation: { enabled: false, type: "r13", sqft: "" },
     hvac: {
-      condenserUnit: { enabled: false, tonnage: "2", seer: "14" },
-      packageUnit: { enabled: false, tonnage: "2", seer: "14" },
-      gasAC: { enabled: false, tonnage: "2", seer: "14" },
-      miniSplit: { enabled: false, zones: "1", highEfficiency: false },
+      condenserUnits: [] as Array<{ id: number; tonnage: string; seer: string; serviceCall: boolean; f9Note: string }>,
+      packageUnits: [] as Array<{ id: number; unitType: string; tonnage: string; seer: string; serviceCall: boolean; f9Note: string }>,
+      miniSplits: [] as Array<{ id: number; zones: string; highEfficiency: boolean; serviceCall: boolean; f9Note: string }>,
     },
     electrical: {
       exteriorOutlets: 0,
       disconnect30Amp: 0,
       breakerPanel: { enabled: false, amps: "200", arcFaults: false },
     },
-    exteriorPaint: { enabled: false, sqft: "" },
-    exteriorSiding: { enabled: false, sqft: "" },
-    f9Note: "",
+    finishing: { enabled: false, exteriorPaint: false, exteriorPaintSqft: "", interiorPaint: false, interiorPaintSqft: "", staining: false, stainingSqft: "" },
   })
 
   // Foundation State
@@ -400,13 +397,11 @@ export default function NewExpressEstimatePage() {
                     <SelectTrigger className="border-border/60 bg-secondary/50">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="single-family">Single Family Home</SelectItem>
-                      <SelectItem value="multi-family">Multi-Family</SelectItem>
-                      <SelectItem value="condo">Condominium</SelectItem>
-                      <SelectItem value="townhouse">Townhouse</SelectItem>
-                      <SelectItem value="mobile">Mobile Home</SelectItem>
-                    </SelectContent>
+<SelectContent>
+                                  <SelectItem value="dwelling">Dwelling</SelectItem>
+                                  <SelectItem value="general-property">General Property</SelectItem>
+                                  <SelectItem value="rcbap">RCBAP</SelectItem>
+                                </SelectContent>
                   </Select>
                 </div>
               </div>
@@ -562,7 +557,7 @@ export default function NewExpressEstimatePage() {
                       <div className="flex items-center gap-3">
                         <Wind className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">HVAC</span>
-                        {(exterior.hvac.condenserUnit.enabled || exterior.hvac.packageUnit.enabled || exterior.hvac.gasAC.enabled || exterior.hvac.miniSplit.enabled) && 
+                        {(exterior.hvac.condenserUnits.length > 0 || exterior.hvac.packageUnits.length > 0 || exterior.hvac.miniSplits.length > 0) && 
                           <Badge variant="secondary" className="text-xs">Saved</Badge>
                         }
                       </div>
@@ -570,80 +565,296 @@ export default function NewExpressEstimatePage() {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="space-y-6">
-                        {/* Condenser Unit */}
+                        {/* Condenser Units */}
                         <div className="space-y-3">
-                          <div className="flex items-center gap-3">
-                            <Switch
-                              checked={exterior.hvac.condenserUnit.enabled}
-                              onCheckedChange={(checked) => { setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnit: { ...exterior.hvac.condenserUnit, enabled: checked } } }); handleSave() }}
-                            />
-                            <Label>Condenser Unit / AC Unit</Label>
+                          <div className="flex items-center justify-between">
+                            <Label className="font-medium">Condenser Unit / AC Unit</Label>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 border-border/60"
+                              onClick={() => {
+                                const newUnit = { id: Date.now(), tonnage: "2", seer: "13", serviceCall: false, f9Note: "" }
+                                setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: [...exterior.hvac.condenserUnits, newUnit] } })
+                                handleSave()
+                              }}
+                            >
+                              <Plus className="h-3 w-3" /> Add Unit
+                            </Button>
                           </div>
-                          {exterior.hvac.condenserUnit.enabled && (
-                            <div className="ml-8 grid gap-4 sm:grid-cols-2">
-                              <div className="space-y-2">
-                                <Label className="text-sm">Tonnage</Label>
-                                <Select value={exterior.hvac.condenserUnit.tonnage} onValueChange={(value) => { setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnit: { ...exterior.hvac.condenserUnit, tonnage: value } } }); handleSave() }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {["2", "2.5", "3", "3.5", "4", "5"].map(t => (
-                                      <SelectItem key={t} value={t}>{t} Ton</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
+                          {exterior.hvac.condenserUnits.map((unit, index) => (
+                            <div key={unit.id} className="ml-4 rounded-lg border border-border/40 bg-secondary/30 p-4 space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-foreground">Unit {index + 1}</span>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                  onClick={() => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.filter(u => u.id !== unit.id) } })
+                                    handleSave()
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="space-y-2">
+                                  <Label className="text-sm">Tonnage</Label>
+                                  <Select value={unit.tonnage} onValueChange={(value) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {["2", "2.5", "3", "4", "5"].map(t => (
+                                        <SelectItem key={t} value={t}>{t} Ton</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-2">
+                                  <Label className="text-sm">SEER Rating</Label>
+                                  <Select value={unit.seer} onValueChange={(value) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="13">13</SelectItem>
+                                      <SelectItem value="14-16">14-16</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <Switch
+                                  checked={unit.serviceCall}
+                                  onCheckedChange={(checked) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                    handleSave()
+                                  }}
+                                />
+                                <Label className="text-sm">Service Call</Label>
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">SEER Rating</Label>
-                                <Select value={exterior.hvac.condenserUnit.seer} onValueChange={(value) => { setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnit: { ...exterior.hvac.condenserUnit, seer: value } } }); handleSave() }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {["13", "14-15", "16-21"].map(s => (
-                                      <SelectItem key={s} value={s}>{s}</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
+                                <Label className="text-sm">F9 Note (Model/Serial #)</Label>
+                                <Input
+                                  placeholder="Enter model and serial number..."
+                                  value={unit.f9Note}
+                                  onChange={(e) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
+                                    handleSave()
+                                  }}
+                                  className="border-border/60 bg-secondary/50"
+                                />
                               </div>
                             </div>
-                          )}
+                          ))}
                         </div>
 
-                        {/* Mini Split */}
+                        {/* Package Units */}
                         <div className="space-y-3">
-                          <div className="flex items-center gap-3">
-                            <Switch
-                              checked={exterior.hvac.miniSplit.enabled}
-                              onCheckedChange={(checked) => { setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplit: { ...exterior.hvac.miniSplit, enabled: checked } } }); handleSave() }}
-                            />
-                            <Label>Mini Split / Duct-Free System</Label>
+                          <div className="flex items-center justify-between">
+                            <Label className="font-medium">Package Unit</Label>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 border-border/60"
+                              onClick={() => {
+                                const newUnit = { id: Date.now(), unitType: "ac", tonnage: "2", seer: "13", serviceCall: false, f9Note: "" }
+                                setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: [...exterior.hvac.packageUnits, newUnit] } })
+                                handleSave()
+                              }}
+                            >
+                              <Plus className="h-3 w-3" /> Add Unit
+                            </Button>
                           </div>
-                          {exterior.hvac.miniSplit.enabled && (
-                            <div className="ml-8 grid gap-4 sm:grid-cols-2">
+                          {exterior.hvac.packageUnits.map((unit, index) => (
+                            <div key={unit.id} className="ml-4 rounded-lg border border-border/40 bg-secondary/30 p-4 space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-foreground">Unit {index + 1}</span>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                  onClick={() => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.filter(u => u.id !== unit.id) } })
+                                    handleSave()
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">Number of Zones</Label>
-                                <Select value={exterior.hvac.miniSplit.zones} onValueChange={(value) => { setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplit: { ...exterior.hvac.miniSplit, zones: value } } }); handleSave() }}>
+                                <Label className="text-sm">Unit Type</Label>
+                                <Select value={unit.unitType} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {["1", "2", "3", "4"].map(z => (
-                                      <SelectItem key={z} value={z}>{z} Zone</SelectItem>
-                                    ))}
+                                    <SelectItem value="ac">AC Unit</SelectItem>
+                                    <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="flex items-center gap-3 pt-6">
+                              <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="space-y-2">
+                                  <Label className="text-sm">Tonnage</Label>
+                                  <Select value={unit.tonnage} onValueChange={(value) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {["2", "2.5", "3", "4", "5"].map(t => (
+                                        <SelectItem key={t} value={t}>{t} Ton</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-2">
+                                  <Label className="text-sm">SEER Rating</Label>
+                                  <Select value={unit.seer} onValueChange={(value) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="13">13</SelectItem>
+                                      <SelectItem value="14-16">14-16</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
                                 <Switch
-                                  checked={exterior.hvac.miniSplit.highEfficiency}
-                                  onCheckedChange={(checked) => { setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplit: { ...exterior.hvac.miniSplit, highEfficiency: checked } } }); handleSave() }}
+                                  checked={unit.serviceCall}
+                                  onCheckedChange={(checked) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                    handleSave()
+                                  }}
                                 />
-                                <Label className="text-sm">High Efficiency</Label>
+                                <Label className="text-sm">Service Call</Label>
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="text-sm">F9 Note (Model/Serial #)</Label>
+                                <Input
+                                  placeholder="Enter model and serial number..."
+                                  value={unit.f9Note}
+                                  onChange={(e) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
+                                    handleSave()
+                                  }}
+                                  className="border-border/60 bg-secondary/50"
+                                />
                               </div>
                             </div>
-                          )}
+                          ))}
+                        </div>
+
+                        {/* Mini Splits */}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <Label className="font-medium">Mini Split / Duct-Free System</Label>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 border-border/60"
+                              onClick={() => {
+                                const newUnit = { id: Date.now(), zones: "1", highEfficiency: false, serviceCall: false, f9Note: "" }
+                                setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: [...exterior.hvac.miniSplits, newUnit] } })
+                                handleSave()
+                              }}
+                            >
+                              <Plus className="h-3 w-3" /> Add Unit
+                            </Button>
+                          </div>
+                          {exterior.hvac.miniSplits.map((unit, index) => (
+                            <div key={unit.id} className="ml-4 rounded-lg border border-border/40 bg-secondary/30 p-4 space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-foreground">Unit {index + 1}</span>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                  onClick={() => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.filter(u => u.id !== unit.id) } })
+                                    handleSave()
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="space-y-2">
+                                  <Label className="text-sm">Number of Zones</Label>
+                                  <Select value={unit.zones} onValueChange={(value) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {["1", "2", "3", "4"].map(z => (
+                                        <SelectItem key={z} value={z}>{z} Zone</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="flex items-center gap-3 pt-6">
+                                  <Switch
+                                    checked={unit.highEfficiency}
+                                    onCheckedChange={(checked) => {
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, highEfficiency: checked } : u) } })
+                                      handleSave()
+                                    }}
+                                  />
+                                  <Label className="text-sm">High Efficiency</Label>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <Switch
+                                  checked={unit.serviceCall}
+                                  onCheckedChange={(checked) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                    handleSave()
+                                  }}
+                                />
+                                <Label className="text-sm">Service Call</Label>
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="text-sm">F9 Note (Model/Serial #)</Label>
+                                <Input
+                                  placeholder="Enter model and serial number..."
+                                  value={unit.f9Note}
+                                  onChange={(e) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
+                                    handleSave()
+                                  }}
+                                  className="border-border/60 bg-secondary/50"
+                                />
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </CollapsibleContent>
@@ -667,22 +878,28 @@ export default function NewExpressEstimatePage() {
                           <div className="space-y-2">
                             <Label>Exterior Outlets</Label>
                             <Input
-                              type="number"
-                              min="0"
-                              max="20"
-                              value={exterior.electrical.exteriorOutlets}
-                              onChange={(e) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: parseInt(e.target.value) || 0 } }); handleSave() }}
+                              type="text"
+                              inputMode="numeric"
+                              pattern="[0-9]*"
+                              value={exterior.electrical.exteriorOutlets || ""}
+                              onChange={(e) => { 
+                                const val = e.target.value.replace(/^0+/, '') || "0"
+                                setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: parseInt(val) || 0 } }); handleSave() 
+                              }}
                               className="border-border/60 bg-secondary/50"
                             />
                           </div>
                           <div className="space-y-2">
                             <Label>30 Amp Disconnect</Label>
                             <Input
-                              type="number"
-                              min="0"
-                              max="20"
-                              value={exterior.electrical.disconnect30Amp}
-                              onChange={(e) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: parseInt(e.target.value) || 0 } }); handleSave() }}
+                              type="text"
+                              inputMode="numeric"
+                              pattern="[0-9]*"
+                              value={exterior.electrical.disconnect30Amp || ""}
+                              onChange={(e) => { 
+                                const val = e.target.value.replace(/^0+/, '') || "0"
+                                setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: parseInt(val) || 0 } }); handleSave() 
+                              }}
                               className="border-border/60 bg-secondary/50"
                             />
                           </div>
@@ -724,16 +941,86 @@ export default function NewExpressEstimatePage() {
                     </CollapsibleContent>
                   </Collapsible>
 
-                  {/* F9 Note */}
-                  <div className="space-y-2">
-                    <Label className="text-foreground">F9 Note (Usually M/S)</Label>
-                    <Textarea
-                      placeholder="Enter additional notes..."
-                      value={exterior.f9Note}
-                      onChange={(e) => { setExterior({ ...exterior, f9Note: e.target.value }); handleSave() }}
-                      className="min-h-[80px] border-border/60 bg-secondary/50"
-                    />
-                  </div>
+                  {/* Finishing */}
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
+                      <div className="flex items-center gap-3">
+                        <Home className="h-5 w-5 text-primary" />
+                        <span className="font-medium text-foreground">Finishing / Painting</span>
+                        {exterior.finishing.enabled && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <Switch
+                            checked={exterior.finishing.enabled}
+                            onCheckedChange={(checked) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, enabled: checked } }); handleSave() }}
+                          />
+                          <Label>Add Finishing</Label>
+                        </div>
+                        {exterior.finishing.enabled && (
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
+                              <Switch
+                                checked={exterior.finishing.exteriorPaint}
+                                onCheckedChange={(checked) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, exteriorPaint: checked } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Exterior Paint</Label>
+                              {exterior.finishing.exteriorPaint && (
+                                <div className="ml-4 flex-1">
+                                  <Input
+                                    type="number"
+                                    placeholder="SF"
+                                    value={exterior.finishing.exteriorPaintSqft}
+                                    onChange={(e) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, exteriorPaintSqft: e.target.value } }); handleSave() }}
+                                    className="w-24 border-border/60 bg-secondary/50"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
+                              <Switch
+                                checked={exterior.finishing.interiorPaint}
+                                onCheckedChange={(checked) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, interiorPaint: checked } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Interior Paint</Label>
+                              {exterior.finishing.interiorPaint && (
+                                <div className="ml-4 flex-1">
+                                  <Input
+                                    type="number"
+                                    placeholder="SF"
+                                    value={exterior.finishing.interiorPaintSqft}
+                                    onChange={(e) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, interiorPaintSqft: e.target.value } }); handleSave() }}
+                                    className="w-24 border-border/60 bg-secondary/50"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
+                              <Switch
+                                checked={exterior.finishing.staining}
+                                onCheckedChange={(checked) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, staining: checked } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Staining</Label>
+                              {exterior.finishing.staining && (
+                                <div className="ml-4 flex-1">
+                                  <Input
+                                    type="number"
+                                    placeholder="SF"
+                                    value={exterior.finishing.stainingSqft}
+                                    onChange={(e) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, stainingSqft: e.target.value } }); handleSave() }}
+                                    className="w-24 border-border/60 bg-secondary/50"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </TabsContent>
 
                 {/* FOUNDATION TAB */}
@@ -1310,60 +1597,84 @@ export default function NewExpressEstimatePage() {
                                   <div className="space-y-2">
                                     <Label className="text-sm">110 Outlets</Label>
                                     <Input
-                                      type="number"
-                                      min="0"
-                                      value={room.electrical.outlets110}
-                                      onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, outlets110: parseInt(e.target.value) || 0 } })}
+                                      type="text"
+                                      inputMode="numeric"
+                                      pattern="[0-9]*"
+                                      value={room.electrical.outlets110 || ""}
+                                      onChange={(e) => {
+                                        const val = e.target.value.replace(/^0+/, '') || "0"
+                                        updateRoom(room.id, { electrical: { ...room.electrical, outlets110: parseInt(val) || 0 } })
+                                      }}
                                       className="border-border/60 bg-secondary/50"
                                     />
                                   </div>
                                   <div className="space-y-2">
                                     <Label className="text-sm">220 Outlets</Label>
                                     <Input
-                                      type="number"
-                                      min="0"
-                                      value={room.electrical.outlets220}
-                                      onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, outlets220: parseInt(e.target.value) || 0 } })}
+                                      type="text"
+                                      inputMode="numeric"
+                                      pattern="[0-9]*"
+                                      value={room.electrical.outlets220 || ""}
+                                      onChange={(e) => {
+                                        const val = e.target.value.replace(/^0+/, '') || "0"
+                                        updateRoom(room.id, { electrical: { ...room.electrical, outlets220: parseInt(val) || 0 } })
+                                      }}
                                       className="border-border/60 bg-secondary/50"
                                     />
                                   </div>
                                   <div className="space-y-2">
                                     <Label className="text-sm">GFI Outlets</Label>
                                     <Input
-                                      type="number"
-                                      min="0"
-                                      value={room.electrical.gfiOutlets}
-                                      onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, gfiOutlets: parseInt(e.target.value) || 0 } })}
+                                      type="text"
+                                      inputMode="numeric"
+                                      pattern="[0-9]*"
+                                      value={room.electrical.gfiOutlets || ""}
+                                      onChange={(e) => {
+                                        const val = e.target.value.replace(/^0+/, '') || "0"
+                                        updateRoom(room.id, { electrical: { ...room.electrical, gfiOutlets: parseInt(val) || 0 } })
+                                      }}
                                       className="border-border/60 bg-secondary/50"
                                     />
                                   </div>
                                   <div className="space-y-2">
                                     <Label className="text-sm">Light Switches</Label>
                                     <Input
-                                      type="number"
-                                      min="0"
-                                      value={room.electrical.lightSwitches}
-                                      onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, lightSwitches: parseInt(e.target.value) || 0 } })}
+                                      type="text"
+                                      inputMode="numeric"
+                                      pattern="[0-9]*"
+                                      value={room.electrical.lightSwitches || ""}
+                                      onChange={(e) => {
+                                        const val = e.target.value.replace(/^0+/, '') || "0"
+                                        updateRoom(room.id, { electrical: { ...room.electrical, lightSwitches: parseInt(val) || 0 } })
+                                      }}
                                       className="border-border/60 bg-secondary/50"
                                     />
                                   </div>
                                   <div className="space-y-2">
                                     <Label className="text-sm">Ceiling Lights</Label>
                                     <Input
-                                      type="number"
-                                      min="0"
-                                      value={room.electrical.ceilingLights}
-                                      onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, ceilingLights: parseInt(e.target.value) || 0 } })}
+                                      type="text"
+                                      inputMode="numeric"
+                                      pattern="[0-9]*"
+                                      value={room.electrical.ceilingLights || ""}
+                                      onChange={(e) => {
+                                        const val = e.target.value.replace(/^0+/, '') || "0"
+                                        updateRoom(room.id, { electrical: { ...room.electrical, ceilingLights: parseInt(val) || 0 } })
+                                      }}
                                       className="border-border/60 bg-secondary/50"
                                     />
                                   </div>
                                   <div className="space-y-2">
                                     <Label className="text-sm">Ceiling Fans</Label>
                                     <Input
-                                      type="number"
-                                      min="0"
-                                      value={room.electrical.ceilingFans}
-                                      onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, ceilingFans: parseInt(e.target.value) || 0 } })}
+                                      type="text"
+                                      inputMode="numeric"
+                                      pattern="[0-9]*"
+                                      value={room.electrical.ceilingFans || ""}
+                                      onChange={(e) => {
+                                        const val = e.target.value.replace(/^0+/, '') || "0"
+                                        updateRoom(room.id, { electrical: { ...room.electrical, ceilingFans: parseInt(val) || 0 } })
+                                      }}
                                       className="border-border/60 bg-secondary/50"
                                     />
                                   </div>
