@@ -192,7 +192,7 @@ export default function NewExpressEstimatePage() {
   // Exterior State
   const [exterior, setExterior] = useState({
     pressureWash: { enabled: false, sqft: "", cleanWithSteam: false },
-    dumpster: { enabled: false, count: 1, size: "20", pickupTruck: false, dumpTruck: false },
+    dumpster: { enabled: false, count: 1, size: "20" },
     insulation: { enabled: false, type: "r13", sqft: "" },
     hvac: {
       condenserUnit: { enabled: false, tonnage: "2", seer: "14" },
@@ -460,7 +460,7 @@ export default function NewExpressEstimatePage() {
                       <div className="flex items-center gap-3">
                         <Droplets className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Pressure Wash / Cleaning</span>
-                        {exterior.pressureWash.enabled && <Badge variant="secondary" className="text-xs">Active</Badge>}
+                        {exterior.pressureWash.enabled && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
@@ -471,17 +471,21 @@ export default function NewExpressEstimatePage() {
                             checked={exterior.pressureWash.enabled}
                             onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, enabled: checked } }); handleSave() }}
                           />
-                          <Label>Enable Pressure Wash</Label>
+                          <Label>Add Pressure Wash</Label>
                         </div>
                         {exterior.pressureWash.enabled && (
                           <div className="grid gap-4 sm:grid-cols-2">
                             <div className="space-y-2">
-                              <Label>Square Footage</Label>
+                              <Label>Perimeter Footage</Label>
                               <Input
                                 type="number"
-                                placeholder="Enter SF"
+                                placeholder="Enter PF"
+                                max={40}
                                 value={exterior.pressureWash.sqft}
-                                onChange={(e) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, sqft: e.target.value } }); handleSave() }}
+                                onChange={(e) => { 
+                                  const val = Math.min(parseInt(e.target.value) || 0, 40)
+                                  setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, sqft: val.toString() } }); handleSave() 
+                                }}
                                 className="border-border/60 bg-secondary/50"
                               />
                             </div>
@@ -504,7 +508,7 @@ export default function NewExpressEstimatePage() {
                       <div className="flex items-center gap-3">
                         <Trash2 className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Dumpster / Debris Removal</span>
-                        {exterior.dumpster.enabled && <Badge variant="secondary" className="text-xs">Active</Badge>}
+                        {exterior.dumpster.enabled && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
@@ -515,7 +519,7 @@ export default function NewExpressEstimatePage() {
                             checked={exterior.dumpster.enabled}
                             onCheckedChange={(checked) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, enabled: checked } }); handleSave() }}
                           />
-                          <Label>Enable Dumpster</Label>
+                          <Label>Add Dumpster</Label>
                         </div>
                         {exterior.dumpster.enabled && (
                           <div className="grid gap-4 sm:grid-cols-3">
@@ -541,24 +545,10 @@ export default function NewExpressEstimatePage() {
                                   <SelectItem value="20">20 Yards</SelectItem>
                                   <SelectItem value="30">30 Yards</SelectItem>
                                   <SelectItem value="40">40 Yards</SelectItem>
+                                  <SelectItem value="pickup">Pickup Truck Load</SelectItem>
+                                  <SelectItem value="dump-truck">Single Axle Dump Truck</SelectItem>
                                 </SelectContent>
                               </Select>
-                            </div>
-                            <div className="space-y-3 pt-6">
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={exterior.dumpster.pickupTruck}
-                                  onCheckedChange={(checked) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, pickupTruck: checked } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Pickup Truck Load</Label>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={exterior.dumpster.dumpTruck}
-                                  onCheckedChange={(checked) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, dumpTruck: checked } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Single Axle Dump Truck</Label>
-                              </div>
                             </div>
                           </div>
                         )}
@@ -573,7 +563,7 @@ export default function NewExpressEstimatePage() {
                         <Wind className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">HVAC</span>
                         {(exterior.hvac.condenserUnit.enabled || exterior.hvac.packageUnit.enabled || exterior.hvac.gasAC.enabled || exterior.hvac.miniSplit.enabled) && 
-                          <Badge variant="secondary" className="text-xs">Active</Badge>
+                          <Badge variant="secondary" className="text-xs">Saved</Badge>
                         }
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
@@ -666,7 +656,7 @@ export default function NewExpressEstimatePage() {
                         <Zap className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Electrical</span>
                         {(exterior.electrical.exteriorOutlets > 0 || exterior.electrical.breakerPanel.enabled) && 
-                          <Badge variant="secondary" className="text-xs">Active</Badge>
+                          <Badge variant="secondary" className="text-xs">Saved</Badge>
                         }
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
@@ -754,7 +744,7 @@ export default function NewExpressEstimatePage() {
                       <div className="flex items-center gap-3">
                         <Droplets className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Crawlspace / PFE Enclosure</span>
-                        {foundation.crawlspace.enabled && <Badge variant="secondary" className="text-xs">Active</Badge>}
+                        {foundation.crawlspace.enabled && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
@@ -984,7 +974,7 @@ export default function NewExpressEstimatePage() {
                       <div className="flex items-center gap-3">
                         <Droplets className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Sump Pump</span>
-                        {foundation.sumpPump.enabled && <Badge variant="secondary" className="text-xs">Active</Badge>}
+                        {foundation.sumpPump.enabled && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
