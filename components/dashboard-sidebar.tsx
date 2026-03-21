@@ -24,12 +24,12 @@ export function DashboardSidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-sidebar-border/60 bg-sidebar">
       {/* Logo */}
-      <div className="flex h-16 items-center gap-2.5 border-b border-sidebar-border/60 px-6">
+      <Link href="/" className="flex h-16 items-center gap-2.5 border-b border-sidebar-border/60 px-6 transition-colors hover:bg-sidebar-accent/30">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary shadow-md shadow-sidebar-primary/30">
           <Zap className="h-5 w-5 text-sidebar-primary-foreground" />
         </div>
-        <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">ClaimFlow</span>
-      </div>
+        <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">AdjustAid</span>
+      </Link>
 
       {/* Main Navigation */}
       <nav className="flex flex-1 flex-col gap-1 p-4">

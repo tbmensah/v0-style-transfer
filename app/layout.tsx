@@ -7,7 +7,7 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'ClaimFlow - Automated Claims Estimating',
+  title: 'AdjustAid - Automated Claims Estimating',
   description: 'Generate accurate NFIP estimates in minutes, not hours. Upload your files or enter site details, and receive estimate-ready ESX outputs powered by intelligent automation.',
   generator: 'v0.app',
 
