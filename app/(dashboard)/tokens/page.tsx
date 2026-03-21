@@ -8,23 +8,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, ClipboardList, CheckCircle } from "lucide-react"
 
 const fastFillPackages = [
-  { tokens: 10, price: 49.99, perToken: "5.00" },
-  { tokens: 25, price: 99.99, perToken: "4.00", popular: true },
-  { tokens: 50, price: 179.99, perToken: "3.60" },
-  { tokens: 100, price: 299.99, perToken: "3.00" },
+  { tokens: 10, price: 149.90, perToken: "14.99" },
+  { tokens: 25, price: 337.25, perToken: "13.49", popular: true },
+  { tokens: 50, price: 599.60, perToken: "11.99" },
+  { tokens: 100, price: 1049.30, perToken: "10.49" },
 ]
 
 const expressEstimatePackages = [
-  { tokens: 10, price: 79.99, perToken: "8.00" },
-  { tokens: 25, price: 174.99, perToken: "7.00", popular: true },
-  { tokens: 50, price: 299.99, perToken: "6.00" },
-  { tokens: 100, price: 499.99, perToken: "5.00" },
+  { tokens: 10, price: 699.90, perToken: "69.99" },
+  { tokens: 25, price: 1574.75, perToken: "62.99", popular: true },
+  { tokens: 50, price: 2799.50, perToken: "55.99" },
+  { tokens: 100, price: 4899.00, perToken: "48.99" },
 ]
 
 const purchaseHistory = [
-  { date: "Mar 1, 2024", type: "Fast Fill", quantity: 25, amount: 99.99 },
-  { date: "Feb 15, 2024", type: "Express Estimate", quantity: 10, amount: 79.99 },
-  { date: "Jan 20, 2024", type: "Fast Fill", quantity: 50, amount: 179.99 },
+  { date: "Mar 1, 2024", type: "Fast Fill", quantity: 25, amount: 337.25 },
+  { date: "Feb 15, 2024", type: "Express Estimate", quantity: 10, amount: 699.90 },
+  { date: "Jan 20, 2024", type: "Fast Fill", quantity: 50, amount: 599.60 },
 ]
 
 export default function TokensPage() {
