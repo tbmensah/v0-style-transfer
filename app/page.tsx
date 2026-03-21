@@ -174,7 +174,7 @@ export default function LandingPage() {
                   <div className="rounded-lg border border-border/60 bg-secondary/40 p-4">
                     <p className="text-sm font-medium text-foreground">Ideal for:</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Fresh inspections where you capture damage details on-site
+                      Inspections with documented  damage details.
                     </p>
                   </div>
                   <Link href="/express-estimate" className="block">
