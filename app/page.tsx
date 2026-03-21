@@ -132,7 +132,7 @@ export default function LandingPage() {
                   <div className="rounded-lg border border-border/60 bg-secondary/40 p-4">
                     <p className="text-sm font-medium text-foreground">Ideal for:</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Existing claim files that need quick estimate preparation
+                      Claim files that require expedited estimate preparation
                     </p>
                   </div>
                   <Link href="/fast-fill" className="block">
