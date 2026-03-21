@@ -388,6 +388,7 @@ export default function NewExpressEstimatePage() {
                   <Input
                     id="inspectionDate"
                     type="date"
+                    max={new Date().toISOString().split('T')[0]}
                     value={projectDetails.inspectionDate}
                     onChange={(e) => { setProjectDetails({ ...projectDetails, inspectionDate: e.target.value }); handleSave() }}
                     className="border-border/60 bg-secondary/50"

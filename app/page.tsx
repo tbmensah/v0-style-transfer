@@ -254,7 +254,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                Why Choose ClaimFlow
+                Why Choose AdjustAid
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
                 Built for the way insurance professionals actually work
@@ -332,7 +332,7 @@ export default function LandingPage() {
                   Start Your Free Trial
                 </p>
                 <p className="text-muted-foreground">
-                  Get 3 free tokens of each type when you sign up
+                  Get 1 free token of each type when you sign up
                 </p>
               </Card>
             </div>

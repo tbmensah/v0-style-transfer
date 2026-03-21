@@ -10,7 +10,7 @@ export function Footer() {
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary shadow-sm shadow-primary/20">
               <Zap className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-sm font-medium text-foreground">ClaimFlow</span>
+            <span className="text-sm font-medium text-foreground">AdjustAid</span>
           </div>
           <nav className="flex gap-6">
             <Link href="/terms" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
@@ -24,7 +24,7 @@ export function Footer() {
             </Link>
           </nav>
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} ClaimFlow. All rights reserved.
+            &copy; {new Date().getFullYear()} AdjustAid. All rights reserved.
           </p>
         </div>
       </div>

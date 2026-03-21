@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, ClipboardList, Coins, CheckCircle, Clock, AlertCircle, XCircle, Download, Eye } from "lucide-react"
 
 const recentJobs = [
@@ -137,36 +138,105 @@ export default function DashboardPage() {
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {recentJobs.map((job) => (
-                <div key={job.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
-                  <div className="flex items-center gap-4">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg text-xs font-bold ring-1 ${
-                      job.type === "FF" ? "bg-primary/20 text-primary ring-primary/20" : "bg-secondary text-foreground ring-border/60"
-                    }`}>
-                      {job.type}
+            <Tabs defaultValue="all">
+              <TabsList className="mb-4">
+                <TabsTrigger value="all">All Jobs</TabsTrigger>
+                <TabsTrigger value="fast-fill">Fast Fill</TabsTrigger>
+                <TabsTrigger value="express-estimate">Express Estimate</TabsTrigger>
+              </TabsList>
+              <TabsContent value="all">
+                <div className="space-y-4">
+                  {recentJobs.map((job) => (
+                    <div key={job.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
+                      <div className="flex items-center gap-4">
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-lg text-xs font-bold ring-1 ${
+                          job.type === "FF" ? "bg-primary/20 text-primary ring-primary/20" : "bg-secondary text-foreground ring-border/60"
+                        }`}>
+                          {job.type}
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">Claim #{job.id} - {job.name}</p>
+                          <p className="text-sm text-muted-foreground">{job.date}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {getStatusBadge(job.status)}
+                        {job.status === "Completed" && (
+                          <Button variant="ghost" size="icon">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {job.status === "Needs Review" && (
+                          <Button variant="ghost" size="icon">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-foreground">Claim #{job.id} - {job.name}</p>
-                      <p className="text-sm text-muted-foreground">{job.date}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {getStatusBadge(job.status)}
-                    {job.status === "Completed" && (
-                      <Button variant="ghost" size="icon">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    )}
-                    {job.status === "Needs Review" && (
-                      <Button variant="ghost" size="icon">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </TabsContent>
+              <TabsContent value="fast-fill">
+                <div className="space-y-4">
+                  {recentJobs.filter(job => job.type === "FF").map((job) => (
+                    <div key={job.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg text-xs font-bold ring-1 bg-primary/20 text-primary ring-primary/20">
+                          {job.type}
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">Claim #{job.id} - {job.name}</p>
+                          <p className="text-sm text-muted-foreground">{job.date}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {getStatusBadge(job.status)}
+                        {job.status === "Completed" && (
+                          <Button variant="ghost" size="icon">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {job.status === "Needs Review" && (
+                          <Button variant="ghost" size="icon">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+              <TabsContent value="express-estimate">
+                <div className="space-y-4">
+                  {recentJobs.filter(job => job.type === "EE").map((job) => (
+                    <div key={job.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg text-xs font-bold ring-1 bg-secondary text-foreground ring-border/60">
+                          {job.type}
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">Claim #{job.id} - {job.name}</p>
+                          <p className="text-sm text-muted-foreground">{job.date}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {getStatusBadge(job.status)}
+                        {job.status === "Completed" && (
+                          <Button variant="ghost" size="icon">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {job.status === "Needs Review" && (
+                          <Button variant="ghost" size="icon">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 

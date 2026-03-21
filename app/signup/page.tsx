@@ -37,11 +37,11 @@ export default function SignupPage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/30">
                 <Zap className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-2xl font-semibold tracking-tight text-foreground">ClaimFlow</span>
+              <span className="text-2xl font-semibold tracking-tight text-foreground">AdjustAid</span>
             </Link>
             <CardTitle className="text-2xl font-bold text-foreground">Create an account</CardTitle>
             <CardDescription className="text-muted-foreground">
-              Get started with 3 free tokens of each type
+              Get started with 1 free token of each type
             </CardDescription>
           </CardHeader>
           <CardContent>
