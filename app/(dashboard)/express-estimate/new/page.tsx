@@ -191,56 +191,98 @@ export default function NewExpressEstimatePage() {
 
   // Exterior State
   const [exterior, setExterior] = useState({
-    pressureWash: { enabled: false, sqft: "", cleanWithSteam: false },
+    pressureWash: { enabled: false, perimeterFeet: "", regularPwash: false, cleanWithSteam: false },
     dumpster: { enabled: false, count: 1, size: "20" },
-    insulation: { enabled: false, type: "r13", sqft: "" },
     hvac: {
-      condenserUnits: [] as Array<{ id: number; tonnage: string; seer: string; serviceCall: boolean; f9Note: string }>,
-      packageUnits: [] as Array<{ id: number; unitType: string; tonnage: string; seer: string; serviceCall: boolean; f9Note: string }>,
-      miniSplits: [] as Array<{ id: number; zones: string; highEfficiency: boolean; serviceCall: boolean; f9Note: string }>,
+      condenserUnits: [] as Array<{ id: number; tonnage: string; seer: string; replace: boolean; serviceCall: boolean; f9Note: string }>,
+      packageUnits: [] as Array<{ id: number; unitType: string; tonnage: string; seer: string; replace: boolean; serviceCall: boolean; f9Note: string }>,
+      miniSplits: [] as Array<{ id: number; zones: string; highEfficiency: boolean; replace: boolean; serviceCall: boolean; f9Note: string }>,
     },
     electrical: {
       exteriorOutlets: 0,
       disconnect30Amp: 0,
       breakerPanel: { enabled: false, amps: "200", arcFaults: false },
+      meterBox: false,
     },
-    finishing: { enabled: false, exteriorPaint: false, exteriorPaintSqft: "", interiorPaint: false, interiorPaintSqft: "", staining: false, stainingSqft: "" },
+    finishes: [] as Array<{
+      id: number;
+      type: string;
+      measureType: "pf" | "sf" | "lf";
+      value: string;
+    }>,
   })
 
   // Foundation State
   const [foundation, setFoundation] = useState({
     crawlspace: {
       enabled: false,
-      foundationWallClean: "",
-      standingWater: false,
-      piers: 0,
-      preFirm: true,
+      preFirm: false,
+      acControlledSpace: false,
+      heavyCleanArea: false,
+      perimeterFeet: "",
+      piersType: "" as "" | "short" | "tall",
+      piersCount: 0,
+      cleanJoist: false,
+      // Pre-FIRM options
       bellyPaper: false,
       floorInsulation: false,
-      floorInsulationType: "r13",
+      floorInsulationType: "spray-foam",
+      // Muck options
       muck: false,
       muckHeavy: false,
+      standingWater: false,
+      houseRewire: "",
+    },
+    enclosureRemoval: {
+      sandRemoval: { enabled: false, cubicFeet: "", length: "", width: "", depth: "" },
+      backfill: { enabled: false, cubicFeet: "", length: "", width: "", depth: "" },
+      confinedSpace: false,
+    },
+    sumpPump: { enabled: false, minorAdjustment: "", action: "replace", hp: "1/3" },
+    hvac: {
+      airHandlers: [] as Array<{ 
+        id: number; 
+        type: string;
+        tonnage: string; 
+        heatElementCount: number;
+        action: string;
+        f9Note: string;
+      }>,
     },
     basement: {
       enabled: false,
-      foundationWallClean: "",
-      backerBoardBehindBrick: "",
-    },
-    enclosureRemoval: {
-      sandRemoval: { enabled: false, length: "", width: "", depth: "" },
-      backfill: { enabled: false, length: "", width: "", depth: "" },
-      confinedSpace: false,
+      wallCleanPf: "",
+      muck: false,
+      muckHeavy: false,
+      // Drywall
+      drywallEnabled: false,
+      drywallMeasureType: "sf" as "sf" | "lf",
+      drywallValue: "",
+      // Stair Cleaning
+      stairCleaning: false,
+      stairCount: 0,
+      totalStairsSubmerged: "",
+      // Foundation Door
+      foundationDoor: false,
+      foundationDoorAction: "detach-reset-handle",
+      // Foundation Windows
+      foundationWindows: [] as Array<{
+        id: number;
+        type: string;
+        size: string;
+        quantity: number;
+        material: string;
+      }>,
     },
     electrical: {
-      outlet110: 0,
-      outlet220: 0,
-      homeRewire: "",
+      outlets110: 0,
+      outlets220: 0,
+      gfiOutlets: 0,
+      lightSwitch: 0,
+      junctionBox: 0,
+      breakerPanel: { enabled: false, amps: "200", arcFaults: false },
+      meterBox: false,
     },
-    hvac: {
-      airHandler: { enabled: false, tonnage: "2", heatElement: false, aCoil: false },
-    },
-    sumpPump: { enabled: false, action: "replace", hp: "1/3" },
-    f9Note: "",
   })
 
   // Interior Rooms
@@ -449,7 +491,7 @@ export default function NewExpressEstimatePage() {
 
                 {/* EXTERIOR TAB */}
                 <TabsContent value="exterior" className="mt-6 space-y-4">
-                  {/* Pressure Wash */}
+                  {/* Pressure Wash / Cleaning */}
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
                       <div className="flex items-center gap-3">
@@ -466,30 +508,39 @@ export default function NewExpressEstimatePage() {
                             checked={exterior.pressureWash.enabled}
                             onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, enabled: checked } }); handleSave() }}
                           />
-                          <Label>Add Pressure Wash</Label>
+                          <Label>Enable Pressure Wash</Label>
                         </div>
                         {exterior.pressureWash.enabled && (
-                          <div className="grid gap-4 sm:grid-cols-2">
+                          <div className="space-y-4">
                             <div className="space-y-2">
-                              <Label>Perimeter Footage</Label>
+                              <Label>Perimeter Feet</Label>
                               <Input
-                                type="number"
+                                type="text"
+                                inputMode="numeric"
                                 placeholder="Enter PF"
-                                max={40}
-                                value={exterior.pressureWash.sqft}
+                                value={exterior.pressureWash.perimeterFeet}
                                 onChange={(e) => { 
-                                  const val = Math.min(parseInt(e.target.value) || 0, 40)
-                                  setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, sqft: val.toString() } }); handleSave() 
+                                  const val = e.target.value.replace(/^0+/, '') || ""
+                                  setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, perimeterFeet: val } }); handleSave() 
                                 }}
-                                className="border-border/60 bg-secondary/50"
+                                className="border-border/60 bg-secondary/50 w-32"
                               />
                             </div>
-                            <div className="flex items-center gap-3 pt-6">
-                              <Switch
-                                checked={exterior.pressureWash.cleanWithSteam}
-                                onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, cleanWithSteam: checked } }); handleSave() }}
-                              />
-                              <Label>Clean with Steam</Label>
+                            <div className="flex items-center gap-6">
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={exterior.pressureWash.regularPwash}
+                                  onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, regularPwash: checked } }); handleSave() }}
+                                />
+                                <Label className="text-sm">Regular Pwash</Label>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={exterior.pressureWash.cleanWithSteam}
+                                  onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, cleanWithSteam: checked } }); handleSave() }}
+                                />
+                                <Label className="text-sm">Clean with Steam</Label>
+                              </div>
                             </div>
                           </div>
                         )}
@@ -575,7 +626,7 @@ export default function NewExpressEstimatePage() {
                               size="sm"
                               className="gap-1 border-border/60"
                               onClick={() => {
-                                const newUnit = { id: Date.now(), tonnage: "2", seer: "13", serviceCall: false, f9Note: "" }
+                                const newUnit = { id: Date.now(), tonnage: "2", seer: "13", replace: true, serviceCall: false, f9Note: "" }
                                 setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: [...exterior.hvac.condenserUnits, newUnit] } })
                                 handleSave()
                               }}
@@ -633,18 +684,31 @@ export default function NewExpressEstimatePage() {
                                   </Select>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-3">
-                                <Switch
-                                  checked={unit.serviceCall}
-                                  onCheckedChange={(checked) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
-                                    handleSave()
-                                  }}
-                                />
-                                <Label className="text-sm">Service Call</Label>
+                              <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={unit.replace}
+                                    onCheckedChange={(checked) => {
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, replace: checked } : u) } })
+                                      handleSave()
+                                    }}
+                                  />
+                                  <Label className="text-sm">Replace</Label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={unit.serviceCall}
+                                    onCheckedChange={(checked) => {
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                      handleSave()
+                                    }}
+                                  />
+                                  <Label className="text-sm">Service Call</Label>
+                                </div>
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">F9 Note (Model/Serial #)</Label>
+                                <Label className="text-sm">F9 Note</Label>
+                                <p className="text-xs text-muted-foreground">Model and Serial Number</p>
                                 <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
@@ -669,7 +733,7 @@ export default function NewExpressEstimatePage() {
                               size="sm"
                               className="gap-1 border-border/60"
                               onClick={() => {
-                                const newUnit = { id: Date.now(), unitType: "ac", tonnage: "2", seer: "13", serviceCall: false, f9Note: "" }
+                                const newUnit = { id: Date.now(), unitType: "ac", tonnage: "2", seer: "13", replace: true, serviceCall: false, f9Note: "" }
                                 setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: [...exterior.hvac.packageUnits, newUnit] } })
                                 handleSave()
                               }}
@@ -742,18 +806,31 @@ export default function NewExpressEstimatePage() {
                                   </Select>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-3">
-                                <Switch
-                                  checked={unit.serviceCall}
-                                  onCheckedChange={(checked) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
-                                    handleSave()
-                                  }}
-                                />
-                                <Label className="text-sm">Service Call</Label>
+                              <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={unit.replace}
+                                    onCheckedChange={(checked) => {
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, replace: checked } : u) } })
+                                      handleSave()
+                                    }}
+                                  />
+                                  <Label className="text-sm">Replace</Label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={unit.serviceCall}
+                                    onCheckedChange={(checked) => {
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                      handleSave()
+                                    }}
+                                  />
+                                  <Label className="text-sm">Service Call</Label>
+                                </div>
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">F9 Note (Model/Serial #)</Label>
+                                <Label className="text-sm">F9 Note</Label>
+                                <p className="text-xs text-muted-foreground">Model and Serial Number</p>
                                 <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
@@ -778,7 +855,7 @@ export default function NewExpressEstimatePage() {
                               size="sm"
                               className="gap-1 border-border/60"
                               onClick={() => {
-                                const newUnit = { id: Date.now(), zones: "1", highEfficiency: false, serviceCall: false, f9Note: "" }
+                                const newUnit = { id: Date.now(), zones: "1", highEfficiency: false, replace: true, serviceCall: false, f9Note: "" }
                                 setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: [...exterior.hvac.miniSplits, newUnit] } })
                                 handleSave()
                               }}
@@ -831,18 +908,31 @@ export default function NewExpressEstimatePage() {
                                   <Label className="text-sm">High Efficiency</Label>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-3">
-                                <Switch
-                                  checked={unit.serviceCall}
-                                  onCheckedChange={(checked) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
-                                    handleSave()
-                                  }}
-                                />
-                                <Label className="text-sm">Service Call</Label>
+                              <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={unit.replace}
+                                    onCheckedChange={(checked) => {
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, replace: checked } : u) } })
+                                      handleSave()
+                                    }}
+                                  />
+                                  <Label className="text-sm">Replace</Label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={unit.serviceCall}
+                                    onCheckedChange={(checked) => {
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                      handleSave()
+                                    }}
+                                  />
+                                  <Label className="text-sm">Service Call</Label>
+                                </div>
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">F9 Note (Model/Serial #)</Label>
+                                <Label className="text-sm">F9 Note</Label>
+                                <p className="text-xs text-muted-foreground">Model and Serial Number</p>
                                 <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
@@ -941,83 +1031,94 @@ export default function NewExpressEstimatePage() {
                     </CollapsibleContent>
                   </Collapsible>
 
-                  {/* Finishing */}
+                  {/* Finishes */}
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
                       <div className="flex items-center gap-3">
                         <Home className="h-5 w-5 text-primary" />
-                        <span className="font-medium text-foreground">Finishing / Painting</span>
-                        {exterior.finishing.enabled && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                        <span className="font-medium text-foreground">Finishes</span>
+                        {exterior.finishes.length > 0 && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                          <Switch
-                            checked={exterior.finishing.enabled}
-                            onCheckedChange={(checked) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, enabled: checked } }); handleSave() }}
-                          />
-                          <Label>Add Finishing</Label>
-                        </div>
-                        {exterior.finishing.enabled && (
-                          <div className="space-y-4">
-                            <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
-                              <Switch
-                                checked={exterior.finishing.exteriorPaint}
-                                onCheckedChange={(checked) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, exteriorPaint: checked } }); handleSave() }}
-                              />
-                              <Label className="text-sm">Exterior Paint</Label>
-                              {exterior.finishing.exteriorPaint && (
-                                <div className="ml-4 flex-1">
-                                  <Input
-                                    type="number"
-                                    placeholder="SF"
-                                    value={exterior.finishing.exteriorPaintSqft}
-                                    onChange={(e) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, exteriorPaintSqft: e.target.value } }); handleSave() }}
-                                    className="w-24 border-border/60 bg-secondary/50"
-                                  />
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
-                              <Switch
-                                checked={exterior.finishing.interiorPaint}
-                                onCheckedChange={(checked) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, interiorPaint: checked } }); handleSave() }}
-                              />
-                              <Label className="text-sm">Interior Paint</Label>
-                              {exterior.finishing.interiorPaint && (
-                                <div className="ml-4 flex-1">
-                                  <Input
-                                    type="number"
-                                    placeholder="SF"
-                                    value={exterior.finishing.interiorPaintSqft}
-                                    onChange={(e) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, interiorPaintSqft: e.target.value } }); handleSave() }}
-                                    className="w-24 border-border/60 bg-secondary/50"
-                                  />
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
-                              <Switch
-                                checked={exterior.finishing.staining}
-                                onCheckedChange={(checked) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, staining: checked } }); handleSave() }}
-                              />
-                              <Label className="text-sm">Staining</Label>
-                              {exterior.finishing.staining && (
-                                <div className="ml-4 flex-1">
-                                  <Input
-                                    type="number"
-                                    placeholder="SF"
-                                    value={exterior.finishing.stainingSqft}
-                                    onChange={(e) => { setExterior({ ...exterior, finishing: { ...exterior.finishing, stainingSqft: e.target.value } }); handleSave() }}
-                                    className="w-24 border-border/60 bg-secondary/50"
-                                  />
-                                </div>
-                              )}
-                            </div>
+                        <div className="flex items-center gap-6">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={exterior.finishes.some(f => f.type === "exterior-paint")}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-paint", measureType: "pf", value: "" }] })
+                                } else {
+                                  setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-paint") })
+                                }
+                                handleSave()
+                              }}
+                            />
+                            <Label className="text-sm">Exterior Paint</Label>
                           </div>
-                        )}
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={exterior.finishes.some(f => f.type === "exterior-siding")}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-siding", measureType: "sf", value: "" }] })
+                                } else {
+                                  setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-siding") })
+                                }
+                                handleSave()
+                              }}
+                            />
+                            <Label className="text-sm">Exterior Siding</Label>
+                          </div>
+                        </div>
+                        {exterior.finishes.map((finish) => (
+                          <div key={finish.id} className="ml-4 flex items-center gap-4 rounded-lg border border-border/40 bg-secondary/30 p-3">
+                            <span className="text-sm font-medium capitalize">{finish.type.replace("-", " ")}</span>
+                            <div className="flex items-center gap-2">
+                              {(["pf", "sf", "lf"] as const).map((mt) => (
+                                <Button
+                                  key={mt}
+                                  type="button"
+                                  variant={finish.measureType === mt ? "default" : "outline"}
+                                  size="sm"
+                                  className="h-7 px-2 text-xs"
+                                  onClick={() => {
+                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.id === finish.id ? { ...f, measureType: mt } : f) })
+                                    handleSave()
+                                  }}
+                                >
+                                  {mt.toUpperCase()}
+                                </Button>
+                              ))}
+                            </div>
+                            <Input
+                              type="text"
+                              inputMode="numeric"
+                              placeholder={finish.measureType.toUpperCase()}
+                              value={finish.value}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/^0+/, '') || ""
+                                setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.id === finish.id ? { ...f, value: val } : f) })
+                                handleSave()
+                              }}
+                              className="w-24 border-border/60 bg-secondary/50"
+                            />
+                          </div>
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="gap-1 border-border/60"
+                          onClick={() => {
+                            setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "other", measureType: "sf", value: "" }] })
+                            handleSave()
+                          }}
+                        >
+                          <Plus className="h-3 w-3" /> Add Finish
+                        </Button>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -1025,7 +1126,7 @@ export default function NewExpressEstimatePage() {
 
                 {/* FOUNDATION TAB */}
                 <TabsContent value="foundation" className="mt-6 space-y-4">
-                  {/* Crawlspace */}
+                  {/* Crawlspace / PFE Enclosure */}
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
                       <div className="flex items-center gap-3">
@@ -1037,58 +1138,92 @@ export default function NewExpressEstimatePage() {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                          <Switch
-                            checked={foundation.crawlspace.enabled}
-                            onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, enabled: checked } }); handleSave() }}
-                          />
-                          <Label>Enable Crawlspace</Label>
+                        <div className="flex flex-wrap items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={foundation.crawlspace.enabled}
+                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, enabled: checked } }); handleSave() }}
+                            />
+                            <Label>Enable Crawlspace/Enclosure area</Label>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={foundation.crawlspace.acControlledSpace}
+                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, acControlledSpace: checked } }); handleSave() }}
+                            />
+                            <Label className="text-sm">AC Controlled Space</Label>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={foundation.crawlspace.heavyCleanArea}
+                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, heavyCleanArea: checked } }); handleSave() }}
+                            />
+                            <Label className="text-sm">Heavy Clean Area</Label>
+                          </div>
                         </div>
                         {foundation.crawlspace.enabled && (
                           <div className="space-y-4">
-                            <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="grid gap-4 sm:grid-cols-3">
                               <div className="space-y-2">
-                                <Label>Foundation Wall Clean (LF)</Label>
+                                <Label>Foundation Wall Clean (PF)</Label>
                                 <Input
-                                  type="number"
-                                  placeholder="Linear feet"
-                                  value={foundation.crawlspace.foundationWallClean}
-                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, foundationWallClean: e.target.value } }); handleSave() }}
+                                  type="text"
+                                  inputMode="numeric"
+                                  placeholder="Perimeter feet"
+                                  value={foundation.crawlspace.perimeterFeet}
+                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, perimeterFeet: e.target.value.replace(/^0+/, '') } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50"
                                 />
                               </div>
                               <div className="space-y-2">
                                 <Label># of Piers</Label>
                                 <Input
-                                  type="number"
-                                  min="0"
-                                  max="40"
-                                  value={foundation.crawlspace.piers}
-                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piers: parseInt(e.target.value) || 0 } }); handleSave() }}
+                                  type="text"
+                                  inputMode="numeric"
+                                  value={foundation.crawlspace.piersCount || ""}
+                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersCount: parseInt(e.target.value.replace(/^0+/, '')) || 0 } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50"
                                 />
                               </div>
+                              <div className="flex items-center gap-4 pt-6">
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="radio"
+                                    checked={foundation.crawlspace.piersType === "short"}
+                                    onChange={() => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersType: "short" } }); handleSave() }}
+                                    className="h-4 w-4"
+                                  />
+                                  <Label className="text-sm">Short Piers</Label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="radio"
+                                    checked={foundation.crawlspace.piersType === "tall"}
+                                    onChange={() => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersType: "tall" } }); handleSave() }}
+                                    className="h-4 w-4"
+                                  />
+                                  <Label className="text-sm">Tall Piers</Label>
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-6">
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={foundation.crawlspace.preFirm}
-                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, preFirm: checked } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Pre-FIRM</Label>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={foundation.crawlspace.standingWater}
-                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, standingWater: checked } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Standing Water</Label>
-                              </div>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={foundation.crawlspace.cleanJoist}
+                                onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, cleanJoist: checked } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Clean Joist</Label>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={foundation.crawlspace.preFirm}
+                                onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, preFirm: checked } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Pre-FIRM</Label>
                             </div>
                             {foundation.crawlspace.preFirm && (
                               <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 space-y-3">
                                 <p className="text-sm font-medium text-foreground">Pre-FIRM Options</p>
-                                <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="flex flex-wrap items-center gap-4">
                                   <div className="flex items-center gap-2">
                                     <Switch
                                       checked={foundation.crawlspace.bellyPaper}
@@ -1103,25 +1238,22 @@ export default function NewExpressEstimatePage() {
                                     />
                                     <Label className="text-sm">Floor Insulation</Label>
                                   </div>
-                                </div>
-                                {foundation.crawlspace.floorInsulation && (
-                                  <div className="space-y-2">
-                                    <Label className="text-sm">Insulation Type</Label>
+                                  {foundation.crawlspace.floorInsulation && (
                                     <Select value={foundation.crawlspace.floorInsulationType} onValueChange={(value) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, floorInsulationType: value } }); handleSave() }}>
-                                      <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
+                                        <SelectItem value="spray-foam">Spray Foam</SelectItem>
                                         <SelectItem value="r13">R-13</SelectItem>
                                         <SelectItem value="r19">R-19</SelectItem>
-                                        <SelectItem value="spray-foam">Spray Foam</SelectItem>
                                       </SelectContent>
                                     </Select>
-                                  </div>
-                                )}
+                                  )}
+                                </div>
                               </div>
                             )}
-                            <div className="flex items-center gap-6">
+                            <div className="flex flex-wrap items-center gap-4">
                               <div className="flex items-center gap-2">
                                 <Switch
                                   checked={foundation.crawlspace.muck}
@@ -1138,26 +1270,46 @@ export default function NewExpressEstimatePage() {
                               </div>
                             </div>
                             {foundation.crawlspace.muckHeavy && (
-                              <p className="text-xs text-amber-500">Note: NFIP won&apos;t cover muck heavy without photos of standing mud</p>
+                              <p className="text-xs text-amber-500">Note: NFIP requires photos of standing mud to endorse for heavy Muck</p>
                             )}
+                            <div className="flex flex-wrap items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={foundation.crawlspace.standingWater}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, standingWater: checked } }); handleSave() }}
+                                />
+                                <Label className="text-sm">Standing Water</Label>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-sm">House Rewire</Label>
+                                <Input
+                                  type="text"
+                                  placeholder="enter home SF..."
+                                  value={foundation.crawlspace.houseRewire}
+                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
+                                  className="w-32 border-border/60 bg-secondary/50"
+                                />
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
 
-                  {/* Enclosure Removal */}
+                  {/* Enclosure Removal Items */}
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
                       <div className="flex items-center gap-3">
                         <Trash2 className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Enclosure Removal Items</span>
+                        {(foundation.enclosureRemoval.sandRemoval.enabled || foundation.enclosureRemoval.backfill.enabled) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="space-y-4">
-                        {/* Sand Removal */}
+                        {/* Sand/Mud Removal */}
                         <div className="space-y-3">
                           <div className="flex items-center gap-3">
                             <Switch
@@ -1165,13 +1317,25 @@ export default function NewExpressEstimatePage() {
                               onCheckedChange={(checked) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, enabled: checked } } }); handleSave() }}
                             />
                             <Label>Sand/Mud Removal</Label>
+                            <span className="text-xs text-muted-foreground">(cubic feet)</span>
+                            {foundation.enclosureRemoval.sandRemoval.enabled && (
+                              <Input
+                                type="text"
+                                inputMode="numeric"
+                                placeholder="# ft cubic"
+                                value={foundation.enclosureRemoval.sandRemoval.cubicFeet}
+                                onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, cubicFeet: e.target.value } } }); handleSave() }}
+                                className="w-24 border-border/60 bg-secondary/50"
+                              />
+                            )}
                           </div>
                           {foundation.enclosureRemoval.sandRemoval.enabled && (
                             <div className="ml-8 grid gap-4 sm:grid-cols-3">
                               <div className="space-y-2">
                                 <Label className="text-sm">Length (FT)</Label>
                                 <Input
-                                  type="number"
+                                  type="text"
+                                  inputMode="numeric"
                                   placeholder="Length"
                                   value={foundation.enclosureRemoval.sandRemoval.length}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, length: e.target.value } } }); handleSave() }}
@@ -1181,7 +1345,8 @@ export default function NewExpressEstimatePage() {
                               <div className="space-y-2">
                                 <Label className="text-sm">Width (FT)</Label>
                                 <Input
-                                  type="number"
+                                  type="text"
+                                  inputMode="numeric"
                                   placeholder="Width"
                                   value={foundation.enclosureRemoval.sandRemoval.width}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, width: e.target.value } } }); handleSave() }}
@@ -1191,7 +1356,8 @@ export default function NewExpressEstimatePage() {
                               <div className="space-y-2">
                                 <Label className="text-sm">Depth (FT)</Label>
                                 <Input
-                                  type="number"
+                                  type="text"
+                                  inputMode="numeric"
                                   placeholder="Depth"
                                   value={foundation.enclosureRemoval.sandRemoval.depth}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, depth: e.target.value } } }); handleSave() }}
@@ -1210,13 +1376,25 @@ export default function NewExpressEstimatePage() {
                               onCheckedChange={(checked) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, enabled: checked } } }); handleSave() }}
                             />
                             <Label>Backfill Around/In Foundation</Label>
+                            <span className="text-xs text-muted-foreground">(cubic ft)</span>
+                            {foundation.enclosureRemoval.backfill.enabled && (
+                              <Input
+                                type="text"
+                                inputMode="numeric"
+                                placeholder="# ft cubic"
+                                value={foundation.enclosureRemoval.backfill.cubicFeet}
+                                onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, cubicFeet: e.target.value } } }); handleSave() }}
+                                className="w-24 border-border/60 bg-secondary/50"
+                              />
+                            )}
                           </div>
                           {foundation.enclosureRemoval.backfill.enabled && (
                             <div className="ml-8 grid gap-4 sm:grid-cols-3">
                               <div className="space-y-2">
                                 <Label className="text-sm">Length (FT)</Label>
                                 <Input
-                                  type="number"
+                                  type="text"
+                                  inputMode="numeric"
                                   value={foundation.enclosureRemoval.backfill.length}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, length: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50"
@@ -1225,7 +1403,8 @@ export default function NewExpressEstimatePage() {
                               <div className="space-y-2">
                                 <Label className="text-sm">Width (FT)</Label>
                                 <Input
-                                  type="number"
+                                  type="text"
+                                  inputMode="numeric"
                                   value={foundation.enclosureRemoval.backfill.width}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, width: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50"
@@ -1234,7 +1413,8 @@ export default function NewExpressEstimatePage() {
                               <div className="space-y-2">
                                 <Label className="text-sm">Depth (FT)</Label>
                                 <Input
-                                  type="number"
+                                  type="text"
+                                  inputMode="numeric"
                                   value={foundation.enclosureRemoval.backfill.depth}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, depth: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50"
@@ -1251,6 +1431,9 @@ export default function NewExpressEstimatePage() {
                           />
                           <Label>Confined Space</Label>
                         </div>
+                        {foundation.enclosureRemoval.confinedSpace && (
+                          <p className="text-xs text-muted-foreground">Note: Confined space charges can be applied to areas where you can not stand to shovel or operate with equipment for removal</p>
+                        )}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -1273,6 +1456,9 @@ export default function NewExpressEstimatePage() {
                             onCheckedChange={(checked) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, enabled: checked } }); handleSave() }}
                           />
                           <Label>Enable Sump Pump</Label>
+                          {foundation.sumpPump.enabled && (
+                            <span className="text-xs text-muted-foreground">MinorAdjustment...</span>
+                          )}
                         </div>
                         {foundation.sumpPump.enabled && (
                           <div className="grid gap-4 sm:grid-cols-2">
@@ -1283,9 +1469,8 @@ export default function NewExpressEstimatePage() {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="detach-reset">Detach and Reset</SelectItem>
                                   <SelectItem value="replace">Replace</SelectItem>
-                                  <SelectItem value="service-call">Service Call</SelectItem>
+                                  <SelectItem value="detach-reset">Detach and Reset</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -1304,20 +1489,540 @@ export default function NewExpressEstimatePage() {
                             </div>
                           </div>
                         )}
+                        <p className="text-xs text-muted-foreground">Info put the basement below the crawlspace items</p>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
 
-                  {/* F9 Note */}
-                  <div className="space-y-2">
-                    <Label className="text-foreground">F9 Note (Usually M/S)</Label>
-                    <Textarea
-                      placeholder="Enter additional notes..."
-                      value={foundation.f9Note}
-                      onChange={(e) => { setFoundation({ ...foundation, f9Note: e.target.value }); handleSave() }}
-                      className="min-h-[80px] border-border/60 bg-secondary/50"
-                    />
-                  </div>
+                  {/* HVAC (Air Handler) */}
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
+                      <div className="flex items-center gap-3">
+                        <Wind className="h-5 w-5 text-primary" />
+                        <span className="font-medium text-foreground">HVAC</span>
+                        {foundation.hvac.airHandlers.length > 0 && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={foundation.hvac.airHandlers.length > 0}
+                              onCheckedChange={(checked) => {
+                                if (checked && foundation.hvac.airHandlers.length === 0) {
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [{ id: Date.now(), type: "air-handler", tonnage: "2", heatElementCount: 0, action: "replace", f9Note: "" }] } })
+                                } else if (!checked) {
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [] } })
+                                }
+                                handleSave()
+                              }}
+                            />
+                            <Label>Enable Air Handler</Label>
+                          </div>
+                          {foundation.hvac.airHandlers.length > 0 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 border-border/60"
+                              onClick={() => {
+                                setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [...foundation.hvac.airHandlers, { id: Date.now(), type: "air-handler", tonnage: "2", heatElementCount: 0, action: "replace", f9Note: "" }] } })
+                                handleSave()
+                              }}
+                            >
+                              <Plus className="h-3 w-3" /> Add Air Handler
+                            </Button>
+                          )}
+                        </div>
+                        {foundation.hvac.airHandlers.map((handler, index) => (
+                          <div key={handler.id} className="ml-4 rounded-lg border border-border/40 bg-secondary/30 p-4 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-foreground">Air Handler {index + 1}</span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                onClick={() => {
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.filter(h => h.id !== handler.id) } })
+                                  handleSave()
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            <div className="grid gap-4 sm:grid-cols-3">
+                              <div className="space-y-2">
+                                <Label className="text-sm">Type</Label>
+                                <Select value={handler.type} onValueChange={(value) => {
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, type: value } : h) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="air-handler">Air Handler</SelectItem>
+                                    <SelectItem value="with-heat-element">With Heat Element</SelectItem>
+                                    <SelectItem value="with-heat-element-a-coil">With Heat Element & A-coil</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="text-sm">Tonnage</Label>
+                                <Select value={handler.tonnage} onValueChange={(value) => {
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, tonnage: value } : h) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {["2", "2.5", "3", "4", "5"].map(t => (
+                                      <SelectItem key={t} value={t}>{t} Ton</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              {(handler.type === "with-heat-element" || handler.type === "with-heat-element-a-coil") && (
+                                <div className="space-y-2">
+                                  <Label className="text-sm">With Heat Element</Label>
+                                  <Select value={handler.heatElementCount.toString()} onValueChange={(value) => {
+                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, heatElementCount: parseInt(value) } : h) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {[1, 2, 3, 4, 5].map(n => (
+                                        <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              )}
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-sm">Action</Label>
+                              <Select value={handler.action} onValueChange={(value) => {
+                                setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, action: value } : h) } })
+                                handleSave()
+                              }}>
+                                <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="replace">Replace</SelectItem>
+                                  <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+
+                  {/* Basement */}
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
+                      <div className="flex items-center gap-3">
+                        <Home className="h-5 w-5 text-primary" />
+                        <span className="font-medium text-foreground">Basement</span>
+                        {foundation.basement.enabled && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <Switch
+                            checked={foundation.basement.enabled}
+                            onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, enabled: checked } }); handleSave() }}
+                          />
+                          <Label>Enable Basement</Label>
+                        </div>
+                        {foundation.basement.enabled && (
+                          <div className="space-y-4">
+                            <div className="grid gap-4 sm:grid-cols-2">
+                              <div className="space-y-2">
+                                <Label>Foundation Wall Clean (PF)</Label>
+                                <Input
+                                  type="text"
+                                  inputMode="numeric"
+                                  placeholder="Perimeter feet"
+                                  value={foundation.basement.wallCleanPf}
+                                  onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, wallCleanPf: e.target.value.replace(/^0+/, '') } }); handleSave() }}
+                                  className="border-border/60 bg-secondary/50"
+                                />
+                              </div>
+                              <div className="flex items-center gap-4 pt-6">
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={foundation.basement.muck}
+                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, muck: checked, muckHeavy: checked ? false : foundation.basement.muckHeavy } }); handleSave() }}
+                                  />
+                                  <Label className="text-sm">Water Muck</Label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={foundation.basement.muckHeavy}
+                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, muckHeavy: checked, muck: checked ? false : foundation.basement.muck } }); handleSave() }}
+                                  />
+                                  <Label className="text-sm">Water Muck Heavy</Label>
+                                </div>
+                              </div>
+                            </div>
+                            {foundation.basement.muckHeavy && (
+                              <p className="text-xs text-amber-500">Note: NFIP requires photos of standing mud to endorse for heavy Muck</p>
+                            )}
+                            {/* Drywall */}
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-3">
+                                <Switch
+                                  checked={foundation.basement.drywallEnabled}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallEnabled: checked } }); handleSave() }}
+                                />
+                                <Label>Drywall Replacement Height</Label>
+                                <p className="text-xs text-muted-foreground">Certain locations require SF calculations, you will need to update this periodically as they get updated</p>
+                              </div>
+                              {foundation.basement.drywallEnabled && (
+                                <div className="ml-8 flex items-center gap-4">
+                                  <div className="flex items-center gap-2">
+                                    <Button
+                                      type="button"
+                                      variant={foundation.basement.drywallMeasureType === "sf" ? "default" : "outline"}
+                                      size="sm"
+                                      className="h-7 px-2 text-xs"
+                                      onClick={() => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallMeasureType: "sf" } }); handleSave() }}
+                                    >
+                                      Square Feet
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      variant={foundation.basement.drywallMeasureType === "lf" ? "default" : "outline"}
+                                      size="sm"
+                                      className="h-7 px-2 text-xs"
+                                      onClick={() => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallMeasureType: "lf" } }); handleSave() }}
+                                    >
+                                      Linear Feet
+                                    </Button>
+                                  </div>
+                                  <Input
+                                    type="text"
+                                    inputMode="numeric"
+                                    placeholder={foundation.basement.drywallMeasureType.toUpperCase()}
+                                    value={foundation.basement.drywallValue}
+                                    onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallValue: e.target.value.replace(/^0+/, '') } }); handleSave() }}
+                                    className="w-24 border-border/60 bg-secondary/50"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            {/* Stair Cleaning */}
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-3">
+                                <Switch
+                                  checked={foundation.basement.stairCleaning}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, stairCleaning: checked } }); handleSave() }}
+                                />
+                                <Label>Enable Stair Cleaning</Label>
+                              </div>
+                              {foundation.basement.stairCleaning && (
+                                <div className="ml-8 grid gap-4 sm:grid-cols-2">
+                                  <div className="space-y-2">
+                                    <Label className="text-sm"># of stairs submerged</Label>
+                                    <Input
+                                      type="text"
+                                      inputMode="numeric"
+                                      value={foundation.basement.stairCount || ""}
+                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, stairCount: parseInt(e.target.value.replace(/^0+/, '')) || 0 } }); handleSave() }}
+                                      className="border-border/60 bg-secondary/50"
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label className="text-sm">Width of treads</Label>
+                                    <Input
+                                      type="text"
+                                      placeholder="3 ft"
+                                      value={foundation.basement.totalStairsSubmerged}
+                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, totalStairsSubmerged: e.target.value } }); handleSave() }}
+                                      className="border-border/60 bg-secondary/50"
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            {/* Foundation Door */}
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-3">
+                                <Switch
+                                  checked={foundation.basement.foundationDoor}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoor: checked } }); handleSave() }}
+                                />
+                                <Label>Enable Foundation Door</Label>
+                                {foundation.basement.foundationDoor && (
+                                  <Select value={foundation.basement.foundationDoorAction} onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoorAction: value } }); handleSave() }}>
+                                    <SelectTrigger className="w-44 border-border/60 bg-secondary/50">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="detach-reset-handle">Detach & Reset Handle</SelectItem>
+                                      <SelectItem value="replace">Replace</SelectItem>
+                                      <SelectItem value="replace-handle">Replace Handle</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                )}
+                              </div>
+                            </div>
+                            {/* Foundation Windows */}
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <Switch
+                                    checked={foundation.basement.foundationWindows.length > 0}
+                                    onCheckedChange={(checked) => {
+                                      if (checked && foundation.basement.foundationWindows.length === 0) {
+                                        setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [{ id: Date.now(), type: "casement", size: "3-4", quantity: 1, material: "vinyl" }] } })
+                                      } else if (!checked) {
+                                        setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [] } })
+                                      }
+                                      handleSave()
+                                    }}
+                                  />
+                                  <Label>Enable Foundation Window</Label>
+                                </div>
+                                {foundation.basement.foundationWindows.length > 0 && (
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="gap-1 border-border/60"
+                                    onClick={() => {
+                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [...foundation.basement.foundationWindows, { id: Date.now(), type: "casement", size: "3-4", quantity: 1, material: "vinyl" }] } })
+                                      handleSave()
+                                    }}
+                                  >
+                                    <Plus className="h-3 w-3" /> Add Window
+                                  </Button>
+                                )}
+                              </div>
+                              {foundation.basement.foundationWindows.map((win, index) => (
+                                <div key={win.id} className="ml-8 flex flex-wrap items-center gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
+                                  <span className="text-sm font-medium">Window {index + 1}</span>
+                                  <Select value={win.type} onValueChange={(value) => {
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, type: value } : w) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="w-28 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="casement">Casement</SelectItem>
+                                      <SelectItem value="single-hung">Single Hung</SelectItem>
+                                      <SelectItem value="double-hung">Double Hung</SelectItem>
+                                      <SelectItem value="slider">Slider</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Select value={win.size} onValueChange={(value) => {
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, size: value } : w) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Size" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="3-4">3-4 sf</SelectItem>
+                                      <SelectItem value="5-8">5-8 sf</SelectItem>
+                                      <SelectItem value="9-12">9-12 sf</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <div className="flex items-center gap-1">
+                                    <Label className="text-xs">Qty</Label>
+                                    <Input
+                                      type="number"
+                                      min="1"
+                                      value={win.quantity}
+                                      onChange={(e) => {
+                                        setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, quantity: parseInt(e.target.value) || 1 } : w) } })
+                                        handleSave()
+                                      }}
+                                      className="w-14 border-border/60 bg-secondary/50"
+                                    />
+                                  </div>
+                                  <Select value={win.material} onValueChange={(value) => {
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, material: value } : w) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Material" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="vinyl">Vinyl</SelectItem>
+                                      <SelectItem value="aluminum">Aluminum</SelectItem>
+                                      <SelectItem value="wood">Wood</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                    onClick={() => {
+                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.filter(w => w.id !== win.id) } })
+                                      handleSave()
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+
+                  {/* Electrical */}
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
+                      <div className="flex items-center gap-3">
+                        <Zap className="h-5 w-5 text-primary" />
+                        <span className="font-medium text-foreground">Electrical</span>
+                        {(foundation.electrical.outlets110 > 0 || foundation.electrical.breakerPanel.enabled || foundation.electrical.meterBox) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
+                      <div className="space-y-4">
+                        <div className="grid gap-4 sm:grid-cols-4">
+                          <div className="space-y-2">
+                            <Label>110 outlet</Label>
+                            <Select value={foundation.electrical.outlets110.toString()} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: parseInt(value) } }); handleSave() }}>
+                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                                <SelectValue placeholder="QTY" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>220 outlet</Label>
+                            <Select value={foundation.electrical.outlets220.toString()} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: parseInt(value) } }); handleSave() }}>
+                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                                <SelectValue placeholder="QTY" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[0, 1, 2, 3, 4, 5].map(n => (
+                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>GFI outlet</Label>
+                            <Select value={foundation.electrical.gfiOutlets.toString()} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: parseInt(value) } }); handleSave() }}>
+                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                                <SelectValue placeholder="QTY" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[0, 1, 2, 3, 4, 5].map(n => (
+                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Light Switch</Label>
+                            <Select value={foundation.electrical.lightSwitch.toString()} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: parseInt(value) } }); handleSave() }}>
+                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                                <SelectValue placeholder="QTY" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(n => (
+                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Junction Box</Label>
+                          <Select value={foundation.electrical.junctionBox.toString()} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: parseInt(value) } }); handleSave() }}>
+                            <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                              <SelectValue placeholder="QTY" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[0, 1, 2, 3, 4, 5].map(n => (
+                                <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {/* Breaker Panel */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3">
+                            <Switch
+                              checked={foundation.electrical.breakerPanel.enabled}
+                              onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
+                            />
+                            <Label>Enable Breaker Panel</Label>
+                          </div>
+                          {foundation.electrical.breakerPanel.enabled && (
+                            <div className="ml-8 flex items-center gap-4">
+                              <div className="space-y-2">
+                                <Label className="text-sm">Amperage</Label>
+                                <Select value={foundation.electrical.breakerPanel.amps} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, amps: value } } }); handleSave() }}>
+                                  <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {["100", "150", "200", "300"].map(a => (
+                                      <SelectItem key={a} value={a}>{a} Amp</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="flex items-center gap-2 pt-6">
+                                <Switch
+                                  checked={foundation.electrical.breakerPanel.arcFaults}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
+                                />
+                                <Label className="text-sm">With Arc Faults</Label>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        {/* Meter Box */}
+                        <div className="flex items-center gap-3">
+                          <Switch
+                            checked={foundation.electrical.meterBox}
+                            onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, meterBox: checked } }); handleSave() }}
+                          />
+                          <Label>Enable Meter Box</Label>
+                          {foundation.electrical.meterBox && (
+                            <Select defaultValue="qty">
+                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
+                                <SelectValue placeholder="QTY" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="qty">QTY</SelectItem>
+                                <SelectItem value="1">1</SelectItem>
+                                <SelectItem value="2">2</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </TabsContent>
 
                 {/* INTERIOR TAB */}
