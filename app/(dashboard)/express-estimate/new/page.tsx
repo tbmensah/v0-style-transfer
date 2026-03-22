@@ -192,7 +192,7 @@ export default function NewExpressEstimatePage() {
   // Exterior State
   const [exterior, setExterior] = useState({
     pressureWash: { enabled: false, perimeterFeet: "", regularPwash: false, cleanWithSteam: false },
-    dumpster: { enabled: false, count: 1, size: "20" },
+    dumpster: { enabled: false, count: 1, size: "" },
     hvac: {
       condenserUnits: [] as Array<{ id: number; tonnage: string; seer: string; replace: boolean; serviceCall: boolean; f9Note: string }>,
       packageUnits: [] as Array<{ id: number; unitType: string; tonnage: string; seer: string; replace: boolean; serviceCall: boolean; f9Note: string }>,
@@ -201,7 +201,7 @@ export default function NewExpressEstimatePage() {
     electrical: {
       exteriorOutlets: 0,
       disconnect30Amp: 0,
-      breakerPanel: { enabled: false, amps: "200", arcFaults: false },
+      breakerPanel: { enabled: false, amps: "", arcFaults: false },
       meterBox: false,
     },
     finishes: [] as Array<{
@@ -226,7 +226,7 @@ export default function NewExpressEstimatePage() {
       // Pre-FIRM options
       bellyPaper: false,
       floorInsulation: false,
-      floorInsulationType: "spray-foam",
+      floorInsulationType: "",
       // Muck options
       muck: false,
       muckHeavy: false,
@@ -238,7 +238,7 @@ export default function NewExpressEstimatePage() {
       backfill: { enabled: false, cubicFeet: "", length: "", width: "", depth: "" },
       confinedSpace: false,
     },
-    sumpPump: { enabled: false, minorAdjustment: "", action: "replace", hp: "1/3" },
+    sumpPump: { enabled: false, minorAdjustment: "", action: "", hp: "" },
     hvac: {
       airHandlers: [] as Array<{ 
         id: number; 
@@ -264,7 +264,7 @@ export default function NewExpressEstimatePage() {
       totalStairsSubmerged: "",
       // Foundation Door
       foundationDoor: false,
-      foundationDoorAction: "detach-reset-handle",
+      foundationDoorAction: "",
       // Foundation Windows
       foundationWindows: [] as Array<{
         id: number;
@@ -280,7 +280,7 @@ export default function NewExpressEstimatePage() {
       gfiOutlets: 0,
       lightSwitch: 0,
       junctionBox: 0,
-      breakerPanel: { enabled: false, amps: "200", arcFaults: false },
+      breakerPanel: { enabled: false, amps: "", arcFaults: false },
       meterBox: false,
     },
   })
@@ -626,7 +626,7 @@ export default function NewExpressEstimatePage() {
                               size="sm"
                               className="gap-1 border-border/60"
                               onClick={() => {
-                                const newUnit = { id: Date.now(), tonnage: "2", seer: "13", replace: true, serviceCall: false, f9Note: "" }
+                                const newUnit = { id: Date.now(), tonnage: "", seer: "", replace: false, serviceCall: false, f9Note: "" }
                                 setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: [...exterior.hvac.condenserUnits, newUnit] } })
                                 handleSave()
                               }}
@@ -733,7 +733,7 @@ export default function NewExpressEstimatePage() {
                               size="sm"
                               className="gap-1 border-border/60"
                               onClick={() => {
-                                const newUnit = { id: Date.now(), unitType: "ac", tonnage: "2", seer: "13", replace: true, serviceCall: false, f9Note: "" }
+                                const newUnit = { id: Date.now(), unitType: "", tonnage: "", seer: "", replace: false, serviceCall: false, f9Note: "" }
                                 setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: [...exterior.hvac.packageUnits, newUnit] } })
                                 handleSave()
                               }}
@@ -855,7 +855,7 @@ export default function NewExpressEstimatePage() {
                               size="sm"
                               className="gap-1 border-border/60"
                               onClick={() => {
-                                const newUnit = { id: Date.now(), zones: "1", highEfficiency: false, replace: true, serviceCall: false, f9Note: "" }
+                                const newUnit = { id: Date.now(), zones: "", highEfficiency: false, replace: false, serviceCall: false, f9Note: "" }
                                 setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: [...exterior.hvac.miniSplits, newUnit] } })
                                 handleSave()
                               }}
@@ -1512,7 +1512,7 @@ export default function NewExpressEstimatePage() {
                               checked={foundation.hvac.airHandlers.length > 0}
                               onCheckedChange={(checked) => {
                                 if (checked && foundation.hvac.airHandlers.length === 0) {
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [{ id: Date.now(), type: "air-handler", tonnage: "2", heatElementCount: 0, action: "replace", f9Note: "" }] } })
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [{ id: Date.now(), type: "", tonnage: "", heatElementCount: 0, action: "", f9Note: "" }] } })
                                 } else if (!checked) {
                                   setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [] } })
                                 }
@@ -1528,7 +1528,7 @@ export default function NewExpressEstimatePage() {
                               size="sm"
                               className="gap-1 border-border/60"
                               onClick={() => {
-                                setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [...foundation.hvac.airHandlers, { id: Date.now(), type: "air-handler", tonnage: "2", heatElementCount: 0, action: "replace", f9Note: "" }] } })
+                                setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [...foundation.hvac.airHandlers, { id: Date.now(), type: "", tonnage: "", heatElementCount: 0, action: "", f9Note: "" }] } })
                                 handleSave()
                               }}
                             >
@@ -1786,7 +1786,7 @@ export default function NewExpressEstimatePage() {
                                     checked={foundation.basement.foundationWindows.length > 0}
                                     onCheckedChange={(checked) => {
                                       if (checked && foundation.basement.foundationWindows.length === 0) {
-                                        setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [{ id: Date.now(), type: "casement", size: "3-4", quantity: 1, material: "vinyl" }] } })
+                                        setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [{ id: Date.now(), type: "", size: "", quantity: 1, material: "" }] } })
                                       } else if (!checked) {
                                         setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [] } })
                                       }
@@ -1802,7 +1802,7 @@ export default function NewExpressEstimatePage() {
                                     size="sm"
                                     className="gap-1 border-border/60"
                                     onClick={() => {
-                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [...foundation.basement.foundationWindows, { id: Date.now(), type: "casement", size: "3-4", quantity: 1, material: "vinyl" }] } })
+                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [...foundation.basement.foundationWindows, { id: Date.now(), type: "", size: "", quantity: 1, material: "" }] } })
                                       handleSave()
                                     }}
                                   >
