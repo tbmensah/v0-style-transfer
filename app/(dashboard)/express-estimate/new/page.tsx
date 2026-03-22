@@ -584,7 +584,7 @@ export default function NewExpressEstimatePage() {
                               <Label>Dumpster Size</Label>
                               <Select value={exterior.dumpster.size} onValueChange={(value) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, size: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
-                                  <SelectValue />
+                                  <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="12">12 Yards</SelectItem>
@@ -659,7 +659,7 @@ export default function NewExpressEstimatePage() {
                                     handleSave()
                                   }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue />
+                                      <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {["2", "2.5", "3", "4", "5"].map(t => (
@@ -675,7 +675,7 @@ export default function NewExpressEstimatePage() {
                                     handleSave()
                                   }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue />
+                                      <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="13">13</SelectItem>
@@ -765,7 +765,7 @@ export default function NewExpressEstimatePage() {
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue />
+                                    <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="ac">AC Unit</SelectItem>
@@ -781,7 +781,7 @@ export default function NewExpressEstimatePage() {
                                     handleSave()
                                   }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue />
+                                      <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {["2", "2.5", "3", "4", "5"].map(t => (
@@ -797,7 +797,7 @@ export default function NewExpressEstimatePage() {
                                     handleSave()
                                   }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue />
+                                      <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="13">13</SelectItem>
@@ -888,7 +888,7 @@ export default function NewExpressEstimatePage() {
                                     handleSave()
                                   }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue />
+                                      <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {["1", "2", "3", "4"].map(z => (
@@ -1008,7 +1008,7 @@ export default function NewExpressEstimatePage() {
                                 <Label className="text-sm">Amperage</Label>
                                 <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(value) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue />
+                                    <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     {["70", "100", "125", "150", "200", "300"].map(a => (
@@ -1241,7 +1241,7 @@ export default function NewExpressEstimatePage() {
                                   {foundation.crawlspace.floorInsulation && (
                                     <Select value={foundation.crawlspace.floorInsulationType} onValueChange={(value) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, floorInsulationType: value } }); handleSave() }}>
                                       <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
-                                        <SelectValue />
+                                        <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                       <SelectContent>
                                         <SelectItem value="spray-foam">Spray Foam</SelectItem>
@@ -1466,7 +1466,7 @@ export default function NewExpressEstimatePage() {
                               <Label>Action</Label>
                               <Select value={foundation.sumpPump.action} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, action: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
-                                  <SelectValue />
+                                  <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="replace">Replace</SelectItem>
@@ -1478,7 +1478,7 @@ export default function NewExpressEstimatePage() {
                               <Label>Horsepower</Label>
                               <Select value={foundation.sumpPump.hp} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, hp: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
-                                  <SelectValue />
+                                  <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="1/3">1/3 HP - up to 1 1/2 discharge</SelectItem>
@@ -1561,7 +1561,7 @@ export default function NewExpressEstimatePage() {
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue />
+                                    <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="air-handler">Air Handler</SelectItem>
@@ -1577,7 +1577,7 @@ export default function NewExpressEstimatePage() {
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue />
+                                    <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     {["2", "2.5", "3", "4", "5"].map(t => (
@@ -1594,7 +1594,7 @@ export default function NewExpressEstimatePage() {
                                     handleSave()
                                   }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue />
+                                      <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {[1, 2, 3, 4, 5].map(n => (
@@ -1612,7 +1612,7 @@ export default function NewExpressEstimatePage() {
                                 handleSave()
                               }}>
                                 <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
-                                  <SelectValue />
+                                  <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="replace">Replace</SelectItem>
@@ -1767,7 +1767,7 @@ export default function NewExpressEstimatePage() {
                                 {foundation.basement.foundationDoor && (
                                   <Select value={foundation.basement.foundationDoorAction} onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoorAction: value } }); handleSave() }}>
                                     <SelectTrigger className="w-44 border-border/60 bg-secondary/50">
-                                      <SelectValue />
+                                      <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="detach-reset-handle">Detach & Reset Handle</SelectItem>
@@ -1981,7 +1981,7 @@ export default function NewExpressEstimatePage() {
                                 <Label className="text-sm">Amperage</Label>
                                 <Select value={foundation.electrical.breakerPanel.amps} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, amps: value } } }); handleSave() }}>
                                   <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
-                                    <SelectValue />
+                                    <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     {["100", "150", "200", "300"].map(a => (
@@ -2102,7 +2102,7 @@ export default function NewExpressEstimatePage() {
                                   <Label>Room Type</Label>
                                   <Select value={room.type} onValueChange={(value) => updateRoom(room.id, { type: value })}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue />
+                                      <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="living-room">Living Room</SelectItem>
@@ -2142,7 +2142,7 @@ export default function NewExpressEstimatePage() {
                                       <Label className="text-sm">Type</Label>
                                       <Select value={room.flooring.type} onValueChange={(value) => updateRoom(room.id, { flooring: { ...room.flooring, type: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="vinyl-plank">Vinyl Plank</SelectItem>
@@ -2158,7 +2158,7 @@ export default function NewExpressEstimatePage() {
                                       <Label className="text-sm">Grade</Label>
                                       <Select value={room.flooring.grade} onValueChange={(value) => updateRoom(room.id, { flooring: { ...room.flooring, grade: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="standard">Standard Grade</SelectItem>
@@ -2202,7 +2202,7 @@ export default function NewExpressEstimatePage() {
                                       <Label className="text-sm">Height</Label>
                                       <Select value={room.trim.baseboardHeight} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, baseboardHeight: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           {["2", "3", "4", "5", "6"].map(h => (
@@ -2215,7 +2215,7 @@ export default function NewExpressEstimatePage() {
                                       <Label className="text-sm">Material</Label>
                                       <Select value={room.trim.material} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, material: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="mdf">MDF</SelectItem>
@@ -2228,7 +2228,7 @@ export default function NewExpressEstimatePage() {
                                       <Label className="text-sm">Finish</Label>
                                       <Select value={room.trim.finish} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, finish: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="paint">Paint</SelectItem>
@@ -2255,7 +2255,7 @@ export default function NewExpressEstimatePage() {
                                       <Label className="text-sm">Type</Label>
                                       <Select value={room.wallCovering.type} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, type: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="drywall">Drywall</SelectItem>
@@ -2269,7 +2269,7 @@ export default function NewExpressEstimatePage() {
                                       <Label className="text-sm">Replacement Height</Label>
                                       <Select value={room.wallCovering.replacementHeight} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="4">4 ft</SelectItem>
@@ -2282,7 +2282,7 @@ export default function NewExpressEstimatePage() {
                                       <Label className="text-sm">Texture</Label>
                                       <Select value={room.wallCovering.texture} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, texture: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="smooth">Smooth</SelectItem>
@@ -2405,7 +2405,7 @@ export default function NewExpressEstimatePage() {
                                         updateRoom(room.id, { windows: newWindows })
                                       }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="vinyl-double-hung">Vinyl Double Hung</SelectItem>
@@ -2424,7 +2424,7 @@ export default function NewExpressEstimatePage() {
                                         updateRoom(room.id, { windows: newWindows })
                                       }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="4-8">4-8 SF</SelectItem>
@@ -2442,7 +2442,7 @@ export default function NewExpressEstimatePage() {
                                         updateRoom(room.id, { windows: newWindows })
                                       }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="standard">Standard</SelectItem>
@@ -2497,7 +2497,7 @@ export default function NewExpressEstimatePage() {
                                         updateRoom(room.id, { doors: newDoors })
                                       }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           {door.category === "interior" ? (
@@ -2528,7 +2528,7 @@ export default function NewExpressEstimatePage() {
                                         updateRoom(room.id, { doors: newDoors })
                                       }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="standard">Standard</SelectItem>
@@ -2545,7 +2545,7 @@ export default function NewExpressEstimatePage() {
                                         updateRoom(room.id, { doors: newDoors })
                                       }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue />
+                                          <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="replace">Replace</SelectItem>
