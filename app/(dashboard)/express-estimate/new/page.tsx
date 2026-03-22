@@ -3307,53 +3307,55 @@ type="text"
                                                     </SelectContent>
                                                   </Select>
                                                 </div>
-                                                <div className="space-y-2">
-                                                  <Label className="text-xs">Size</Label>
-                                                  <Select value={room.appliances.refrigerator.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, size: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      {room.appliances.refrigerator.type === "top-freezer" && (
-                                                        <>
-                                                          <SelectItem value="14-18">14-18 CF</SelectItem>
-                                                          <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                          <SelectItem value="23-26">23-26 CF</SelectItem>
-                                                          <SelectItem value="14-26">14-26 CF</SelectItem>
-                                                        </>
-                                                      )}
-                                                      {room.appliances.refrigerator.type === "bottom-freezer" && (
-                                                        <>
-                                                          <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                          <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                          <SelectItem value="25-30">25-30 CF</SelectItem>
-                                                          <SelectItem value="25-36">25-36 CF</SelectItem>
-                                                        </>
-                                                      )}
-                                                      {room.appliances.refrigerator.type === "built-in" && (
-                                                        <>
-                                                          <SelectItem value="36">36&quot;</SelectItem>
-                                                          <SelectItem value="42">42&quot;</SelectItem>
-                                                          <SelectItem value="48">48&quot;</SelectItem>
-                                                        </>
-                                                      )}
-                                                      {room.appliances.refrigerator.type === "side-by-side" && (
-                                                        <>
-                                                          <SelectItem value="12-22">12-22 CF</SelectItem>
-                                                          <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                          <SelectItem value="25-30">25-30 CF</SelectItem>
-                                                        </>
-                                                      )}
-                                                      {(!room.appliances.refrigerator.type || room.appliances.refrigerator.type === "compact") && (
-                                                        <>
-                                                          <SelectItem value="14-18">14-18 CF</SelectItem>
-                                                          <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                          <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                        </>
-                                                      )}
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
+                                                {room.appliances.refrigerator.type !== "compact" && (
+                                                  <div className="space-y-2">
+                                                    <Label className="text-xs">Size</Label>
+                                                    <Select value={room.appliances.refrigerator.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, size: value } } })}>
+                                                      <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                        <SelectValue placeholder="Select" />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        {room.appliances.refrigerator.type === "top-freezer" && (
+                                                          <>
+                                                            <SelectItem value="14-18">14-18 CF</SelectItem>
+                                                            <SelectItem value="18-22">18-22 CF</SelectItem>
+                                                            <SelectItem value="23-26">23-26 CF</SelectItem>
+                                                            <SelectItem value="14-26">14-26 CF</SelectItem>
+                                                          </>
+                                                        )}
+                                                        {room.appliances.refrigerator.type === "bottom-freezer" && (
+                                                          <>
+                                                            <SelectItem value="18-22">18-22 CF</SelectItem>
+                                                            <SelectItem value="22-25">22-25 CF</SelectItem>
+                                                            <SelectItem value="25-30">25-30 CF</SelectItem>
+                                                            <SelectItem value="25-36">25-36 CF</SelectItem>
+                                                          </>
+                                                        )}
+                                                        {room.appliances.refrigerator.type === "built-in" && (
+                                                          <>
+                                                            <SelectItem value="36">36&quot;</SelectItem>
+                                                            <SelectItem value="42">42&quot;</SelectItem>
+                                                            <SelectItem value="48">48&quot;</SelectItem>
+                                                          </>
+                                                        )}
+                                                        {room.appliances.refrigerator.type === "side-by-side" && (
+                                                          <>
+                                                            <SelectItem value="12-22">12-22 CF</SelectItem>
+                                                            <SelectItem value="22-25">22-25 CF</SelectItem>
+                                                            <SelectItem value="25-30">25-30 CF</SelectItem>
+                                                          </>
+                                                        )}
+                                                        {!room.appliances.refrigerator.type && (
+                                                          <>
+                                                            <SelectItem value="14-18">14-18 CF</SelectItem>
+                                                            <SelectItem value="18-22">18-22 CF</SelectItem>
+                                                            <SelectItem value="22-25">22-25 CF</SelectItem>
+                                                          </>
+                                                        )}
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
+                                                )}
                                                 <div className="space-y-2">
                                                   <Label className="text-xs">Grade</Label>
                                                   <Select value={room.appliances.refrigerator.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, grade: value } } })}>
