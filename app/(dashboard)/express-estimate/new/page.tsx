@@ -192,15 +192,15 @@ export default function NewExpressEstimatePage() {
   // Exterior State
   const [exterior, setExterior] = useState({
     pressureWash: { enabled: false, perimeterFeet: "", regularPwash: false, cleanWithSteam: false },
-    dumpster: { enabled: false, count: 1, size: "" },
+    dumpster: { enabled: false, count: "", size: "" },
     hvac: {
       condenserUnits: [] as Array<{ id: number; tonnage: string; seer: string; replace: boolean; serviceCall: boolean; f9Note: string }>,
       packageUnits: [] as Array<{ id: number; unitType: string; tonnage: string; seer: string; replace: boolean; serviceCall: boolean; f9Note: string }>,
       miniSplits: [] as Array<{ id: number; zones: string; highEfficiency: boolean; replace: boolean; serviceCall: boolean; f9Note: string }>,
     },
     electrical: {
-      exteriorOutlets: 0,
-      disconnect30Amp: 0,
+      exteriorOutlets: "",
+      disconnect30Amp: "",
       breakerPanel: { enabled: false, amps: "", arcFaults: false },
       meterBox: false,
     },
@@ -221,7 +221,7 @@ export default function NewExpressEstimatePage() {
       heavyCleanArea: false,
       perimeterFeet: "",
       piersType: "" as "" | "short" | "tall",
-      piersCount: 0,
+      piersCount: "",
       cleanJoist: false,
       // Pre-FIRM options
       bellyPaper: false,
@@ -244,7 +244,7 @@ export default function NewExpressEstimatePage() {
         id: number; 
         type: string;
         tonnage: string; 
-        heatElementCount: number;
+        heatElementCount: string;
         action: string;
         f9Note: string;
       }>,
@@ -260,7 +260,7 @@ export default function NewExpressEstimatePage() {
       drywallValue: "",
       // Stair Cleaning
       stairCleaning: false,
-      stairCount: 0,
+      stairCount: "",
       totalStairsSubmerged: "",
       // Foundation Door
       foundationDoor: false,
@@ -270,16 +270,16 @@ export default function NewExpressEstimatePage() {
         id: number;
         type: string;
         size: string;
-        quantity: number;
+        quantity: string;
         material: string;
       }>,
     },
     electrical: {
-      outlets110: 0,
-      outlets220: 0,
-      gfiOutlets: 0,
-      lightSwitch: 0,
-      junctionBox: 0,
+      outlets110: "",
+      outlets220: "",
+      gfiOutlets: "",
+      lightSwitch: "",
+      junctionBox: "",
       breakerPanel: { enabled: false, amps: "", arcFaults: false },
       meterBox: false,
     },
@@ -575,8 +575,8 @@ export default function NewExpressEstimatePage() {
                                 type="number"
                                 min="1"
                                 max="20"
-                                value={exterior.dumpster.count}
-                                onChange={(e) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, count: parseInt(e.target.value) || 1 } }); handleSave() }}
+value={exterior.dumpster.count}
+                              onChange={(e) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, count: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
                                 className="border-border/60 bg-secondary/50"
                               />
                             </div>
@@ -882,13 +882,13 @@ export default function NewExpressEstimatePage() {
                               </div>
                               <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
-                                  <Label className="text-sm">Number of Zones</Label>
-                                  <Select value={unit.zones} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
+<Label className="text-sm">Number of Zones</Label>
+                                <Select value={unit.zones} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="QTY" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {["1", "2", "3", "4"].map(z => (
@@ -971,10 +971,10 @@ export default function NewExpressEstimatePage() {
                               type="text"
                               inputMode="numeric"
                               pattern="[0-9]*"
-                              value={exterior.electrical.exteriorOutlets || ""}
-                              onChange={(e) => { 
-                                const val = e.target.value.replace(/^0+/, '') || "0"
-                                setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: parseInt(val) || 0 } }); handleSave() 
+value={exterior.electrical.exteriorOutlets}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/^0+/, '') || ""
+                                setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: val } }); handleSave()
                               }}
                               className="border-border/60 bg-secondary/50"
                             />
@@ -985,10 +985,10 @@ export default function NewExpressEstimatePage() {
                               type="text"
                               inputMode="numeric"
                               pattern="[0-9]*"
-                              value={exterior.electrical.disconnect30Amp || ""}
-                              onChange={(e) => { 
-                                const val = e.target.value.replace(/^0+/, '') || "0"
-                                setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: parseInt(val) || 0 } }); handleSave() 
+value={exterior.electrical.disconnect30Amp}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/^0+/, '') || ""
+                                setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: val } }); handleSave()
                               }}
                               className="border-border/60 bg-secondary/50"
                             />
@@ -1180,8 +1180,8 @@ export default function NewExpressEstimatePage() {
                                 <Input
                                   type="text"
                                   inputMode="numeric"
-                                  value={foundation.crawlspace.piersCount || ""}
-                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersCount: parseInt(e.target.value.replace(/^0+/, '')) || 0 } }); handleSave() }}
+value={foundation.crawlspace.piersCount}
+                                onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50"
                                 />
                               </div>
@@ -1512,7 +1512,7 @@ export default function NewExpressEstimatePage() {
                               checked={foundation.hvac.airHandlers.length > 0}
                               onCheckedChange={(checked) => {
                                 if (checked && foundation.hvac.airHandlers.length === 0) {
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [{ id: Date.now(), type: "", tonnage: "", heatElementCount: 0, action: "", f9Note: "" }] } })
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [{ id: Date.now(), type: "", tonnage: "", heatElementCount: "", action: "", f9Note: "" }] } })
                                 } else if (!checked) {
                                   setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [] } })
                                 }
@@ -1528,7 +1528,7 @@ export default function NewExpressEstimatePage() {
                               size="sm"
                               className="gap-1 border-border/60"
                               onClick={() => {
-                                setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [...foundation.hvac.airHandlers, { id: Date.now(), type: "", tonnage: "", heatElementCount: 0, action: "", f9Note: "" }] } })
+                                setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [...foundation.hvac.airHandlers, { id: Date.now(), type: "", tonnage: "", heatElementCount: "", action: "", f9Note: "" }] } })
                                 handleSave()
                               }}
                             >
@@ -1589,12 +1589,12 @@ export default function NewExpressEstimatePage() {
                               {(handler.type === "with-heat-element" || handler.type === "with-heat-element-a-coil") && (
                                 <div className="space-y-2">
                                   <Label className="text-sm">With Heat Element</Label>
-                                  <Select value={handler.heatElementCount.toString()} onValueChange={(value) => {
-                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, heatElementCount: parseInt(value) } : h) } })
+                                  <Select value={handler.heatElementCount} onValueChange={(value) => {
+                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, heatElementCount: value } : h) } })
                                     handleSave()
                                   }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
+                                      <SelectValue placeholder="QTY" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {[1, 2, 3, 4, 5].map(n => (
@@ -1738,8 +1738,8 @@ export default function NewExpressEstimatePage() {
                                     <Input
                                       type="text"
                                       inputMode="numeric"
-                                      value={foundation.basement.stairCount || ""}
-                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, stairCount: parseInt(e.target.value.replace(/^0+/, '')) || 0 } }); handleSave() }}
+value={foundation.basement.stairCount}
+                                    onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, stairCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
                                       className="border-border/60 bg-secondary/50"
                                     />
                                   </div>
@@ -1786,7 +1786,7 @@ export default function NewExpressEstimatePage() {
                                     checked={foundation.basement.foundationWindows.length > 0}
                                     onCheckedChange={(checked) => {
                                       if (checked && foundation.basement.foundationWindows.length === 0) {
-                                        setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [{ id: Date.now(), type: "", size: "", quantity: 1, material: "" }] } })
+                                        setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [{ id: Date.now(), type: "", size: "", quantity: "", material: "" }] } })
                                       } else if (!checked) {
                                         setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [] } })
                                       }
@@ -1802,7 +1802,7 @@ export default function NewExpressEstimatePage() {
                                     size="sm"
                                     className="gap-1 border-border/60"
                                     onClick={() => {
-                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [...foundation.basement.foundationWindows, { id: Date.now(), type: "", size: "", quantity: 1, material: "" }] } })
+                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: [...foundation.basement.foundationWindows, { id: Date.now(), type: "", size: "", quantity: "", material: "" }] } })
                                       handleSave()
                                     }}
                                   >
@@ -1843,11 +1843,12 @@ export default function NewExpressEstimatePage() {
                                   <div className="flex items-center gap-1">
                                     <Label className="text-xs">Qty</Label>
                                     <Input
-                                      type="number"
-                                      min="1"
-                                      value={win.quantity}
-                                      onChange={(e) => {
-                                        setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, quantity: parseInt(e.target.value) || 1 } : w) } })
+type="text"
+                                  inputMode="numeric"
+                                  placeholder="QTY"
+                                  value={win.quantity}
+                                  onChange={(e) => {
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, quantity: e.target.value.replace(/^0+/, '') || "" } : w) } })
                                         handleSave()
                                       }}
                                       className="w-14 border-border/60 bg-secondary/50"
@@ -1902,7 +1903,7 @@ export default function NewExpressEstimatePage() {
                         <div className="grid gap-4 sm:grid-cols-4">
                           <div className="space-y-2">
                             <Label>110 outlet</Label>
-                            <Select value={foundation.electrical.outlets110.toString()} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: parseInt(value) } }); handleSave() }}>
+                            <Select value={foundation.electrical.outlets110} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: value } }); handleSave() }}>
                               <SelectTrigger className="border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
@@ -1915,7 +1916,7 @@ export default function NewExpressEstimatePage() {
                           </div>
                           <div className="space-y-2">
                             <Label>220 outlet</Label>
-                            <Select value={foundation.electrical.outlets220.toString()} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: parseInt(value) } }); handleSave() }}>
+                            <Select value={foundation.electrical.outlets220} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: value } }); handleSave() }}>
                               <SelectTrigger className="border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
@@ -1928,7 +1929,7 @@ export default function NewExpressEstimatePage() {
                           </div>
                           <div className="space-y-2">
                             <Label>GFI outlet</Label>
-                            <Select value={foundation.electrical.gfiOutlets.toString()} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: parseInt(value) } }); handleSave() }}>
+                            <Select value={foundation.electrical.gfiOutlets} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: value } }); handleSave() }}>
                               <SelectTrigger className="border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
@@ -1941,7 +1942,7 @@ export default function NewExpressEstimatePage() {
                           </div>
                           <div className="space-y-2">
                             <Label>Light Switch</Label>
-                            <Select value={foundation.electrical.lightSwitch.toString()} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: parseInt(value) } }); handleSave() }}>
+                            <Select value={foundation.electrical.lightSwitch} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: value } }); handleSave() }}>
                               <SelectTrigger className="border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
@@ -1955,7 +1956,7 @@ export default function NewExpressEstimatePage() {
                         </div>
                         <div className="space-y-2">
                           <Label>Junction Box</Label>
-                          <Select value={foundation.electrical.junctionBox.toString()} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: parseInt(value) } }); handleSave() }}>
+                          <Select value={foundation.electrical.junctionBox} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: value } }); handleSave() }}>
                             <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
                               <SelectValue placeholder="QTY" />
                             </SelectTrigger>
