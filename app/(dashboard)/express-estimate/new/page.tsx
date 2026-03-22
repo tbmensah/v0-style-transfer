@@ -26,11 +26,25 @@ import {
 } from "lucide-react"
 
 // Types
+interface NFIPCleaningOptions {
+  enabled: boolean
+  wall: {
+    height: string
+    wallType: string
+    ceilingAffected: boolean
+  }
+  floor: {
+    type: string
+    areaOnCrawlspace: boolean
+  }
+}
+
 interface Room {
   id: number
   name: string
   type: string
   sqft: string
+  nfipCleaning: NFIPCleaningOptions
   flooring: FlooringOptions
   trim: TrimOptions
   wallCovering: WallCoveringOptions
@@ -51,6 +65,7 @@ interface FloorLayer {
   id: number
   type: string
   grade: string
+  application: string
   action: string
   }
   
@@ -156,7 +171,8 @@ interface ApplianceOptions {
 const defaultRoom: Omit<Room, "id" | "name"> = {
   type: "room",
   sqft: "",
-  flooring: { enabled: false, multipleLayers: false, layers: [{ id: Date.now(), type: "", grade: "", action: "" }], vaporBarrier: false, subfloorReplacement: false, f9Note: "" },
+  nfipCleaning: { enabled: false, wall: { height: "", wallType: "", ceilingAffected: false }, floor: { type: "", areaOnCrawlspace: false } },
+  flooring: { enabled: false, multipleLayers: false, layers: [{ id: Date.now(), type: "", grade: "", application: "", action: "" }], vaporBarrier: false, subfloorReplacement: false, f9Note: "" },
   trim: { enabled: false, baseboardHeight: "", material: "", shoe: false, baseCap: false, finish: "" },
   wallCovering: { enabled: false, type: "", replacementHeight: "", texture: "", ceilingDamaged: false },
   electrical: { outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0 },
@@ -2078,8 +2094,9 @@ type="text"
                           <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-primary/30 bg-primary/10 p-4 transition-colors hover:bg-primary/15 [&[data-state=open]>svg]:rotate-180">
                             <div className="flex items-center gap-3">
                               <Home className="h-5 w-5 text-primary" />
-                              <span className="font-medium text-foreground">{room.name || "Unnamed Room"}</span>
                               <Badge variant="secondary" className="text-xs capitalize">{room.type.replace("-", " ")}</Badge>
+                              <span className="text-sm text-muted-foreground">Re-Name</span>
+                              <span className="font-medium text-foreground">{room.name || "Unnamed Room"}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Button
@@ -2137,6 +2154,103 @@ type="text"
                                 </div>
                               </div>
 
+                              {/* NFIP Cleaning */}
+                              <div className="space-y-3 rounded-lg border border-border/40 p-4">
+                                <div className="flex items-center gap-3">
+                                  <Switch
+                                    checked={room.nfipCleaning.enabled}
+                                    onCheckedChange={(checked) => updateRoom(room.id, { nfipCleaning: { ...room.nfipCleaning, enabled: checked } })}
+                                  />
+                                  <Label className="font-medium">NFIP Cleaning</Label>
+                                </div>
+                                {room.nfipCleaning.enabled && (
+                                  <div className="space-y-4">
+                                    <div className="grid gap-6 sm:grid-cols-2">
+                                      {/* Wall */}
+                                      <div className="space-y-3">
+                                        <Label className="text-sm font-medium">Wall</Label>
+                                        <div className="flex flex-wrap items-center gap-4">
+                                          <Select value={room.nfipCleaning.wall.height} onValueChange={(value) => updateRoom(room.id, { nfipCleaning: { ...room.nfipCleaning, wall: { ...room.nfipCleaning.wall, height: value } } })}>
+                                            <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                              <SelectValue placeholder="Select" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="1-40">1-40 PF</SelectItem>
+                                              <SelectItem value="41-80">41-80 PF</SelectItem>
+                                              <SelectItem value="81-120">81-120 PF</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                          <div className="flex items-center gap-4">
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                              <input
+                                                type="radio"
+                                                name={`wall-type-${room.id}`}
+                                                checked={room.nfipCleaning.wall.wallType === "block"}
+                                                onChange={() => updateRoom(room.id, { nfipCleaning: { ...room.nfipCleaning, wall: { ...room.nfipCleaning.wall, wallType: "block" } } })}
+                                                className="accent-primary"
+                                              />
+                                              <span className="text-sm">Block wall</span>
+                                            </label>
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                              <input
+                                                type="radio"
+                                                name={`wall-type-${room.id}`}
+                                                checked={room.nfipCleaning.wall.wallType === "stud"}
+                                                onChange={() => updateRoom(room.id, { nfipCleaning: { ...room.nfipCleaning, wall: { ...room.nfipCleaning.wall, wallType: "stud" } } })}
+                                                className="accent-primary"
+                                              />
+                                              <span className="text-sm">Stud Wall</span>
+                                            </label>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Switch
+                                            checked={room.nfipCleaning.wall.ceilingAffected}
+                                            onCheckedChange={(checked) => updateRoom(room.id, { nfipCleaning: { ...room.nfipCleaning, wall: { ...room.nfipCleaning.wall, ceilingAffected: checked } } })}
+                                          />
+                                          <Label className="text-sm">Ceiling affected</Label>
+                                        </div>
+                                      </div>
+
+                                      {/* Floor */}
+                                      <div className="space-y-3">
+                                        <Label className="text-sm font-medium">Floor</Label>
+                                        <div className="flex items-center gap-4">
+                                          <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                              type="radio"
+                                              name={`floor-type-${room.id}`}
+                                              checked={room.nfipCleaning.floor.type === "muck-out"}
+                                              onChange={() => updateRoom(room.id, { nfipCleaning: { ...room.nfipCleaning, floor: { ...room.nfipCleaning.floor, type: "muck-out" } } })}
+                                              className="accent-primary"
+                                            />
+                                            <span className="text-sm">Muck out</span>
+                                          </label>
+                                          <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                              type="radio"
+                                              name={`floor-type-${room.id}`}
+                                              checked={room.nfipCleaning.floor.type === "muck-heavy"}
+                                              onChange={() => updateRoom(room.id, { nfipCleaning: { ...room.nfipCleaning, floor: { ...room.nfipCleaning.floor, type: "muck-heavy" } } })}
+                                              className="accent-primary"
+                                            />
+                                            <span className="text-sm">Muck Heavy</span>
+                                          </label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Switch
+                                            checked={room.nfipCleaning.floor.areaOnCrawlspace}
+                                            onCheckedChange={(checked) => updateRoom(room.id, { nfipCleaning: { ...room.nfipCleaning, floor: { ...room.nfipCleaning.floor, areaOnCrawlspace: checked } } })}
+                                          />
+                                          <Label className="text-sm">Area on crawlspace</Label>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <p className="text-xs text-amber-500">Note: Section includes standard method 1 SF drycut.</p>
+                                  </div>
+                                )}
+                              </div>
+
                               {/* Flooring */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
                                 <div className="flex flex-wrap items-center gap-4">
@@ -2146,7 +2260,7 @@ type="text"
                                       onCheckedChange={(checked) => {
                                         const newFlooring = { ...room.flooring, enabled: checked }
                                         if (checked && newFlooring.layers.length === 0) {
-                                          newFlooring.layers = [{ id: Date.now(), type: "", grade: "", action: "" }]
+                                          newFlooring.layers = [{ id: Date.now(), type: "", grade: "", application: "", action: "" }]
                                         }
                                         updateRoom(room.id, { flooring: newFlooring })
                                       }}
@@ -2226,8 +2340,30 @@ type="text"
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="standard">Standard Grade</SelectItem>
+                                                <SelectItem value="vinyl-plank-base">Vinyl Plank base</SelectItem>
                                                 <SelectItem value="high">High Grade</SelectItem>
                                                 <SelectItem value="premium">Premium Grade</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="space-y-1 min-w-[160px]">
+                                            <Label className="text-xs text-muted-foreground">Application</Label>
+                                            <Select 
+                                              value={layer.application} 
+                                              onValueChange={(value) => {
+                                                const newLayers = [...room.flooring.layers]
+                                                newLayers[layerIndex] = { ...layer, application: value }
+                                                updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                              }}
+                                            >
+                                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="glue-down-concrete">Glue down on Concrete</SelectItem>
+                                                <SelectItem value="glue-down-wood">Glue down on Wood</SelectItem>
+                                                <SelectItem value="floating">Floating</SelectItem>
+                                                <SelectItem value="nail-down">Nail down</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           </div>
@@ -2276,7 +2412,7 @@ type="text"
                                               onClick={() => {
                                                 const newLayers = room.flooring.layers.filter(l => l.id !== layer.id)
                                                 if (newLayers.length === 0) {
-                                                  newLayers.push({ id: Date.now(), type: "", grade: "", action: "" })
+                                                  newLayers.push({ id: Date.now(), type: "", grade: "", application: "", action: "" })
                                                 }
                                                 updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers, multipleLayers: newLayers.length > 1 } })
                                               }}
@@ -2293,7 +2429,7 @@ type="text"
                                         size="sm"
                                         className="text-primary"
                                         onClick={() => {
-                                          const newLayers = [...room.flooring.layers, { id: Date.now(), type: "", grade: "", action: "" }]
+                                          const newLayers = [...room.flooring.layers, { id: Date.now(), type: "", grade: "", application: "", action: "" }]
                                           updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                         }}
                                       >
