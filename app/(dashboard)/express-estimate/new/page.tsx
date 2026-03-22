@@ -83,26 +83,31 @@ interface TrimOptions {
   enabled: boolean
   baseboardHeight: string
   material: string
-  shoe: boolean
-  baseCap: boolean
   finish: string
+  cap: boolean
+  shoe: boolean
+  shoeFinish: string
 }
 
 interface WallCoveringOptions {
   enabled: boolean
   type: string
+  replacementCalc: string
   replacementHeight: string
-  texture: string
-  ceilingDamaged: boolean
+  texture: boolean
+  textureType: string
 }
 
 interface ElectricalOptions {
+  enabled: boolean
   outlets110: number
   outlets220: number
   gfiOutlets: number
   lightSwitches: number
   ceilingLights: number
   ceilingFans: number
+  bathroomLightBar: string
+  bathroomLightBarQty: number
 }
 
 interface WindowItem {
@@ -121,6 +126,8 @@ interface DoorItem {
   grade: string
   finish: string
   handleAction: string
+  peepHole: boolean
+  mailSlot: boolean
 }
 
 interface VanityOptions {
@@ -192,9 +199,9 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
   sqft: "",
   nfipCleaning: { enabled: false, wall: { height: "", wallType: "", ceilingAffected: false }, floor: { type: "", areaOnCrawlspace: false } },
   flooring: { enabled: false, multipleLayers: false, layers: [{ id: Date.now(), type: "", grade: "", application: "", action: "" }], vaporBarrier: false, subfloorReplacement: false, f9Note: "" },
-  trim: { enabled: false, baseboardHeight: "", material: "", shoe: false, baseCap: false, finish: "" },
-  wallCovering: { enabled: false, type: "", replacementHeight: "", texture: "", ceilingDamaged: false },
-  electrical: { outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0 },
+  trim: { enabled: false, baseboardHeight: "", material: "", finish: "", cap: false, shoe: false, shoeFinish: "" },
+  wallCovering: { enabled: false, type: "", replacementCalc: "", replacementHeight: "", texture: false, textureType: "" },
+  electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
   windows: [],
   doors: [],
 }
@@ -412,14 +419,16 @@ export default function NewExpressEstimatePage() {
   const addDoor = (roomId: number, category: "interior" | "exterior") => {
     const room = rooms.find(r => r.id === roomId)
     if (room) {
-      const newDoor: DoorItem = {
-        id: Date.now(),
-        category,
-        type: "",
-        grade: "",
-        finish: "",
-        handleAction: "",
-      }
+const newDoor: DoorItem = {
+      id: Date.now(),
+      category,
+      type: "",
+      grade: "",
+      finish: "",
+      handleAction: "",
+      peepHole: false,
+      mailSlot: false,
+    }
       updateRoom(roomId, { doors: [...room.doors, newDoor] })
     }
   }
@@ -2474,7 +2483,7 @@ type="text"
                                 )}
                               </div>
 
-                              {/* Trim */}
+                              {/* Trim / Baseboard */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
                                 <div className="flex items-center gap-3">
                                   <Switch
@@ -2484,9 +2493,9 @@ type="text"
                                   <Label className="font-medium">Trim / Baseboard</Label>
                                 </div>
                                 {room.trim.enabled && (
-                                  <div className="grid gap-4 sm:grid-cols-3">
-                                    <div className="space-y-2">
-                                      <Label className="text-sm">Height</Label>
+                                  <div className="flex flex-wrap items-end gap-4">
+                                    <div className="space-y-1 min-w-[120px]">
+                                      <Label className="text-xs text-muted-foreground">Height</Label>
                                       <Select value={room.trim.baseboardHeight} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, baseboardHeight: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
@@ -2498,8 +2507,8 @@ type="text"
                                         </SelectContent>
                                       </Select>
                                     </div>
-                                    <div className="space-y-2">
-                                      <Label className="text-sm">Material</Label>
+                                    <div className="space-y-1 min-w-[100px]">
+                                      <Label className="text-xs text-muted-foreground">Material</Label>
                                       <Select value={room.trim.material} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, material: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
@@ -2511,8 +2520,8 @@ type="text"
                                         </SelectContent>
                                       </Select>
                                     </div>
-                                    <div className="space-y-2">
-                                      <Label className="text-sm">Finish</Label>
+                                    <div className="space-y-1 min-w-[100px]">
+                                      <Label className="text-xs text-muted-foreground">Finish</Label>
                                       <Select value={room.trim.finish} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, finish: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
@@ -2523,154 +2532,257 @@ type="text"
                                         </SelectContent>
                                       </Select>
                                     </div>
+                                    <div className="flex items-center gap-2 pb-1">
+                                      <Switch
+                                        checked={room.trim.cap}
+                                        onCheckedChange={(checked) => updateRoom(room.id, { trim: { ...room.trim, cap: checked } })}
+                                      />
+                                      <Label className="text-sm">Cap</Label>
+                                    </div>
+                                    <div className="flex items-center gap-2 pb-1">
+                                      <Switch
+                                        checked={room.trim.shoe}
+                                        onCheckedChange={(checked) => updateRoom(room.id, { trim: { ...room.trim, shoe: checked } })}
+                                      />
+                                      <Label className="text-sm">Shoe</Label>
+                                    </div>
+                                    {room.trim.shoe && (
+                                      <div className="space-y-1 min-w-[100px]">
+                                        <Select value={room.trim.shoeFinish} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, shoeFinish: value } })}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Finish" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="paint">Paint</SelectItem>
+                                            <SelectItem value="stain">Stain</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                               </div>
 
-                              {/* Wall Covering */}
+                              {/* Wall Coverings */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
                                 <div className="flex items-center gap-3">
                                   <Switch
                                     checked={room.wallCovering.enabled}
                                     onCheckedChange={(checked) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, enabled: checked } })}
                                   />
-                                  <Label className="font-medium">Wall Covering</Label>
+                                  <Label className="font-medium">Wall Coverings</Label>
                                 </div>
                                 {room.wallCovering.enabled && (
-                                  <div className="grid gap-4 sm:grid-cols-3">
-                                    <div className="space-y-2">
-                                      <Label className="text-sm">Type</Label>
-                                      <Select value={room.wallCovering.type} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, type: value } })}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="drywall">Drywall</SelectItem>
-                                          <SelectItem value="plaster">Plaster</SelectItem>
-                                          <SelectItem value="wainscoting">Wainscoting</SelectItem>
-                                          <SelectItem value="paneling">Paneling</SelectItem>
-                                        </SelectContent>
-                                      </Select>
+                                  <div className="space-y-3">
+                                    <div className="flex flex-wrap items-end gap-4">
+                                      <div className="space-y-1 min-w-[140px]">
+                                        <Label className="text-xs text-muted-foreground">Type</Label>
+                                        <Select value={room.wallCovering.type} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, type: value } })}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="drywall">Drywall</SelectItem>
+                                            <SelectItem value="plaster">Plaster</SelectItem>
+                                            <SelectItem value="wainscoting">Wainscoting</SelectItem>
+                                            <SelectItem value="paneling">Paneling</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-1 min-w-[100px]">
+                                        <Label className="text-xs text-muted-foreground">Replacement calc</Label>
+                                        <Select value={room.wallCovering.replacementCalc} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementCalc: value, replacementHeight: "" } })}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="lf">LF</SelectItem>
+                                            <SelectItem value="sf">SF</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-1 min-w-[100px]">
+                                        <Label className="text-xs text-muted-foreground">Replacement Height</Label>
+                                        <Select value={room.wallCovering.replacementHeight} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: value } })}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {room.wallCovering.replacementCalc === "sf" ? (
+                                              <>
+                                                <SelectItem value=".5w">.5w</SelectItem>
+                                                <SelectItem value="w">w</SelectItem>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <SelectItem value="4">4 ft</SelectItem>
+                                                <SelectItem value="8">8 ft</SelectItem>
+                                                <SelectItem value="12">12 ft</SelectItem>
+                                                <SelectItem value="16">16 ft</SelectItem>
+                                              </>
+                                            )}
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="flex items-center gap-2 pb-1">
+                                        <Switch
+                                          checked={room.wallCovering.texture}
+                                          onCheckedChange={(checked) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, texture: checked } })}
+                                        />
+                                        <Label className="text-sm">Texture</Label>
+                                      </div>
+                                      {room.wallCovering.texture && (
+                                        <div className="space-y-1 min-w-[140px]">
+                                          <Select value={room.wallCovering.textureType} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, textureType: value } })}>
+                                            <SelectTrigger className="border-border/60 bg-secondary/50">
+                                              <SelectValue placeholder="Select" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="smooth">Smooth</SelectItem>
+                                              <SelectItem value="no-texture">No texture</SelectItem>
+                                              <SelectItem value="hand-texture">Hand texture</SelectItem>
+                                              <SelectItem value="machine-texture">Machine texture</SelectItem>
+                                              <SelectItem value="heavy-texture">Heavy texture</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                      )}
                                     </div>
-                                    <div className="space-y-2">
-                                      <Label className="text-sm">Replacement Height</Label>
-                                      <Select value={room.wallCovering.replacementHeight} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: value } })}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="4">4 ft</SelectItem>
-                                          <SelectItem value="8">8 ft</SelectItem>
-                                          <SelectItem value="12">12 ft</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                      <Label className="text-sm">Texture</Label>
-                                      <Select value={room.wallCovering.texture} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, texture: value } })}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="smooth">Smooth</SelectItem>
-                                          <SelectItem value="textured">Textured</SelectItem>
-                                          <SelectItem value="heavy-texture">Heavy Texture</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
+                                    <p className="text-xs text-amber-500">Note: Some carriers require drywall calculated in SF instead of LF, please check with current guidelines of carriers</p>
                                   </div>
                                 )}
                               </div>
 
                               {/* Electrical */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
-                                <Label className="font-medium">Electrical</Label>
-                                <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
-                                  <div className="space-y-2">
-                                    <Label className="text-sm">110 Outlets</Label>
-                                    <Input
-                                      type="text"
-                                      inputMode="numeric"
-                                      pattern="[0-9]*"
-                                      value={room.electrical.outlets110 || ""}
-                                      onChange={(e) => {
-                                        const val = e.target.value.replace(/^0+/, '') || "0"
-                                        updateRoom(room.id, { electrical: { ...room.electrical, outlets110: parseInt(val) || 0 } })
-                                      }}
-                                      className="border-border/60 bg-secondary/50"
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label className="text-sm">220 Outlets</Label>
-                                    <Input
-                                      type="text"
-                                      inputMode="numeric"
-                                      pattern="[0-9]*"
-                                      value={room.electrical.outlets220 || ""}
-                                      onChange={(e) => {
-                                        const val = e.target.value.replace(/^0+/, '') || "0"
-                                        updateRoom(room.id, { electrical: { ...room.electrical, outlets220: parseInt(val) || 0 } })
-                                      }}
-                                      className="border-border/60 bg-secondary/50"
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label className="text-sm">GFI Outlets</Label>
-                                    <Input
-                                      type="text"
-                                      inputMode="numeric"
-                                      pattern="[0-9]*"
-                                      value={room.electrical.gfiOutlets || ""}
-                                      onChange={(e) => {
-                                        const val = e.target.value.replace(/^0+/, '') || "0"
-                                        updateRoom(room.id, { electrical: { ...room.electrical, gfiOutlets: parseInt(val) || 0 } })
-                                      }}
-                                      className="border-border/60 bg-secondary/50"
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label className="text-sm">Light Switches</Label>
-                                    <Input
-                                      type="text"
-                                      inputMode="numeric"
-                                      pattern="[0-9]*"
-                                      value={room.electrical.lightSwitches || ""}
-                                      onChange={(e) => {
-                                        const val = e.target.value.replace(/^0+/, '') || "0"
-                                        updateRoom(room.id, { electrical: { ...room.electrical, lightSwitches: parseInt(val) || 0 } })
-                                      }}
-                                      className="border-border/60 bg-secondary/50"
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label className="text-sm">Ceiling Lights</Label>
-                                    <Input
-                                      type="text"
-                                      inputMode="numeric"
-                                      pattern="[0-9]*"
-                                      value={room.electrical.ceilingLights || ""}
-                                      onChange={(e) => {
-                                        const val = e.target.value.replace(/^0+/, '') || "0"
-                                        updateRoom(room.id, { electrical: { ...room.electrical, ceilingLights: parseInt(val) || 0 } })
-                                      }}
-                                      className="border-border/60 bg-secondary/50"
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label className="text-sm">Ceiling Fans</Label>
-                                    <Input
-                                      type="text"
-                                      inputMode="numeric"
-                                      pattern="[0-9]*"
-                                      value={room.electrical.ceilingFans || ""}
-                                      onChange={(e) => {
-                                        const val = e.target.value.replace(/^0+/, '') || "0"
-                                        updateRoom(room.id, { electrical: { ...room.electrical, ceilingFans: parseInt(val) || 0 } })
-                                      }}
-                                      className="border-border/60 bg-secondary/50"
-                                    />
-                                  </div>
+                                <div className="flex items-center gap-3">
+                                  <Switch
+                                    checked={room.electrical.enabled}
+                                    onCheckedChange={(checked) => updateRoom(room.id, { electrical: { ...room.electrical, enabled: checked } })}
+                                  />
+                                  <Label className="font-medium">Electrical</Label>
                                 </div>
+                                {room.electrical.enabled && (
+                                  <div className="flex flex-wrap items-end gap-4">
+                                    <div className="space-y-1 w-[80px]">
+                                      <Label className="text-xs text-muted-foreground">110 Outlets</Label>
+                                      <Input
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        placeholder="0"
+                                        value={room.electrical.outlets110 || ""}
+                                        onChange={(e) => {
+                                          const val = e.target.value.replace(/^0+/, '') || "0"
+                                          updateRoom(room.id, { electrical: { ...room.electrical, outlets110: parseInt(val) || 0 } })
+                                        }}
+                                        className="border-border/60 bg-secondary/50"
+                                      />
+                                    </div>
+                                    <div className="space-y-1 w-[80px]">
+                                      <Label className="text-xs text-muted-foreground">220 Outlets</Label>
+                                      <Input
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        placeholder="0"
+                                        value={room.electrical.outlets220 || ""}
+                                        onChange={(e) => {
+                                          const val = e.target.value.replace(/^0+/, '') || "0"
+                                          updateRoom(room.id, { electrical: { ...room.electrical, outlets220: parseInt(val) || 0 } })
+                                        }}
+                                        className="border-border/60 bg-secondary/50"
+                                      />
+                                    </div>
+                                    <div className="space-y-1 w-[80px]">
+                                      <Label className="text-xs text-muted-foreground">GFI Outlets</Label>
+                                      <Input
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        placeholder="0"
+                                        value={room.electrical.gfiOutlets || ""}
+                                        onChange={(e) => {
+                                          const val = e.target.value.replace(/^0+/, '') || "0"
+                                          updateRoom(room.id, { electrical: { ...room.electrical, gfiOutlets: parseInt(val) || 0 } })
+                                        }}
+                                        className="border-border/60 bg-secondary/50"
+                                      />
+                                    </div>
+                                    <div className="space-y-1 w-[80px]">
+                                      <Label className="text-xs text-muted-foreground">Light Switches</Label>
+                                      <Input
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        placeholder="0"
+                                        value={room.electrical.lightSwitches || ""}
+                                        onChange={(e) => {
+                                          const val = e.target.value.replace(/^0+/, '') || "0"
+                                          updateRoom(room.id, { electrical: { ...room.electrical, lightSwitches: parseInt(val) || 0 } })
+                                        }}
+                                        className="border-border/60 bg-secondary/50"
+                                      />
+                                    </div>
+                                    <div className="space-y-1 w-[80px]">
+                                      <Label className="text-xs text-muted-foreground">Ceiling Lights</Label>
+                                      <Input
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        placeholder="0"
+                                        value={room.electrical.ceilingLights || ""}
+                                        onChange={(e) => {
+                                          const val = e.target.value.replace(/^0+/, '') || "0"
+                                          updateRoom(room.id, { electrical: { ...room.electrical, ceilingLights: parseInt(val) || 0 } })
+                                        }}
+                                        className="border-border/60 bg-secondary/50"
+                                      />
+                                    </div>
+                                    <div className="space-y-1 w-[80px]">
+                                      <Label className="text-xs text-muted-foreground">Ceiling Fans</Label>
+                                      <Input
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        placeholder="0"
+                                        value={room.electrical.ceilingFans || ""}
+                                        onChange={(e) => {
+                                          const val = e.target.value.replace(/^0+/, '') || "0"
+                                          updateRoom(room.id, { electrical: { ...room.electrical, ceilingFans: parseInt(val) || 0 } })
+                                        }}
+                                        className="border-border/60 bg-secondary/50"
+                                      />
+                                    </div>
+                                    <div className="space-y-1 min-w-[130px]">
+                                      <Label className="text-xs text-muted-foreground">Bathroom Light Bar</Label>
+                                      <Select value={room.electrical.bathroomLightBar} onValueChange={(value) => updateRoom(room.id, { electrical: { ...room.electrical, bathroomLightBar: value } })}>
+                                        <SelectTrigger className="border-border/60 bg-secondary/50">
+                                          <SelectValue placeholder="Select" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="1">1 light</SelectItem>
+                                          <SelectItem value="2">2 light</SelectItem>
+                                          <SelectItem value="3">3 light</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <div className="space-y-1 w-[80px]">
+                                      <Input
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        placeholder="0"
+                                        value={room.electrical.bathroomLightBarQty || ""}
+                                        onChange={(e) => {
+                                          const val = e.target.value.replace(/^0+/, '') || "0"
+                                          updateRoom(room.id, { electrical: { ...room.electrical, bathroomLightBarQty: parseInt(val) || 0 } })
+                                        }}
+                                        className="border-border/60 bg-secondary/50"
+                                      />
+                                    </div>
+                                  </div>
+                                )}
                               </div>
 
                               {/* Windows */}
@@ -2771,88 +2883,118 @@ type="text"
                                   </div>
                                 </div>
                                 {room.doors.map((door, idx) => (
-                                  <div key={door.id} className="grid gap-4 rounded-lg bg-secondary/30 p-3 sm:grid-cols-5">
-                                    <div className="space-y-2">
-                                      <Label className="text-xs">Category</Label>
-                                      <Badge variant="secondary" className="capitalize">{door.category}</Badge>
-                                    </div>
-                                    <div className="space-y-2">
-                                      <Label className="text-xs">Type</Label>
-                                      <Select value={door.type} onValueChange={(value) => {
-                                        const newDoors = [...room.doors]
-                                        newDoors[idx] = { ...door, type: value }
-                                        updateRoom(room.id, { doors: newDoors })
-                                      }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          {door.category === "interior" ? (
-                                            <>
-                                              <SelectItem value="6-panel">6 Panel</SelectItem>
-                                              <SelectItem value="8ft-paneled">8ft Paneled</SelectItem>
-                                              <SelectItem value="french">French</SelectItem>
-                                              <SelectItem value="bifold-single">Bifold Single</SelectItem>
-                                              <SelectItem value="bifold-double">Bifold Double</SelectItem>
-                                              <SelectItem value="pocket-single">Pocket Single</SelectItem>
-                                            </>
-                                          ) : (
-                                            <>
-                                              <SelectItem value="wood-door">Wood Door</SelectItem>
-                                              <SelectItem value="metal-door">Metal Door</SelectItem>
-                                              <SelectItem value="french-wood">French Wood</SelectItem>
-                                              <SelectItem value="french-metal">French Metal</SelectItem>
-                                            </>
-                                          )}
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                      <Label className="text-xs">Grade</Label>
-                                      <Select value={door.grade} onValueChange={(value) => {
-                                        const newDoors = [...room.doors]
-                                        newDoors[idx] = { ...door, grade: value }
-                                        updateRoom(room.id, { doors: newDoors })
-                                      }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="standard">Standard</SelectItem>
-                                          <SelectItem value="high">High</SelectItem>
-                                          <SelectItem value="premium">Premium</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                      <Label className="text-xs">Handle</Label>
-                                      <Select value={door.handleAction} onValueChange={(value) => {
-                                        const newDoors = [...room.doors]
-                                        newDoors[idx] = { ...door, handleAction: value }
-                                        updateRoom(room.id, { doors: newDoors })
-                                      }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="replace">Replace</SelectItem>
-                                          <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                    <div className="flex items-end gap-2">
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-9 w-9 text-destructive hover:bg-destructive/20"
-                                        onClick={() => {
-                                          const newDoors = room.doors.filter(d => d.id !== door.id)
+                                  <div key={door.id} className="space-y-3 rounded-lg bg-secondary/30 p-3">
+                                    <div className="flex flex-wrap items-end gap-4">
+                                      <div className="space-y-2">
+                                        <Label className="text-xs">Category</Label>
+                                        <Badge variant="secondary" className="capitalize">{door.category}</Badge>
+                                      </div>
+                                      <div className="space-y-2 min-w-[120px]">
+                                        <Label className="text-xs">Type</Label>
+                                        <Select value={door.type} onValueChange={(value) => {
+                                          const newDoors = [...room.doors]
+                                          newDoors[idx] = { ...door, type: value }
                                           updateRoom(room.id, { doors: newDoors })
-                                        }}
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
+                                        }}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {door.category === "interior" ? (
+                                              <>
+                                                <SelectItem value="6-panel">6 Panel</SelectItem>
+                                                <SelectItem value="8ft-paneled">8ft Paneled</SelectItem>
+                                                <SelectItem value="french">French</SelectItem>
+                                                <SelectItem value="bifold-single">Bifold Single</SelectItem>
+                                                <SelectItem value="bifold-double">Bifold Double</SelectItem>
+                                                <SelectItem value="pocket-single">Pocket Single</SelectItem>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <SelectItem value="wood-door">Wood Door</SelectItem>
+                                                <SelectItem value="metal-door">Metal Door</SelectItem>
+                                                <SelectItem value="french-wood">French Wood</SelectItem>
+                                                <SelectItem value="french-metal">French Metal</SelectItem>
+                                              </>
+                                            )}
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-2 min-w-[100px]">
+                                        <Label className="text-xs">Grade</Label>
+                                        <Select value={door.grade} onValueChange={(value) => {
+                                          const newDoors = [...room.doors]
+                                          newDoors[idx] = { ...door, grade: value }
+                                          updateRoom(room.id, { doors: newDoors })
+                                        }}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="standard">Standard</SelectItem>
+                                            <SelectItem value="high">High</SelectItem>
+                                            <SelectItem value="premium">Premium</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-2 min-w-[120px]">
+                                        <Label className="text-xs">Handle</Label>
+                                        <Select value={door.handleAction} onValueChange={(value) => {
+                                          const newDoors = [...room.doors]
+                                          newDoors[idx] = { ...door, handleAction: value }
+                                          updateRoom(room.id, { doors: newDoors })
+                                        }}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="replace">Replace</SelectItem>
+                                            <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="flex items-end gap-2 pb-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-9 w-9 text-destructive hover:bg-destructive/20"
+                                          onClick={() => {
+                                            const newDoors = room.doors.filter(d => d.id !== door.id)
+                                            updateRoom(room.id, { doors: newDoors })
+                                          }}
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </div>
                                     </div>
+                                    {/* Misc options for Exterior doors */}
+                                    {door.category === "exterior" && (
+                                      <div className="flex items-center gap-4 pt-2 border-t border-border/20">
+                                        <Label className="text-sm font-medium">Misc</Label>
+                                        <div className="flex items-center gap-2">
+                                          <Switch
+                                            checked={door.peepHole}
+                                            onCheckedChange={(checked) => {
+                                              const newDoors = [...room.doors]
+                                              newDoors[idx] = { ...door, peepHole: checked }
+                                              updateRoom(room.id, { doors: newDoors })
+                                            }}
+                                          />
+                                          <Label className="text-sm">Peep Hole</Label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Switch
+                                            checked={door.mailSlot}
+                                            onCheckedChange={(checked) => {
+                                              const newDoors = [...room.doors]
+                                              newDoors[idx] = { ...door, mailSlot: checked }
+                                              updateRoom(room.id, { doors: newDoors })
+                                            }}
+                                          />
+                                          <Label className="text-sm">Mail Slot</Label>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 ))}
                               </div>
