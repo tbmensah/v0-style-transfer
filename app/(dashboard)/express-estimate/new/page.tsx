@@ -146,32 +146,32 @@ interface ApplianceOptions {
 
 // Default values
 const defaultRoom: Omit<Room, "id" | "name"> = {
-  type: "room",
+  type: "living-room",
   sqft: "",
-  flooring: { enabled: false, type: "", grade: "", subfloorReplacement: false, vaporBarrier: false },
-  trim: { enabled: false, baseboardHeight: "", material: "", shoe: false, baseCap: false, finish: "" },
-  wallCovering: { enabled: false, type: "", replacementHeight: "", texture: "", ceilingDamaged: false },
-  electrical: { outlets110: "", outlets220: "", gfiOutlets: "", lightSwitches: "", ceilingLights: "", ceilingFans: "" },
+  flooring: { enabled: false, type: "vinyl-plank", grade: "standard", subfloorReplacement: false, vaporBarrier: false },
+  trim: { enabled: false, baseboardHeight: "4", material: "mdf", shoe: false, baseCap: false, finish: "paint" },
+  wallCovering: { enabled: false, type: "drywall", replacementHeight: "4", texture: "smooth", ceilingDamaged: false },
+  electrical: { outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0 },
   windows: [],
   doors: [],
-  }
+}
 
 const defaultBathroomExtras = {
-  vanity: { enabled: false, linearFeet: "", countertop: "", backsplash: false },
-  toilet: { enabled: false, action: "", seatReplacement: false },
-  shower: { enabled: false, type: "", size: "", glassDoor: false, tileNiche: false },
-  }
+  vanity: { enabled: false, linearFeet: 0, countertop: "cultured-marble", backsplash: false },
+  toilet: { enabled: false, action: "replace", seatReplacement: false },
+  shower: { enabled: false, type: "fiberglass-tub-shower", size: "up-to-60", glassDoor: false, tileNiche: false },
+}
 
 const defaultKitchenExtras = {
-  cabinets: { enabled: false, linearFeet: "", grade: "", action: "", toeKick: false },
-  countertop: { enabled: false, type: "", sqft: "", backsplash: false, sinkAction: "", faucetAction: "" },
+  cabinets: { enabled: false, linearFeet: 0, grade: "standard", action: "replace", toeKick: false },
+  countertop: { enabled: false, type: "laminate", sqft: 0, backsplash: false, sinkAction: "replace", faucetAction: "replace" },
   appliances: {
-  refrigerator: { enabled: false, type: "", size: "", grade: "", action: "" },
-  dishwasher: { enabled: false, grade: "", action: "" },
-  range: { enabled: false, type: "", fuel: "", grade: "", action: "" },
-  waterHeater: { enabled: false, size: "", warranty: "", action: "" },
+    refrigerator: { enabled: false, type: "top-freezer", size: "18-22", grade: "standard", action: "replace" },
+    dishwasher: { enabled: false, grade: "standard", action: "replace" },
+    range: { enabled: false, type: "free-standing", fuel: "electric", grade: "standard", action: "replace" },
+    waterHeater: { enabled: false, size: "40", warranty: "6", action: "replace" },
   },
-  }
+}
 
 export default function NewExpressEstimatePage() {
   const [activeTab, setActiveTab] = useState("exterior")
@@ -336,10 +336,10 @@ export default function NewExpressEstimatePage() {
     if (room) {
       const newWindow: WindowItem = {
         id: Date.now(),
-        type: "",
-        size: "",
-        grade: "",
-        casing: "",
+        type: "vinyl-double-hung",
+        size: "4-8",
+        grade: "standard",
+        casing: "paint",
         marbleSill: false,
       }
       updateRoom(roomId, { windows: [...room.windows, newWindow] })
@@ -352,10 +352,10 @@ export default function NewExpressEstimatePage() {
       const newDoor: DoorItem = {
         id: Date.now(),
         category,
-        type: "",
-        grade: "",
-        finish: "",
-        handleAction: "",
+        type: category === "interior" ? "6-panel" : "wood-door",
+        grade: "standard",
+        finish: "paint",
+        handleAction: "replace",
       }
       updateRoom(roomId, { doors: [...room.doors, newDoor] })
     }
@@ -2034,17 +2034,25 @@ type="text"
                       <h3 className="mt-4 text-lg font-medium text-foreground">No Rooms Added</h3>
                       <p className="mt-2 text-sm text-muted-foreground">Add rooms to enter interior damage details</p>
                       <div className="mt-6 flex flex-wrap justify-center gap-2">
-                        <Button variant="outline" className="gap-2 border-border/60" onClick={() => addRoom("room", "")}>
+                        <Button variant="outline" className="gap-2 border-border/60" onClick={() => addRoom("living-room", "Living Room")}>
                           <Plus className="h-4 w-4" />
-                          Room
+                          Living Room
                         </Button>
-                        <Button variant="outline" className="gap-2 border-border/60" onClick={() => addRoom("bathroom", "")}>
+                        <Button variant="outline" className="gap-2 border-border/60" onClick={() => addRoom("bedroom", "Bedroom")}>
+                          <Plus className="h-4 w-4" />
+                          Bedroom
+                        </Button>
+                        <Button variant="outline" className="gap-2 border-border/60" onClick={() => addRoom("bathroom", "Bathroom")}>
                           <Plus className="h-4 w-4" />
                           Bathroom
                         </Button>
-                        <Button variant="outline" className="gap-2 border-border/60" onClick={() => addRoom("kitchen", "")}>
+                        <Button variant="outline" className="gap-2 border-border/60" onClick={() => addRoom("kitchen", "Kitchen")}>
                           <Plus className="h-4 w-4" />
                           Kitchen
+                        </Button>
+                        <Button variant="outline" className="gap-2 border-border/60" onClick={() => addRoom("other", "")}>
+                          <Plus className="h-4 w-4" />
+                          Other
                         </Button>
                       </div>
                     </div>
@@ -2098,9 +2106,14 @@ type="text"
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="room">Room</SelectItem>
+                                      <SelectItem value="living-room">Living Room</SelectItem>
+                                      <SelectItem value="bedroom">Bedroom</SelectItem>
                                       <SelectItem value="bathroom">Bathroom</SelectItem>
                                       <SelectItem value="kitchen">Kitchen</SelectItem>
+                                      <SelectItem value="dining-room">Dining Room</SelectItem>
+                                      <SelectItem value="hallway">Hallway</SelectItem>
+                                      <SelectItem value="laundry">Laundry</SelectItem>
+                                      <SelectItem value="other">Other</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -2293,11 +2306,10 @@ type="text"
                                       type="text"
                                       inputMode="numeric"
                                       pattern="[0-9]*"
-                                      placeholder="QTY"
-                                      value={room.electrical.outlets110}
+                                      value={room.electrical.outlets110 || ""}
                                       onChange={(e) => {
-                                        const val = e.target.value.replace(/^0+/, '') || ""
-                                        updateRoom(room.id, { electrical: { ...room.electrical, outlets110: val } })
+                                        const val = e.target.value.replace(/^0+/, '') || "0"
+                                        updateRoom(room.id, { electrical: { ...room.electrical, outlets110: parseInt(val) || 0 } })
                                       }}
                                       className="border-border/60 bg-secondary/50"
                                     />
@@ -2308,11 +2320,10 @@ type="text"
                                       type="text"
                                       inputMode="numeric"
                                       pattern="[0-9]*"
-                                      placeholder="QTY"
-                                      value={room.electrical.outlets220}
+                                      value={room.electrical.outlets220 || ""}
                                       onChange={(e) => {
-                                        const val = e.target.value.replace(/^0+/, '') || ""
-                                        updateRoom(room.id, { electrical: { ...room.electrical, outlets220: val } })
+                                        const val = e.target.value.replace(/^0+/, '') || "0"
+                                        updateRoom(room.id, { electrical: { ...room.electrical, outlets220: parseInt(val) || 0 } })
                                       }}
                                       className="border-border/60 bg-secondary/50"
                                     />
