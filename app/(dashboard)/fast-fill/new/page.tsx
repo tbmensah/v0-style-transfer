@@ -165,6 +165,22 @@ export default function NewFastFillPage() {
               <CardHeader>
                 <CardTitle className="text-foreground">Upload File Pairs</CardTitle>
                 <CardDescription>Each job requires one PDF claim document and one corresponding ESX file from XactAnalysis.</CardDescription>
+                <div className="mt-3 rounded-lg border border-border/60 bg-secondary/30 p-3">
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">Supported PDF formats:</span> NFIP Proof of Loss, Preliminary Report, XactContents Export, Flood Damage Assessment
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {"Don't see your format? "}
+                    <button 
+                      type="button"
+                      onClick={() => alert("Upload form for training would open here")}
+                      className="font-medium text-primary hover:underline"
+                    >
+                      Upload a sample PDF
+                    </button>
+                    {" to help us add support for your documents."}
+                  </p>
+                </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 {filePairs.map((pair, index) => (

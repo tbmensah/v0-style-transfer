@@ -135,7 +135,7 @@ export default function LandingPage() {
                       Claim files that require expedited estimate preparation
                     </p>
                   </div>
-                  <Link href="/fast-fill" className="block">
+                  <Link href="/signup" className="block">
                     <Button className="w-full gap-2 shadow-md shadow-primary/20">
                       Start Using Fast Fill
                       <ArrowRight className="h-4 w-4" />
@@ -177,7 +177,7 @@ export default function LandingPage() {
                       Inspections with documented  damage details.
                     </p>
                   </div>
-                  <Link href="/express-estimate" className="block">
+                  <Link href="/signup" className="block">
                     <Button className="w-full gap-2 shadow-md shadow-primary/20">
                       Start Using Express Estimate
                       <ArrowRight className="h-4 w-4" />
@@ -208,7 +208,7 @@ export default function LandingPage() {
                 {[
                   { step: 1, icon: Upload, title: "Upload Files", description: "Pair your PDF claim documents with XactAnalysis ESX files" },
                   { step: 2, icon: Send, title: "Batch Submit", description: "Add multiple file pairs and submit them all at once" },
-                  { step: 3, icon: Zap, title: "AI Processing", description: "Our system extracts data and fills required ESX fields" },
+                  { step: 3, icon: Zap, title: "Processing", description: "Our system extracts data and fills required ESX fields and forms" },
                   { step: 4, icon: FileDown, title: "Download", description: "Get your completed ESX files ready for review" },
                 ].map((item) => (
                   <div key={item.step} className="relative">
@@ -266,7 +266,7 @@ export default function LandingPage() {
                 { icon: Clock, title: "Save Time", description: "Generate estimates in minutes instead of hours of manual entry" },
                 { icon: Shield, title: "Reduce Errors", description: "Structured inputs minimize mistakes and omissions" },
                 { icon: CheckCircle, title: "Stay Secure", description: "Your data is encrypted and protected at all times" },
-                { icon: Download, title: "Easy Output", description: "Download ESX files ready for XactAnalysis" },
+                { icon: Download, title: "Easy Output", description: "Download ESX files ready for use in Xactimate" },
               ].map((feature) => (
                 <Card key={feature.title} className="border-border/60 bg-card/80 text-center transition-all hover:border-primary/30">
                   <CardContent className="pt-6">
@@ -304,7 +304,7 @@ export default function LandingPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-3xl font-bold text-foreground">
-                    From $4.99<span className="text-base font-normal text-muted-foreground">/token</span>
+                    $14.99<span className="text-base font-normal text-muted-foreground">/token</span>
                   </p>
                   <p className="mt-2 text-sm text-muted-foreground">Volume discounts available</p>
                 </CardContent>
@@ -319,7 +319,7 @@ export default function LandingPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-3xl font-bold text-foreground">
-                    From $7.99<span className="text-base font-normal text-muted-foreground">/token</span>
+                    $69.99<span className="text-base font-normal text-muted-foreground">/token</span>
                   </p>
                   <p className="mt-2 text-sm text-muted-foreground">Volume discounts available</p>
                 </CardContent>

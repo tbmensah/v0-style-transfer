@@ -110,13 +110,13 @@ export default function DashboardPage() {
             </Button>
           </Link>
           <Link href="/express-estimate/new">
-            <Button variant="outline" className="gap-2 border-border/60">
+            <Button className="gap-2 shadow-md shadow-primary/20">
               <ClipboardList className="h-4 w-4" />
               New Express Estimate
             </Button>
           </Link>
           <Link href="/tokens">
-            <Button variant="outline" className="gap-2 border-border/60">
+            <Button className="gap-2 shadow-md shadow-primary/20">
               <Coins className="h-4 w-4" />
               Buy Tokens
             </Button>
