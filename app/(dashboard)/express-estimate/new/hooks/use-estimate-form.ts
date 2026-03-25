@@ -176,4 +176,3 @@ export function useEstimateForm() {
     addDoor,
   }
 
-  export type EstimateFormReturn = ReturnType<typeof useEstimateForm>
