@@ -157,6 +157,11 @@ export function useEstimateForm() {
     foundation,
     rooms,
 
+    // Direct setters
+    setProjectDetails,
+    setExterior,
+    setFoundation,
+
     // Actions
     handleSave,
     updateProjectDetails,
@@ -164,11 +169,11 @@ export function useEstimateForm() {
     updateFoundation,
     addRoom,
     copyRoom,
+    duplicateRoom: copyRoom,
     removeRoom,
     updateRoom,
     addWindow,
     addDoor,
   }
-}
 
-export type EstimateFormReturn = ReturnType<typeof useEstimateForm>
+  export type EstimateFormReturn = ReturnType<typeof useEstimateForm>
