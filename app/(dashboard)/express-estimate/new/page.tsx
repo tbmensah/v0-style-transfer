@@ -2062,19 +2062,19 @@ value={exterior.dumpster.count}
                               </SelectContent>
                             </Select>
                           </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Junction Box</Label>
-                          <Select value={foundation.electrical.junctionBox} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: value } }); handleSave() }}>
-                            <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
-                              <SelectValue placeholder="QTY" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {[0, 1, 2, 3, 4, 5].map(n => (
-                                <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                          <div className="space-y-2">
+                            <Label>Junction Box</Label>
+                            <Select value={foundation.electrical.junctionBox} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: value } }); handleSave() }}>
+                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                                <SelectValue placeholder="QTY" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[0, 1, 2, 3, 4, 5].map(n => (
+                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
                               ))}
-                            </SelectContent>
-                          </Select>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                         {/* Breaker Panel */}
                         <div className="space-y-3">
