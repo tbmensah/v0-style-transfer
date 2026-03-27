@@ -294,7 +294,7 @@ export default function NewExpressEstimatePage() {
       backfill: { enabled: false, cubicFeet: "", length: "", width: "", depth: "" },
       confinedSpace: false,
     },
-    sumpPump: { enabled: false, minorAdjustment: "", action: "", hp: "" },
+    sumpPump: { enabled: false, minorAdjustment: "", action: "", hp: "", f9Note: "" },
     hvac: {
       airHandlers: [] as Array<{ 
         id: number; 
@@ -583,12 +583,12 @@ const newDoor: DoorItem = {
                           <Label>Enable Pressure Wash</Label>
                         </div>
                         {exterior.pressureWash.enabled && (
-                          <div className="space-y-4">
+                          <div className="flex flex-wrap items-end gap-6">
                             <div className="space-y-2">
-                              <Label>Perimeter Feet</Label>
+                              <Label className="text-xs text-muted-foreground">Perimeter Feet</Label>
                               <Input
-                                type="text"
-                                inputMode="numeric"
+                                type="number"
+                                min="0"
                                 placeholder="Enter PF"
                                 value={exterior.pressureWash.perimeterFeet}
                                 onChange={(e) => { 
@@ -598,21 +598,19 @@ const newDoor: DoorItem = {
                                 className="border-border/60 bg-secondary/50 w-32"
                               />
                             </div>
-                            <div className="flex items-center gap-6">
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={exterior.pressureWash.regularPwash}
-                                  onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, regularPwash: checked } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Regular Pwash</Label>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={exterior.pressureWash.cleanWithSteam}
-                                  onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, cleanWithSteam: checked } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Clean with Steam</Label>
-                              </div>
+                            <div className="flex items-center gap-2 pb-2">
+                              <Switch
+                                checked={exterior.pressureWash.regularPwash}
+                                onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, regularPwash: checked, cleanWithSteam: checked ? false : exterior.pressureWash.cleanWithSteam } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Regular PWash</Label>
+                            </div>
+                            <div className="flex items-center gap-2 pb-2">
+                              <Switch
+                                checked={exterior.pressureWash.cleanWithSteam}
+                                onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, cleanWithSteam: checked, regularPwash: checked ? false : exterior.pressureWash.regularPwash } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Clean with Steam</Label>
                             </div>
                           </div>
                         )}
@@ -723,8 +721,8 @@ value={exterior.dumpster.count}
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="space-y-2">
+                              <div className="flex flex-wrap items-end gap-4">
+                                <div className="space-y-2 min-w-[120px]">
                                   <Label className="text-sm">Tonnage</Label>
                                   <Select value={unit.tonnage} onValueChange={(value) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
@@ -740,7 +738,7 @@ value={exterior.dumpster.count}
                                     </SelectContent>
                                   </Select>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-2 min-w-[120px]">
                                   <Label className="text-sm">SEER Rating</Label>
                                   <Select value={unit.seer} onValueChange={(value) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
@@ -755,23 +753,21 @@ value={exterior.dumpster.count}
                                     </SelectContent>
                                   </Select>
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, replace: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
                                       handleSave()
                                     }}
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -780,7 +776,6 @@ value={exterior.dumpster.count}
                               </div>
                               <div className="space-y-2">
                                 <Label className="text-sm">F9 Note</Label>
-                                <p className="text-xs text-muted-foreground">Model and Serial Number</p>
                                 <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
@@ -830,23 +825,23 @@ value={exterior.dumpster.count}
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="space-y-2">
-                                <Label className="text-sm">Unit Type</Label>
-                                <Select value={unit.unitType} onValueChange={(value) => {
-                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
-                                  handleSave()
-                                }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="Select" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="ac">AC Unit</SelectItem>
-                                    <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="space-y-2">
+                              <div className="flex flex-wrap items-end gap-4">
+                                <div className="space-y-2 min-w-[140px]">
+                                  <Label className="text-sm">Unit Type</Label>
+                                  <Select value={unit.unitType} onValueChange={(value) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="ac">AC Unit</SelectItem>
+                                      <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-2 min-w-[120px]">
                                   <Label className="text-sm">Tonnage</Label>
                                   <Select value={unit.tonnage} onValueChange={(value) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
@@ -862,7 +857,7 @@ value={exterior.dumpster.count}
                                     </SelectContent>
                                   </Select>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-2 min-w-[120px]">
                                   <Label className="text-sm">SEER Rating</Label>
                                   <Select value={unit.seer} onValueChange={(value) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
@@ -877,23 +872,21 @@ value={exterior.dumpster.count}
                                     </SelectContent>
                                   </Select>
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, replace: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
                                       handleSave()
                                     }}
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -902,7 +895,6 @@ value={exterior.dumpster.count}
                               </div>
                               <div className="space-y-2">
                                 <Label className="text-sm">F9 Note</Label>
-                                <p className="text-xs text-muted-foreground">Model and Serial Number</p>
                                 <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
@@ -952,15 +944,15 @@ value={exterior.dumpster.count}
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="space-y-2">
-<Label className="text-sm">Number of Zones</Label>
-                                <Select value={unit.zones} onValueChange={(value) => {
-                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
-                                  handleSave()
-                                }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="QTY" />
+                              <div className="flex flex-wrap items-end gap-4">
+                                <div className="space-y-2 min-w-[120px]">
+                                  <Label className="text-sm">Number of Zones</Label>
+                                  <Select value={unit.zones} onValueChange={(value) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="QTY" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {["1", "2", "3", "4"].map(z => (
@@ -969,7 +961,7 @@ value={exterior.dumpster.count}
                                     </SelectContent>
                                   </Select>
                                 </div>
-                                <div className="flex items-center gap-3 pt-6">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.highEfficiency}
                                     onCheckedChange={(checked) => {
@@ -979,23 +971,21 @@ value={exterior.dumpster.count}
                                   />
                                   <Label className="text-sm">High Efficiency</Label>
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, replace: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
                                       handleSave()
                                     }}
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -1004,7 +994,6 @@ value={exterior.dumpster.count}
                               </div>
                               <div className="space-y-2">
                                 <Label className="text-sm">F9 Note</Label>
-                                <p className="text-xs text-muted-foreground">Model and Serial Number</p>
                                 <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
@@ -1035,70 +1024,64 @@ value={exterior.dumpster.count}
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
-                      <div className="space-y-4">
-                        <div className="grid gap-4 sm:grid-cols-2">
-                          <div className="space-y-2">
-                            <Label>Exterior Outlets</Label>
-                            <Input
-                              type="text"
-                              inputMode="numeric"
-                              pattern="[0-9]*"
-value={exterior.electrical.exteriorOutlets}
-                              onChange={(e) => {
-                                const val = e.target.value.replace(/^0+/, '') || ""
-                                setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: val } }); handleSave()
-                              }}
-                              className="border-border/60 bg-secondary/50"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>30 Amp Disconnect</Label>
-                            <Input
-                              type="text"
-                              inputMode="numeric"
-                              pattern="[0-9]*"
-value={exterior.electrical.disconnect30Amp}
-                              onChange={(e) => {
-                                const val = e.target.value.replace(/^0+/, '') || ""
-                                setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: val } }); handleSave()
-                              }}
-                              className="border-border/60 bg-secondary/50"
-                            />
-                          </div>
+                      <div className="flex flex-wrap items-end gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-xs text-muted-foreground">Exterior Outlets</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            value={exterior.electrical.exteriorOutlets}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/^0+/, '') || ""
+                              setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: val } }); handleSave()
+                            }}
+                            className="border-border/60 bg-secondary/50 w-24"
+                          />
                         </div>
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-3">
-                            <Switch
-                              checked={exterior.electrical.breakerPanel.enabled}
-                              onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
-                            />
-                            <Label>Breaker Panel</Label>
-                          </div>
-                          {exterior.electrical.breakerPanel.enabled && (
-                            <div className="ml-8 grid gap-4 sm:grid-cols-2">
-                              <div className="space-y-2">
-                                <Label className="text-sm">Amperage</Label>
-                                <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(value) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="Select" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {["70", "100", "125", "150", "200", "300"].map(a => (
-                                      <SelectItem key={a} value={a}>{a} Amp</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div className="flex items-center gap-3 pt-6">
-                                <Switch
-                                  checked={exterior.electrical.breakerPanel.arcFaults}
-                                  onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
-                                />
-                                <Label className="text-sm">With Arc Faults</Label>
-                              </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs text-muted-foreground">30 Amp Disconnect</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            value={exterior.electrical.disconnect30Amp}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/^0+/, '') || ""
+                              setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: val } }); handleSave()
+                            }}
+                            className="border-border/60 bg-secondary/50 w-24"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 pb-2">
+                          <Switch
+                            checked={exterior.electrical.breakerPanel.enabled}
+                            onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
+                          />
+                          <Label className="text-sm">Breaker Panel</Label>
+                        </div>
+                        {exterior.electrical.breakerPanel.enabled && (
+                          <>
+                            <div className="space-y-2 min-w-[120px]">
+                              <Label className="text-xs text-muted-foreground">Amperage</Label>
+                              <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(value) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
+                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {["70", "100", "125", "150", "200", "300"].map(a => (
+                                    <SelectItem key={a} value={a}>{a} Amp</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </div>
-                          )}
-                        </div>
+                            <div className="flex items-center gap-2 pb-2">
+                              <Switch
+                                checked={exterior.electrical.breakerPanel.arcFaults}
+                                onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
+                                />
+                              <Label className="text-sm">With Arc Faults</Label>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -1114,50 +1097,33 @@ value={exterior.electrical.disconnect30Amp}
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-6">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={exterior.finishes.some(f => f.type === "exterior-paint")}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-paint", measureType: "pf", value: "" }] })
-                                } else {
-                                  setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-paint") })
-                                }
-                                handleSave()
-                              }}
-                            />
-                            <Label className="text-sm">Exterior Paint</Label>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={exterior.finishes.some(f => f.type === "exterior-siding")}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-siding", measureType: "sf", value: "" }] })
-                                } else {
-                                  setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-siding") })
-                                }
-                                handleSave()
-                              }}
-                            />
-                            <Label className="text-sm">Exterior Siding</Label>
-                          </div>
+                      <div className="flex flex-wrap items-end gap-4">
+                        <div className="flex items-center gap-2 pb-2">
+                          <Switch
+                            checked={exterior.finishes.some(f => f.type === "exterior-paint")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-paint", measureType: "pf", value: "" }] })
+                              } else {
+                                setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-paint") })
+                              }
+                              handleSave()
+                            }}
+                          />
+                          <Label className="text-sm">Exterior Paint</Label>
                         </div>
-                        {exterior.finishes.map((finish) => (
-                          <div key={finish.id} className="ml-4 flex items-center gap-4 rounded-lg border border-border/40 bg-secondary/30 p-3">
-                            <span className="text-sm font-medium capitalize">{finish.type.replace("-", " ")}</span>
+                        {exterior.finishes.some(f => f.type === "exterior-paint") && (
+                          <>
                             <div className="flex items-center gap-2">
-                              {(["pf", "sf", "lf"] as const).map((mt) => (
+                              {(["pf", "sf"] as const).map((mt) => (
                                 <Button
                                   key={mt}
                                   type="button"
-                                  variant={finish.measureType === mt ? "default" : "outline"}
+                                  variant={exterior.finishes.find(f => f.type === "exterior-paint")?.measureType === mt ? "default" : "outline"}
                                   size="sm"
                                   className="h-7 px-2 text-xs"
                                   onClick={() => {
-                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.id === finish.id ? { ...f, measureType: mt } : f) })
+                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-paint" ? { ...f, measureType: mt } : f) })
                                     handleSave()
                                   }}
                                 >
@@ -1165,32 +1131,79 @@ value={exterior.electrical.disconnect30Amp}
                                 </Button>
                               ))}
                             </div>
-                            <Input
-                              type="text"
-                              inputMode="numeric"
-                              placeholder={finish.measureType.toUpperCase()}
-                              value={finish.value}
-                              onChange={(e) => {
-                                const val = e.target.value.replace(/^0+/, '') || ""
-                                setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.id === finish.id ? { ...f, value: val } : f) })
-                                handleSave()
-                              }}
-                              className="w-24 border-border/60 bg-secondary/50"
-                            />
-                          </div>
-                        ))}
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="gap-1 border-border/60"
-                          onClick={() => {
-                            setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "other", measureType: "sf", value: "" }] })
-                            handleSave()
-                          }}
-                        >
-                          <Plus className="h-3 w-3" /> Add Finish
-                        </Button>
+                            <div className="space-y-2 min-w-[100px]">
+                              <Select 
+                                value={exterior.finishes.find(f => f.type === "exterior-paint")?.value || ""} 
+                                onValueChange={(value) => {
+                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-paint" ? { ...f, value } : f) })
+                                  handleSave()
+                                }}
+                              >
+                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="0.25">0.25</SelectItem>
+                                  <SelectItem value="0.5">0.5</SelectItem>
+                                  <SelectItem value="W">W</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </>
+                        )}
+                        <div className="flex items-center gap-2 pb-2">
+                          <Switch
+                            checked={exterior.finishes.some(f => f.type === "exterior-siding")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-siding", measureType: "sf", value: "" }] })
+                              } else {
+                                setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-siding") })
+                              }
+                              handleSave()
+                            }}
+                          />
+                          <Label className="text-sm">Exterior Siding</Label>
+                        </div>
+                        {exterior.finishes.some(f => f.type === "exterior-siding") && (
+                          <>
+                            <div className="flex items-center gap-2">
+                              {(["pf", "sf"] as const).map((mt) => (
+                                <Button
+                                  key={mt}
+                                  type="button"
+                                  variant={exterior.finishes.find(f => f.type === "exterior-siding")?.measureType === mt ? "default" : "outline"}
+                                  size="sm"
+                                  className="h-7 px-2 text-xs"
+                                  onClick={() => {
+                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-siding" ? { ...f, measureType: mt } : f) })
+                                    handleSave()
+                                  }}
+                                >
+                                  {mt.toUpperCase()}
+                                </Button>
+                              ))}
+                            </div>
+                            <div className="space-y-2 min-w-[100px]">
+                              <Select 
+                                value={exterior.finishes.find(f => f.type === "exterior-siding")?.value || ""} 
+                                onValueChange={(value) => {
+                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-siding" ? { ...f, value } : f) })
+                                  handleSave()
+                                }}
+                              >
+                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="0.25">0.25</SelectItem>
+                                  <SelectItem value="0.5">0.5</SelectItem>
+                                  <SelectItem value="W">W</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -1235,29 +1248,29 @@ value={exterior.electrical.disconnect30Amp}
                         </div>
                         {foundation.crawlspace.enabled && (
                           <div className="space-y-4">
-                            <div className="grid gap-4 sm:grid-cols-3">
+                            <div className="flex flex-wrap items-end gap-4">
                               <div className="space-y-2">
-                                <Label>Foundation Wall Clean (PF)</Label>
+                                <Label className="text-xs text-muted-foreground">Foundation Wall Clean (PF)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
-                                  placeholder="Perimeter feet"
+                                  type="number"
+                                  min="0"
+                                  placeholder="PF"
                                   value={foundation.crawlspace.perimeterFeet}
                                   onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, perimeterFeet: e.target.value.replace(/^0+/, '') } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label># of Piers</Label>
+                                <Label className="text-xs text-muted-foreground"># of Piers</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
-value={foundation.crawlspace.piersCount}
-                                onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  type="number"
+                                  min="0"
+                                  value={foundation.crawlspace.piersCount}
+                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
-                              <div className="flex items-center gap-4 pt-6">
+                              <div className="flex items-center gap-4 pb-2">
                                 <div className="flex items-center gap-2">
                                   <input
                                     type="radio"
@@ -1278,12 +1291,31 @@ value={foundation.crawlspace.piersCount}
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Switch
-                                checked={foundation.crawlspace.cleanJoist}
-                                onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, cleanJoist: checked } }); handleSave() }}
-                              />
-                              <Label className="text-sm">Clean Joist</Label>
+                            <div className="flex flex-wrap items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={foundation.crawlspace.cleanJoist}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, cleanJoist: checked } }); handleSave() }}
+                                />
+                                <Label className="text-sm">Clean Joist</Label>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={foundation.crawlspace.houseRewire !== ""}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: checked ? " " : "" } }); handleSave() }}
+                                />
+                                <Label className="text-sm">House Rewire</Label>
+                              </div>
+                              {foundation.crawlspace.houseRewire !== "" && (
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="Enter home SF"
+                                  value={foundation.crawlspace.houseRewire.trim()}
+                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
+                                  className="border-border/60 bg-secondary/50 w-32"
+                                />
+                              )}
                             </div>
                             <div className="flex items-center gap-2">
                               <Switch
@@ -1340,11 +1372,6 @@ value={foundation.crawlspace.piersCount}
                                 />
                                 <Label className="text-sm">Water Muck Heavy</Label>
                               </div>
-                            </div>
-                            {foundation.crawlspace.muckHeavy && (
-                              <p className="text-xs text-amber-500">Note: NFIP requires photos of standing mud to endorse for heavy Muck</p>
-                            )}
-                            <div className="flex flex-wrap items-center gap-4">
                               <div className="flex items-center gap-2">
                                 <Switch
                                   checked={foundation.crawlspace.standingWater}
@@ -1352,29 +1379,22 @@ value={foundation.crawlspace.piersCount}
                                 />
                                 <Label className="text-sm">Standing Water</Label>
                               </div>
-                              <div className="space-y-1">
-                                <Label className="text-sm">House Rewire</Label>
-                                <Input
-                                  type="text"
-                                  placeholder="enter home SF..."
-                                  value={foundation.crawlspace.houseRewire}
-                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
-                                  className="w-32 border-border/60 bg-secondary/50"
-                                />
-                              </div>
                             </div>
+                            {foundation.crawlspace.muckHeavy && (
+                              <p className="text-xs text-amber-500">Note: NFIP requires photos of standing mud to endorse for heavy Muck</p>
+                            )}
                           </div>
                         )}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
 
-                  {/* Enclosure Removal Items */}
+                  {/* Enclosure/Basement Removal Items */}
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
                       <div className="flex items-center gap-3">
                         <Trash2 className="h-5 w-5 text-primary" />
-                        <span className="font-medium text-foreground">Enclosure Removal Items</span>
+                        <span className="font-medium text-foreground">Enclosure/Basement Removal Items</span>
                         {(foundation.enclosureRemoval.sandRemoval.enabled || foundation.enclosureRemoval.backfill.enabled) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
@@ -1390,50 +1410,40 @@ value={foundation.crawlspace.piersCount}
                             />
                             <Label>Sand/Mud Removal</Label>
                             <span className="text-xs text-muted-foreground">(cubic feet)</span>
-                            {foundation.enclosureRemoval.sandRemoval.enabled && (
-                              <Input
-                                type="text"
-                                inputMode="numeric"
-                                placeholder="# ft cubic"
-                                value={foundation.enclosureRemoval.sandRemoval.cubicFeet}
-                                onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, cubicFeet: e.target.value } } }); handleSave() }}
-                                className="w-24 border-border/60 bg-secondary/50"
-                              />
-                            )}
                           </div>
                           {foundation.enclosureRemoval.sandRemoval.enabled && (
-                            <div className="ml-8 grid gap-4 sm:grid-cols-3">
+                            <div className="ml-8 flex flex-wrap items-end gap-4">
                               <div className="space-y-2">
-                                <Label className="text-sm">Length (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Length (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   placeholder="Length"
                                   value={foundation.enclosureRemoval.sandRemoval.length}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, length: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">Width (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Width (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   placeholder="Width"
                                   value={foundation.enclosureRemoval.sandRemoval.width}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, width: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">Depth (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Depth (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   placeholder="Depth"
                                   value={foundation.enclosureRemoval.sandRemoval.depth}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, depth: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                             </div>
@@ -1448,48 +1458,38 @@ value={foundation.crawlspace.piersCount}
                               onCheckedChange={(checked) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, enabled: checked } } }); handleSave() }}
                             />
                             <Label>Backfill Around/In Foundation</Label>
-                            <span className="text-xs text-muted-foreground">(cubic ft)</span>
-                            {foundation.enclosureRemoval.backfill.enabled && (
-                              <Input
-                                type="text"
-                                inputMode="numeric"
-                                placeholder="# ft cubic"
-                                value={foundation.enclosureRemoval.backfill.cubicFeet}
-                                onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, cubicFeet: e.target.value } } }); handleSave() }}
-                                className="w-24 border-border/60 bg-secondary/50"
-                              />
-                            )}
+                            <span className="text-xs text-muted-foreground">(cubic feet)</span>
                           </div>
                           {foundation.enclosureRemoval.backfill.enabled && (
-                            <div className="ml-8 grid gap-4 sm:grid-cols-3">
+                            <div className="ml-8 flex flex-wrap items-end gap-4">
                               <div className="space-y-2">
-                                <Label className="text-sm">Length (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Length (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   value={foundation.enclosureRemoval.backfill.length}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, length: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">Width (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Width (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   value={foundation.enclosureRemoval.backfill.width}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, width: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">Depth (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Depth (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   value={foundation.enclosureRemoval.backfill.depth}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, depth: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                             </div>
@@ -1521,21 +1521,18 @@ value={foundation.crawlspace.piersCount}
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-end gap-4">
+                        <div className="flex items-center gap-2 pb-2">
                           <Switch
                             checked={foundation.sumpPump.enabled}
                             onCheckedChange={(checked) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, enabled: checked } }); handleSave() }}
                           />
                           <Label>Enable Sump Pump</Label>
-                          {foundation.sumpPump.enabled && (
-                            <span className="text-xs text-muted-foreground">MinorAdjustment...</span>
-                          )}
                         </div>
                         {foundation.sumpPump.enabled && (
-                          <div className="grid gap-4 sm:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label>Action</Label>
+                          <>
+                            <div className="space-y-2 min-w-[140px]">
+                              <Label className="text-xs text-muted-foreground">Action</Label>
                               <Select value={foundation.sumpPump.action} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, action: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
@@ -1546,8 +1543,8 @@ value={foundation.crawlspace.piersCount}
                                 </SelectContent>
                               </Select>
                             </div>
-                            <div className="space-y-2">
-                              <Label>Horsepower</Label>
+                            <div className="space-y-2 min-w-[200px]">
+                              <Label className="text-xs text-muted-foreground">Horsepower</Label>
                               <Select value={foundation.sumpPump.hp} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, hp: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
@@ -1559,10 +1556,21 @@ value={foundation.crawlspace.piersCount}
                                 </SelectContent>
                               </Select>
                             </div>
-                          </div>
+                          </>
                         )}
-                        <p className="text-xs text-muted-foreground">Info put the basement below the crawlspace items</p>
                       </div>
+                      {foundation.sumpPump.enabled && (
+                        <div className="mt-4 space-y-2">
+                          <Label className="text-sm">F9 Note</Label>
+                          <Input
+                            type="text"
+                            placeholder="Enter model and serial number..."
+                            value={foundation.sumpPump.f9Note}
+                            onChange={(e) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, f9Note: e.target.value } }); handleSave() }}
+                            className="border-border/60 bg-secondary/50"
+                          />
+                        </div>
+                      )}
                     </CollapsibleContent>
                   </Collapsible>
 

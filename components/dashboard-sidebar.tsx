@@ -3,7 +3,8 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Upload, ClipboardList, Coins, Settings, HelpCircle, LogOut, History, Zap } from "lucide-react"
+import { LayoutDashboard, Upload, ClipboardList, Coins, Settings, HelpCircle, LogOut, History, Zap, ChevronLeft, ChevronRight } from "lucide-react"
+import { createContext, useContext, useState, ReactNode } from "react"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -18,18 +19,67 @@ const secondaryNavigation = [
   { name: "Support", href: "/support", icon: HelpCircle },
 ]
 
+// Context for sidebar state
+const SidebarContext = createContext<{
+  isCollapsed: boolean
+  setIsCollapsed: (value: boolean) => void
+}>({
+  isCollapsed: false,
+  setIsCollapsed: () => {},
+})
+
+export function useSidebar() {
+  return useContext(SidebarContext)
+}
+
+export function SidebarProvider({ children }: { children: ReactNode }) {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  return (
+    <SidebarContext.Provider value={{ isCollapsed, setIsCollapsed }}>
+      {children}
+    </SidebarContext.Provider>
+  )
+}
+
 export function DashboardSidebar() {
   const pathname = usePathname()
+  const { isCollapsed, setIsCollapsed } = useSidebar()
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-sidebar-border/60 bg-sidebar">
+    <aside 
+      className={cn(
+        "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-sidebar-border/60 bg-sidebar transition-all duration-300",
+        isCollapsed ? "w-16" : "w-64"
+      )}
+    >
       {/* Logo */}
-      <Link href="/" className="flex h-16 items-center gap-2.5 border-b border-sidebar-border/60 px-6 transition-colors hover:bg-sidebar-accent/30">
+      <Link 
+        href="/" 
+        className={cn(
+          "flex h-16 items-center border-b border-sidebar-border/60 transition-colors hover:bg-sidebar-accent/30",
+          isCollapsed ? "justify-center px-2" : "gap-2.5 px-6"
+        )}
+      >
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary shadow-md shadow-sidebar-primary/30">
           <Zap className="h-5 w-5 text-sidebar-primary-foreground" />
         </div>
-        <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">AdjustAid</span>
+        {!isCollapsed && (
+          <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">AdjustAid</span>
+        )}
       </Link>
+
+      {/* Collapse Toggle */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute -right-3 top-20 flex h-6 w-6 items-center justify-center rounded-full border border-sidebar-border bg-sidebar text-sidebar-foreground/70 shadow-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+      >
+        {isCollapsed ? (
+          <ChevronRight className="h-3.5 w-3.5" />
+        ) : (
+          <ChevronLeft className="h-3.5 w-3.5" />
+        )}
+      </button>
 
       {/* Main Navigation */}
       <nav className="flex flex-1 flex-col gap-1 p-4">
@@ -40,15 +90,17 @@ export function DashboardSidebar() {
               <Link
                 key={item.name}
                 href={item.href}
+                title={isCollapsed ? item.name : undefined}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                  "flex items-center rounded-lg text-sm font-medium transition-all duration-200",
+                  isCollapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
                   isActive
                     ? "bg-sidebar-primary/15 text-sidebar-primary ring-1 ring-sidebar-primary/20"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                 )}
               >
-                <item.icon className={cn("h-5 w-5", isActive && "text-sidebar-primary")} />
-                {item.name}
+                <item.icon className={cn("h-5 w-5 shrink-0", isActive && "text-sidebar-primary")} />
+                {!isCollapsed && item.name}
               </Link>
             )
           })}
@@ -61,38 +113,55 @@ export function DashboardSidebar() {
               <Link
                 key={item.name}
                 href={item.href}
+                title={isCollapsed ? item.name : undefined}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                  "flex items-center rounded-lg text-sm font-medium transition-all duration-200",
+                  isCollapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
                   isActive
                     ? "bg-sidebar-primary/15 text-sidebar-primary ring-1 ring-sidebar-primary/20"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                 )}
               >
-                <item.icon className={cn("h-5 w-5", isActive && "text-sidebar-primary")} />
-                {item.name}
+                <item.icon className={cn("h-5 w-5 shrink-0", isActive && "text-sidebar-primary")} />
+                {!isCollapsed && item.name}
               </Link>
             )
           })}
           <Link
             href="/"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+            title={isCollapsed ? "Log Out" : undefined}
+            className={cn(
+              "flex items-center rounded-lg text-sm font-medium text-sidebar-foreground/70 transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
+              isCollapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5"
+            )}
           >
-            <LogOut className="h-5 w-5" />
-            Log Out
+            <LogOut className="h-5 w-5 shrink-0" />
+            {!isCollapsed && "Log Out"}
           </Link>
         </div>
       </nav>
 
       {/* User Info */}
-      <div className="border-t border-sidebar-border/60 p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sidebar-primary/20 text-sm font-medium text-sidebar-primary ring-1 ring-sidebar-primary/20">
+      <div className={cn(
+        "border-t border-sidebar-border/60 p-4",
+        isCollapsed && "flex justify-center"
+      )}>
+        <div className={cn(
+          "flex items-center",
+          isCollapsed ? "justify-center" : "gap-3"
+        )}>
+          <div 
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-sidebar-primary/20 text-sm font-medium text-sidebar-primary ring-1 ring-sidebar-primary/20"
+            title={isCollapsed ? "Sarah Mitchell" : undefined}
+          >
             SM
           </div>
-          <div className="flex-1 overflow-hidden">
-            <p className="truncate text-sm font-medium text-sidebar-foreground">Sarah Mitchell</p>
-            <p className="truncate text-xs text-sidebar-foreground/60">sarah@insuranceco.com</p>
-          </div>
+          {!isCollapsed && (
+            <div className="flex-1 overflow-hidden">
+              <p className="truncate text-sm font-medium text-sidebar-foreground">Sarah Mitchell</p>
+              <p className="truncate text-xs text-sidebar-foreground/60">sarah@insuranceco.com</p>
+            </div>
+          )}
         </div>
       </div>
     </aside>
