@@ -1025,33 +1025,31 @@ value={exterior.dumpster.count}
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="space-y-4">
-                        <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="flex flex-wrap items-end gap-4">
                           <div className="space-y-2">
-                            <Label>Exterior Outlets</Label>
+                            <Label className="text-xs text-muted-foreground">Exterior Outlets</Label>
                             <Input
-                              type="text"
-                              inputMode="numeric"
-                              pattern="[0-9]*"
-value={exterior.electrical.exteriorOutlets}
+                              type="number"
+                              min="0"
+                              value={exterior.electrical.exteriorOutlets}
                               onChange={(e) => {
                                 const val = e.target.value.replace(/^0+/, '') || ""
                                 setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: val } }); handleSave()
                               }}
-                              className="border-border/60 bg-secondary/50"
+                              className="border-border/60 bg-secondary/50 w-24"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label>30 Amp Disconnect</Label>
+                            <Label className="text-xs text-muted-foreground">30 Amp Disconnect</Label>
                             <Input
-                              type="text"
-                              inputMode="numeric"
-                              pattern="[0-9]*"
-value={exterior.electrical.disconnect30Amp}
+                              type="number"
+                              min="0"
+                              value={exterior.electrical.disconnect30Amp}
                               onChange={(e) => {
                                 const val = e.target.value.replace(/^0+/, '') || ""
                                 setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: val } }); handleSave()
                               }}
-                              className="border-border/60 bg-secondary/50"
+                              className="border-border/60 bg-secondary/50 w-24"
                             />
                           </div>
                         </div>
@@ -1064,8 +1062,8 @@ value={exterior.electrical.disconnect30Amp}
                             <Label>Breaker Panel</Label>
                           </div>
                           {exterior.electrical.breakerPanel.enabled && (
-                            <div className="ml-8 grid gap-4 sm:grid-cols-2">
-                              <div className="space-y-2">
+                            <div className="ml-8 flex flex-wrap items-end gap-4">
+                              <div className="space-y-2 min-w-[120px]">
                                 <Label className="text-sm">Amperage</Label>
                                 <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(value) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
@@ -1078,7 +1076,7 @@ value={exterior.electrical.disconnect30Amp}
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="flex items-center gap-3 pt-6">
+                              <div className="flex items-center gap-2 pb-2">
                                 <Switch
                                   checked={exterior.electrical.breakerPanel.arcFaults}
                                   onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
