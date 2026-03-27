@@ -1521,21 +1521,18 @@ value={exterior.dumpster.count}
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-end gap-4">
+                        <div className="flex items-center gap-2 pb-2">
                           <Switch
                             checked={foundation.sumpPump.enabled}
                             onCheckedChange={(checked) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, enabled: checked } }); handleSave() }}
                           />
                           <Label>Enable Sump Pump</Label>
-                          {foundation.sumpPump.enabled && (
-                            <span className="text-xs text-muted-foreground">MinorAdjustment...</span>
-                          )}
                         </div>
                         {foundation.sumpPump.enabled && (
-                          <div className="grid gap-4 sm:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label>Action</Label>
+                          <>
+                            <div className="space-y-2 min-w-[140px]">
+                              <Label className="text-xs text-muted-foreground">Action</Label>
                               <Select value={foundation.sumpPump.action} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, action: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
@@ -1546,8 +1543,8 @@ value={exterior.dumpster.count}
                                 </SelectContent>
                               </Select>
                             </div>
-                            <div className="space-y-2">
-                              <Label>Horsepower</Label>
+                            <div className="space-y-2 min-w-[200px]">
+                              <Label className="text-xs text-muted-foreground">Horsepower</Label>
                               <Select value={foundation.sumpPump.hp} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, hp: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
@@ -1559,9 +1556,8 @@ value={exterior.dumpster.count}
                                 </SelectContent>
                               </Select>
                             </div>
-                          </div>
+                          </>
                         )}
-                        <p className="text-xs text-muted-foreground">Info put the basement below the crawlspace items</p>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
