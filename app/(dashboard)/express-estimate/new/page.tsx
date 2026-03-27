@@ -587,8 +587,8 @@ const newDoor: DoorItem = {
                             <div className="space-y-2">
                               <Label className="text-xs text-muted-foreground">Perimeter Feet</Label>
                               <Input
-                                type="text"
-                                inputMode="numeric"
+                                type="number"
+                                min="0"
                                 placeholder="Enter PF"
                                 value={exterior.pressureWash.perimeterFeet}
                                 onChange={(e) => { 
