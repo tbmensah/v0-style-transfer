@@ -69,7 +69,9 @@ interface FloorLayer {
   grade: string
   application: string
   action: string
-  }
+  vaporBarrier: boolean
+  subfloorReplacement: boolean
+}
   
   interface FlooringOptions {
   enabled: boolean
@@ -199,7 +201,7 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
   type: "room",
   sqft: "",
   nfipCleaning: { enabled: false, wall: { height: "", wallType: "", ceilingAffected: false }, floor: { type: "", areaOnCrawlspace: false } },
-  flooring: { enabled: false, multipleLayers: false, layers: [{ id: Date.now(), type: "", grade: "", application: "", action: "" }], vaporBarrier: false, subfloorReplacement: false, f9Note: "" },
+  flooring: { enabled: false, multipleLayers: false, layers: [{ id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }], vaporBarrier: false, subfloorReplacement: false, f9Note: "" },
   trim: { enabled: false, baseboardHeight: "", material: "", finish: "", cap: false, shoe: false, shoeFinish: "" },
   wallCovering: { enabled: false, type: "", replacementCalc: "", replacementHeight: "", texture: false, textureType: "" },
   electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
@@ -2321,7 +2323,7 @@ value={exterior.dumpster.count}
                                         onCheckedChange={(checked) => {
                                           const newFlooring = { ...room.flooring, enabled: checked }
                                           if (checked && (!newFlooring.layers || newFlooring.layers.length === 0)) {
-                                            newFlooring.layers = [{ id: Date.now(), type: "", grade: "", application: "", action: "" }]
+                                            newFlooring.layers = [{ id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }]
                                           }
                                           updateRoom(room.id, { flooring: newFlooring })
                                         }}
@@ -2347,7 +2349,7 @@ value={exterior.dumpster.count}
                                       className="gap-1 border-border/60"
                                       onClick={() => {
                                         const currentLayers = room.flooring.layers || []
-                                        const newLayer = { id: Date.now(), type: "", grade: "", application: "", action: "" }
+                                        const newLayer = { id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }
                                         updateRoom(room.id, { 
                                           flooring: { 
                                             ...room.flooring, 
@@ -2390,7 +2392,7 @@ value={exterior.dumpster.count}
                                             )}
                                           </div>
                                           <div className="flex flex-wrap items-end gap-3">
-                                            <div className="space-y-1 min-w-[140px]">
+                                            <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Type</Label>
                                               <Select 
                                                 value={layer.type} 
@@ -2400,7 +2402,7 @@ value={exterior.dumpster.count}
                                                   updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                 }}
                                               >
-                                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                                <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -2413,7 +2415,7 @@ value={exterior.dumpster.count}
                                                 </SelectContent>
                                               </Select>
                                             </div>
-                                            <div className="space-y-1 min-w-[140px]">
+                                            <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Grade</Label>
                                               <Select 
                                                 value={layer.grade} 
@@ -2423,7 +2425,7 @@ value={exterior.dumpster.count}
                                                   updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                 }}
                                               >
-                                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                                <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -2434,7 +2436,7 @@ value={exterior.dumpster.count}
                                                 </SelectContent>
                                               </Select>
                                             </div>
-                                            <div className="space-y-1 min-w-[160px]">
+                                            <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Application</Label>
                                               <Select 
                                                 value={layer.application} 
@@ -2444,7 +2446,7 @@ value={exterior.dumpster.count}
                                                   updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                 }}
                                               >
-                                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                                <SelectTrigger className="w-[170px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -2456,7 +2458,7 @@ value={exterior.dumpster.count}
                                               </Select>
                                             </div>
                                             {room.flooring.multipleLayers && (
-                                              <div className="space-y-1 min-w-[160px]">
+                                              <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Action</Label>
                                                 <Select 
                                                   value={layer.action} 
@@ -2466,7 +2468,7 @@ value={exterior.dumpster.count}
                                                     updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                   }}
                                                 >
-                                                  <SelectTrigger className="border-border/60 bg-secondary/50">
+                                                  <SelectTrigger className="w-[150px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
@@ -2476,24 +2478,30 @@ value={exterior.dumpster.count}
                                                 </Select>
                                               </div>
                                             )}
-                                            {layerIndex === 0 && (
-                                              <>
-                                                <div className="flex items-center gap-2 pb-1">
-                                                  <Switch
-                                                    checked={room.flooring.vaporBarrier}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { flooring: { ...room.flooring, vaporBarrier: checked, subfloorReplacement: checked ? false : room.flooring.subfloorReplacement } })}
-                                                  />
-                                                  <Label className="text-sm">Vapor Barrier</Label>
-                                                </div>
-                                                <div className="flex items-center gap-2 pb-1">
-                                                  <Switch
-                                                    checked={room.flooring.subfloorReplacement}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { flooring: { ...room.flooring, subfloorReplacement: checked, vaporBarrier: checked ? false : room.flooring.vaporBarrier } })}
-                                                  />
-                                                  <Label className="text-sm">Subfloor Replacement</Label>
-                                                </div>
-                                              </>
-                                            )}
+                                          </div>
+                                          <div className="flex items-center gap-6 mt-2">
+                                            <div className="flex items-center gap-2">
+                                              <Switch
+                                                checked={layer.vaporBarrier}
+                                                onCheckedChange={(checked) => {
+                                                  const newLayers = [...(room.flooring.layers || [])]
+                                                  newLayers[layerIndex] = { ...layer, vaporBarrier: checked, subfloorReplacement: checked ? false : layer.subfloorReplacement }
+                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                }}
+                                              />
+                                              <Label className="text-sm">Vapor Barrier</Label>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              <Switch
+                                                checked={layer.subfloorReplacement}
+                                                onCheckedChange={(checked) => {
+                                                  const newLayers = [...(room.flooring.layers || [])]
+                                                  newLayers[layerIndex] = { ...layer, subfloorReplacement: checked, vaporBarrier: checked ? false : layer.vaporBarrier }
+                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                }}
+                                              />
+                                              <Label className="text-sm">Subfloor Replacement</Label>
+                                            </div>
                                           </div>
                                         </div>
                                       ))}
