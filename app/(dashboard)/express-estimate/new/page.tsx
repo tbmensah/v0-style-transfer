@@ -721,8 +721,8 @@ value={exterior.dumpster.count}
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="space-y-2">
+                              <div className="flex flex-wrap items-end gap-4">
+                                <div className="space-y-2 min-w-[120px]">
                                   <Label className="text-sm">Tonnage</Label>
                                   <Select value={unit.tonnage} onValueChange={(value) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
@@ -738,7 +738,7 @@ value={exterior.dumpster.count}
                                     </SelectContent>
                                   </Select>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-2 min-w-[120px]">
                                   <Label className="text-sm">SEER Rating</Label>
                                   <Select value={unit.seer} onValueChange={(value) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
@@ -753,23 +753,21 @@ value={exterior.dumpster.count}
                                     </SelectContent>
                                   </Select>
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, replace: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
                                       handleSave()
                                     }}
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -778,7 +776,6 @@ value={exterior.dumpster.count}
                               </div>
                               <div className="space-y-2">
                                 <Label className="text-sm">F9 Note</Label>
-                                <p className="text-xs text-muted-foreground">Model and Serial Number</p>
                                 <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
@@ -843,8 +840,8 @@ value={exterior.dumpster.count}
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="space-y-2">
+                              <div className="flex flex-wrap items-end gap-4">
+                                <div className="space-y-2 min-w-[120px]">
                                   <Label className="text-sm">Tonnage</Label>
                                   <Select value={unit.tonnage} onValueChange={(value) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
@@ -860,7 +857,7 @@ value={exterior.dumpster.count}
                                     </SelectContent>
                                   </Select>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-2 min-w-[120px]">
                                   <Label className="text-sm">SEER Rating</Label>
                                   <Select value={unit.seer} onValueChange={(value) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
@@ -875,23 +872,21 @@ value={exterior.dumpster.count}
                                     </SelectContent>
                                   </Select>
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, replace: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
                                       handleSave()
                                     }}
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -900,7 +895,6 @@ value={exterior.dumpster.count}
                               </div>
                               <div className="space-y-2">
                                 <Label className="text-sm">F9 Note</Label>
-                                <p className="text-xs text-muted-foreground">Model and Serial Number</p>
                                 <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
@@ -950,15 +944,15 @@ value={exterior.dumpster.count}
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="space-y-2">
-<Label className="text-sm">Number of Zones</Label>
-                                <Select value={unit.zones} onValueChange={(value) => {
-                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
-                                  handleSave()
-                                }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="QTY" />
+                              <div className="flex flex-wrap items-end gap-4">
+                                <div className="space-y-2 min-w-[120px]">
+                                  <Label className="text-sm">Number of Zones</Label>
+                                  <Select value={unit.zones} onValueChange={(value) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="QTY" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {["1", "2", "3", "4"].map(z => (
@@ -967,7 +961,7 @@ value={exterior.dumpster.count}
                                     </SelectContent>
                                   </Select>
                                 </div>
-                                <div className="flex items-center gap-3 pt-6">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.highEfficiency}
                                     onCheckedChange={(checked) => {
@@ -977,23 +971,21 @@ value={exterior.dumpster.count}
                                   />
                                   <Label className="text-sm">High Efficiency</Label>
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, replace: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
                                       handleSave()
                                     }}
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pb-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, serviceCall: checked } : u) } })
+                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -1002,7 +994,6 @@ value={exterior.dumpster.count}
                               </div>
                               <div className="space-y-2">
                                 <Label className="text-sm">F9 Note</Label>
-                                <p className="text-xs text-muted-foreground">Model and Serial Number</p>
                                 <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
