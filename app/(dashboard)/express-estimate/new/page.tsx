@@ -317,7 +317,8 @@ export default function NewExpressEstimatePage() {
       // Stair Cleaning
       stairCleaning: false,
       stairCount: "",
-      totalStairsSubmerged: "",
+      treadWidth: "",
+      stringersLength: "",
       // Foundation Door
       foundationDoor: false,
       foundationDoorAction: "",
@@ -1776,7 +1777,7 @@ value={exterior.dumpster.count}
                                       variant={foundation.basement.drywallMeasureType === "sf" ? "default" : "outline"}
                                       size="sm"
                                       className="h-7 px-2 text-xs"
-                                      onClick={() => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallMeasureType: "sf" } }); handleSave() }}
+                                      onClick={() => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallMeasureType: "sf", drywallValue: "" } }); handleSave() }}
                                     >
                                       Square Feet
                                     </Button>
@@ -1785,19 +1786,34 @@ value={exterior.dumpster.count}
                                       variant={foundation.basement.drywallMeasureType === "lf" ? "default" : "outline"}
                                       size="sm"
                                       className="h-7 px-2 text-xs"
-                                      onClick={() => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallMeasureType: "lf" } }); handleSave() }}
+                                      onClick={() => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallMeasureType: "lf", drywallValue: "" } }); handleSave() }}
                                     >
                                       Linear Feet
                                     </Button>
                                   </div>
-                                  <Input
-                                    type="text"
-                                    inputMode="numeric"
-                                    placeholder={foundation.basement.drywallMeasureType.toUpperCase()}
-                                    value={foundation.basement.drywallValue}
-                                    onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallValue: e.target.value.replace(/^0+/, '') } }); handleSave() }}
-                                    className="w-24 border-border/60 bg-secondary/50"
-                                  />
+                                  {foundation.basement.drywallMeasureType === "sf" ? (
+                                    <Select 
+                                      value={foundation.basement.drywallValue} 
+                                      onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallValue: value } }); handleSave() }}
+                                    >
+                                      <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="SF" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="0.5">0.5</SelectItem>
+                                        <SelectItem value="W">W</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  ) : (
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      placeholder="LF"
+                                      value={foundation.basement.drywallValue}
+                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallValue: e.target.value.replace(/^0+/, '') } }); handleSave() }}
+                                      className="w-24 border-border/60 bg-secondary/50"
+                                    />
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -1811,25 +1827,37 @@ value={exterior.dumpster.count}
                                 <Label>Enable Stair Cleaning</Label>
                               </div>
                               {foundation.basement.stairCleaning && (
-                                <div className="ml-8 grid gap-4 sm:grid-cols-2">
+                                <div className="ml-8 flex flex-wrap items-end gap-4">
                                   <div className="space-y-2">
-                                    <Label className="text-sm"># of stairs submerged</Label>
+                                    <Label className="text-xs text-muted-foreground"># of stairs submerged</Label>
                                     <Input
-                                      type="text"
-                                      inputMode="numeric"
-value={foundation.basement.stairCount}
-                                    onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, stairCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
-                                      className="border-border/60 bg-secondary/50"
+                                      type="number"
+                                      min="0"
+                                      value={foundation.basement.stairCount}
+                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, stairCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
+                                      className="border-border/60 bg-secondary/50 w-24"
                                     />
                                   </div>
                                   <div className="space-y-2">
-                                    <Label className="text-sm">Width of treads</Label>
+                                    <Label className="text-xs text-muted-foreground">Width of Treads (ft)</Label>
                                     <Input
-                                      type="text"
-                                      placeholder="3 ft"
-                                      value={foundation.basement.totalStairsSubmerged}
-                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, totalStairsSubmerged: e.target.value } }); handleSave() }}
-                                      className="border-border/60 bg-secondary/50"
+                                      type="number"
+                                      min="0"
+                                      step="0.1"
+                                      value={foundation.basement.treadWidth}
+                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, treadWidth: e.target.value } }); handleSave() }}
+                                      className="border-border/60 bg-secondary/50 w-24"
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label className="text-xs text-muted-foreground">Total Length of Stringers Submerged (ft)</Label>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      step="0.1"
+                                      value={foundation.basement.stringersLength}
+                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, stringersLength: e.target.value } }); handleSave() }}
+                                      className="border-border/60 bg-secondary/50 w-24"
                                     />
                                   </div>
                                 </div>
