@@ -1863,30 +1863,6 @@ value={exterior.dumpster.count}
                                 </div>
                               )}
                             </div>
-                            {/* Foundation Door */}
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-3">
-                                <Switch
-                                  checked={foundation.basement.foundationDoor}
-                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoor: checked } }); handleSave() }}
-                                />
-                                <Label>Enable Foundation Door</Label>
-                                {foundation.basement.foundationDoor && (
-                                  <Select value={foundation.basement.foundationDoorAction} onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoorAction: value } }); handleSave() }}>
-                                    <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="detach-reset-handle">Detach & Reset Handle</SelectItem>
-                                      <SelectItem value="replace-handle">Replace Handle</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                )}
-                              </div>
-                              {foundation.basement.foundationDoor && (
-                                <p className="ml-9 text-xs text-muted-foreground">The inclusion of the interior slab only</p>
-                              )}
-                            </div>
                             {/* Foundation Windows */}
                             <div className="space-y-3">
                               <div className="flex items-center justify-between">
@@ -1944,20 +1920,20 @@ value={exterior.dumpster.count}
                                       <SelectValue placeholder="Size" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="3-4">3-4 sf</SelectItem>
-                                      <SelectItem value="5-8">5-8 sf</SelectItem>
-                                      <SelectItem value="9-12">9-12 sf</SelectItem>
+                                      <SelectItem value="4-8">4-8 SF</SelectItem>
+                                      <SelectItem value="9-12">9-12 SF</SelectItem>
+                                      <SelectItem value="13-18">13-18 SF</SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <div className="flex items-center gap-1">
                                     <Label className="text-xs">Qty</Label>
                                     <Input
-type="text"
-                                  inputMode="numeric"
-                                  placeholder="QTY"
-                                  value={win.quantity}
-                                  onChange={(e) => {
-                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, quantity: e.target.value.replace(/^0+/, '') || "" } : w) } })
+                                      type="text"
+                                      inputMode="numeric"
+                                      placeholder="QTY"
+                                      value={win.quantity}
+                                      onChange={(e) => {
+                                        setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, quantity: e.target.value.replace(/^0+/, '') || "" } : w) } })
                                         handleSave()
                                       }}
                                       className="w-14 border-border/60 bg-secondary/50"
@@ -1990,6 +1966,30 @@ type="text"
                                   </Button>
                                 </div>
                               ))}
+                            </div>
+                            {/* Foundation Door */}
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-3">
+                                <Switch
+                                  checked={foundation.basement.foundationDoor}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoor: checked } }); handleSave() }}
+                                />
+                                <Label>Enable Foundation Door</Label>
+                                {foundation.basement.foundationDoor && (
+                                  <Select value={foundation.basement.foundationDoorAction} onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoorAction: value } }); handleSave() }}>
+                                    <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="detach-reset-handle">Detach & Reset Handle</SelectItem>
+                                      <SelectItem value="replace-handle">Replace Handle</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                )}
+                              </div>
+                              {foundation.basement.foundationDoor && (
+                                <p className="ml-9 text-xs text-muted-foreground">The inclusion of the interior slab only</p>
+                              )}
                             </div>
                           </div>
                         )}
