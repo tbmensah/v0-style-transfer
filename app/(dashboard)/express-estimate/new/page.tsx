@@ -2366,7 +2366,29 @@ value={exterior.dumpster.count}
                                     <div className="space-y-4">
                                       {(room.flooring.layers || []).map((layer, layerIndex) => (
                                         <div key={layer.id} className="space-y-2">
-                                          <Label className="text-sm font-medium">{layerIndex === 0 ? "1st Layer" : `${layerIndex + 1}${layerIndex === 1 ? "nd" : layerIndex === 2 ? "rd" : "th"} Layer`}</Label>
+                                          <div className="flex items-center justify-between">
+                                            <Label className="text-sm font-medium">{layerIndex === 0 ? "1st Layer" : `${layerIndex + 1}${layerIndex === 1 ? "nd" : layerIndex === 2 ? "rd" : "th"} Layer`}</Label>
+                                            {layerIndex > 0 && (
+                                              <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                                onClick={() => {
+                                                  const newLayers = (room.flooring.layers || []).filter(l => l.id !== layer.id)
+                                                  updateRoom(room.id, { 
+                                                    flooring: { 
+                                                      ...room.flooring, 
+                                                      layers: newLayers, 
+                                                      multipleLayers: newLayers.length > 1 
+                                                    } 
+                                                  })
+                                                }}
+                                              >
+                                                <Trash2 className="h-4 w-4" />
+                                              </Button>
+                                            )}
+                                          </div>
                                           <div className="flex flex-wrap items-end gap-3">
                                             <div className="space-y-1 min-w-[140px]">
                                               <Label className="text-xs text-muted-foreground">Type</Label>
@@ -2470,26 +2492,6 @@ value={exterior.dumpster.count}
                                                 </SelectContent>
                                               </Select>
                                             </div>
-                                            {layerIndex > 0 && (
-                                              <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                                                onClick={() => {
-                                                  const newLayers = (room.flooring.layers || []).filter(l => l.id !== layer.id)
-                                                  updateRoom(room.id, { 
-                                                    flooring: { 
-                                                      ...room.flooring, 
-                                                      layers: newLayers, 
-                                                      multipleLayers: newLayers.length > 1 
-                                                    } 
-                                                  })
-                                                }}
-                                              >
-                                                <Trash2 className="h-4 w-4" />
-                                              </Button>
-                                            )}
                                           </div>
                                         </div>
                                       ))}
