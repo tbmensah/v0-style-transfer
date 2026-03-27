@@ -1988,7 +1988,7 @@ value={exterior.dumpster.count}
                                 )}
                               </div>
                               {foundation.basement.foundationDoor && (
-                                <p className="ml-9 text-xs text-muted-foreground">The inclusion of the interior slab only</p>
+                                <p className="ml-9 text-xs text-amber-500">Note: The inclusion of the interior slab only</p>
                               )}
                             </div>
                           </div>
