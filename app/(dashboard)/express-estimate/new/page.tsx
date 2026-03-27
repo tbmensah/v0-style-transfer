@@ -2348,7 +2348,7 @@ value={exterior.dumpster.count}
                                             onChange={() => updateRoom(room.id, { flooring: { ...room.flooring, multipleLayers: true } })}
                                             className="accent-primary"
                                           />
-                                          <span className="text-sm">Multiple layers of Flooring</span>
+                                          <span className="text-sm">Multiple layers of flooring</span>
                                         </label>
                                       </div>
                                       <p className="text-xs text-amber-500 ml-auto">Note: Please note carpet installed over flooring is a content item</p>
@@ -2482,7 +2482,7 @@ value={exterior.dumpster.count}
                                         </div>
                                       </div>
                                     ))}
-                                    {room.flooring.multipleLayers && (
+                                    {room.flooring.multipleLayers && room.flooring.layers.length < 6 && (
                                       <Button
                                         variant="ghost"
                                         size="sm"
