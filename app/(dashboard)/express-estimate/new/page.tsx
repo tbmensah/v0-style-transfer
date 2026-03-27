@@ -1633,8 +1633,8 @@ value={exterior.dumpster.count}
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
-                            <div className="grid gap-4 sm:grid-cols-3">
-                              <div className="space-y-2">
+                            <div className="flex flex-wrap items-end gap-4">
+                              <div className="space-y-2 min-w-[160px]">
                                 <Label className="text-sm">Type</Label>
                                 <Select value={handler.type} onValueChange={(value) => {
                                   setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, type: value } : h) } })
@@ -1650,7 +1650,7 @@ value={exterior.dumpster.count}
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="space-y-2">
+                              <div className="space-y-2 min-w-[100px]">
                                 <Label className="text-sm">Tonnage</Label>
                                 <Select value={handler.tonnage} onValueChange={(value) => {
                                   setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, tonnage: value } : h) } })
@@ -1666,8 +1666,23 @@ value={exterior.dumpster.count}
                                   </SelectContent>
                                 </Select>
                               </div>
+                              <div className="space-y-2 min-w-[140px]">
+                                <Label className="text-sm">Action</Label>
+                                <Select value={handler.action} onValueChange={(value) => {
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, action: value } : h) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="replace">Replace</SelectItem>
+                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
                               {(handler.type === "with-heat-element" || handler.type === "with-heat-element-a-coil") && (
-                                <div className="space-y-2">
+                                <div className="space-y-2 min-w-[100px]">
                                   <Label className="text-sm">With Heat Element</Label>
                                   <Select value={handler.heatElementCount} onValueChange={(value) => {
                                     setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, heatElementCount: value } : h) } })
@@ -1684,21 +1699,6 @@ value={exterior.dumpster.count}
                                   </Select>
                                 </div>
                               )}
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-sm">Action</Label>
-                              <Select value={handler.action} onValueChange={(value) => {
-                                setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, action: value } : h) } })
-                                handleSave()
-                              }}>
-                                <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="replace">Replace</SelectItem>
-                                  <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                </SelectContent>
-                              </Select>
                             </div>
                           </div>
                         ))}
