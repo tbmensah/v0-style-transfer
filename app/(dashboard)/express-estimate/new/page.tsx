@@ -294,7 +294,7 @@ export default function NewExpressEstimatePage() {
       backfill: { enabled: false, cubicFeet: "", length: "", width: "", depth: "" },
       confinedSpace: false,
     },
-    sumpPump: { enabled: false, minorAdjustment: "", action: "", hp: "" },
+    sumpPump: { enabled: false, minorAdjustment: "", action: "", hp: "", f9Note: "" },
     hvac: {
       airHandlers: [] as Array<{ 
         id: number; 
@@ -1559,6 +1559,18 @@ value={exterior.dumpster.count}
                           </>
                         )}
                       </div>
+                      {foundation.sumpPump.enabled && (
+                        <div className="mt-4 space-y-2">
+                          <Label className="text-sm">F9 Note</Label>
+                          <Input
+                            type="text"
+                            placeholder="Enter model and serial number..."
+                            value={foundation.sumpPump.f9Note}
+                            onChange={(e) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, f9Note: e.target.value } }); handleSave() }}
+                            className="border-border/60 bg-secondary/50"
+                          />
+                        </div>
+                      )}
                     </CollapsibleContent>
                   </Collapsible>
 
