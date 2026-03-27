@@ -776,25 +776,31 @@ value={exterior.dumpster.count}
                               </div>
                               <div className="space-y-2">
                                 <Label className="text-sm">F9 Note</Label>
-                                <Textarea
+                                <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
                                   onChange={(e) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
-                                  className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                  className="border-border/60 bg-secondary/50"
                                 />
                               </div>
                             </div>
                           ))}
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="gap-1 border-border/60"
-                            onClick={() => {
-                              const newUnit = { id: Date.now(), unitType: "", tonnage: "", seer: "", replace: false, serviceCall: false, f9Note: "" }
+                        </div>
+
+                        {/* Package Units */}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <Label className="font-medium">Package Unit</Label>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 border-border/60"
+                              onClick={() => {
+                                const newUnit = { id: Date.now(), unitType: "", tonnage: "", seer: "", replace: false, serviceCall: false, f9Note: "" }
                                 setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: [...exterior.hvac.packageUnits, newUnit] } })
                                 handleSave()
                               }}
@@ -887,16 +893,16 @@ value={exterior.dumpster.count}
                                   <Label className="text-sm">Service Call</Label>
                                 </div>
                               </div>
-<div className="space-y-2">
+                              <div className="space-y-2">
                                 <Label className="text-sm">F9 Note</Label>
-                                <Textarea
+                                <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
                                   onChange={(e) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
-                                  className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                  className="border-border/60 bg-secondary/50"
                                 />
                               </div>
                             </div>
@@ -988,14 +994,14 @@ value={exterior.dumpster.count}
                               </div>
                               <div className="space-y-2">
                                 <Label className="text-sm">F9 Note</Label>
-                                <Textarea
+                                <Input
                                   placeholder="Enter model and serial number..."
                                   value={unit.f9Note}
                                   onChange={(e) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
-                                  className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                  className="border-border/60 bg-secondary/50"
                                 />
                               </div>
                             </div>
@@ -1556,11 +1562,12 @@ value={exterior.dumpster.count}
                       {foundation.sumpPump.enabled && (
                         <div className="mt-4 space-y-2">
                           <Label className="text-sm">F9 Note</Label>
-                          <Textarea
+                          <Input
+                            type="text"
                             placeholder="Enter model and serial number..."
                             value={foundation.sumpPump.f9Note}
                             onChange={(e) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, f9Note: e.target.value } }); handleSave() }}
-                            className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                            className="border-border/60 bg-secondary/50"
                           />
                         </div>
                       )}
@@ -2477,7 +2484,7 @@ type="text"
                                         placeholder="F9 Description of the layers of floor removed..."
                                         value={room.flooring.f9Note}
                                         onChange={(e) => updateRoom(room.id, { flooring: { ...room.flooring, f9Note: e.target.value } })}
-                                        className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                        className="border-border/60 bg-secondary/50 min-h-[60px]"
                                       />
                                     </div>
                                   </div>
@@ -3370,11 +3377,11 @@ type="text"
                                               <SelectItem value="replace">Replace</SelectItem>
                                             </SelectContent>
                                           </Select>
-                                          <Textarea
+                                          <Input
                                             placeholder="F9 Model/serial..."
                                             value={room.plumbing.reverseOsmosis.f9Note}
                                             onChange={(e) => updateRoom(room.id, { plumbing: { ...room.plumbing!, reverseOsmosis: { ...room.plumbing!.reverseOsmosis, f9Note: e.target.value } } })}
-                                            className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                            className="border-border/60 bg-secondary/50 flex-1 min-w-[200px]"
                                           />
                                         </>
                                       )}
@@ -3400,11 +3407,11 @@ type="text"
                                               <SelectItem value="replace">Replace</SelectItem>
                                             </SelectContent>
                                           </Select>
-                                          <Textarea
+                                          <Input
                                             placeholder="F9 Model/serial..."
                                             value={room.plumbing.garbageDisposal.f9Note}
                                             onChange={(e) => updateRoom(room.id, { plumbing: { ...room.plumbing!, garbageDisposal: { ...room.plumbing!.garbageDisposal, f9Note: e.target.value } } })}
-                                            className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                            className="border-border/60 bg-secondary/50 flex-1 min-w-[200px]"
                                           />
                                         </>
                                       )}
@@ -3527,11 +3534,11 @@ type="text"
                                                   </Select>
                                                 </div>
                                               </div>
-                                              <Textarea
+                                              <Input
                                                 placeholder="F9 Model/serial..."
                                                 value={room.appliances.refrigerator.f9Note}
                                                 onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                                className="border-border/60 bg-secondary/50"
                                               />
                                             </div>
                                           )}
@@ -3575,11 +3582,11 @@ type="text"
                                                   </Select>
                                                 </div>
                                               </div>
-                                              <Textarea
+                                              <Input
                                                 placeholder="F9 Model/serial..."
                                                 value={room.appliances.dishwasher.f9Note}
                                                 onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                                className="border-border/60 bg-secondary/50"
                                               />
                                             </div>
                                           )}
@@ -3648,11 +3655,11 @@ type="text"
                                                   </Select>
                                                 </div>
                                               </div>
-                                              <Textarea
+                                              <Input
                                                 placeholder="F9 Model/serial..."
                                                 value={room.appliances.range.f9Note}
                                                 onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                                className="border-border/60 bg-secondary/50"
                                               />
                                             </div>
                                           )}
@@ -3708,11 +3715,11 @@ type="text"
                                                   </Select>
                                                 </div>
                                               </div>
-                                              <Textarea
+                                              <Input
                                                 placeholder="F9 Model/serial..."
                                                 value={room.appliances.cooktop.f9Note}
                                                 onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                                className="border-border/60 bg-secondary/50"
                                               />
                                             </div>
                                           )}
@@ -3785,11 +3792,11 @@ type="text"
                                                   </Select>
                                                 </div>
                                               </div>
-                                              <Textarea
+                                              <Input
                                                 placeholder="F9 Model/serial..."
                                                 value={room.appliances.waterHeater.f9Note}
                                                 onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                                className="border-border/60 bg-secondary/50"
                                               />
                                             </div>
                                           )}
@@ -3849,11 +3856,11 @@ type="text"
                                                   </Select>
                                                 </div>
                                               </div>
-                                              <Textarea
+                                              <Input
                                                 placeholder="F9 Model/serial..."
                                                 value={room.appliances.wallOven.f9Note}
                                                 onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                                className="border-border/60 bg-secondary/50"
                                               />
                                             </div>
                                           )}
@@ -3911,11 +3918,11 @@ type="text"
                                                   </Select>
                                                 </div>
                                               </div>
-                                              <Textarea
+                                              <Input
                                                 placeholder="F9 Model/serial..."
                                                 value={room.appliances.airHandler.f9Note}
                                                 onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                                className="border-border/60 bg-secondary/50"
                                               />
                                             </div>
                                           )}
@@ -3959,11 +3966,11 @@ type="text"
                                                   </Select>
                                                 </div>
                                               </div>
-                                              <Textarea
+                                              <Input
                                                 placeholder="F9 Model/serial..."
                                                 value={room.appliances.boiler.f9Note}
                                                 onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50 min-h-[38px] max-w-sm resize-none"
+                                                className="border-border/60 bg-secondary/50"
                                               />
                                               <div className="flex items-center gap-6">
                                                 <div className="flex items-center gap-2">
