@@ -1248,29 +1248,29 @@ value={exterior.dumpster.count}
                         </div>
                         {foundation.crawlspace.enabled && (
                           <div className="space-y-4">
-                            <div className="grid gap-4 sm:grid-cols-3">
+                            <div className="flex flex-wrap items-end gap-4">
                               <div className="space-y-2">
-                                <Label>Foundation Wall Clean (PF)</Label>
+                                <Label className="text-xs text-muted-foreground">Foundation Wall Clean (PF)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
-                                  placeholder="Perimeter feet"
+                                  type="number"
+                                  min="0"
+                                  placeholder="PF"
                                   value={foundation.crawlspace.perimeterFeet}
                                   onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, perimeterFeet: e.target.value.replace(/^0+/, '') } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label># of Piers</Label>
+                                <Label className="text-xs text-muted-foreground"># of Piers</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
-value={foundation.crawlspace.piersCount}
-                                onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  type="number"
+                                  min="0"
+                                  value={foundation.crawlspace.piersCount}
+                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
-                              <div className="flex items-center gap-4 pt-6">
+                              <div className="flex items-center gap-4 pb-2">
                                 <div className="flex items-center gap-2">
                                   <input
                                     type="radio"
@@ -1291,12 +1291,31 @@ value={foundation.crawlspace.piersCount}
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Switch
-                                checked={foundation.crawlspace.cleanJoist}
-                                onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, cleanJoist: checked } }); handleSave() }}
-                              />
-                              <Label className="text-sm">Clean Joist</Label>
+                            <div className="flex flex-wrap items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={foundation.crawlspace.cleanJoist}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, cleanJoist: checked } }); handleSave() }}
+                                />
+                                <Label className="text-sm">Clean Joist</Label>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={foundation.crawlspace.houseRewire !== ""}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: checked ? " " : "" } }); handleSave() }}
+                                />
+                                <Label className="text-sm">House Rewire</Label>
+                              </div>
+                              {foundation.crawlspace.houseRewire !== "" && (
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="Enter home SF"
+                                  value={foundation.crawlspace.houseRewire.trim()}
+                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
+                                  className="border-border/60 bg-secondary/50 w-32"
+                                />
+                              )}
                             </div>
                             <div className="flex items-center gap-2">
                               <Switch
@@ -1353,11 +1372,6 @@ value={foundation.crawlspace.piersCount}
                                 />
                                 <Label className="text-sm">Water Muck Heavy</Label>
                               </div>
-                            </div>
-                            {foundation.crawlspace.muckHeavy && (
-                              <p className="text-xs text-amber-500">Note: NFIP requires photos of standing mud to endorse for heavy Muck</p>
-                            )}
-                            <div className="flex flex-wrap items-center gap-4">
                               <div className="flex items-center gap-2">
                                 <Switch
                                   checked={foundation.crawlspace.standingWater}
@@ -1365,17 +1379,10 @@ value={foundation.crawlspace.piersCount}
                                 />
                                 <Label className="text-sm">Standing Water</Label>
                               </div>
-                              <div className="space-y-1">
-                                <Label className="text-sm">House Rewire</Label>
-                                <Input
-                                  type="text"
-                                  placeholder="enter home SF..."
-                                  value={foundation.crawlspace.houseRewire}
-                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
-                                  className="w-32 border-border/60 bg-secondary/50"
-                                />
-                              </div>
                             </div>
+                            {foundation.crawlspace.muckHeavy && (
+                              <p className="text-xs text-amber-500">Note: NFIP requires photos of standing mud to endorse for heavy Muck</p>
+                            )}
                           </div>
                         )}
                       </div>
