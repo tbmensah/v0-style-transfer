@@ -1389,12 +1389,12 @@ value={exterior.dumpster.count}
                     </CollapsibleContent>
                   </Collapsible>
 
-                  {/* Enclosure Removal Items */}
+                  {/* Enclosure/Basement Removal Items */}
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
                       <div className="flex items-center gap-3">
                         <Trash2 className="h-5 w-5 text-primary" />
-                        <span className="font-medium text-foreground">Enclosure Removal Items</span>
+                        <span className="font-medium text-foreground">Enclosure/Basement Removal Items</span>
                         {(foundation.enclosureRemoval.sandRemoval.enabled || foundation.enclosureRemoval.backfill.enabled) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
@@ -1410,50 +1410,40 @@ value={exterior.dumpster.count}
                             />
                             <Label>Sand/Mud Removal</Label>
                             <span className="text-xs text-muted-foreground">(cubic feet)</span>
-                            {foundation.enclosureRemoval.sandRemoval.enabled && (
-                              <Input
-                                type="text"
-                                inputMode="numeric"
-                                placeholder="# ft cubic"
-                                value={foundation.enclosureRemoval.sandRemoval.cubicFeet}
-                                onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, cubicFeet: e.target.value } } }); handleSave() }}
-                                className="w-24 border-border/60 bg-secondary/50"
-                              />
-                            )}
                           </div>
                           {foundation.enclosureRemoval.sandRemoval.enabled && (
-                            <div className="ml-8 grid gap-4 sm:grid-cols-3">
+                            <div className="ml-8 flex flex-wrap items-end gap-4">
                               <div className="space-y-2">
-                                <Label className="text-sm">Length (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Length (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   placeholder="Length"
                                   value={foundation.enclosureRemoval.sandRemoval.length}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, length: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">Width (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Width (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   placeholder="Width"
                                   value={foundation.enclosureRemoval.sandRemoval.width}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, width: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">Depth (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Depth (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   placeholder="Depth"
                                   value={foundation.enclosureRemoval.sandRemoval.depth}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, depth: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                             </div>
@@ -1468,48 +1458,38 @@ value={exterior.dumpster.count}
                               onCheckedChange={(checked) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, enabled: checked } } }); handleSave() }}
                             />
                             <Label>Backfill Around/In Foundation</Label>
-                            <span className="text-xs text-muted-foreground">(cubic ft)</span>
-                            {foundation.enclosureRemoval.backfill.enabled && (
-                              <Input
-                                type="text"
-                                inputMode="numeric"
-                                placeholder="# ft cubic"
-                                value={foundation.enclosureRemoval.backfill.cubicFeet}
-                                onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, cubicFeet: e.target.value } } }); handleSave() }}
-                                className="w-24 border-border/60 bg-secondary/50"
-                              />
-                            )}
+                            <span className="text-xs text-muted-foreground">(cubic feet)</span>
                           </div>
                           {foundation.enclosureRemoval.backfill.enabled && (
-                            <div className="ml-8 grid gap-4 sm:grid-cols-3">
+                            <div className="ml-8 flex flex-wrap items-end gap-4">
                               <div className="space-y-2">
-                                <Label className="text-sm">Length (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Length (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   value={foundation.enclosureRemoval.backfill.length}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, length: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">Width (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Width (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   value={foundation.enclosureRemoval.backfill.width}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, width: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm">Depth (FT)</Label>
+                                <Label className="text-xs text-muted-foreground">Depth (FT)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
+                                  type="number"
+                                  min="0"
                                   value={foundation.enclosureRemoval.backfill.depth}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, depth: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
                             </div>
