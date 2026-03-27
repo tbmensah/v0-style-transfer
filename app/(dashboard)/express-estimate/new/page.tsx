@@ -825,22 +825,22 @@ value={exterior.dumpster.count}
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="space-y-2">
-                                <Label className="text-sm">Unit Type</Label>
-                                <Select value={unit.unitType} onValueChange={(value) => {
-                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
-                                  handleSave()
-                                }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="Select" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="ac">AC Unit</SelectItem>
-                                    <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
                               <div className="flex flex-wrap items-end gap-4">
+                                <div className="space-y-2 min-w-[140px]">
+                                  <Label className="text-sm">Unit Type</Label>
+                                  <Select value={unit.unitType} onValueChange={(value) => {
+                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="ac">AC Unit</SelectItem>
+                                      <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
                                 <div className="space-y-2 min-w-[120px]">
                                   <Label className="text-sm">Tonnage</Label>
                                   <Select value={unit.tonnage} onValueChange={(value) => {
