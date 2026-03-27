@@ -1727,26 +1727,26 @@ value={exterior.dumpster.count}
                         </div>
                         {foundation.basement.enabled && (
                           <div className="space-y-4">
-                            <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="flex flex-wrap items-end gap-4">
                               <div className="space-y-2">
-                                <Label>Foundation Wall Clean (PF)</Label>
+                                <Label className="text-xs text-muted-foreground">Foundation Wall Clean (PF)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
-                                  placeholder="Perimeter feet"
+                                  type="number"
+                                  min="0"
+                                  placeholder="PF"
                                   value={foundation.basement.wallCleanPf}
                                   onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, wallCleanPf: e.target.value.replace(/^0+/, '') } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
-                              <div className="flex items-center gap-4 pt-6">
-                                <div className="flex items-center gap-2">
-                                  <Switch
-                                    checked={foundation.basement.muck}
-                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, muck: checked, muckHeavy: checked ? false : foundation.basement.muckHeavy } }); handleSave() }}
-                                  />
-                                  <Label className="text-sm">Water Muck</Label>
-                                </div>
+                              <div className="flex items-center gap-2 pb-2">
+                                <Switch
+                                  checked={foundation.basement.muck}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, muck: checked, muckHeavy: checked ? false : foundation.basement.muckHeavy } }); handleSave() }}
+                                />
+                                <Label className="text-sm">Water Muck</Label>
+                              </div>
+                              <div className="flex flex-col gap-1 pb-2">
                                 <div className="flex items-center gap-2">
                                   <Switch
                                     checked={foundation.basement.muckHeavy}
@@ -1754,11 +1754,11 @@ value={exterior.dumpster.count}
                                   />
                                   <Label className="text-sm">Water Muck Heavy</Label>
                                 </div>
+                                {foundation.basement.muckHeavy && (
+                                  <p className="text-xs text-amber-500 ml-9">Note: NFIP requires photos of standing mud to endorse for heavy Muck</p>
+                                )}
                               </div>
                             </div>
-                            {foundation.basement.muckHeavy && (
-                              <p className="text-xs text-amber-500">Note: NFIP requires photos of standing mud to endorse for heavy Muck</p>
-                            )}
                             {/* Drywall */}
                             <div className="space-y-3">
                               <div className="flex items-center gap-3">
@@ -1767,7 +1767,6 @@ value={exterior.dumpster.count}
                                   onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallEnabled: checked } }); handleSave() }}
                                 />
                                 <Label>Drywall Replacement Height</Label>
-                                <p className="text-xs text-muted-foreground">Certain locations require SF calculations, you will need to update this periodically as they get updated</p>
                               </div>
                               {foundation.basement.drywallEnabled && (
                                 <div className="ml-8 flex items-center gap-4">
