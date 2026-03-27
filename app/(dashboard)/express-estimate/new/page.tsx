@@ -2472,9 +2472,10 @@ value={exterior.dumpster.count}
                                             </div>
                                             {layerIndex > 0 && (
                                               <Button
+                                                type="button"
                                                 variant="ghost"
-                                                size="icon"
-                                                className="text-destructive hover:text-destructive/80"
+                                                size="sm"
+                                                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                                                 onClick={() => {
                                                   const newLayers = (room.flooring.layers || []).filter(l => l.id !== layer.id)
                                                   updateRoom(room.id, { 
@@ -2486,7 +2487,7 @@ value={exterior.dumpster.count}
                                                   })
                                                 }}
                                               >
-                                                <X className="h-4 w-4" />
+                                                <Trash2 className="h-4 w-4" />
                                               </Button>
                                             )}
                                           </div>
