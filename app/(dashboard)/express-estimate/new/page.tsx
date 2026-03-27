@@ -1024,68 +1024,64 @@ value={exterior.dumpster.count}
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
-                      <div className="space-y-4">
-                        <div className="flex flex-wrap items-end gap-4">
-                          <div className="space-y-2">
-                            <Label className="text-xs text-muted-foreground">Exterior Outlets</Label>
-                            <Input
-                              type="number"
-                              min="0"
-                              value={exterior.electrical.exteriorOutlets}
-                              onChange={(e) => {
-                                const val = e.target.value.replace(/^0+/, '') || ""
-                                setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: val } }); handleSave()
-                              }}
-                              className="border-border/60 bg-secondary/50 w-24"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label className="text-xs text-muted-foreground">30 Amp Disconnect</Label>
-                            <Input
-                              type="number"
-                              min="0"
-                              value={exterior.electrical.disconnect30Amp}
-                              onChange={(e) => {
-                                const val = e.target.value.replace(/^0+/, '') || ""
-                                setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: val } }); handleSave()
-                              }}
-                              className="border-border/60 bg-secondary/50 w-24"
-                            />
-                          </div>
+                      <div className="flex flex-wrap items-end gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-xs text-muted-foreground">Exterior Outlets</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            value={exterior.electrical.exteriorOutlets}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/^0+/, '') || ""
+                              setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: val } }); handleSave()
+                            }}
+                            className="border-border/60 bg-secondary/50 w-24"
+                          />
                         </div>
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-3">
-                            <Switch
-                              checked={exterior.electrical.breakerPanel.enabled}
-                              onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
-                            />
-                            <Label>Breaker Panel</Label>
-                          </div>
-                          {exterior.electrical.breakerPanel.enabled && (
-                            <div className="ml-8 flex flex-wrap items-end gap-4">
-                              <div className="space-y-2 min-w-[120px]">
-                                <Label className="text-sm">Amperage</Label>
-                                <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(value) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="Select" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {["70", "100", "125", "150", "200", "300"].map(a => (
-                                      <SelectItem key={a} value={a}>{a} Amp</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div className="flex items-center gap-2 pb-2">
-                                <Switch
-                                  checked={exterior.electrical.breakerPanel.arcFaults}
-                                  onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
-                                />
-                                <Label className="text-sm">With Arc Faults</Label>
-                              </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs text-muted-foreground">30 Amp Disconnect</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            value={exterior.electrical.disconnect30Amp}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/^0+/, '') || ""
+                              setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: val } }); handleSave()
+                            }}
+                            className="border-border/60 bg-secondary/50 w-24"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 pb-2">
+                          <Switch
+                            checked={exterior.electrical.breakerPanel.enabled}
+                            onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
+                          />
+                          <Label className="text-sm">Breaker Panel</Label>
+                        </div>
+                        {exterior.electrical.breakerPanel.enabled && (
+                          <>
+                            <div className="space-y-2 min-w-[120px]">
+                              <Label className="text-xs text-muted-foreground">Amperage</Label>
+                              <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(value) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
+                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {["70", "100", "125", "150", "200", "300"].map(a => (
+                                    <SelectItem key={a} value={a}>{a} Amp</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </div>
-                          )}
-                        </div>
+                            <div className="flex items-center gap-2 pb-2">
+                              <Switch
+                                checked={exterior.electrical.breakerPanel.arcFaults}
+                                onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
+                                />
+                              <Label className="text-sm">With Arc Faults</Label>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
