@@ -22,7 +22,8 @@ import {
   Droplets,
   Zap,
   Wind,
-  HelpCircle
+  HelpCircle,
+  X
 } from "lucide-react"
 
 // Types
