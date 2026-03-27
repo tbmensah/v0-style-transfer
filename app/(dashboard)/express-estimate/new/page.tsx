@@ -1864,7 +1864,7 @@ value={exterior.dumpster.count}
                               )}
                             </div>
                             {/* Foundation Door */}
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                               <div className="flex items-center gap-3">
                                 <Switch
                                   checked={foundation.basement.foundationDoor}
@@ -1873,17 +1873,19 @@ value={exterior.dumpster.count}
                                 <Label>Enable Foundation Door</Label>
                                 {foundation.basement.foundationDoor && (
                                   <Select value={foundation.basement.foundationDoorAction} onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoorAction: value } }); handleSave() }}>
-                                    <SelectTrigger className="w-44 border-border/60 bg-secondary/50">
+                                    <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="detach-reset-handle">Detach & Reset Handle</SelectItem>
-                                      <SelectItem value="replace">Replace</SelectItem>
                                       <SelectItem value="replace-handle">Replace Handle</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 )}
                               </div>
+                              {foundation.basement.foundationDoor && (
+                                <p className="ml-9 text-xs text-muted-foreground">The inclusion of the interior slab only</p>
+                              )}
                             </div>
                             {/* Foundation Windows */}
                             <div className="space-y-3">
