@@ -317,7 +317,8 @@ export default function NewExpressEstimatePage() {
       // Stair Cleaning
       stairCleaning: false,
       stairCount: "",
-      totalStairsSubmerged: "",
+      treadWidth: "",
+      stringersLength: "",
       // Foundation Door
       foundationDoor: false,
       foundationDoorAction: "",
@@ -1633,8 +1634,8 @@ value={exterior.dumpster.count}
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
-                            <div className="grid gap-4 sm:grid-cols-3">
-                              <div className="space-y-2">
+                            <div className="flex flex-wrap items-end gap-4">
+                              <div className="space-y-2 min-w-[160px]">
                                 <Label className="text-sm">Type</Label>
                                 <Select value={handler.type} onValueChange={(value) => {
                                   setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, type: value } : h) } })
@@ -1650,7 +1651,7 @@ value={exterior.dumpster.count}
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="space-y-2">
+                              <div className="space-y-2 min-w-[100px]">
                                 <Label className="text-sm">Tonnage</Label>
                                 <Select value={handler.tonnage} onValueChange={(value) => {
                                   setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, tonnage: value } : h) } })
@@ -1666,8 +1667,23 @@ value={exterior.dumpster.count}
                                   </SelectContent>
                                 </Select>
                               </div>
+                              <div className="space-y-2 min-w-[140px]">
+                                <Label className="text-sm">Action</Label>
+                                <Select value={handler.action} onValueChange={(value) => {
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, action: value } : h) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="replace">Replace</SelectItem>
+                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
                               {(handler.type === "with-heat-element" || handler.type === "with-heat-element-a-coil") && (
-                                <div className="space-y-2">
+                                <div className="space-y-2 min-w-[100px]">
                                   <Label className="text-sm">With Heat Element</Label>
                                   <Select value={handler.heatElementCount} onValueChange={(value) => {
                                     setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, heatElementCount: value } : h) } })
@@ -1684,21 +1700,6 @@ value={exterior.dumpster.count}
                                   </Select>
                                 </div>
                               )}
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-sm">Action</Label>
-                              <Select value={handler.action} onValueChange={(value) => {
-                                setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, action: value } : h) } })
-                                handleSave()
-                              }}>
-                                <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="replace">Replace</SelectItem>
-                                  <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                </SelectContent>
-                              </Select>
                             </div>
                           </div>
                         ))}
@@ -1727,26 +1728,26 @@ value={exterior.dumpster.count}
                         </div>
                         {foundation.basement.enabled && (
                           <div className="space-y-4">
-                            <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="flex flex-wrap items-end gap-4">
                               <div className="space-y-2">
-                                <Label>Foundation Wall Clean (PF)</Label>
+                                <Label className="text-xs text-muted-foreground">Foundation Wall Clean (PF)</Label>
                                 <Input
-                                  type="text"
-                                  inputMode="numeric"
-                                  placeholder="Perimeter feet"
+                                  type="number"
+                                  min="0"
+                                  placeholder="PF"
                                   value={foundation.basement.wallCleanPf}
                                   onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, wallCleanPf: e.target.value.replace(/^0+/, '') } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
-                              <div className="flex items-center gap-4 pt-6">
-                                <div className="flex items-center gap-2">
-                                  <Switch
-                                    checked={foundation.basement.muck}
-                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, muck: checked, muckHeavy: checked ? false : foundation.basement.muckHeavy } }); handleSave() }}
-                                  />
-                                  <Label className="text-sm">Water Muck</Label>
-                                </div>
+                              <div className="flex items-center gap-2 pb-2">
+                                <Switch
+                                  checked={foundation.basement.muck}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, muck: checked, muckHeavy: checked ? false : foundation.basement.muckHeavy } }); handleSave() }}
+                                />
+                                <Label className="text-sm">Water Muck</Label>
+                              </div>
+                              <div className="flex flex-col gap-1 pb-2">
                                 <div className="flex items-center gap-2">
                                   <Switch
                                     checked={foundation.basement.muckHeavy}
@@ -1754,11 +1755,11 @@ value={exterior.dumpster.count}
                                   />
                                   <Label className="text-sm">Water Muck Heavy</Label>
                                 </div>
+                                {foundation.basement.muckHeavy && (
+                                  <p className="text-xs text-amber-500 ml-9">Note: NFIP requires photos of standing mud to endorse for heavy Muck</p>
+                                )}
                               </div>
                             </div>
-                            {foundation.basement.muckHeavy && (
-                              <p className="text-xs text-amber-500">Note: NFIP requires photos of standing mud to endorse for heavy Muck</p>
-                            )}
                             {/* Drywall */}
                             <div className="space-y-3">
                               <div className="flex items-center gap-3">
@@ -1767,7 +1768,6 @@ value={exterior.dumpster.count}
                                   onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallEnabled: checked } }); handleSave() }}
                                 />
                                 <Label>Drywall Replacement Height</Label>
-                                <p className="text-xs text-muted-foreground">Certain locations require SF calculations, you will need to update this periodically as they get updated</p>
                               </div>
                               {foundation.basement.drywallEnabled && (
                                 <div className="ml-8 flex items-center gap-4">
@@ -1777,7 +1777,7 @@ value={exterior.dumpster.count}
                                       variant={foundation.basement.drywallMeasureType === "sf" ? "default" : "outline"}
                                       size="sm"
                                       className="h-7 px-2 text-xs"
-                                      onClick={() => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallMeasureType: "sf" } }); handleSave() }}
+                                      onClick={() => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallMeasureType: "sf", drywallValue: "" } }); handleSave() }}
                                     >
                                       Square Feet
                                     </Button>
@@ -1786,19 +1786,34 @@ value={exterior.dumpster.count}
                                       variant={foundation.basement.drywallMeasureType === "lf" ? "default" : "outline"}
                                       size="sm"
                                       className="h-7 px-2 text-xs"
-                                      onClick={() => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallMeasureType: "lf" } }); handleSave() }}
+                                      onClick={() => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallMeasureType: "lf", drywallValue: "" } }); handleSave() }}
                                     >
                                       Linear Feet
                                     </Button>
                                   </div>
-                                  <Input
-                                    type="text"
-                                    inputMode="numeric"
-                                    placeholder={foundation.basement.drywallMeasureType.toUpperCase()}
-                                    value={foundation.basement.drywallValue}
-                                    onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallValue: e.target.value.replace(/^0+/, '') } }); handleSave() }}
-                                    className="w-24 border-border/60 bg-secondary/50"
-                                  />
+                                  {foundation.basement.drywallMeasureType === "sf" ? (
+                                    <Select 
+                                      value={foundation.basement.drywallValue} 
+                                      onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallValue: value } }); handleSave() }}
+                                    >
+                                      <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="SF" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="0.5">0.5</SelectItem>
+                                        <SelectItem value="W">W</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  ) : (
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      placeholder="LF"
+                                      value={foundation.basement.drywallValue}
+                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallValue: e.target.value.replace(/^0+/, '') } }); handleSave() }}
+                                      className="w-24 border-border/60 bg-secondary/50"
+                                    />
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -1812,51 +1827,41 @@ value={exterior.dumpster.count}
                                 <Label>Enable Stair Cleaning</Label>
                               </div>
                               {foundation.basement.stairCleaning && (
-                                <div className="ml-8 grid gap-4 sm:grid-cols-2">
+                                <div className="ml-8 flex flex-wrap items-end gap-4">
                                   <div className="space-y-2">
-                                    <Label className="text-sm"># of stairs submerged</Label>
+                                    <Label className="text-xs text-muted-foreground"># of stairs submerged</Label>
                                     <Input
-                                      type="text"
-                                      inputMode="numeric"
-value={foundation.basement.stairCount}
-                                    onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, stairCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
-                                      className="border-border/60 bg-secondary/50"
+                                      type="number"
+                                      min="0"
+                                      value={foundation.basement.stairCount}
+                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, stairCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
+                                      className="border-border/60 bg-secondary/50 w-24"
                                     />
                                   </div>
                                   <div className="space-y-2">
-                                    <Label className="text-sm">Width of treads</Label>
+                                    <Label className="text-xs text-muted-foreground">Width of Treads (ft)</Label>
                                     <Input
-                                      type="text"
-                                      placeholder="3 ft"
-                                      value={foundation.basement.totalStairsSubmerged}
-                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, totalStairsSubmerged: e.target.value } }); handleSave() }}
-                                      className="border-border/60 bg-secondary/50"
+                                      type="number"
+                                      min="0"
+                                      step="0.1"
+                                      value={foundation.basement.treadWidth}
+                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, treadWidth: e.target.value } }); handleSave() }}
+                                      className="border-border/60 bg-secondary/50 w-24"
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label className="text-xs text-muted-foreground">Total Length of Stringers Submerged (ft)</Label>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      step="0.1"
+                                      value={foundation.basement.stringersLength}
+                                      onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, stringersLength: e.target.value } }); handleSave() }}
+                                      className="border-border/60 bg-secondary/50 w-24"
                                     />
                                   </div>
                                 </div>
                               )}
-                            </div>
-                            {/* Foundation Door */}
-                            <div className="space-y-3">
-                              <div className="flex items-center gap-3">
-                                <Switch
-                                  checked={foundation.basement.foundationDoor}
-                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoor: checked } }); handleSave() }}
-                                />
-                                <Label>Enable Foundation Door</Label>
-                                {foundation.basement.foundationDoor && (
-                                  <Select value={foundation.basement.foundationDoorAction} onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoorAction: value } }); handleSave() }}>
-                                    <SelectTrigger className="w-44 border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="detach-reset-handle">Detach & Reset Handle</SelectItem>
-                                      <SelectItem value="replace">Replace</SelectItem>
-                                      <SelectItem value="replace-handle">Replace Handle</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                )}
-                              </div>
                             </div>
                             {/* Foundation Windows */}
                             <div className="space-y-3">
@@ -1915,20 +1920,20 @@ value={foundation.basement.stairCount}
                                       <SelectValue placeholder="Size" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="3-4">3-4 sf</SelectItem>
-                                      <SelectItem value="5-8">5-8 sf</SelectItem>
-                                      <SelectItem value="9-12">9-12 sf</SelectItem>
+                                      <SelectItem value="4-8">4-8 SF</SelectItem>
+                                      <SelectItem value="9-12">9-12 SF</SelectItem>
+                                      <SelectItem value="13-18">13-18 SF</SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <div className="flex items-center gap-1">
                                     <Label className="text-xs">Qty</Label>
                                     <Input
-type="text"
-                                  inputMode="numeric"
-                                  placeholder="QTY"
-                                  value={win.quantity}
-                                  onChange={(e) => {
-                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, quantity: e.target.value.replace(/^0+/, '') || "" } : w) } })
+                                      type="text"
+                                      inputMode="numeric"
+                                      placeholder="QTY"
+                                      value={win.quantity}
+                                      onChange={(e) => {
+                                        setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, quantity: e.target.value.replace(/^0+/, '') || "" } : w) } })
                                         handleSave()
                                       }}
                                       className="w-14 border-border/60 bg-secondary/50"
@@ -1962,6 +1967,30 @@ type="text"
                                 </div>
                               ))}
                             </div>
+                            {/* Foundation Door */}
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-3">
+                                <Switch
+                                  checked={foundation.basement.foundationDoor}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoor: checked } }); handleSave() }}
+                                />
+                                <Label>Enable Foundation Door</Label>
+                                {foundation.basement.foundationDoor && (
+                                  <Select value={foundation.basement.foundationDoorAction} onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoorAction: value } }); handleSave() }}>
+                                    <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="detach-reset-handle">Detach & Reset Handle</SelectItem>
+                                      <SelectItem value="replace-handle">Replace Handle</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                )}
+                              </div>
+                              {foundation.basement.foundationDoor && (
+                                <p className="ml-9 text-xs text-amber-500">Note: The inclusion of the interior slab only</p>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1980,11 +2009,11 @@ type="text"
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="space-y-4">
-                        <div className="grid gap-4 sm:grid-cols-4">
+                        <div className="flex flex-wrap items-end gap-4">
                           <div className="space-y-2">
                             <Label>110 outlet</Label>
                             <Select value={foundation.electrical.outlets110} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: value } }); handleSave() }}>
-                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
@@ -1997,7 +2026,7 @@ type="text"
                           <div className="space-y-2">
                             <Label>220 outlet</Label>
                             <Select value={foundation.electrical.outlets220} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: value } }); handleSave() }}>
-                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
@@ -2010,7 +2039,7 @@ type="text"
                           <div className="space-y-2">
                             <Label>GFI outlet</Label>
                             <Select value={foundation.electrical.gfiOutlets} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: value } }); handleSave() }}>
-                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
@@ -2023,7 +2052,7 @@ type="text"
                           <div className="space-y-2">
                             <Label>Light Switch</Label>
                             <Select value={foundation.electrical.lightSwitch} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: value } }); handleSave() }}>
-                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
@@ -2033,19 +2062,19 @@ type="text"
                               </SelectContent>
                             </Select>
                           </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Junction Box</Label>
-                          <Select value={foundation.electrical.junctionBox} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: value } }); handleSave() }}>
-                            <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
-                              <SelectValue placeholder="QTY" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {[0, 1, 2, 3, 4, 5].map(n => (
-                                <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                          <div className="space-y-2">
+                            <Label>Junction Box</Label>
+                            <Select value={foundation.electrical.junctionBox} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: value } }); handleSave() }}>
+                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
+                                <SelectValue placeholder="QTY" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[0, 1, 2, 3, 4, 5].map(n => (
+                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
                               ))}
-                            </SelectContent>
-                          </Select>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                         {/* Breaker Panel */}
                         <div className="space-y-3">
