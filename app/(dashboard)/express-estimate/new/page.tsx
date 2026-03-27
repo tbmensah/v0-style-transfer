@@ -2455,24 +2455,6 @@ value={exterior.dumpster.count}
                                                 </SelectContent>
                                               </Select>
                                             </div>
-                                            {layerIndex === 0 && (
-                                              <>
-                                                <div className="flex items-center gap-2 pb-1">
-                                                  <Switch
-                                                    checked={room.flooring.vaporBarrier}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { flooring: { ...room.flooring, vaporBarrier: checked, subfloorReplacement: checked ? false : room.flooring.subfloorReplacement } })}
-                                                  />
-                                                  <Label className="text-sm">Vapor Barrier</Label>
-                                                </div>
-                                                <div className="flex items-center gap-2 pb-1">
-                                                  <Switch
-                                                    checked={room.flooring.subfloorReplacement}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { flooring: { ...room.flooring, subfloorReplacement: checked, vaporBarrier: checked ? false : room.flooring.vaporBarrier } })}
-                                                  />
-                                                  <Label className="text-sm">Subfloor Replacement</Label>
-                                                </div>
-                                              </>
-                                            )}
                                             {room.flooring.multipleLayers && (
                                               <div className="space-y-1 min-w-[160px]">
                                                 <Label className="text-xs text-muted-foreground">Action</Label>
@@ -2493,6 +2475,24 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
+                                            )}
+                                            {layerIndex === 0 && (
+                                              <>
+                                                <div className="flex items-center gap-2 pb-1">
+                                                  <Switch
+                                                    checked={room.flooring.vaporBarrier}
+                                                    onCheckedChange={(checked) => updateRoom(room.id, { flooring: { ...room.flooring, vaporBarrier: checked, subfloorReplacement: checked ? false : room.flooring.subfloorReplacement } })}
+                                                  />
+                                                  <Label className="text-sm">Vapor Barrier</Label>
+                                                </div>
+                                                <div className="flex items-center gap-2 pb-1">
+                                                  <Switch
+                                                    checked={room.flooring.subfloorReplacement}
+                                                    onCheckedChange={(checked) => updateRoom(room.id, { flooring: { ...room.flooring, subfloorReplacement: checked, vaporBarrier: checked ? false : room.flooring.vaporBarrier } })}
+                                                  />
+                                                  <Label className="text-sm">Subfloor Replacement</Label>
+                                                </div>
+                                              </>
                                             )}
                                           </div>
                                         </div>
