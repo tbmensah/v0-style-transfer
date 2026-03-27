@@ -2346,8 +2346,13 @@ value={exterior.dumpster.count}
                                       className="gap-1 border-border/60"
                                       onClick={() => {
                                         const currentLayers = room.flooring.layers || []
-                                        const newLayers = [...currentLayers, { id: Date.now(), type: "", grade: "", application: "", action: "" }]
-                                        updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                        const newLayer = { id: Date.now(), type: "", grade: "", application: "", action: "" }
+                                        updateRoom(room.id, { 
+                                          flooring: { 
+                                            ...room.flooring, 
+                                            layers: [...currentLayers, newLayer] 
+                                          } 
+                                        })
                                       }}
                                     >
                                       <Plus className="h-3 w-3" /> Add Flooring
@@ -2471,7 +2476,13 @@ value={exterior.dumpster.count}
                                                 className="text-destructive hover:text-destructive/80"
                                                 onClick={() => {
                                                   const newLayers = (room.flooring.layers || []).filter(l => l.id !== layer.id)
-                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers, multipleLayers: newLayers.length > 1 } })
+                                                  updateRoom(room.id, { 
+                                                    flooring: { 
+                                                      ...room.flooring, 
+                                                      layers: newLayers, 
+                                                      multipleLayers: newLayers.length > 1 
+                                                    } 
+                                                  })
                                                 }}
                                               >
                                                 <X className="h-4 w-4" />
