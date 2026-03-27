@@ -2334,7 +2334,11 @@ value={exterior.dumpster.count}
                                             type="radio"
                                             name={`flooring-layers-${room.id}`}
                                             checked={!room.flooring.multipleLayers}
-                                            onChange={() => updateRoom(room.id, { flooring: { ...room.flooring, multipleLayers: false, layers: room.flooring.layers.slice(0, 1) } })}
+                                            onChange={() => {
+                                              const currentLayers = room.flooring.layers || []
+                                              const singleLayer = currentLayers.length > 0 ? [currentLayers[0]] : [{ id: Date.now(), type: "", grade: "", application: "", action: "" }]
+                                              updateRoom(room.id, { flooring: { ...room.flooring, multipleLayers: false, layers: singleLayer } })
+                                            }}
                                             className="accent-primary"
                                           />
                                           <span className="text-sm">1 layer of flooring</span>
@@ -2345,7 +2349,11 @@ value={exterior.dumpster.count}
                                             type="radio"
                                             name={`flooring-layers-${room.id}`}
                                             checked={room.flooring.multipleLayers}
-                                            onChange={() => updateRoom(room.id, { flooring: { ...room.flooring, multipleLayers: true } })}
+                                            onChange={() => {
+                                              const currentLayers = room.flooring.layers || []
+                                              const layers = currentLayers.length > 0 ? currentLayers : [{ id: Date.now(), type: "", grade: "", application: "", action: "" }]
+                                              updateRoom(room.id, { flooring: { ...room.flooring, multipleLayers: true, layers } })
+                                            }}
                                             className="accent-primary"
                                           />
                                           <span className="text-sm">Multiple layers of flooring</span>
