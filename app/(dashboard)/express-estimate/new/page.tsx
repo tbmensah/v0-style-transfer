@@ -2312,207 +2312,184 @@ value={exterior.dumpster.count}
 
                               {/* Flooring */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
-                                <div className="flex flex-wrap items-center gap-4">
-                                  <div className="flex items-center gap-3">
-                                    <Switch
-                                      checked={room.flooring.enabled}
-                                      onCheckedChange={(checked) => {
-                                        const newFlooring = { ...room.flooring, enabled: checked }
-                                        if (checked && newFlooring.layers.length === 0) {
-                                          newFlooring.layers = [{ id: Date.now(), type: "", grade: "", application: "", action: "" }]
-                                        }
-                                        updateRoom(room.id, { flooring: newFlooring })
-                                      }}
-                                    />
-                                    <Label className="font-medium">Flooring</Label>
-                                  </div>
-                                  {room.flooring.enabled && (
-                                    <>
-                                      <div className="flex items-center gap-4">
-                                        <label className="flex items-center gap-2 cursor-pointer">
-                                          <input
-                                            type="radio"
-                                            name={`flooring-layers-${room.id}`}
-                                            checked={!room.flooring.multipleLayers}
-                                            onChange={() => {
-                                              const currentLayers = room.flooring.layers || []
-                                              const singleLayer = currentLayers.length > 0 ? [currentLayers[0]] : [{ id: Date.now(), type: "", grade: "", application: "", action: "" }]
-                                              updateRoom(room.id, { flooring: { ...room.flooring, multipleLayers: false, layers: singleLayer } })
-                                            }}
-                                            className="accent-primary"
-                                          />
-                                          <span className="text-sm">1 layer of flooring</span>
-                                        </label>
-                                        <span className="text-muted-foreground text-sm">or</span>
-                                        <label className="flex items-center gap-2 cursor-pointer">
-                                          <input
-                                            type="radio"
-                                            name={`flooring-layers-${room.id}`}
-                                            checked={room.flooring.multipleLayers}
-                                            onChange={() => {
-                                              const currentLayers = room.flooring.layers || []
-                                              const layers = currentLayers.length > 0 ? currentLayers : [{ id: Date.now(), type: "", grade: "", application: "", action: "" }]
-                                              updateRoom(room.id, { flooring: { ...room.flooring, multipleLayers: true, layers } })
-                                            }}
-                                            className="accent-primary"
-                                          />
-                                          <span className="text-sm">Multiple layers of flooring</span>
-                                        </label>
+                                <div className="flex flex-wrap items-center justify-between gap-4">
+                                  <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-3">
+                                      <Switch
+                                        checked={room.flooring.enabled}
+                                        onCheckedChange={(checked) => {
+                                          const newFlooring = { ...room.flooring, enabled: checked }
+                                          if (checked && (!newFlooring.layers || newFlooring.layers.length === 0)) {
+                                            newFlooring.layers = [{ id: Date.now(), type: "", grade: "", application: "", action: "" }]
+                                          }
+                                          updateRoom(room.id, { flooring: newFlooring })
+                                        }}
+                                      />
+                                      <Label className="font-medium">Flooring</Label>
+                                    </div>
+                                    {room.flooring.enabled && (
+                                      <div className="flex items-center gap-3">
+                                        <Switch
+                                          checked={room.flooring.multipleLayers}
+                                          onCheckedChange={(checked) => {
+                                            updateRoom(room.id, { flooring: { ...room.flooring, multipleLayers: checked } })
+                                          }}
+                                        />
+                                        <Label className="text-sm">Multiple Layers of Flooring</Label>
                                       </div>
-                                      <p className="text-xs text-amber-500 ml-auto">Note: Please note carpet installed over flooring is a content item</p>
-                                    </>
+                                    )}
+                                  </div>
+                                  {room.flooring.enabled && room.flooring.multipleLayers && (room.flooring.layers?.length || 0) < 6 && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="gap-1 border-border/60"
+                                      onClick={() => {
+                                        const currentLayers = room.flooring.layers || []
+                                        const newLayers = [...currentLayers, { id: Date.now(), type: "", grade: "", application: "", action: "" }]
+                                        updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                      }}
+                                    >
+                                      <Plus className="h-3 w-3" /> Add Flooring
+                                    </Button>
                                   )}
                                 </div>
                                 {room.flooring.enabled && (
-                                  <div className="space-y-4">
-                                    {room.flooring.layers.map((layer, layerIndex) => (
-                                      <div key={layer.id} className="space-y-2">
-                                        <Label className="text-sm font-medium">{layerIndex === 0 ? "1st Layer" : `${layerIndex + 1}${layerIndex === 1 ? "nd" : layerIndex === 2 ? "rd" : "th"} Layer`}</Label>
-                                        <div className="flex flex-wrap items-end gap-3">
-                                          <div className="space-y-1 min-w-[140px]">
-                                            <Label className="text-xs text-muted-foreground">Type</Label>
-                                            <Select 
-                                              value={layer.type} 
-                                              onValueChange={(value) => {
-                                                const newLayers = [...room.flooring.layers]
-                                                newLayers[layerIndex] = { ...layer, type: value }
-                                                updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                              }}
-                                            >
-                                              <SelectTrigger className="border-border/60 bg-secondary/50">
-                                                <SelectValue placeholder="Select" />
-                                              </SelectTrigger>
-                                              <SelectContent>
-                                                <SelectItem value="vinyl-plank">Vinyl Plank</SelectItem>
-                                                <SelectItem value="sheet-vinyl">Sheet Vinyl</SelectItem>
-                                                <SelectItem value="laminate">Laminate</SelectItem>
-                                                <SelectItem value="carpet">Carpet</SelectItem>
-                                                <SelectItem value="hardwood">Hardwood</SelectItem>
-                                                <SelectItem value="tile">Tile</SelectItem>
-                                              </SelectContent>
-                                            </Select>
+                                  <>
+                                    <p className="text-xs text-amber-500">Note: Please note carpet installed over flooring is a content item</p>
+                                    <div className="space-y-4">
+                                      {(room.flooring.layers || []).map((layer, layerIndex) => (
+                                        <div key={layer.id} className="space-y-2">
+                                          <Label className="text-sm font-medium">{layerIndex === 0 ? "1st Layer" : `${layerIndex + 1}${layerIndex === 1 ? "nd" : layerIndex === 2 ? "rd" : "th"} Layer`}</Label>
+                                          <div className="flex flex-wrap items-end gap-3">
+                                            <div className="space-y-1 min-w-[140px]">
+                                              <Label className="text-xs text-muted-foreground">Type</Label>
+                                              <Select 
+                                                value={layer.type} 
+                                                onValueChange={(value) => {
+                                                  const newLayers = [...(room.flooring.layers || [])]
+                                                  newLayers[layerIndex] = { ...layer, type: value }
+                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                }}
+                                              >
+                                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="vinyl-plank">Vinyl Plank</SelectItem>
+                                                  <SelectItem value="sheet-vinyl">Sheet Vinyl</SelectItem>
+                                                  <SelectItem value="laminate">Laminate</SelectItem>
+                                                  <SelectItem value="carpet">Carpet</SelectItem>
+                                                  <SelectItem value="hardwood">Hardwood</SelectItem>
+                                                  <SelectItem value="tile">Tile</SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                            <div className="space-y-1 min-w-[140px]">
+                                              <Label className="text-xs text-muted-foreground">Grade</Label>
+                                              <Select 
+                                                value={layer.grade} 
+                                                onValueChange={(value) => {
+                                                  const newLayers = [...(room.flooring.layers || [])]
+                                                  newLayers[layerIndex] = { ...layer, grade: value }
+                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                }}
+                                              >
+                                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="standard">Standard Grade</SelectItem>
+                                                  <SelectItem value="vinyl-plank-base">Vinyl Plank base</SelectItem>
+                                                  <SelectItem value="high">High Grade</SelectItem>
+                                                  <SelectItem value="premium">Premium Grade</SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                            <div className="space-y-1 min-w-[160px]">
+                                              <Label className="text-xs text-muted-foreground">Application</Label>
+                                              <Select 
+                                                value={layer.application} 
+                                                onValueChange={(value) => {
+                                                  const newLayers = [...(room.flooring.layers || [])]
+                                                  newLayers[layerIndex] = { ...layer, application: value }
+                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                }}
+                                              >
+                                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="glue-down-concrete">Glue down on Concrete</SelectItem>
+                                                  <SelectItem value="glue-down-wood">Glue down on Wood</SelectItem>
+                                                  <SelectItem value="floating">Floating</SelectItem>
+                                                  <SelectItem value="nail-down">Nail down</SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                            {layerIndex === 0 && (
+                                              <>
+                                                <div className="flex items-center gap-2 pb-1">
+                                                  <Switch
+                                                    checked={room.flooring.vaporBarrier}
+                                                    onCheckedChange={(checked) => updateRoom(room.id, { flooring: { ...room.flooring, vaporBarrier: checked } })}
+                                                  />
+                                                  <Label className="text-sm">Vapor Barrier</Label>
+                                                </div>
+                                                <div className="flex items-center gap-2 pb-1">
+                                                  <Switch
+                                                    checked={room.flooring.subfloorReplacement}
+                                                    onCheckedChange={(checked) => updateRoom(room.id, { flooring: { ...room.flooring, subfloorReplacement: checked } })}
+                                                  />
+                                                  <Label className="text-sm">Subfloor Replacement</Label>
+                                                </div>
+                                              </>
+                                            )}
+                                            <div className="space-y-1 min-w-[160px]">
+                                              <Label className="text-xs text-muted-foreground">Action</Label>
+                                              <Select 
+                                                value={layer.action} 
+                                                onValueChange={(value) => {
+                                                  const newLayers = [...(room.flooring.layers || [])]
+                                                  newLayers[layerIndex] = { ...layer, action: value }
+                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                }}
+                                              >
+                                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="remove">Remove</SelectItem>
+                                                  <SelectItem value="remove-replace">Remove & Replace</SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                            {layerIndex > 0 && (
+                                              <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-destructive hover:text-destructive/80"
+                                                onClick={() => {
+                                                  const newLayers = (room.flooring.layers || []).filter(l => l.id !== layer.id)
+                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers, multipleLayers: newLayers.length > 1 } })
+                                                }}
+                                              >
+                                                <X className="h-4 w-4" />
+                                              </Button>
+                                            )}
                                           </div>
-                                          <div className="space-y-1 min-w-[140px]">
-                                            <Label className="text-xs text-muted-foreground">Grade</Label>
-                                            <Select 
-                                              value={layer.grade} 
-                                              onValueChange={(value) => {
-                                                const newLayers = [...room.flooring.layers]
-                                                newLayers[layerIndex] = { ...layer, grade: value }
-                                                updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                              }}
-                                            >
-                                              <SelectTrigger className="border-border/60 bg-secondary/50">
-                                                <SelectValue placeholder="Select" />
-                                              </SelectTrigger>
-                                              <SelectContent>
-                                                <SelectItem value="standard">Standard Grade</SelectItem>
-                                                <SelectItem value="vinyl-plank-base">Vinyl Plank base</SelectItem>
-                                                <SelectItem value="high">High Grade</SelectItem>
-                                                <SelectItem value="premium">Premium Grade</SelectItem>
-                                              </SelectContent>
-                                            </Select>
-                                          </div>
-                                          <div className="space-y-1 min-w-[160px]">
-                                            <Label className="text-xs text-muted-foreground">Application</Label>
-                                            <Select 
-                                              value={layer.application} 
-                                              onValueChange={(value) => {
-                                                const newLayers = [...room.flooring.layers]
-                                                newLayers[layerIndex] = { ...layer, application: value }
-                                                updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                              }}
-                                            >
-                                              <SelectTrigger className="border-border/60 bg-secondary/50">
-                                                <SelectValue placeholder="Select" />
-                                              </SelectTrigger>
-                                              <SelectContent>
-                                                <SelectItem value="glue-down-concrete">Glue down on Concrete</SelectItem>
-                                                <SelectItem value="glue-down-wood">Glue down on Wood</SelectItem>
-                                                <SelectItem value="floating">Floating</SelectItem>
-                                                <SelectItem value="nail-down">Nail down</SelectItem>
-                                              </SelectContent>
-                                            </Select>
-                                          </div>
-                                          {layerIndex === 0 && (
-                                            <>
-                                              <div className="flex items-center gap-2 pb-1">
-                                                <Switch
-                                                  checked={room.flooring.vaporBarrier}
-                                                  onCheckedChange={(checked) => updateRoom(room.id, { flooring: { ...room.flooring, vaporBarrier: checked } })}
-                                                />
-                                                <Label className="text-sm">Vapor Barrier</Label>
-                                              </div>
-                                              <div className="flex items-center gap-2 pb-1">
-                                                <Switch
-                                                  checked={room.flooring.subfloorReplacement}
-                                                  onCheckedChange={(checked) => updateRoom(room.id, { flooring: { ...room.flooring, subfloorReplacement: checked } })}
-                                                />
-                                                <Label className="text-sm">Subfloor Replacement</Label>
-                                              </div>
-                                            </>
-                                          )}
-                                          <div className="space-y-1 min-w-[160px]">
-                                            <Label className="text-xs text-muted-foreground">Action</Label>
-                                            <Select 
-                                              value={layer.action} 
-                                              onValueChange={(value) => {
-                                                const newLayers = [...room.flooring.layers]
-                                                newLayers[layerIndex] = { ...layer, action: value }
-                                                updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                              }}
-                                            >
-                                              <SelectTrigger className="border-border/60 bg-secondary/50">
-                                                <SelectValue placeholder="Select" />
-                                              </SelectTrigger>
-                                              <SelectContent>
-                                                <SelectItem value="remove">Remove</SelectItem>
-                                                <SelectItem value="remove-replace">Remove & Replace</SelectItem>
-                                              </SelectContent>
-                                            </Select>
-                                          </div>
-                                          {(room.flooring.multipleLayers || layerIndex > 0) && (
-                                            <Button
-                                              variant="ghost"
-                                              size="icon"
-                                              className="text-destructive hover:text-destructive/80"
-                                              onClick={() => {
-                                                const newLayers = room.flooring.layers.filter(l => l.id !== layer.id)
-                                                if (newLayers.length === 0) {
-                                                  newLayers.push({ id: Date.now(), type: "", grade: "", application: "", action: "" })
-                                                }
-                                                updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers, multipleLayers: newLayers.length > 1 } })
-                                              }}
-                                            >
-                                              <X className="h-4 w-4" />
-                                            </Button>
-                                          )}
                                         </div>
+                                      ))}
+                                      <div className="space-y-2 pt-2">
+                                        <Textarea
+                                          placeholder="F9 Description of the layers of floor removed..."
+                                          value={room.flooring.f9Note}
+                                          onChange={(e) => updateRoom(room.id, { flooring: { ...room.flooring, f9Note: e.target.value } })}
+                                          className="border-border/60 bg-secondary/50 min-h-[60px]"
+                                        />
                                       </div>
-                                    ))}
-                                    {room.flooring.multipleLayers && room.flooring.layers.length < 6 && (
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-primary"
-                                        onClick={() => {
-                                          const newLayers = [...room.flooring.layers, { id: Date.now(), type: "", grade: "", application: "", action: "" }]
-                                          updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                        }}
-                                      >
-                                        <Plus className="h-4 w-4 mr-1" />
-                                        Add Layer
-                                      </Button>
-                                    )}
-                                    <div className="space-y-2 pt-2">
-                                      <Textarea
-                                        placeholder="F9 Description of the layers of floor removed..."
-                                        value={room.flooring.f9Note}
-                                        onChange={(e) => updateRoom(room.id, { flooring: { ...room.flooring, f9Note: e.target.value } })}
-                                        className="border-border/60 bg-secondary/50 min-h-[60px]"
-                                      />
                                     </div>
-                                  </div>
+                                  </>
                                 )}
                               </div>
 
