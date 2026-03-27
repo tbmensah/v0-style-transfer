@@ -2166,7 +2166,6 @@ value={exterior.dumpster.count}
                             <div className="flex items-center gap-3">
                               <Home className="h-5 w-5 text-primary" />
                               <Badge variant="secondary" className="text-xs capitalize">{room.type.replace("-", " ")}</Badge>
-                              <span className="text-sm text-muted-foreground">Re-Name</span>
                               <span className="font-medium text-foreground">{room.name || "Unnamed Room"}</span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -2192,8 +2191,8 @@ value={exterior.dumpster.count}
                           <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                             <div className="space-y-6">
                               {/* Room Name & Type */}
-                              <div className="grid gap-4 sm:grid-cols-3">
-                                <div className="space-y-2">
+                              <div className="flex flex-wrap items-end gap-4">
+                                <div className="space-y-2 min-w-[160px]">
                                   <Label>Room Name</Label>
                                   <Input
                                     value={room.name}
@@ -2201,7 +2200,7 @@ value={exterior.dumpster.count}
                                     className="border-border/60 bg-secondary/50"
                                   />
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-2 min-w-[120px]">
                                   <Label>Room Type</Label>
                                   <Select value={room.type} onValueChange={(value) => updateRoom(room.id, { type: value })}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
@@ -2213,15 +2212,6 @@ value={exterior.dumpster.count}
                                       <SelectItem value="kitchen">Kitchen</SelectItem>
                                     </SelectContent>
                                   </Select>
-                                </div>
-                                <div className="space-y-2">
-                                  <Label>Square Footage</Label>
-                                  <Input
-                                    type="number"
-                                    value={room.sqft}
-                                    onChange={(e) => updateRoom(room.id, { sqft: e.target.value })}
-                                    className="border-border/60 bg-secondary/50"
-                                  />
                                 </div>
                               </div>
 
@@ -2239,18 +2229,16 @@ value={exterior.dumpster.count}
                                     <div className="grid gap-6 sm:grid-cols-2">
                                       {/* Wall */}
                                       <div className="space-y-3">
-                                        <Label className="text-sm font-medium">Wall</Label>
+                                        <Label className="text-sm font-medium">Wall (PF)</Label>
                                         <div className="flex flex-wrap items-center gap-4">
-                                          <Select value={room.nfipCleaning.wall.height} onValueChange={(value) => updateRoom(room.id, { nfipCleaning: { ...room.nfipCleaning, wall: { ...room.nfipCleaning.wall, height: value } } })}>
-                                            <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
-                                              <SelectValue placeholder="Select" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              <SelectItem value="1-40">1-40 PF</SelectItem>
-                                              <SelectItem value="41-80">41-80 PF</SelectItem>
-                                              <SelectItem value="81-120">81-120 PF</SelectItem>
-                                            </SelectContent>
-                                          </Select>
+                                          <Input
+                                            type="number"
+                                            min="0"
+                                            placeholder="PF"
+                                            value={room.nfipCleaning.wall.height}
+                                            onChange={(e) => updateRoom(room.id, { nfipCleaning: { ...room.nfipCleaning, wall: { ...room.nfipCleaning.wall, height: e.target.value } } })}
+                                            className="border-border/60 bg-secondary/50 w-24"
+                                          />
                                           <div className="flex items-center gap-4">
                                             <label className="flex items-center gap-2 cursor-pointer">
                                               <input
