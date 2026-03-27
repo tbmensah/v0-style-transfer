@@ -583,9 +583,9 @@ const newDoor: DoorItem = {
                           <Label>Enable Pressure Wash</Label>
                         </div>
                         {exterior.pressureWash.enabled && (
-                          <div className="space-y-4">
+                          <div className="flex flex-wrap items-end gap-6">
                             <div className="space-y-2">
-                              <Label>Perimeter Feet</Label>
+                              <Label className="text-xs text-muted-foreground">Perimeter Feet</Label>
                               <Input
                                 type="text"
                                 inputMode="numeric"
@@ -598,21 +598,19 @@ const newDoor: DoorItem = {
                                 className="border-border/60 bg-secondary/50 w-32"
                               />
                             </div>
-                            <div className="flex items-center gap-6">
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={exterior.pressureWash.regularPwash}
-                                  onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, regularPwash: checked } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Regular Pwash</Label>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={exterior.pressureWash.cleanWithSteam}
-                                  onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, cleanWithSteam: checked } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Clean with Steam</Label>
-                              </div>
+                            <div className="flex items-center gap-2 pb-2">
+                              <Switch
+                                checked={exterior.pressureWash.regularPwash}
+                                onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, regularPwash: checked, cleanWithSteam: checked ? false : exterior.pressureWash.cleanWithSteam } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Regular PWash</Label>
+                            </div>
+                            <div className="flex items-center gap-2 pb-2">
+                              <Switch
+                                checked={exterior.pressureWash.cleanWithSteam}
+                                onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, cleanWithSteam: checked, regularPwash: checked ? false : exterior.pressureWash.regularPwash } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Clean with Steam</Label>
                             </div>
                           </div>
                         )}
