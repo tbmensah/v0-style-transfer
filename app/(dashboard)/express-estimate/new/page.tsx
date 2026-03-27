@@ -1097,50 +1097,33 @@ value={exterior.dumpster.count}
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-6">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={exterior.finishes.some(f => f.type === "exterior-paint")}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-paint", measureType: "pf", value: "" }] })
-                                } else {
-                                  setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-paint") })
-                                }
-                                handleSave()
-                              }}
-                            />
-                            <Label className="text-sm">Exterior Paint</Label>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={exterior.finishes.some(f => f.type === "exterior-siding")}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-siding", measureType: "sf", value: "" }] })
-                                } else {
-                                  setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-siding") })
-                                }
-                                handleSave()
-                              }}
-                            />
-                            <Label className="text-sm">Exterior Siding</Label>
-                          </div>
+                      <div className="flex flex-wrap items-end gap-4">
+                        <div className="flex items-center gap-2 pb-2">
+                          <Switch
+                            checked={exterior.finishes.some(f => f.type === "exterior-paint")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-paint", measureType: "pf", value: "" }] })
+                              } else {
+                                setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-paint") })
+                              }
+                              handleSave()
+                            }}
+                          />
+                          <Label className="text-sm">Exterior Paint</Label>
                         </div>
-                        {exterior.finishes.map((finish) => (
-                          <div key={finish.id} className="ml-4 flex items-center gap-4 rounded-lg border border-border/40 bg-secondary/30 p-3">
-                            <span className="text-sm font-medium capitalize">{finish.type.replace("-", " ")}</span>
+                        {exterior.finishes.some(f => f.type === "exterior-paint") && (
+                          <>
                             <div className="flex items-center gap-2">
-                              {(["pf", "sf", "lf"] as const).map((mt) => (
+                              {(["pf", "sf"] as const).map((mt) => (
                                 <Button
                                   key={mt}
                                   type="button"
-                                  variant={finish.measureType === mt ? "default" : "outline"}
+                                  variant={exterior.finishes.find(f => f.type === "exterior-paint")?.measureType === mt ? "default" : "outline"}
                                   size="sm"
                                   className="h-7 px-2 text-xs"
                                   onClick={() => {
-                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.id === finish.id ? { ...f, measureType: mt } : f) })
+                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-paint" ? { ...f, measureType: mt } : f) })
                                     handleSave()
                                   }}
                                 >
@@ -1148,32 +1131,79 @@ value={exterior.dumpster.count}
                                 </Button>
                               ))}
                             </div>
-                            <Input
-                              type="text"
-                              inputMode="numeric"
-                              placeholder={finish.measureType.toUpperCase()}
-                              value={finish.value}
-                              onChange={(e) => {
-                                const val = e.target.value.replace(/^0+/, '') || ""
-                                setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.id === finish.id ? { ...f, value: val } : f) })
-                                handleSave()
-                              }}
-                              className="w-24 border-border/60 bg-secondary/50"
-                            />
-                          </div>
-                        ))}
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="gap-1 border-border/60"
-                          onClick={() => {
-                            setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "other", measureType: "sf", value: "" }] })
-                            handleSave()
-                          }}
-                        >
-                          <Plus className="h-3 w-3" /> Add Finish
-                        </Button>
+                            <div className="space-y-2 min-w-[100px]">
+                              <Select 
+                                value={exterior.finishes.find(f => f.type === "exterior-paint")?.value || ""} 
+                                onValueChange={(value) => {
+                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-paint" ? { ...f, value } : f) })
+                                  handleSave()
+                                }}
+                              >
+                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="0.25">0.25</SelectItem>
+                                  <SelectItem value="0.5">0.5</SelectItem>
+                                  <SelectItem value="W">W</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </>
+                        )}
+                        <div className="flex items-center gap-2 pb-2">
+                          <Switch
+                            checked={exterior.finishes.some(f => f.type === "exterior-siding")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-siding", measureType: "sf", value: "" }] })
+                              } else {
+                                setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-siding") })
+                              }
+                              handleSave()
+                            }}
+                          />
+                          <Label className="text-sm">Exterior Siding</Label>
+                        </div>
+                        {exterior.finishes.some(f => f.type === "exterior-siding") && (
+                          <>
+                            <div className="flex items-center gap-2">
+                              {(["pf", "sf"] as const).map((mt) => (
+                                <Button
+                                  key={mt}
+                                  type="button"
+                                  variant={exterior.finishes.find(f => f.type === "exterior-siding")?.measureType === mt ? "default" : "outline"}
+                                  size="sm"
+                                  className="h-7 px-2 text-xs"
+                                  onClick={() => {
+                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-siding" ? { ...f, measureType: mt } : f) })
+                                    handleSave()
+                                  }}
+                                >
+                                  {mt.toUpperCase()}
+                                </Button>
+                              ))}
+                            </div>
+                            <div className="space-y-2 min-w-[100px]">
+                              <Select 
+                                value={exterior.finishes.find(f => f.type === "exterior-siding")?.value || ""} 
+                                onValueChange={(value) => {
+                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-siding" ? { ...f, value } : f) })
+                                  handleSave()
+                                }}
+                              >
+                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="0.25">0.25</SelectItem>
+                                  <SelectItem value="0.5">0.5</SelectItem>
+                                  <SelectItem value="W">W</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
