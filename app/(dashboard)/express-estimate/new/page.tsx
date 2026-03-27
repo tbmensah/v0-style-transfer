@@ -2009,11 +2009,11 @@ value={exterior.dumpster.count}
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="space-y-4">
-                        <div className="grid gap-4 sm:grid-cols-4">
+                        <div className="flex flex-wrap items-end gap-4">
                           <div className="space-y-2">
                             <Label>110 outlet</Label>
                             <Select value={foundation.electrical.outlets110} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: value } }); handleSave() }}>
-                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
@@ -2026,7 +2026,7 @@ value={exterior.dumpster.count}
                           <div className="space-y-2">
                             <Label>220 outlet</Label>
                             <Select value={foundation.electrical.outlets220} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: value } }); handleSave() }}>
-                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
@@ -2039,7 +2039,7 @@ value={exterior.dumpster.count}
                           <div className="space-y-2">
                             <Label>GFI outlet</Label>
                             <Select value={foundation.electrical.gfiOutlets} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: value } }); handleSave() }}>
-                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
@@ -2052,7 +2052,7 @@ value={exterior.dumpster.count}
                           <div className="space-y-2">
                             <Label>Light Switch</Label>
                             <Select value={foundation.electrical.lightSwitch} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: value } }); handleSave() }}>
-                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
@@ -2065,7 +2065,7 @@ value={exterior.dumpster.count}
                           <div className="space-y-2">
                             <Label>Junction Box</Label>
                             <Select value={foundation.electrical.junctionBox} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: value } }); handleSave() }}>
-                              <SelectTrigger className="border-border/60 bg-secondary/50">
+                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
