@@ -3985,8 +3985,8 @@ value={exterior.dumpster.count}
                                     {room.appliances.enabled && (
                                       <div className="space-y-3">
                                         {/* Refrigerator */}
-                                        <div className="space-y-3 rounded-lg bg-secondary/30 p-3">
-                                          <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-end gap-3 rounded-lg bg-secondary/30 p-3">
+                                          <div className="flex items-center gap-2 min-w-[130px]">
                                             <Switch
                                               checked={room.appliances.refrigerator.enabled}
                                               onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, enabled: checked } } })}
@@ -3994,8 +3994,8 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Refrigerator</Label>
                                           </div>
                                           {room.appliances.refrigerator.enabled && (
-                                            <div className="flex flex-wrap items-end gap-4">
-                                              <div className="space-y-2 w-[160px]">
+                                            <>
+                                              <div className="space-y-1 w-[160px]">
                                                 <Label className="text-xs">Type</Label>
                                                 <Select value={room.appliances.refrigerator.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, type: value, size: "" } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4011,7 +4011,7 @@ value={exterior.dumpster.count}
                                                 </Select>
                                               </div>
                                               {room.appliances.refrigerator.type !== "compact" && (
-                                                <div className="space-y-2 w-[100px]">
+                                                <div className="space-y-1 w-[100px]">
                                                   <Label className="text-xs">Size</Label>
                                                   <Select value={room.appliances.refrigerator.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, size: value } } })}>
                                                     <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4059,7 +4059,7 @@ value={exterior.dumpster.count}
                                                   </Select>
                                                 </div>
                                               )}
-                                              <div className="space-y-2 w-[120px]">
+                                              <div className="space-y-1 w-[120px]">
                                                 <Label className="text-xs">Grade</Label>
                                                 <Select value={room.appliances.refrigerator.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, grade: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4073,7 +4073,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[140px]">
+                                              <div className="space-y-1 w-[140px]">
                                                 <Label className="text-xs">Action</Label>
                                                 <Select value={room.appliances.refrigerator.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, action: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4086,7 +4086,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                              <div className="space-y-1 flex-1 min-w-[150px]">
                                                 <Label className="text-xs">F9 Model/Serial</Label>
                                                 <Input
                                                   placeholder="F9 Model/serial..."
@@ -4095,13 +4095,13 @@ value={exterior.dumpster.count}
                                                   className="border-border/60 bg-secondary/50"
                                                 />
                                               </div>
-                                            </div>
+                                            </>
                                           )}
                                         </div>
 
                                         {/* Dishwasher */}
-                                        <div className="space-y-3 rounded-lg bg-secondary/30 p-3">
-                                          <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-end gap-3 rounded-lg bg-secondary/30 p-3">
+                                          <div className="flex items-center gap-2 min-w-[130px]">
                                             <Switch
                                               checked={room.appliances.dishwasher.enabled}
                                               onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, enabled: checked } } })}
@@ -4109,8 +4109,8 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Dishwasher</Label>
                                           </div>
                                           {room.appliances.dishwasher.enabled && (
-                                            <div className="flex flex-wrap items-end gap-4">
-                                              <div className="space-y-2 w-[120px]">
+                                            <>
+                                              <div className="space-y-1 w-[120px]">
                                                 <Label className="text-xs">Grade</Label>
                                                 <Select value={room.appliances.dishwasher.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, grade: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4123,7 +4123,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[140px]">
+                                              <div className="space-y-1 w-[140px]">
                                                 <Label className="text-xs">Action</Label>
                                                 <Select value={room.appliances.dishwasher.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, action: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4136,7 +4136,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                              <div className="space-y-1 flex-1 min-w-[150px]">
                                                 <Label className="text-xs">F9 Model/Serial</Label>
                                                 <Input
                                                   placeholder="F9 Model/serial..."
@@ -4145,13 +4145,13 @@ value={exterior.dumpster.count}
                                                   className="border-border/60 bg-secondary/50"
                                                 />
                                               </div>
-                                            </div>
+                                            </>
                                           )}
                                         </div>
 
                                         {/* Range */}
-                                        <div className="space-y-3 rounded-lg bg-secondary/30 p-3">
-                                          <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-end gap-3 rounded-lg bg-secondary/30 p-3">
+                                          <div className="flex items-center gap-2 min-w-[130px]">
                                             <Switch
                                               checked={room.appliances.range.enabled}
                                               onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, enabled: checked } } })}
@@ -4159,8 +4159,8 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Range</Label>
                                           </div>
                                           {room.appliances.range.enabled && (
-                                            <div className="flex flex-wrap items-end gap-4">
-                                              <div className="space-y-2 w-[100px]">
+                                            <>
+                                              <div className="space-y-1 w-[100px]">
                                                 <Label className="text-xs">Type</Label>
                                                 <Select value={room.appliances.range.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, type: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4172,7 +4172,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[120px]">
+                                              <div className="space-y-1 w-[120px]">
                                                 <Label className="text-xs">Options</Label>
                                                 <Select value={room.appliances.range.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, options: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4185,7 +4185,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[120px]">
+                                              <div className="space-y-1 w-[120px]">
                                                 <Label className="text-xs">Grade</Label>
                                                 <Select value={room.appliances.range.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, grade: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4198,7 +4198,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[140px]">
+                                              <div className="space-y-1 w-[140px]">
                                                 <Label className="text-xs">Action</Label>
                                                 <Select value={room.appliances.range.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, action: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4211,7 +4211,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                              <div className="space-y-1 flex-1 min-w-[150px]">
                                                 <Label className="text-xs">F9 Model/Serial</Label>
                                                 <Input
                                                   placeholder="F9 Model/serial..."
@@ -4220,13 +4220,13 @@ value={exterior.dumpster.count}
                                                   className="border-border/60 bg-secondary/50"
                                                 />
                                               </div>
-                                            </div>
+                                            </>
                                           )}
                                         </div>
 
                                         {/* Cooktop */}
-                                        <div className="space-y-3 rounded-lg bg-secondary/30 p-3">
-                                          <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-end gap-3 rounded-lg bg-secondary/30 p-3">
+                                          <div className="flex items-center gap-2 min-w-[130px]">
                                             <Switch
                                               checked={room.appliances.cooktop.enabled}
                                               onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, enabled: checked } } })}
@@ -4234,8 +4234,8 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Cooktop</Label>
                                           </div>
                                           {room.appliances.cooktop.enabled && (
-                                            <div className="flex flex-wrap items-end gap-4">
-                                              <div className="space-y-2 w-[100px]">
+                                            <>
+                                              <div className="space-y-1 w-[100px]">
                                                 <Label className="text-xs">Type</Label>
                                                 <Select value={room.appliances.cooktop.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, type: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4247,7 +4247,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[120px]">
+                                              <div className="space-y-1 w-[120px]">
                                                 <Label className="text-xs">Grade</Label>
                                                 <Select value={room.appliances.cooktop.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, grade: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4260,7 +4260,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[140px]">
+                                              <div className="space-y-1 w-[140px]">
                                                 <Label className="text-xs">Action</Label>
                                                 <Select value={room.appliances.cooktop.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, action: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4273,7 +4273,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                              <div className="space-y-1 flex-1 min-w-[150px]">
                                                 <Label className="text-xs">F9 Model/Serial</Label>
                                                 <Input
                                                   placeholder="F9 Model/serial..."
@@ -4282,13 +4282,13 @@ value={exterior.dumpster.count}
                                                   className="border-border/60 bg-secondary/50"
                                                 />
                                               </div>
-                                            </div>
+                                            </>
                                           )}
                                         </div>
 
                                         {/* Water Heater */}
-                                        <div className="space-y-3 rounded-lg bg-secondary/30 p-3">
-                                          <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-end gap-3 rounded-lg bg-secondary/30 p-3">
+                                          <div className="flex items-center gap-2 min-w-[130px]">
                                             <Switch
                                               checked={room.appliances.waterHeater.enabled}
                                               onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, enabled: checked } } })}
@@ -4296,8 +4296,8 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Water Heater</Label>
                                           </div>
                                           {room.appliances.waterHeater.enabled && (
-                                            <div className="flex flex-wrap items-end gap-4">
-                                              <div className="space-y-2 w-[100px]">
+                                            <>
+                                              <div className="space-y-1 w-[100px]">
                                                 <Label className="text-xs">Type</Label>
                                                 <Select value={room.appliances.waterHeater.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, type: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4309,7 +4309,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[100px]">
+                                              <div className="space-y-1 w-[100px]">
                                                 <Label className="text-xs">Size</Label>
                                                 <Select value={room.appliances.waterHeater.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, size: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4326,7 +4326,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[100px]">
+                                              <div className="space-y-1 w-[100px]">
                                                 <Label className="text-xs">Rating</Label>
                                                 <Select value={room.appliances.waterHeater.rating} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, rating: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4339,7 +4339,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[140px]">
+                                              <div className="space-y-1 w-[140px]">
                                                 <Label className="text-xs">Action</Label>
                                                 <Select value={room.appliances.waterHeater.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, action: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4352,7 +4352,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                              <div className="space-y-1 flex-1 min-w-[150px]">
                                                 <Label className="text-xs">F9 Model/Serial</Label>
                                                 <Input
                                                   placeholder="F9 Model/serial..."
@@ -4361,13 +4361,13 @@ value={exterior.dumpster.count}
                                                   className="border-border/60 bg-secondary/50"
                                                 />
                                               </div>
-                                            </div>
+                                            </>
                                           )}
                                         </div>
 
                                         {/* Wall Oven */}
-                                        <div className="space-y-3 rounded-lg bg-secondary/30 p-3">
-                                          <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-end gap-3 rounded-lg bg-secondary/30 p-3">
+                                          <div className="flex items-center gap-2 min-w-[130px]">
                                             <Switch
                                               checked={room.appliances.wallOven.enabled}
                                               onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, enabled: checked } } })}
@@ -4375,8 +4375,8 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Wall oven</Label>
                                           </div>
                                           {room.appliances.wallOven.enabled && (
-                                            <div className="flex flex-wrap items-end gap-4">
-                                              <div className="space-y-2 w-[180px]">
+                                            <>
+                                              <div className="space-y-1 w-[180px]">
                                                 <Label className="text-xs">Type</Label>
                                                 <Select value={room.appliances.wallOven.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, type: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4392,7 +4392,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[120px]">
+                                              <div className="space-y-1 w-[120px]">
                                                 <Label className="text-xs">Grade</Label>
                                                 <Select value={room.appliances.wallOven.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, grade: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4405,7 +4405,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[140px]">
+                                              <div className="space-y-1 w-[140px]">
                                                 <Label className="text-xs">Action</Label>
                                                 <Select value={room.appliances.wallOven.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, action: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4418,7 +4418,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                              <div className="space-y-1 flex-1 min-w-[150px]">
                                                 <Label className="text-xs">F9 Model/Serial</Label>
                                                 <Input
                                                   placeholder="F9 Model/serial..."
@@ -4427,13 +4427,13 @@ value={exterior.dumpster.count}
                                                   className="border-border/60 bg-secondary/50"
                                                 />
                                               </div>
-                                            </div>
+                                            </>
                                           )}
                                         </div>
 
                                         {/* Air Handler */}
-                                        <div className="space-y-3 rounded-lg bg-secondary/30 p-3">
-                                          <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-end gap-3 rounded-lg bg-secondary/30 p-3">
+                                          <div className="flex items-center gap-2 min-w-[130px]">
                                             <Switch
                                               checked={room.appliances.airHandler.enabled}
                                               onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, enabled: checked } } })}
@@ -4441,8 +4441,8 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Air handler</Label>
                                           </div>
                                           {room.appliances.airHandler.enabled && (
-                                            <div className="flex flex-wrap items-end gap-4">
-                                              <div className="space-y-2 w-[100px]">
+                                            <>
+                                              <div className="space-y-1 w-[100px]">
                                                 <Label className="text-xs">Type</Label>
                                                 <Select value={room.appliances.airHandler.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, type: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4456,7 +4456,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[200px]">
+                                              <div className="space-y-1 w-[200px]">
                                                 <Label className="text-xs">Options</Label>
                                                 <Select value={room.appliances.airHandler.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, options: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4469,7 +4469,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 w-[140px]">
+                                              <div className="space-y-1 w-[140px]">
                                                 <Label className="text-xs">Action</Label>
                                                 <Select value={room.appliances.airHandler.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, action: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
@@ -4482,7 +4482,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
-                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                              <div className="space-y-1 flex-1 min-w-[150px]">
                                                 <Label className="text-xs">F9 Model/Serial</Label>
                                                 <Input
                                                   placeholder="F9 Model/serial..."
@@ -4491,13 +4491,13 @@ value={exterior.dumpster.count}
                                                   className="border-border/60 bg-secondary/50"
                                                 />
                                               </div>
-                                            </div>
+                                            </>
                                           )}
                                         </div>
 
                                         {/* Boiler */}
-                                        <div className="space-y-3 rounded-lg bg-secondary/30 p-3">
-                                          <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-end gap-3 rounded-lg bg-secondary/30 p-3">
+                                          <div className="flex items-center gap-2 min-w-[130px]">
                                             <Switch
                                               checked={room.appliances.boiler.enabled}
                                               onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, enabled: checked } } })}
@@ -4505,61 +4505,57 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Boiler</Label>
                                           </div>
                                           {room.appliances.boiler.enabled && (
-                                            <div className="space-y-3">
-                                              <div className="flex flex-wrap items-end gap-4">
-                                                <div className="space-y-2 w-[120px]">
-                                                  <Label className="text-xs">Type</Label>
-                                                  <Select value={room.appliances.boiler.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, type: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="natural-gas">Natural Gas</SelectItem>
-                                                      <SelectItem value="electric">Electric</SelectItem>
-                                                      <SelectItem value="oil-fired">Oil fired</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[140px]">
-                                                  <Label className="text-xs">Action</Label>
-                                                  <Select value={room.appliances.boiler.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, action: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                      <SelectItem value="replace">Replace</SelectItem>
-                                                      <SelectItem value="service-call">Service Call</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 flex-1 min-w-[150px]">
-                                                  <Label className="text-xs">F9 Model/Serial</Label>
-                                                  <Input
-                                                    placeholder="F9 Model/serial..."
-                                                    value={room.appliances.boiler.f9Note}
-                                                    onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, f9Note: e.target.value } } })}
-                                                    className="border-border/60 bg-secondary/50"
-                                                  />
-                                                </div>
+                                            <>
+                                              <div className="space-y-1 w-[120px]">
+                                                <Label className="text-xs">Type</Label>
+                                                <Select value={room.appliances.boiler.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, type: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="natural-gas">Natural Gas</SelectItem>
+                                                    <SelectItem value="electric">Electric</SelectItem>
+                                                    <SelectItem value="oil-fired">Oil fired</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
-                                              <div className="flex items-center gap-6">
-                                                <div className="flex items-center gap-2">
-                                                  <Switch
-                                                    checked={room.appliances.boiler.expansionTank}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, expansionTank: checked } } })}
-                                                  />
-                                                  <Label className="text-sm">Expansion Tank</Label>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                  <Switch
-                                                    checked={room.appliances.boiler.circulatorPump}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, circulatorPump: checked } } })}
-                                                  />
-                                                  <Label className="text-sm">Circulator pump</Label>
-                                                </div>
+                                              <div className="space-y-1 w-[140px]">
+                                                <Label className="text-xs">Action</Label>
+                                                <Select value={room.appliances.boiler.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, action: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
-                                            </div>
+                                              <div className="space-y-1 flex-1 min-w-[150px]">
+                                                <Label className="text-xs">F9 Model/Serial</Label>
+                                                <Input
+                                                  placeholder="F9 Model/serial..."
+                                                  value={room.appliances.boiler.f9Note}
+                                                  onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, f9Note: e.target.value } } })}
+                                                  className="border-border/60 bg-secondary/50"
+                                                />
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <Switch
+                                                  checked={room.appliances.boiler.expansionTank}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, expansionTank: checked } } })}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Expansion Tank</Label>
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <Switch
+                                                  checked={room.appliances.boiler.circulatorPump}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, circulatorPump: checked } } })}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Circulator pump</Label>
+                                              </div>
+                                            </>
                                           )}
                                         </div>
                                       </div>
