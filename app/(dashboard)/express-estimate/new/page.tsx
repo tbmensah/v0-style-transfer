@@ -2827,8 +2827,9 @@ value={exterior.dumpster.count}
                                   </Button>
                                 </div>
                                 {room.windows.map((window, idx) => (
-                                  <div key={window.id} className="space-y-3 rounded-lg bg-secondary/30 p-3">
-                                    <div className="flex flex-wrap items-end gap-3">
+                                  <div key={window.id} className="rounded-lg bg-secondary/30 p-3">
+                                    <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                      {/* All dropdowns first */}
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Type</Label>
                                         <Select value={window.type} onValueChange={(value) => {
@@ -2836,7 +2837,7 @@ value={exterior.dumpster.count}
                                           newWindows[idx] = { ...window, type: value, size: "", grade: "" }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
-                                          <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                          <SelectTrigger className="w-[125px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -2855,7 +2856,7 @@ value={exterior.dumpster.count}
                                           newWindows[idx] = { ...window, material: value, size: "", grade: "" }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
-                                          <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
+                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -2873,11 +2874,10 @@ value={exterior.dumpster.count}
                                             newWindows[idx] = { ...window, size: value }
                                             updateRoom(room.id, { windows: newWindows })
                                           }}>
-                                            <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                            <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              {/* Vinyl/Aluminum Single Hung, Vinyl/Aluminum Double Hung, Wood Single Hung, Wood Double Hung */}
                                               {((window.material === "vinyl" && (window.type === "single-hung" || window.type === "double-hung")) ||
                                                 (window.material === "aluminum" && (window.type === "single-hung" || window.type === "double-hung")) ||
                                                 (window.material === "wood" && (window.type === "single-hung" || window.type === "double-hung"))) && (
@@ -2888,7 +2888,6 @@ value={exterior.dumpster.count}
                                                   <SelectItem value="20-28">20-28 SF</SelectItem>
                                                 </>
                                               )}
-                                              {/* Vinyl Casement, Aluminum Casement */}
                                               {((window.material === "vinyl" || window.material === "aluminum") && window.type === "casement") && (
                                                 <>
                                                   <SelectItem value="3-5">3-5 SF</SelectItem>
@@ -2896,7 +2895,6 @@ value={exterior.dumpster.count}
                                                   <SelectItem value="9-13">9-13 SF</SelectItem>
                                                 </>
                                               )}
-                                              {/* Aluminum Horizontal Slider */}
                                               {window.material === "aluminum" && window.type === "horizontal-slider" && (
                                                 <>
                                                   <SelectItem value="3-11">3-11 SF</SelectItem>
@@ -2905,7 +2903,6 @@ value={exterior.dumpster.count}
                                                   <SelectItem value="33-40">33-40 SF</SelectItem>
                                                 </>
                                               )}
-                                              {/* Aluminum Fixed/Picture */}
                                               {window.material === "aluminum" && window.type === "fixed" && (
                                                 <>
                                                   <SelectItem value="3-11">3-11 SF</SelectItem>
@@ -2914,7 +2911,6 @@ value={exterior.dumpster.count}
                                                   <SelectItem value="33-40">33-40 SF</SelectItem>
                                                 </>
                                               )}
-                                              {/* Wood Casement, Wood Horizontal Slider */}
                                               {window.material === "wood" && (window.type === "casement" || window.type === "horizontal-slider") && (
                                                 <>
                                                   <SelectItem value="3-11">3-11 SF</SelectItem>
@@ -2923,7 +2919,6 @@ value={exterior.dumpster.count}
                                                   <SelectItem value="33-40">33-40 SF</SelectItem>
                                                 </>
                                               )}
-                                              {/* Wood Fixed/Picture */}
                                               {window.material === "wood" && window.type === "fixed" && (
                                                 <>
                                                   <SelectItem value="3-11">3-11 SF</SelectItem>
@@ -2933,7 +2928,6 @@ value={exterior.dumpster.count}
                                                   <SelectItem value="44-55">44-55 SF</SelectItem>
                                                 </>
                                               )}
-                                              {/* Vinyl Horizontal Slider, Vinyl Fixed - use default sizes */}
                                               {window.material === "vinyl" && (window.type === "horizontal-slider" || window.type === "fixed") && (
                                                 <>
                                                   <SelectItem value="4-8">4-8 SF</SelectItem>
@@ -2954,27 +2948,24 @@ value={exterior.dumpster.count}
                                             newWindows[idx] = { ...window, grade: value }
                                             updateRoom(room.id, { windows: newWindows })
                                           }}>
-                                            <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                            <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              {/* Vinyl Double Hung, Vinyl Casement */}
-                                              {window.material === "vinyl" && (window.type === "double-hung" || window.type === "casement" || window.type === "single-hung" || window.type === "horizontal-slider" || window.type === "fixed") && (
+                                              {window.material === "vinyl" && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
                                                   <SelectItem value="high">High Grade</SelectItem>
                                                   <SelectItem value="premium">Premium Grade</SelectItem>
                                                 </>
                                               )}
-                                              {/* Aluminum Horizontal Slider, Aluminum Fixed, Aluminum Single Hung */}
-                                              {window.material === "aluminum" && (window.type === "horizontal-slider" || window.type === "fixed" || window.type === "single-hung" || window.type === "double-hung") && (
+                                              {window.material === "aluminum" && window.type !== "casement" && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
                                                   <SelectItem value="2-pane">2 Pane</SelectItem>
                                                   <SelectItem value="2-pane-thermal">2 Pane w/thermal</SelectItem>
                                                 </>
                                               )}
-                                              {/* Aluminum Casement */}
                                               {window.material === "aluminum" && window.type === "casement" && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
@@ -2982,8 +2973,7 @@ value={exterior.dumpster.count}
                                                   <SelectItem value="premium">Premium Grade</SelectItem>
                                                 </>
                                               )}
-                                              {/* Wood Single Hung, Wood Double Hung, Wood Horizontal Slider, Wood Fixed */}
-                                              {window.material === "wood" && (window.type === "single-hung" || window.type === "double-hung" || window.type === "horizontal-slider" || window.type === "fixed") && (
+                                              {window.material === "wood" && window.type !== "casement" && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
                                                   <SelectItem value="standard">Standard Grade</SelectItem>
@@ -2991,7 +2981,6 @@ value={exterior.dumpster.count}
                                                   <SelectItem value="premium">Premium Grade</SelectItem>
                                                 </>
                                               )}
-                                              {/* Wood Casement */}
                                               {window.material === "wood" && window.type === "casement" && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
@@ -3004,32 +2993,13 @@ value={exterior.dumpster.count}
                                         </div>
                                       )}
                                       <div className="space-y-1">
-                                        <Label className="text-xs text-muted-foreground">Quantity</Label>
-                                        <Select value={window.quantity} onValueChange={(value) => {
-                                          const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, quantity: value }
-                                          updateRoom(room.id, { windows: newWindows })
-                                        }}>
-                                          <SelectTrigger className="w-[80px] border-border/60 bg-secondary/50">
-                                            <SelectValue placeholder="Select" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            {Array.from({ length: 30 }, (_, i) => i + 1).map((num) => (
-                                              <SelectItem key={num} value={String(num)}>{num}</SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
-                                      </div>
-                                    </div>
-                                    <div className="flex flex-wrap items-end gap-3">
-                                      <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Blinds</Label>
                                         <Select value={window.blinds} onValueChange={(value) => {
                                           const newWindows = [...room.windows]
                                           newWindows[idx] = { ...window, blinds: value }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
-                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                          <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -3047,7 +3017,7 @@ value={exterior.dumpster.count}
                                           newWindows[idx] = { ...window, casingTrim: value }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
-                                          <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                          <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -3063,7 +3033,7 @@ value={exterior.dumpster.count}
                                           newWindows[idx] = { ...window, finish: value }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
-                                          <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
+                                          <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -3073,6 +3043,24 @@ value={exterior.dumpster.count}
                                           </SelectContent>
                                         </Select>
                                       </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Quantity</Label>
+                                        <Select value={window.quantity} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, quantity: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[70px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {Array.from({ length: 30 }, (_, i) => i + 1).map((num) => (
+                                              <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      {/* Toggles after dropdowns */}
                                       <div className="flex items-center gap-2 pb-1">
                                         <Switch
                                           checked={window.marbleSillReplace}
@@ -3082,7 +3070,7 @@ value={exterior.dumpster.count}
                                             updateRoom(room.id, { windows: newWindows })
                                           }}
                                         />
-                                        <Label className="text-sm">Marble window sill replace</Label>
+                                        <Label className="text-sm whitespace-nowrap">Marble sill replace</Label>
                                       </div>
                                       <div className="flex items-center gap-2 pb-1">
                                         <Switch
@@ -3093,8 +3081,9 @@ value={exterior.dumpster.count}
                                             updateRoom(room.id, { windows: newWindows })
                                           }}
                                         />
-                                        <Label className="text-sm">Marble window sill detach</Label>
+                                        <Label className="text-sm whitespace-nowrap">Marble sill detach</Label>
                                       </div>
+                                      {/* Delete button at far right */}
                                       <div className="flex-1" />
                                       <Button
                                         type="button"
