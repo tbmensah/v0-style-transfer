@@ -3824,7 +3824,7 @@ value={exterior.dumpster.count}
                                           <SelectContent>
                                             <SelectItem value="tile">Tile</SelectItem>
                                             <SelectItem value="solid-surface">Solid surface</SelectItem>
-                                            <SelectItem value="unstained">Unstained</SelectItem>
+                                            <SelectItem value="unattached">Unattached</SelectItem>
                                           </SelectContent>
                                         </Select>
                                       </div>
@@ -3912,11 +3912,11 @@ value={exterior.dumpster.count}
                                       </div>
                                       {room.plumbing.reverseOsmosis.enabled && (
                                         <>
-                                          <div className="space-y-1">
-                                            <Label className="text-xs text-muted-foreground">Backsplash</Label>
-                                            <Select value={room.plumbing.reverseOsmosis.action} onValueChange={(value) => updateRoom(room.id, { plumbing: { ...room.plumbing!, reverseOsmosis: { ...room.plumbing!.reverseOsmosis, action: value } } })}>
-                                              <SelectTrigger className="border-border/60 bg-secondary/50 w-[140px]">
-                                                <SelectValue placeholder="Select" />
+<div className="space-y-1">
+  <Label className="text-xs text-muted-foreground">Action</Label>
+  <Select value={room.plumbing.reverseOsmosis.action} onValueChange={(value) => updateRoom(room.id, { plumbing: { ...room.plumbing!, reverseOsmosis: { ...room.plumbing!.reverseOsmosis, action: value } } })}>
+  <SelectTrigger className="border-border/60 bg-secondary/50 w-[140px]">
+  <SelectValue placeholder="Select" />
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="detach-reset">Detach and reset</SelectItem>
