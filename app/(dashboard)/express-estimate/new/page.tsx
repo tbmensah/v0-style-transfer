@@ -2398,30 +2398,7 @@ value={exterior.dumpster.count}
                                                 value={layer.type} 
                                                 onValueChange={(value) => {
                                                   const newLayers = [...(room.flooring.layers || [])]
-                                                  newLayers[layerIndex] = { ...layer, type: value }
-                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                                }}
-                                              >
-                                                <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
-                                                  <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="vinyl-plank">Vinyl Plank</SelectItem>
-                                                  <SelectItem value="sheet-vinyl">Sheet Vinyl</SelectItem>
-                                                  <SelectItem value="laminate">Laminate</SelectItem>
-                                                  <SelectItem value="carpet">Carpet</SelectItem>
-                                                  <SelectItem value="hardwood">Hardwood</SelectItem>
-                                                  <SelectItem value="tile">Tile</SelectItem>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                            <div className="space-y-1">
-                                              <Label className="text-xs text-muted-foreground">Grade</Label>
-                                              <Select 
-                                                value={layer.grade} 
-                                                onValueChange={(value) => {
-                                                  const newLayers = [...(room.flooring.layers || [])]
-                                                  newLayers[layerIndex] = { ...layer, grade: value }
+                                                  newLayers[layerIndex] = { ...layer, type: value, grade: "", application: "" }
                                                   updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                 }}
                                               >
@@ -2429,34 +2406,134 @@ value={exterior.dumpster.count}
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="standard">Standard Grade</SelectItem>
-                                                  <SelectItem value="vinyl-plank-base">Vinyl Plank base</SelectItem>
-                                                  <SelectItem value="high">High Grade</SelectItem>
-                                                  <SelectItem value="premium">Premium Grade</SelectItem>
+                                                  <SelectItem value="vinyl-plank">Vinyl Plank</SelectItem>
+                                                  <SelectItem value="sheet-vinyl">Sheet Vinyl</SelectItem>
+                                                  <SelectItem value="laminate">Laminate</SelectItem>
+                                                  <SelectItem value="carpet">Carpet</SelectItem>
+                                                  <SelectItem value="carpet-glue-down">Carpet Glue Down</SelectItem>
+                                                  <SelectItem value="hardwood">Hardwood</SelectItem>
+                                                  <SelectItem value="tile">Tile</SelectItem>
+                                                  <SelectItem value="terrazzo">Terrazzo Floor</SelectItem>
                                                 </SelectContent>
                                               </Select>
                                             </div>
-                                            <div className="space-y-1">
-                                              <Label className="text-xs text-muted-foreground">Application</Label>
-                                              <Select 
-                                                value={layer.application} 
-                                                onValueChange={(value) => {
-                                                  const newLayers = [...(room.flooring.layers || [])]
-                                                  newLayers[layerIndex] = { ...layer, application: value }
-                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                                }}
-                                              >
-                                                <SelectTrigger className="w-[170px] border-border/60 bg-secondary/50">
-                                                  <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="glue-down-concrete">Glue down on Concrete</SelectItem>
-                                                  <SelectItem value="glue-down-wood">Glue down on Wood</SelectItem>
-                                                  <SelectItem value="floating">Floating</SelectItem>
-                                                  <SelectItem value="nail-down">Nail down</SelectItem>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
+                                            {layer.type && layer.type !== "terrazzo" && (
+                                              <div className="space-y-1">
+                                                <Label className="text-xs text-muted-foreground">Grade</Label>
+                                                <Select 
+                                                  value={layer.grade} 
+                                                  onValueChange={(value) => {
+                                                    const newLayers = [...(room.flooring.layers || [])]
+                                                    newLayers[layerIndex] = { ...layer, grade: value }
+                                                    updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                  }}
+                                                >
+                                                  <SelectTrigger className="w-[320px] border-border/60 bg-secondary/50">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    {layer.type === "vinyl-plank" && (
+                                                      <>
+                                                        <SelectItem value="vinyl-plank">Vinyl Plank</SelectItem>
+                                                        <SelectItem value="vinyl-plank-standard">Vinyl Plank - Standard</SelectItem>
+                                                        <SelectItem value="vinyl-plank-high">Vinyl Plank - High Grade</SelectItem>
+                                                        <SelectItem value="vinyl-plank-premium">Vinyl Plank - Premium Grade</SelectItem>
+                                                      </>
+                                                    )}
+                                                    {layer.type === "sheet-vinyl" && (
+                                                      <>
+                                                        <SelectItem value="sheet-vinyl">Vinyl Floor Covering (sheet Goods)</SelectItem>
+                                                        <SelectItem value="sheet-vinyl-standard">Vinyl Floor Covering (sheet Goods) - Standard Grade</SelectItem>
+                                                        <SelectItem value="sheet-vinyl-economy">Vinyl Floor Covering (sheet Goods) - Economy Grade</SelectItem>
+                                                        <SelectItem value="sheet-vinyl-high">Vinyl Floor Covering (sheet Goods) - High Grade</SelectItem>
+                                                        <SelectItem value="sheet-vinyl-premium">Vinyl Floor Covering (sheet Goods) - Premium Grade</SelectItem>
+                                                      </>
+                                                    )}
+                                                    {layer.type === "laminate" && (
+                                                      <>
+                                                        <SelectItem value="laminate">Snaplock Laminate - Simulated Wood Flooring</SelectItem>
+                                                        <SelectItem value="laminate-standard">Snaplock Laminate - Simulated Wood Flooring - Standard Grade</SelectItem>
+                                                        <SelectItem value="laminate-high">Snaplock Laminate - Simulated Wood Flooring - High Grade</SelectItem>
+                                                      </>
+                                                    )}
+                                                    {layer.type === "carpet" && (
+                                                      <>
+                                                        <SelectItem value="carpet">Carpet</SelectItem>
+                                                        <SelectItem value="carpet-standard">Carpet - Standard Grade</SelectItem>
+                                                        <SelectItem value="carpet-economy">Carpet - Economy Grade</SelectItem>
+                                                        <SelectItem value="carpet-high">Carpet - High Grade</SelectItem>
+                                                        <SelectItem value="carpet-premium">Carpet - Premium Grade</SelectItem>
+                                                      </>
+                                                    )}
+                                                    {layer.type === "carpet-glue-down" && (
+                                                      <>
+                                                        <SelectItem value="glue-down-carpet">Glue Down Carpet</SelectItem>
+                                                        <SelectItem value="glue-down-carpet-standard">Glue Down Carpet - Standard Grade</SelectItem>
+                                                        <SelectItem value="glue-down-carpet-high">Glue Down Carpet - High Grade</SelectItem>
+                                                        <SelectItem value="glue-down-carpet-premium">Glue Down Carpet - Premium Grade</SelectItem>
+                                                        <SelectItem value="glue-down-carpet-heavy">Glue Down Carpet - Heavy Traffic</SelectItem>
+                                                      </>
+                                                    )}
+                                                    {layer.type === "hardwood" && (
+                                                      <>
+                                                        <SelectItem value="oak-1-common">Oak Flooring - #1 common</SelectItem>
+                                                        <SelectItem value="oak-2-common">Oak Flooring - #2 common</SelectItem>
+                                                        <SelectItem value="oak-select">Oak Flooring - select grade</SelectItem>
+                                                        <SelectItem value="oak-clear">Oak Flooring - Clear Grade</SelectItem>
+                                                      </>
+                                                    )}
+                                                    {layer.type === "tile" && (
+                                                      <>
+                                                        <SelectItem value="tile">Tile Floor Covering</SelectItem>
+                                                        <SelectItem value="tile-standard">Tile Floor Covering - Standard Grade</SelectItem>
+                                                        <SelectItem value="tile-economy">Tile Floor Covering - Economy Grade</SelectItem>
+                                                        <SelectItem value="tile-high">Tile Floor Covering - High Grade</SelectItem>
+                                                        <SelectItem value="tile-premium">Tile Floor Covering - Premium Grade</SelectItem>
+                                                      </>
+                                                    )}
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                            )}
+                                            {(layer.type === "vinyl-plank" || layer.type === "hardwood" || layer.type === "terrazzo") && (
+                                              <div className="space-y-1">
+                                                <Label className="text-xs text-muted-foreground">Application</Label>
+                                                <Select 
+                                                  value={layer.application} 
+                                                  onValueChange={(value) => {
+                                                    const newLayers = [...(room.flooring.layers || [])]
+                                                    newLayers[layerIndex] = { ...layer, application: value }
+                                                    updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                  }}
+                                                >
+                                                  <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    {layer.type === "vinyl-plank" && (
+                                                      <>
+                                                        <SelectItem value="glue-down-concrete">Glue Down on Concrete</SelectItem>
+                                                        <SelectItem value="glue-down-wood">Glue Down on Wood</SelectItem>
+                                                        <SelectItem value="floating">Floating</SelectItem>
+                                                      </>
+                                                    )}
+                                                    {layer.type === "hardwood" && (
+                                                      <>
+                                                        <SelectItem value="gluedown">Gluedown</SelectItem>
+                                                        <SelectItem value="sleeper">Sleeper</SelectItem>
+                                                        <SelectItem value="naildown-standard">Naildown - standard</SelectItem>
+                                                      </>
+                                                    )}
+                                                    {layer.type === "terrazzo" && (
+                                                      <>
+                                                        <SelectItem value="clean-polish-seal">Clean, Polish and Seal</SelectItem>
+                                                        <SelectItem value="grind-reseal">Grind and Reseal</SelectItem>
+                                                      </>
+                                                    )}
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                            )}
                                             {room.flooring.multipleLayers && (
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Action</Label>
