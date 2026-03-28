@@ -783,39 +783,33 @@ const newDoor: DoorItem = {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="flex flex-wrap items-end gap-4">
-                                <div className="space-y-2 min-w-[120px]">
-                                  <Label className="text-sm">Tonnage</Label>
-                                  <Select value={unit.tonnage} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {["2", "2.5", "3", "4", "5"].map(t => (
-                                        <SelectItem key={t} value={t}>{t} Ton</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="space-y-2 min-w-[120px]">
-                                  <Label className="text-sm">SEER Rating</Label>
-                                  <Select value={unit.seer} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="13">13</SelectItem>
-                                      <SelectItem value="14-16">14-16</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="flex items-center gap-2 pb-2">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <Select value={unit.tonnage} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="Tonnage" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {["2", "2.5", "3", "4", "5"].map(t => (
+                                      <SelectItem key={t} value={t}>{t} Ton</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <Select value={unit.seer} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="SEER" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="13">13</SelectItem>
+                                    <SelectItem value="14-16">14-16</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
@@ -825,7 +819,7 @@ const newDoor: DoorItem = {
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2 pb-2">
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
@@ -835,17 +829,14 @@ const newDoor: DoorItem = {
                                   />
                                   <Label className="text-sm">Service Call</Label>
                                 </div>
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="text-sm">F9 Note</Label>
                                 <Input
-                                  placeholder="Enter model and serial number..."
+                                  placeholder="Enter Model and Serial Number"
                                   value={unit.f9Note}
                                   onChange={(e) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 flex-1 min-w-[180px]"
                                 />
                               </div>
                             </div>
@@ -887,54 +878,45 @@ const newDoor: DoorItem = {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="flex flex-wrap items-end gap-4">
-                                <div className="space-y-2 min-w-[140px]">
-                                  <Label className="text-sm">Unit Type</Label>
-                                  <Select value={unit.unitType} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="ac">AC Unit</SelectItem>
-                                      <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="space-y-2 min-w-[120px]">
-                                  <Label className="text-sm">Tonnage</Label>
-                                  <Select value={unit.tonnage} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {["2", "2.5", "3", "4", "5"].map(t => (
-                                        <SelectItem key={t} value={t}>{t} Ton</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="space-y-2 min-w-[120px]">
-                                  <Label className="text-sm">SEER Rating</Label>
-                                  <Select value={unit.seer} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="13">13</SelectItem>
-                                      <SelectItem value="14-16">14-16</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="flex items-center gap-2 pb-2">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <Select value={unit.unitType} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[160px]">
+                                    <SelectValue placeholder="Unit Type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="ac">AC Unit</SelectItem>
+                                    <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Select value={unit.tonnage} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="Tonnage" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {["2", "2.5", "3", "4", "5"].map(t => (
+                                      <SelectItem key={t} value={t}>{t} Ton</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <Select value={unit.seer} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="SEER" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="13">13</SelectItem>
+                                    <SelectItem value="14-16">14-16</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
@@ -944,7 +926,7 @@ const newDoor: DoorItem = {
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2 pb-2">
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
@@ -954,17 +936,14 @@ const newDoor: DoorItem = {
                                   />
                                   <Label className="text-sm">Service Call</Label>
                                 </div>
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="text-sm">F9 Note</Label>
                                 <Input
-                                  placeholder="Enter model and serial number..."
+                                  placeholder="Enter Model and Serial Number"
                                   value={unit.f9Note}
                                   onChange={(e) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 flex-1 min-w-[180px]"
                                 />
                               </div>
                             </div>
@@ -1006,24 +985,21 @@ const newDoor: DoorItem = {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="flex flex-wrap items-end gap-4">
-                                <div className="space-y-2 min-w-[120px]">
-                                  <Label className="text-sm">Number of Zones</Label>
-                                  <Select value={unit.zones} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="QTY" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {["1", "2", "3", "4"].map(z => (
-                                        <SelectItem key={z} value={z}>{z} Zone</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="flex items-center gap-2 pb-2">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <Select value={unit.zones} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="Zones" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {["1", "2", "3", "4"].map(z => (
+                                      <SelectItem key={z} value={z}>{z} Zone</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.highEfficiency}
                                     onCheckedChange={(checked) => {
@@ -1033,7 +1009,7 @@ const newDoor: DoorItem = {
                                   />
                                   <Label className="text-sm">High Efficiency</Label>
                                 </div>
-                                <div className="flex items-center gap-2 pb-2">
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
@@ -1043,7 +1019,7 @@ const newDoor: DoorItem = {
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2 pb-2">
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
@@ -1053,17 +1029,14 @@ const newDoor: DoorItem = {
                                   />
                                   <Label className="text-sm">Service Call</Label>
                                 </div>
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="text-sm">F9 Note</Label>
                                 <Input
-                                  placeholder="Enter model and serial number..."
+                                  placeholder="Enter Model and Serial Number"
                                   value={unit.f9Note}
                                   onChange={(e) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 flex-1 min-w-[180px]"
                                 />
                               </div>
                             </div>
