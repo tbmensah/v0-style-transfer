@@ -1,13 +1,13 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Zap } from "lucide-react"
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -34,9 +34,7 @@ export default function SignupPage() {
         <Card className="w-full max-w-md border-border/60 bg-card/90 shadow-2xl backdrop-blur-sm">
           <CardHeader className="space-y-1 text-center">
             <Link href="/" className="mx-auto mb-4 flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/30">
-                <Zap className="h-5 w-5 text-primary-foreground" />
-              </div>
+              <Image src="/icon.png" alt="AdjustAid Logo" width={40} height={40} className="rounded-lg" />
               <span className="text-2xl font-semibold tracking-tight text-foreground">AdjustAid</span>
             </Link>
             <CardTitle className="text-2xl font-bold text-foreground">Create an account</CardTitle>
