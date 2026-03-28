@@ -574,6 +574,7 @@ const newDoor: DoorItem = {
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
 <SelectContent>
+                                  <SelectItem value="">Clear</SelectItem>
                                   <SelectItem value="dwelling">Dwelling</SelectItem>
                                   <SelectItem value="general-property">General Property</SelectItem>
                                   <SelectItem value="rcbap">RCBAP</SelectItem>
@@ -719,6 +720,7 @@ const newDoor: DoorItem = {
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
+                                  <SelectItem value="">Clear</SelectItem>
                                   <SelectItem value="12">12 Yards</SelectItem>
                                   <SelectItem value="20">20 Yards</SelectItem>
                                   <SelectItem value="30">30 Yards</SelectItem>
