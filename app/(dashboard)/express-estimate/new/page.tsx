@@ -1264,7 +1264,7 @@ const newDoor: DoorItem = {
                               checked={foundation.crawlspace.enabled}
                               onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, enabled: checked } }); handleSave() }}
                             />
-                            <Label>Enable Crawlspace/Enclosure area</Label>
+                            <Label>Enable Crawlspace/Enclosure Area</Label>
                           </div>
                           <div className="flex items-center gap-2">
                             <Switch
@@ -1341,16 +1341,16 @@ const newDoor: DoorItem = {
                                 />
                                 <Label className="text-sm">House Rewire</Label>
                               </div>
-                              {foundation.crawlspace.houseRewire !== "" && (
-                                <Input
-                                  type="number"
-                                  min="0"
-                                  placeholder="Enter home SF"
-                                  value={foundation.crawlspace.houseRewire.trim()}
-                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50 w-32"
-                                />
-                              )}
+{foundation.crawlspace.houseRewire !== "" && (
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="Enter Home SF"
+                                value={foundation.crawlspace.houseRewire.trim()}
+                                onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
+                                className="border-border/60 bg-secondary/50 w-36"
+                              />
+                            )}
                             </div>
                             <div className="flex items-center gap-2">
                               <Switch
