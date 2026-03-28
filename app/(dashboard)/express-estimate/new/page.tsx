@@ -3290,8 +3290,8 @@ value={exterior.dumpster.count}
                                       <Label className="font-medium">Vanity</Label>
                                     </div>
                                     {room.vanity.enabled && (
-                                      <div className="space-y-4">
-                                        {/* Vanity row */}
+                                      <div className="space-y-3 pl-2">
+                                        {/* Vanity Cabinet row */}
                                         <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Size (LF)</Label>
@@ -3328,9 +3328,11 @@ value={exterior.dumpster.count}
                                             />
                                             <Label className="text-sm whitespace-nowrap">Detach and reset</Label>
                                           </div>
-                                          {/* Countertop section */}
-                                          <div className="border-l border-border/40 pl-3 ml-1 flex flex-wrap items-end gap-x-3 gap-y-2">
-                                            <Label className="text-xs text-muted-foreground pb-2 font-medium">Countertop</Label>
+                                        </div>
+                                        {/* Countertop section */}
+                                        <div className="rounded-md border border-border/30 bg-secondary/20 p-3 space-y-2">
+                                          <Label className="text-xs font-medium text-muted-foreground">Countertop</Label>
+                                          <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Type</Label>
                                               <Select value={room.vanity.countertop.type} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, type: value } } })}>
@@ -3383,13 +3385,13 @@ value={exterior.dumpster.count}
                                               />
                                               <Label className="text-sm whitespace-nowrap">Detach and reset</Label>
                                             </div>
-                                          </div>
-                                          <div className="flex items-center gap-2 pb-1">
-                                            <Switch
-                                              checked={room.vanity.backsplashUnattached}
-                                              onCheckedChange={(checked) => updateRoom(room.id, { vanity: { ...room.vanity!, backsplashUnattached: checked } })}
-                                            />
-                                            <Label className="text-sm whitespace-nowrap">Backsplash/Unattached</Label>
+                                            <div className="flex items-center gap-2 pb-1">
+                                              <Switch
+                                                checked={room.vanity.backsplashUnattached}
+                                                onCheckedChange={(checked) => updateRoom(room.id, { vanity: { ...room.vanity!, backsplashUnattached: checked } })}
+                                              />
+                                              <Label className="text-sm whitespace-nowrap">Backsplash/Unattached</Label>
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
