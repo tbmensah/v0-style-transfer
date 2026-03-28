@@ -3326,7 +3326,7 @@ value={exterior.dumpster.count}
                                               checked={room.vanity.detachAndReset}
                                               onCheckedChange={(checked) => updateRoom(room.id, { vanity: { ...room.vanity!, detachAndReset: checked } })}
                                             />
-                                            <Label className="text-sm whitespace-nowrap">Detach and reset</Label>
+                                            <Label className="text-xs whitespace-nowrap">Detach and reset</Label>
                                           </div>
                                         </div>
                                         {/* Countertop section */}
@@ -3383,14 +3383,14 @@ value={exterior.dumpster.count}
                                                 checked={room.vanity.countertop.detachAndReset}
                                                 onCheckedChange={(checked) => updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, detachAndReset: checked } } })}
                                               />
-                                              <Label className="text-sm whitespace-nowrap">Detach and reset</Label>
+                                              <Label className="text-xs whitespace-nowrap">Detach and reset</Label>
                                             </div>
                                             <div className="flex items-center gap-2 pb-1">
                                               <Switch
                                                 checked={room.vanity.backsplashUnattached}
                                                 onCheckedChange={(checked) => updateRoom(room.id, { vanity: { ...room.vanity!, backsplashUnattached: checked } })}
                                               />
-                                              <Label className="text-sm whitespace-nowrap">Backsplash/Unattached</Label>
+                                              <Label className="text-xs whitespace-nowrap">Backsplash/Unattached</Label>
                                             </div>
                                           </div>
                                         </div>
