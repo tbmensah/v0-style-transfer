@@ -56,7 +56,7 @@ export default function NewFastFillPage() {
     setFilePairs(filePairs.map((pair) => (pair.id === id ? { ...pair, selected: !pair.selected } : pair)))
   }
 
-  const validPairs = filePairs.filter((pair) => pair.pdf && pair.esx)
+  const validPairs = filePairs.filter((pair) => pair.pdf)
   const selectedPairs = validPairs.filter((pair) => pair.selected)
   const tokenCost = selectedPairs.length
 
@@ -72,7 +72,7 @@ export default function NewFastFillPage() {
     
     // Update all selected pairs to processing status
     setFilePairs(prev => prev.map(pair => 
-      pair.selected && pair.pdf && pair.esx 
+      pair.selected && pair.pdf 
         ? { ...pair, status: "processing", progress: 0 } 
         : pair
     ))
@@ -224,7 +224,7 @@ export default function NewFastFillPage() {
                       </div>
                       {/* ESX Upload */}
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-foreground">XactAnalysis ESX</label>
+                        <label className="mb-2 block text-sm font-medium text-foreground">XactAnalysis ESX <span className="text-muted-foreground font-normal">(optional)</span></label>
                         <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border/60 bg-background/50 p-6 transition-all hover:border-primary/50 hover:bg-secondary/50">
                           {pair.esx ? (
                             <div className="flex items-center gap-2 text-sm text-foreground">
@@ -246,10 +246,10 @@ export default function NewFastFillPage() {
                         </label>
                       </div>
                     </div>
-                    {pair.pdf && pair.esx && (
+                    {pair.pdf && (
                       <div className="mt-4 flex items-center gap-2 text-sm text-primary">
                         <CheckCircle className="h-4 w-4" />
-                        <span>Ready for processing</span>
+                        <span>Ready for processing{!pair.esx && " (new ESX will be generated)"}</span>
                       </div>
                     )}
                   </div>
@@ -357,7 +357,7 @@ export default function NewFastFillPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <File className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm text-foreground truncate">{pair.esx?.name}</span>
+                          <span className="text-sm text-foreground truncate">{pair.esx?.name || <span className="text-muted-foreground italic">New ESX will be generated</span>}</span>
                         </div>
                       </div>
                     </div>
