@@ -116,10 +116,15 @@ interface ElectricalOptions {
 interface WindowItem {
   id: number
   type: string
+  material: string
   size: string
   grade: string
-  casing: string
-  marbleSill: boolean
+  quantity: string
+  finish: string
+  blinds: string
+  casingTrim: string
+  marbleSillReplace: boolean
+  marbleSillDetach: boolean
 }
 
 interface DoorItem {
@@ -411,10 +416,15 @@ export default function NewExpressEstimatePage() {
       const newWindow: WindowItem = {
         id: Date.now(),
         type: "",
+        material: "",
         size: "",
         grade: "",
-        casing: "",
-        marbleSill: false,
+        quantity: "",
+        finish: "",
+        blinds: "",
+        casingTrim: "",
+        marbleSillReplace: false,
+        marbleSillDetach: false,
       }
       updateRoom(roomId, { windows: [...room.windows, newWindow] })
     }
@@ -2807,6 +2817,198 @@ value={exterior.dumpster.count}
                                 )}
                               </div>
 
+                              {/* Windows */}
+                              <div className="space-y-3 rounded-lg border border-border/40 p-4">
+                                <div className="flex items-center justify-between">
+                                  <Label className="font-medium">Windows ({room.windows.length})</Label>
+                                  <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addWindow(room.id)}>
+                                    <Plus className="h-3 w-3" />
+                                    Add Window
+                                  </Button>
+                                </div>
+                                {room.windows.map((window, idx) => (
+                                  <div key={window.id} className="space-y-3 rounded-lg bg-secondary/30 p-3">
+                                    <div className="flex flex-wrap items-end gap-3">
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Type</Label>
+                                        <Select value={window.type} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, type: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="single-hung">Single Hung</SelectItem>
+                                            <SelectItem value="double-hung">Double Hung</SelectItem>
+                                            <SelectItem value="casement">Casement</SelectItem>
+                                            <SelectItem value="fixed">Fixed</SelectItem>
+                                            <SelectItem value="horizontal-slider">Horizontal Slider</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Material</Label>
+                                        <Select value={window.material} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, material: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="aluminum">Aluminum</SelectItem>
+                                            <SelectItem value="vinyl">Vinyl</SelectItem>
+                                            <SelectItem value="wood">Wood</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Size</Label>
+                                        <Select value={window.size} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, size: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="4-8">4-8 SF</SelectItem>
+                                            <SelectItem value="9-12">9-12 SF</SelectItem>
+                                            <SelectItem value="13-19">13-19 SF</SelectItem>
+                                            <SelectItem value="20-28">20-28 SF</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Grade</Label>
+                                        <Select value={window.grade} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, grade: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="standard">Standard</SelectItem>
+                                            <SelectItem value="premium">Premium</SelectItem>
+                                            <SelectItem value="high">High</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Quantity</Label>
+                                        <Select value={window.quantity} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, quantity: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[80px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {Array.from({ length: 30 }, (_, i) => i + 1).map((num) => (
+                                              <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Finish</Label>
+                                        <Select value={window.finish} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, finish: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="trimmed-window">Trimmed Window</SelectItem>
+                                            <SelectItem value="sill-apron">Sill and Apron</SelectItem>
+                                            <SelectItem value="marble-sill">Marble Sill</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                        onClick={() => {
+                                          const newWindows = room.windows.filter(w => w.id !== window.id)
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                    <div className="flex flex-wrap items-end gap-3">
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Blinds</Label>
+                                        <Select value={window.blinds} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, blinds: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="pvc">PVC</SelectItem>
+                                            <SelectItem value="wood">Wood</SelectItem>
+                                            <SelectItem value="metal">Metal</SelectItem>
+                                            <SelectItem value="shutters">Shutters</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Casing/Trim</Label>
+                                        <Select value={window.casingTrim} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, casingTrim: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="casing-stain">Casing - Stain</SelectItem>
+                                            <SelectItem value="casing-paint">Casing - Paint</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="flex items-center gap-2 pb-1">
+                                        <Switch
+                                          checked={window.marbleSillReplace}
+                                          onCheckedChange={(checked) => {
+                                            const newWindows = [...room.windows]
+                                            newWindows[idx] = { ...window, marbleSillReplace: checked }
+                                            updateRoom(room.id, { windows: newWindows })
+                                          }}
+                                        />
+                                        <Label className="text-sm">Marble window sill replace</Label>
+                                      </div>
+                                      <div className="flex items-center gap-2 pb-1">
+                                        <Switch
+                                          checked={window.marbleSillDetach}
+                                          onCheckedChange={(checked) => {
+                                            const newWindows = [...room.windows]
+                                            newWindows[idx] = { ...window, marbleSillDetach: checked }
+                                            updateRoom(room.id, { windows: newWindows })
+                                          }}
+                                        />
+                                        <Label className="text-sm">Marble window sill detach</Label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
                               {/* Electrical */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
                                 <div className="flex items-center gap-3">
@@ -2909,88 +3111,6 @@ value={exterior.dumpster.count}
                                     </div>
                                   </div>
                                 )}
-                              </div>
-
-                              {/* Windows */}
-                              <div className="space-y-3 rounded-lg border border-border/40 p-4">
-                                <div className="flex items-center justify-between">
-                                  <Label className="font-medium">Windows ({room.windows.length})</Label>
-                                  <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addWindow(room.id)}>
-                                    <Plus className="h-3 w-3" />
-                                    Add Window
-                                  </Button>
-                                </div>
-                                {room.windows.map((window, idx) => (
-                                  <div key={window.id} className="grid gap-4 rounded-lg bg-secondary/30 p-3 sm:grid-cols-4">
-                                    <div className="space-y-2">
-                                      <Label className="text-xs">Type</Label>
-                                      <Select value={window.type} onValueChange={(value) => {
-                                        const newWindows = [...room.windows]
-                                        newWindows[idx] = { ...window, type: value }
-                                        updateRoom(room.id, { windows: newWindows })
-                                      }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="vinyl-double-hung">Vinyl Double Hung</SelectItem>
-                                          <SelectItem value="vinyl-single-hung">Vinyl Single Hung</SelectItem>
-                                          <SelectItem value="vinyl-casement">Vinyl Casement</SelectItem>
-                                          <SelectItem value="wood-double-hung">Wood Double Hung</SelectItem>
-                                          <SelectItem value="aluminum-double-hung">Aluminum Double Hung</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                      <Label className="text-xs">Size</Label>
-                                      <Select value={window.size} onValueChange={(value) => {
-                                        const newWindows = [...room.windows]
-                                        newWindows[idx] = { ...window, size: value }
-                                        updateRoom(room.id, { windows: newWindows })
-                                      }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="4-8">4-8 SF</SelectItem>
-                                          <SelectItem value="9-12">9-12 SF</SelectItem>
-                                          <SelectItem value="13-19">13-19 SF</SelectItem>
-                                          <SelectItem value="20-28">20-28 SF</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                      <Label className="text-xs">Grade</Label>
-                                      <Select value={window.grade} onValueChange={(value) => {
-                                        const newWindows = [...room.windows]
-                                        newWindows[idx] = { ...window, grade: value }
-                                        updateRoom(room.id, { windows: newWindows })
-                                      }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                          <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="standard">Standard</SelectItem>
-                                          <SelectItem value="premium">Premium</SelectItem>
-                                          <SelectItem value="high">High</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                    <div className="flex items-end gap-2">
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-9 w-9 text-destructive hover:bg-destructive/20"
-                                        onClick={() => {
-                                          const newWindows = room.windows.filter(w => w.id !== window.id)
-                                          updateRoom(room.id, { windows: newWindows })
-                                        }}
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                ))}
                               </div>
 
                               {/* Doors */}
