@@ -718,32 +718,20 @@ const newDoor: DoorItem = {
                             </div>
                             <div className="space-y-2 w-[180px]">
                               <Label>Dumpster Size</Label>
-                              <div className="flex items-center gap-1">
-                                <Select value={exterior.dumpster.size} onValueChange={(value) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, size: value } }); handleSave() }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50 flex-1">
-                                    <SelectValue placeholder="Select" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="12">12 Yards</SelectItem>
-                                    <SelectItem value="20">20 Yards</SelectItem>
-                                    <SelectItem value="30">30 Yards</SelectItem>
-                                    <SelectItem value="40">40 Yards</SelectItem>
-                                    <SelectItem value="pickup">Pickup Truck Load</SelectItem>
-                                    <SelectItem value="dump-truck">Single Axle Dump Truck</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                {exterior.dumpster.size && (
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                                    onClick={() => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, size: "" } }); handleSave() }}
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </Button>
-                                )}
-                              </div>
+                              <Select value={exterior.dumpster.size} onValueChange={(value) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, size: clearValue(value) } }); handleSave() }}>
+                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
+                                  <SelectItem value="12">12 Yards</SelectItem>
+                                  <SelectItem value="20">20 Yards</SelectItem>
+                                  <SelectItem value="30">30 Yards</SelectItem>
+                                  <SelectItem value="40">40 Yards</SelectItem>
+                                  <SelectItem value="pickup">Pickup Truck Load</SelectItem>
+                                  <SelectItem value="dump-truck">Single Axle Dump Truck</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
                           </div>
                         )}
@@ -801,57 +789,33 @@ const newDoor: DoorItem = {
                                 </Button>
                               </div>
                               <div className="flex flex-wrap items-center gap-3">
-                                <div className="flex items-center gap-1">
-                                  <Select value={unit.tonnage} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
-                                      <SelectValue placeholder="Tonnage" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {["2", "2.5", "3", "4", "5"].map(t => (
-                                        <SelectItem key={t} value={t}>{t} Ton</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                  {unit.tonnage && (
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                                      onClick={() => { setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: "" } : u) } }); handleSave() }}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Select value={unit.seer} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
-                                      <SelectValue placeholder="SEER" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="13">13</SelectItem>
-                                      <SelectItem value="14-16">14-16</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  {unit.seer && (
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                                      onClick={() => { setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: "" } : u) } }); handleSave() }}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  )}
-                                </div>
+                                <Select value={unit.tonnage} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="Tonnage" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
+                                    {["2", "2.5", "3", "4", "5"].map(t => (
+                                      <SelectItem key={t} value={t}>{t} Ton</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <Select value={unit.seer} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="SEER" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
+                                    <SelectItem value="13">13</SelectItem>
+                                    <SelectItem value="14-16">14-16</SelectItem>
+                                  </SelectContent>
+                                </Select>
                                 <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.replace}
@@ -922,82 +886,46 @@ const newDoor: DoorItem = {
                                 </Button>
                               </div>
                               <div className="flex flex-wrap items-center gap-3">
-                                <div className="flex items-center gap-1">
-                                  <Select value={unit.unitType} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50 w-[160px]">
-                                      <SelectValue placeholder="Unit Type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="ac">AC Unit</SelectItem>
-                                      <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  {unit.unitType && (
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                                      onClick={() => { setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: "" } : u) } }); handleSave() }}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Select value={unit.tonnage} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
-                                      <SelectValue placeholder="Tonnage" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {["2", "2.5", "3", "4", "5"].map(t => (
-                                        <SelectItem key={t} value={t}>{t} Ton</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                  {unit.tonnage && (
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                                      onClick={() => { setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: "" } : u) } }); handleSave() }}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Select value={unit.seer} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
-                                      <SelectValue placeholder="SEER" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="13">13</SelectItem>
-                                      <SelectItem value="14-16">14-16</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  {unit.seer && (
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                                      onClick={() => { setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: "" } : u) } }); handleSave() }}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  )}
-                                </div>
+                                <Select value={unit.unitType} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[160px]">
+                                    <SelectValue placeholder="Unit Type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
+                                    <SelectItem value="ac">AC Unit</SelectItem>
+                                    <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Select value={unit.tonnage} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="Tonnage" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
+                                    {["2", "2.5", "3", "4", "5"].map(t => (
+                                      <SelectItem key={t} value={t}>{t} Ton</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <Select value={unit.seer} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="SEER" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
+                                    <SelectItem value="13">13</SelectItem>
+                                    <SelectItem value="14-16">14-16</SelectItem>
+                                  </SelectContent>
+                                </Select>
                                 <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.replace}
@@ -1068,32 +996,20 @@ const newDoor: DoorItem = {
                                 </Button>
                               </div>
                               <div className="flex flex-wrap items-center gap-3">
-                                <div className="flex items-center gap-1">
-                                  <Select value={unit.zones} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
-                                      <SelectValue placeholder="Zones" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {["1", "2", "3", "4"].map(z => (
-                                        <SelectItem key={z} value={z}>{z} Zone</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                  {unit.zones && (
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                                      onClick={() => { setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: "" } : u) } }); handleSave() }}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  )}
-                                </div>
+                                <Select value={unit.zones} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="Zones" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
+                                    {["1", "2", "3", "4"].map(z => (
+                                      <SelectItem key={z} value={z}>{z} Zone</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                                 <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.highEfficiency}
@@ -1192,29 +1108,17 @@ const newDoor: DoorItem = {
                           <>
                             <div className="space-y-2 min-w-[120px]">
                               <Label className="text-xs text-muted-foreground">Amperage</Label>
-                              <div className="flex items-center gap-1">
-                                <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(value) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50 flex-1">
-                                    <SelectValue placeholder="Select" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {["70", "100", "125", "150", "200", "300"].map(a => (
-                                      <SelectItem key={a} value={a}>{a} amps</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                {exterior.electrical.breakerPanel.amps && (
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                                    onClick={() => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: "" } } }); handleSave() }}
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </Button>
-                                )}
-                              </div>
+                              <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(value) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: clearValue(value) } } }); handleSave() }}>
+                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
+                                  {["70", "100", "125", "150", "200", "300"].map(a => (
+                                    <SelectItem key={a} value={a}>{a} amps</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </div>
                             <div className="flex items-center gap-2 pb-2">
                               <Switch
