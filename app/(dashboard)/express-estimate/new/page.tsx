@@ -2358,7 +2358,7 @@ value={exterior.dumpster.count}
                                         })
                                       }}
                                     >
-                                      <Plus className="h-3 w-3" /> Add Flooring
+                                      <Plus className="h-3 w-3" /> Add Layer
                                     </Button>
                                   )}
                                 </div>
@@ -2505,14 +2505,16 @@ value={exterior.dumpster.count}
                                           </div>
                                         </div>
                                       ))}
-                                      <div className="space-y-2 pt-2">
-                                        <Textarea
-                                          placeholder="F9 Description of the layers of floor removed..."
-                                          value={room.flooring.f9Note}
-                                          onChange={(e) => updateRoom(room.id, { flooring: { ...room.flooring, f9Note: e.target.value } })}
-                                          className="border-border/60 bg-secondary/50 min-h-[60px]"
-                                        />
-                                      </div>
+                                      {room.flooring.multipleLayers && (
+                                        <div className="space-y-2 pt-2">
+                                          <Textarea
+                                            placeholder="F9 Description of the layers of floor removed..."
+                                            value={room.flooring.f9Note}
+                                            onChange={(e) => updateRoom(room.id, { flooring: { ...room.flooring, f9Note: e.target.value } })}
+                                            className="border-border/60 bg-secondary/50 min-h-[60px]"
+                                          />
+                                        </div>
+                                      )}
                                     </div>
                                   </>
                                 )}
