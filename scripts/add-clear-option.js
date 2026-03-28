@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-const filePath = './app/(dashboard)/express-estimate/new/page.tsx';
+const filePath = '/vercel/share/v0-project/app/(dashboard)/express-estimate/new/page.tsx';
 let content = fs.readFileSync(filePath, 'utf8');
 
 // Replace all <SelectContent> that don't already have a Clear option
