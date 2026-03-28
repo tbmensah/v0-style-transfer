@@ -3994,106 +3994,107 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Refrigerator</Label>
                                           </div>
                                           {room.appliances.refrigerator.enabled && (
-                                            <div className="space-y-3">
-                                              <div className="flex flex-wrap items-end gap-4">
-                                                <div className="space-y-2 w-[160px]">
-                                                  <Label className="text-xs">Type</Label>
-                                                  <Select value={room.appliances.refrigerator.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, type: value, size: "" } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="top-freezer">Top Freezer</SelectItem>
-                                                      <SelectItem value="bottom-freezer">Bottom Freezer</SelectItem>
-                                                      <SelectItem value="built-in">Built In</SelectItem>
-                                                      <SelectItem value="compact">Compact (under counter)</SelectItem>
-                                                      <SelectItem value="side-by-side">Side by side</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                {room.appliances.refrigerator.type !== "compact" && (
-                                                  <div className="space-y-2 w-[100px]">
-                                                    <Label className="text-xs">Size</Label>
-                                                    <Select value={room.appliances.refrigerator.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, size: value } } })}>
-                                                      <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                        <SelectValue placeholder="Select" />
-                                                      </SelectTrigger>
-                                                      <SelectContent>
-                                                        {room.appliances.refrigerator.type === "top-freezer" && (
-                                                          <>
-                                                            <SelectItem value="14-18">14-18 CF</SelectItem>
-                                                            <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                            <SelectItem value="23-26">23-26 CF</SelectItem>
-                                                            <SelectItem value="14-26">14-26 CF</SelectItem>
-                                                          </>
-                                                        )}
-                                                        {room.appliances.refrigerator.type === "bottom-freezer" && (
-                                                          <>
-                                                            <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                            <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                            <SelectItem value="25-30">25-30 CF</SelectItem>
-                                                            <SelectItem value="25-36">25-36 CF</SelectItem>
-                                                          </>
-                                                        )}
-                                                        {room.appliances.refrigerator.type === "built-in" && (
-                                                          <>
-                                                            <SelectItem value="36">36&quot;</SelectItem>
-                                                            <SelectItem value="42">42&quot;</SelectItem>
-                                                            <SelectItem value="48">48&quot;</SelectItem>
-                                                          </>
-                                                        )}
-                                                        {room.appliances.refrigerator.type === "side-by-side" && (
-                                                          <>
-                                                            <SelectItem value="12-22">12-22 CF</SelectItem>
-                                                            <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                            <SelectItem value="25-30">25-30 CF</SelectItem>
-                                                          </>
-                                                        )}
-                                                        {!room.appliances.refrigerator.type && (
-                                                          <>
-                                                            <SelectItem value="14-18">14-18 CF</SelectItem>
-                                                            <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                            <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                          </>
-                                                        )}
-                                                      </SelectContent>
-                                                    </Select>
-                                                  </div>
-                                                )}
-                                                <div className="space-y-2 w-[120px]">
-                                                  <Label className="text-xs">Grade</Label>
-                                                  <Select value={room.appliances.refrigerator.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, grade: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="base">Base</SelectItem>
-                                                      <SelectItem value="standard">Standard</SelectItem>
-                                                      <SelectItem value="high">High grade</SelectItem>
-                                                      <SelectItem value="premium">Premium</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[140px]">
-                                                  <Label className="text-xs">Action</Label>
-                                                  <Select value={room.appliances.refrigerator.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, action: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                      <SelectItem value="replace">Replace</SelectItem>
-                                                      <SelectItem value="service-call">Service Call</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
+                                            <div className="flex flex-wrap items-end gap-4">
+                                              <div className="space-y-2 w-[160px]">
+                                                <Label className="text-xs">Type</Label>
+                                                <Select value={room.appliances.refrigerator.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, type: value, size: "" } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="top-freezer">Top Freezer</SelectItem>
+                                                    <SelectItem value="bottom-freezer">Bottom Freezer</SelectItem>
+                                                    <SelectItem value="built-in">Built In</SelectItem>
+                                                    <SelectItem value="compact">Compact (under counter)</SelectItem>
+                                                    <SelectItem value="side-by-side">Side by side</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
-                                              <Input
-                                                placeholder="F9 Model/serial..."
-                                                value={room.appliances.refrigerator.f9Note}
-                                                onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50"
-                                              />
+                                              {room.appliances.refrigerator.type !== "compact" && (
+                                                <div className="space-y-2 w-[100px]">
+                                                  <Label className="text-xs">Size</Label>
+                                                  <Select value={room.appliances.refrigerator.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, size: value } } })}>
+                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                      <SelectValue placeholder="Select" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                      {room.appliances.refrigerator.type === "top-freezer" && (
+                                                        <>
+                                                          <SelectItem value="14-18">14-18 CF</SelectItem>
+                                                          <SelectItem value="18-22">18-22 CF</SelectItem>
+                                                          <SelectItem value="23-26">23-26 CF</SelectItem>
+                                                          <SelectItem value="14-26">14-26 CF</SelectItem>
+                                                        </>
+                                                      )}
+                                                      {room.appliances.refrigerator.type === "bottom-freezer" && (
+                                                        <>
+                                                          <SelectItem value="18-22">18-22 CF</SelectItem>
+                                                          <SelectItem value="22-25">22-25 CF</SelectItem>
+                                                          <SelectItem value="25-30">25-30 CF</SelectItem>
+                                                          <SelectItem value="25-36">25-36 CF</SelectItem>
+                                                        </>
+                                                      )}
+                                                      {room.appliances.refrigerator.type === "built-in" && (
+                                                        <>
+                                                          <SelectItem value="36">36&quot;</SelectItem>
+                                                          <SelectItem value="42">42&quot;</SelectItem>
+                                                          <SelectItem value="48">48&quot;</SelectItem>
+                                                        </>
+                                                      )}
+                                                      {room.appliances.refrigerator.type === "side-by-side" && (
+                                                        <>
+                                                          <SelectItem value="12-22">12-22 CF</SelectItem>
+                                                          <SelectItem value="22-25">22-25 CF</SelectItem>
+                                                          <SelectItem value="25-30">25-30 CF</SelectItem>
+                                                        </>
+                                                      )}
+                                                      {!room.appliances.refrigerator.type && (
+                                                        <>
+                                                          <SelectItem value="14-18">14-18 CF</SelectItem>
+                                                          <SelectItem value="18-22">18-22 CF</SelectItem>
+                                                          <SelectItem value="22-25">22-25 CF</SelectItem>
+                                                        </>
+                                                      )}
+                                                    </SelectContent>
+                                                  </Select>
+                                                </div>
+                                              )}
+                                              <div className="space-y-2 w-[120px]">
+                                                <Label className="text-xs">Grade</Label>
+                                                <Select value={room.appliances.refrigerator.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, grade: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="base">Base</SelectItem>
+                                                    <SelectItem value="standard">Standard</SelectItem>
+                                                    <SelectItem value="high">High grade</SelectItem>
+                                                    <SelectItem value="premium">Premium</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 w-[140px]">
+                                                <Label className="text-xs">Action</Label>
+                                                <Select value={room.appliances.refrigerator.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, action: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                                <Label className="text-xs">F9 Model/Serial</Label>
+                                                <Input
+                                                  placeholder="F9 Model/serial..."
+                                                  value={room.appliances.refrigerator.f9Note}
+                                                  onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, f9Note: e.target.value } } })}
+                                                  className="border-border/60 bg-secondary/50"
+                                                />
+                                              </div>
                                             </div>
                                           )}
                                         </div>
@@ -4108,41 +4109,42 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Dishwasher</Label>
                                           </div>
                                           {room.appliances.dishwasher.enabled && (
-                                            <div className="space-y-3">
-                                              <div className="flex flex-wrap items-end gap-4">
-                                                <div className="space-y-2 w-[120px]">
-                                                  <Label className="text-xs">Grade</Label>
-                                                  <Select value={room.appliances.dishwasher.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, grade: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="standard">Standard</SelectItem>
-                                                      <SelectItem value="high">High</SelectItem>
-                                                      <SelectItem value="premium">Premium</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[140px]">
-                                                  <Label className="text-xs">Action</Label>
-                                                  <Select value={room.appliances.dishwasher.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, action: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                      <SelectItem value="replace">Replace</SelectItem>
-                                                      <SelectItem value="service-call">Service Call</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
+                                            <div className="flex flex-wrap items-end gap-4">
+                                              <div className="space-y-2 w-[120px]">
+                                                <Label className="text-xs">Grade</Label>
+                                                <Select value={room.appliances.dishwasher.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, grade: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="standard">Standard</SelectItem>
+                                                    <SelectItem value="high">High</SelectItem>
+                                                    <SelectItem value="premium">Premium</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
-                                              <Input
-                                                placeholder="F9 Model/serial..."
-                                                value={room.appliances.dishwasher.f9Note}
-                                                onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50"
-                                              />
+                                              <div className="space-y-2 w-[140px]">
+                                                <Label className="text-xs">Action</Label>
+                                                <Select value={room.appliances.dishwasher.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, action: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                                <Label className="text-xs">F9 Model/Serial</Label>
+                                                <Input
+                                                  placeholder="F9 Model/serial..."
+                                                  value={room.appliances.dishwasher.f9Note}
+                                                  onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, f9Note: e.target.value } } })}
+                                                  className="border-border/60 bg-secondary/50"
+                                                />
+                                              </div>
                                             </div>
                                           )}
                                         </div>
@@ -4157,66 +4159,67 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Range</Label>
                                           </div>
                                           {room.appliances.range.enabled && (
-                                            <div className="space-y-3">
-                                              <div className="flex flex-wrap items-end gap-4">
-                                                <div className="space-y-2 w-[100px]">
-                                                  <Label className="text-xs">Type</Label>
-                                                  <Select value={room.appliances.range.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, type: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="gas">Gas</SelectItem>
-                                                      <SelectItem value="electric">Electric</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[120px]">
-                                                  <Label className="text-xs">Options</Label>
-                                                  <Select value={room.appliances.range.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, options: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="free-standing">Free Standing</SelectItem>
-                                                      <SelectItem value="slide-in">Slide In</SelectItem>
-                                                      <SelectItem value="drop-in">Drop In</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[120px]">
-                                                  <Label className="text-xs">Grade</Label>
-                                                  <Select value={room.appliances.range.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, grade: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="standard">Standard</SelectItem>
-                                                      <SelectItem value="high">High</SelectItem>
-                                                      <SelectItem value="premium">Premium</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[140px]">
-                                                  <Label className="text-xs">Action</Label>
-                                                  <Select value={room.appliances.range.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, action: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                      <SelectItem value="replace">Replace</SelectItem>
-                                                      <SelectItem value="service-call">Service Call</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
+                                            <div className="flex flex-wrap items-end gap-4">
+                                              <div className="space-y-2 w-[100px]">
+                                                <Label className="text-xs">Type</Label>
+                                                <Select value={room.appliances.range.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, type: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="gas">Gas</SelectItem>
+                                                    <SelectItem value="electric">Electric</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
-                                              <Input
-                                                placeholder="F9 Model/serial..."
-                                                value={room.appliances.range.f9Note}
-                                                onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50"
-                                              />
+                                              <div className="space-y-2 w-[120px]">
+                                                <Label className="text-xs">Options</Label>
+                                                <Select value={room.appliances.range.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, options: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="free-standing">Free Standing</SelectItem>
+                                                    <SelectItem value="slide-in">Slide In</SelectItem>
+                                                    <SelectItem value="drop-in">Drop In</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 w-[120px]">
+                                                <Label className="text-xs">Grade</Label>
+                                                <Select value={room.appliances.range.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, grade: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="standard">Standard</SelectItem>
+                                                    <SelectItem value="high">High</SelectItem>
+                                                    <SelectItem value="premium">Premium</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 w-[140px]">
+                                                <Label className="text-xs">Action</Label>
+                                                <Select value={room.appliances.range.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, action: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                                <Label className="text-xs">F9 Model/Serial</Label>
+                                                <Input
+                                                  placeholder="F9 Model/serial..."
+                                                  value={room.appliances.range.f9Note}
+                                                  onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, f9Note: e.target.value } } })}
+                                                  className="border-border/60 bg-secondary/50"
+                                                />
+                                              </div>
                                             </div>
                                           )}
                                         </div>
@@ -4231,53 +4234,54 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Cooktop</Label>
                                           </div>
                                           {room.appliances.cooktop.enabled && (
-                                            <div className="space-y-3">
-                                              <div className="flex flex-wrap items-end gap-4">
-                                                <div className="space-y-2 w-[100px]">
-                                                  <Label className="text-xs">Type</Label>
-                                                  <Select value={room.appliances.cooktop.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, type: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="gas">Gas</SelectItem>
-                                                      <SelectItem value="electric">Electric</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[120px]">
-                                                  <Label className="text-xs">Grade</Label>
-                                                  <Select value={room.appliances.cooktop.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, grade: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="standard">Standard</SelectItem>
-                                                      <SelectItem value="high">High</SelectItem>
-                                                      <SelectItem value="premium">Premium</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[140px]">
-                                                  <Label className="text-xs">Action</Label>
-                                                  <Select value={room.appliances.cooktop.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, action: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                      <SelectItem value="replace">Replace</SelectItem>
-                                                      <SelectItem value="service-call">Service Call</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
+                                            <div className="flex flex-wrap items-end gap-4">
+                                              <div className="space-y-2 w-[100px]">
+                                                <Label className="text-xs">Type</Label>
+                                                <Select value={room.appliances.cooktop.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, type: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="gas">Gas</SelectItem>
+                                                    <SelectItem value="electric">Electric</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
-                                              <Input
-                                                placeholder="F9 Model/serial..."
-                                                value={room.appliances.cooktop.f9Note}
-                                                onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50"
-                                              />
+                                              <div className="space-y-2 w-[120px]">
+                                                <Label className="text-xs">Grade</Label>
+                                                <Select value={room.appliances.cooktop.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, grade: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="standard">Standard</SelectItem>
+                                                    <SelectItem value="high">High</SelectItem>
+                                                    <SelectItem value="premium">Premium</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 w-[140px]">
+                                                <Label className="text-xs">Action</Label>
+                                                <Select value={room.appliances.cooktop.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, action: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                                <Label className="text-xs">F9 Model/Serial</Label>
+                                                <Input
+                                                  placeholder="F9 Model/serial..."
+                                                  value={room.appliances.cooktop.f9Note}
+                                                  onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, f9Note: e.target.value } } })}
+                                                  className="border-border/60 bg-secondary/50"
+                                                />
+                                              </div>
                                             </div>
                                           )}
                                         </div>
@@ -4292,70 +4296,71 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Water Heater</Label>
                                           </div>
                                           {room.appliances.waterHeater.enabled && (
-                                            <div className="space-y-3">
-                                              <div className="flex flex-wrap items-end gap-4">
-                                                <div className="space-y-2 w-[100px]">
-                                                  <Label className="text-xs">Type</Label>
-                                                  <Select value={room.appliances.waterHeater.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, type: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="gas">Gas</SelectItem>
-                                                      <SelectItem value="electric">Electric</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[100px]">
-                                                  <Label className="text-xs">Size</Label>
-                                                  <Select value={room.appliances.waterHeater.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, size: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="20">20 gal</SelectItem>
-                                                      <SelectItem value="30">30 gal</SelectItem>
-                                                      <SelectItem value="40">40 gal</SelectItem>
-                                                      <SelectItem value="50">50 gal</SelectItem>
-                                                      <SelectItem value="60">60 gal</SelectItem>
-                                                      <SelectItem value="75">75 gal</SelectItem>
-                                                      <SelectItem value="80">80 gal</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[100px]">
-                                                  <Label className="text-xs">Rating</Label>
-                                                  <Select value={room.appliances.waterHeater.rating} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, rating: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="6">6 yr</SelectItem>
-                                                      <SelectItem value="9">9 yr</SelectItem>
-                                                      <SelectItem value="12">12 yr</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[140px]">
-                                                  <Label className="text-xs">Action</Label>
-                                                  <Select value={room.appliances.waterHeater.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, action: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                      <SelectItem value="replace">Replace</SelectItem>
-                                                      <SelectItem value="service-call">Service Call</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
+                                            <div className="flex flex-wrap items-end gap-4">
+                                              <div className="space-y-2 w-[100px]">
+                                                <Label className="text-xs">Type</Label>
+                                                <Select value={room.appliances.waterHeater.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, type: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="gas">Gas</SelectItem>
+                                                    <SelectItem value="electric">Electric</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
-                                              <Input
-                                                placeholder="F9 Model/serial..."
-                                                value={room.appliances.waterHeater.f9Note}
-                                                onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50"
-                                              />
+                                              <div className="space-y-2 w-[100px]">
+                                                <Label className="text-xs">Size</Label>
+                                                <Select value={room.appliances.waterHeater.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, size: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="20">20 gal</SelectItem>
+                                                    <SelectItem value="30">30 gal</SelectItem>
+                                                    <SelectItem value="40">40 gal</SelectItem>
+                                                    <SelectItem value="50">50 gal</SelectItem>
+                                                    <SelectItem value="60">60 gal</SelectItem>
+                                                    <SelectItem value="75">75 gal</SelectItem>
+                                                    <SelectItem value="80">80 gal</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 w-[100px]">
+                                                <Label className="text-xs">Rating</Label>
+                                                <Select value={room.appliances.waterHeater.rating} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, rating: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="6">6 yr</SelectItem>
+                                                    <SelectItem value="9">9 yr</SelectItem>
+                                                    <SelectItem value="12">12 yr</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 w-[140px]">
+                                                <Label className="text-xs">Action</Label>
+                                                <Select value={room.appliances.waterHeater.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, action: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                                <Label className="text-xs">F9 Model/Serial</Label>
+                                                <Input
+                                                  placeholder="F9 Model/serial..."
+                                                  value={room.appliances.waterHeater.f9Note}
+                                                  onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, f9Note: e.target.value } } })}
+                                                  className="border-border/60 bg-secondary/50"
+                                                />
+                                              </div>
                                             </div>
                                           )}
                                         </div>
@@ -4370,57 +4375,58 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Wall oven</Label>
                                           </div>
                                           {room.appliances.wallOven.enabled && (
-                                            <div className="space-y-3">
-                                              <div className="flex flex-wrap items-end gap-4">
-                                                <div className="space-y-2 w-[180px]">
-                                                  <Label className="text-xs">Type</Label>
-                                                  <Select value={room.appliances.wallOven.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, type: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="freestanding">Freestanding</SelectItem>
-                                                      <SelectItem value="slide-in">Slide in</SelectItem>
-                                                      <SelectItem value="drop-in">Drop in</SelectItem>
-                                                      <SelectItem value="freestanding-double">Freestanding - double oven</SelectItem>
-                                                      <SelectItem value="built-in">Built in</SelectItem>
-                                                      <SelectItem value="built-in-double">Built in double oven</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[120px]">
-                                                  <Label className="text-xs">Grade</Label>
-                                                  <Select value={room.appliances.wallOven.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, grade: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="standard">Standard</SelectItem>
-                                                      <SelectItem value="high">High</SelectItem>
-                                                      <SelectItem value="premium">Premium</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[140px]">
-                                                  <Label className="text-xs">Action</Label>
-                                                  <Select value={room.appliances.wallOven.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, action: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                      <SelectItem value="replace">Replace</SelectItem>
-                                                      <SelectItem value="service-call">Service Call</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
+                                            <div className="flex flex-wrap items-end gap-4">
+                                              <div className="space-y-2 w-[180px]">
+                                                <Label className="text-xs">Type</Label>
+                                                <Select value={room.appliances.wallOven.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, type: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="freestanding">Freestanding</SelectItem>
+                                                    <SelectItem value="slide-in">Slide in</SelectItem>
+                                                    <SelectItem value="drop-in">Drop in</SelectItem>
+                                                    <SelectItem value="freestanding-double">Freestanding - double oven</SelectItem>
+                                                    <SelectItem value="built-in">Built in</SelectItem>
+                                                    <SelectItem value="built-in-double">Built in double oven</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
-                                              <Input
-                                                placeholder="F9 Model/serial..."
-                                                value={room.appliances.wallOven.f9Note}
-                                                onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50"
-                                              />
+                                              <div className="space-y-2 w-[120px]">
+                                                <Label className="text-xs">Grade</Label>
+                                                <Select value={room.appliances.wallOven.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, grade: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="standard">Standard</SelectItem>
+                                                    <SelectItem value="high">High</SelectItem>
+                                                    <SelectItem value="premium">Premium</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 w-[140px]">
+                                                <Label className="text-xs">Action</Label>
+                                                <Select value={room.appliances.wallOven.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, action: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                                <Label className="text-xs">F9 Model/Serial</Label>
+                                                <Input
+                                                  placeholder="F9 Model/serial..."
+                                                  value={room.appliances.wallOven.f9Note}
+                                                  onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, f9Note: e.target.value } } })}
+                                                  className="border-border/60 bg-secondary/50"
+                                                />
+                                              </div>
                                             </div>
                                           )}
                                         </div>
@@ -4435,55 +4441,56 @@ value={exterior.dumpster.count}
                                             <Label className="text-sm font-medium">Air handler</Label>
                                           </div>
                                           {room.appliances.airHandler.enabled && (
-                                            <div className="space-y-3">
-                                              <div className="flex flex-wrap items-end gap-4">
-                                                <div className="space-y-2 w-[100px]">
-                                                  <Label className="text-xs">Type</Label>
-                                                  <Select value={room.appliances.airHandler.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, type: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="2-ton">2 ton</SelectItem>
-                                                      <SelectItem value="3-ton">3 ton</SelectItem>
-                                                      <SelectItem value="4-ton">4 ton</SelectItem>
-                                                      <SelectItem value="5-ton">5 ton</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[200px]">
-                                                  <Label className="text-xs">Options</Label>
-                                                  <Select value={room.appliances.airHandler.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, options: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="with-heating-element">With heating element</SelectItem>
-                                                      <SelectItem value="with-a-coil">With A coil</SelectItem>
-                                                      <SelectItem value="with-heating-and-coil">With heating element and a Coil</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="space-y-2 w-[140px]">
-                                                  <Label className="text-xs">Action</Label>
-                                                  <Select value={room.appliances.airHandler.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, action: value } } })}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                      <SelectItem value="replace">Replace</SelectItem>
-                                                      <SelectItem value="service-call">Service Call</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
+                                            <div className="flex flex-wrap items-end gap-4">
+                                              <div className="space-y-2 w-[100px]">
+                                                <Label className="text-xs">Type</Label>
+                                                <Select value={room.appliances.airHandler.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, type: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="2-ton">2 ton</SelectItem>
+                                                    <SelectItem value="3-ton">3 ton</SelectItem>
+                                                    <SelectItem value="4-ton">4 ton</SelectItem>
+                                                    <SelectItem value="5-ton">5 ton</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
-                                              <Input
-                                                placeholder="F9 Model/serial..."
-                                                value={room.appliances.airHandler.f9Note}
-                                                onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50"
-                                              />
+                                              <div className="space-y-2 w-[200px]">
+                                                <Label className="text-xs">Options</Label>
+                                                <Select value={room.appliances.airHandler.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, options: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="with-heating-element">With heating element</SelectItem>
+                                                    <SelectItem value="with-a-coil">With A coil</SelectItem>
+                                                    <SelectItem value="with-heating-and-coil">With heating element and a Coil</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 w-[140px]">
+                                                <Label className="text-xs">Action</Label>
+                                                <Select value={room.appliances.airHandler.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, action: value } } })}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                                <Label className="text-xs">F9 Model/Serial</Label>
+                                                <Input
+                                                  placeholder="F9 Model/serial..."
+                                                  value={room.appliances.airHandler.f9Note}
+                                                  onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, f9Note: e.target.value } } })}
+                                                  className="border-border/60 bg-secondary/50"
+                                                />
+                                              </div>
                                             </div>
                                           )}
                                         </div>
@@ -4526,13 +4533,16 @@ value={exterior.dumpster.count}
                                                     </SelectContent>
                                                   </Select>
                                                 </div>
+                                                <div className="space-y-2 flex-1 min-w-[150px]">
+                                                  <Label className="text-xs">F9 Model/Serial</Label>
+                                                  <Input
+                                                    placeholder="F9 Model/serial..."
+                                                    value={room.appliances.boiler.f9Note}
+                                                    onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, f9Note: e.target.value } } })}
+                                                    className="border-border/60 bg-secondary/50"
+                                                  />
+                                                </div>
                                               </div>
-                                              <Input
-                                                placeholder="F9 Model/serial..."
-                                                value={room.appliances.boiler.f9Note}
-                                                onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50"
-                                              />
                                               <div className="flex items-center gap-6">
                                                 <div className="flex items-center gap-2">
                                                   <Switch
