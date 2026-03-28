@@ -407,6 +407,9 @@ export default function NewExpressEstimatePage() {
     setTimeout(() => setIsSaved(true), 1000)
   }
 
+  // Helper to handle clear value in selects
+  const clearValue = (value: string) => value === "__clear__" ? "" : value
+
   const addRoom = (type: string = "room", name: string = "") => {
     // Count existing rooms of this type for auto-naming
     const existingCount = rooms.filter(r => r.type === type).length + 1
@@ -569,11 +572,12 @@ const newDoor: DoorItem = {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="propertyType" className="text-foreground">Property Type</Label>
-                  <Select value={projectDetails.propertyType} onValueChange={(value) => { setProjectDetails({ ...projectDetails, propertyType: value }); handleSave() }}>
+                  <Select value={projectDetails.propertyType} onValueChange={(value) => { setProjectDetails({ ...projectDetails, propertyType: clearValue(value) }); handleSave() }}>
                     <SelectTrigger className="border-border/60 bg-secondary/50">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
 <SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
                                   <SelectItem value="dwelling">Dwelling</SelectItem>
                                   <SelectItem value="general-property">General Property</SelectItem>
                                   <SelectItem value="rcbap">RCBAP</SelectItem>
@@ -700,25 +704,26 @@ const newDoor: DoorItem = {
                           <Label>Add Dumpster</Label>
                         </div>
                         {exterior.dumpster.enabled && (
-                          <div className="grid gap-4 sm:grid-cols-3">
-                            <div className="space-y-2">
+                          <div className="flex flex-wrap items-center gap-4">
+                            <div className="space-y-2 w-[100px]">
                               <Label># of Dumpsters</Label>
                               <Input
                                 type="number"
                                 min="1"
                                 max="20"
-value={exterior.dumpster.count}
-                              onChange={(e) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, count: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
+                                value={exterior.dumpster.count}
+                                onChange={(e) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, count: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
                                 className="border-border/60 bg-secondary/50"
                               />
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-2 w-[180px]">
                               <Label>Dumpster Size</Label>
-                              <Select value={exterior.dumpster.size} onValueChange={(value) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, size: value } }); handleSave() }}>
+                              <Select value={exterior.dumpster.size} onValueChange={(value) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, size: clearValue(value) } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
                                   <SelectItem value="12">12 Yards</SelectItem>
                                   <SelectItem value="20">20 Yards</SelectItem>
                                   <SelectItem value="30">30 Yards</SelectItem>
@@ -783,39 +788,35 @@ value={exterior.dumpster.count}
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="flex flex-wrap items-end gap-4">
-                                <div className="space-y-2 min-w-[120px]">
-                                  <Label className="text-sm">Tonnage</Label>
-                                  <Select value={unit.tonnage} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {["2", "2.5", "3", "4", "5"].map(t => (
-                                        <SelectItem key={t} value={t}>{t} Ton</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="space-y-2 min-w-[120px]">
-                                  <Label className="text-sm">SEER Rating</Label>
-                                  <Select value={unit.seer} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="13">13</SelectItem>
-                                      <SelectItem value="14-16">14-16</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="flex items-center gap-2 pb-2">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <Select value={unit.tonnage} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="Tonnage" />
+                                  </SelectTrigger>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {["2", "2.5", "3", "4", "5"].map(t => (
+                                    <SelectItem key={t} value={t}>{t} Ton</SelectItem>
+                                  ))}
+                                </SelectContent>
+                                </Select>
+                                <Select value={unit.seer} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="SEER" />
+                                  </SelectTrigger>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="13">13</SelectItem>
+                                  <SelectItem value="14-16">14-16</SelectItem>
+                                </SelectContent>
+                                </Select>
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
@@ -825,7 +826,7 @@ value={exterior.dumpster.count}
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2 pb-2">
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
@@ -835,17 +836,14 @@ value={exterior.dumpster.count}
                                   />
                                   <Label className="text-sm">Service Call</Label>
                                 </div>
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="text-sm">F9 Note</Label>
                                 <Input
-                                  placeholder="Enter model and serial number..."
+                                  placeholder="Enter Model and Serial Number"
                                   value={unit.f9Note}
                                   onChange={(e) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 flex-1 min-w-[180px]"
                                 />
                               </div>
                             </div>
@@ -887,54 +885,48 @@ value={exterior.dumpster.count}
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="flex flex-wrap items-end gap-4">
-                                <div className="space-y-2 min-w-[140px]">
-                                  <Label className="text-sm">Unit Type</Label>
-                                  <Select value={unit.unitType} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="ac">AC Unit</SelectItem>
-                                      <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="space-y-2 min-w-[120px]">
-                                  <Label className="text-sm">Tonnage</Label>
-                                  <Select value={unit.tonnage} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {["2", "2.5", "3", "4", "5"].map(t => (
-                                        <SelectItem key={t} value={t}>{t} Ton</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="space-y-2 min-w-[120px]">
-                                  <Label className="text-sm">SEER Rating</Label>
-                                  <Select value={unit.seer} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="13">13</SelectItem>
-                                      <SelectItem value="14-16">14-16</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="flex items-center gap-2 pb-2">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <Select value={unit.unitType} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[160px]">
+                                    <SelectValue placeholder="Unit Type" />
+                                  </SelectTrigger>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="ac">AC Unit</SelectItem>
+                                  <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
+                                </SelectContent>
+                                </Select>
+                                <Select value={unit.tonnage} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="Tonnage" />
+                                  </SelectTrigger>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {["2", "2.5", "3", "4", "5"].map(t => (
+                                    <SelectItem key={t} value={t}>{t} Ton</SelectItem>
+                                  ))}
+                                </SelectContent>
+                                </Select>
+                                <Select value={unit.seer} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="SEER" />
+                                  </SelectTrigger>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="13">13</SelectItem>
+                                  <SelectItem value="14-16">14-16</SelectItem>
+                                </SelectContent>
+                                </Select>
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
@@ -944,7 +936,7 @@ value={exterior.dumpster.count}
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2 pb-2">
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
@@ -954,17 +946,14 @@ value={exterior.dumpster.count}
                                   />
                                   <Label className="text-sm">Service Call</Label>
                                 </div>
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="text-sm">F9 Note</Label>
                                 <Input
-                                  placeholder="Enter model and serial number..."
+                                  placeholder="Enter Model and Serial Number"
                                   value={unit.f9Note}
                                   onChange={(e) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 flex-1 min-w-[180px]"
                                 />
                               </div>
                             </div>
@@ -1006,24 +995,22 @@ value={exterior.dumpster.count}
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="flex flex-wrap items-end gap-4">
-                                <div className="space-y-2 min-w-[120px]">
-                                  <Label className="text-sm">Number of Zones</Label>
-                                  <Select value={unit.zones} onValueChange={(value) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="QTY" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {["1", "2", "3", "4"].map(z => (
-                                        <SelectItem key={z} value={z}>{z} Zone</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="flex items-center gap-2 pb-2">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <Select value={unit.zones} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: clearValue(value) } : u) } })
+                                  handleSave()
+                                }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                    <SelectValue placeholder="Zones" />
+                                  </SelectTrigger>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {["1", "2", "3", "4"].map(z => (
+                                    <SelectItem key={z} value={z}>{z} Zone</SelectItem>
+                                  ))}
+                                </SelectContent>
+                                </Select>
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.highEfficiency}
                                     onCheckedChange={(checked) => {
@@ -1033,7 +1020,7 @@ value={exterior.dumpster.count}
                                   />
                                   <Label className="text-sm">High Efficiency</Label>
                                 </div>
-                                <div className="flex items-center gap-2 pb-2">
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
@@ -1043,7 +1030,7 @@ value={exterior.dumpster.count}
                                   />
                                   <Label className="text-sm">Replace</Label>
                                 </div>
-                                <div className="flex items-center gap-2 pb-2">
+                                <div className="flex items-center gap-2">
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
@@ -1053,17 +1040,14 @@ value={exterior.dumpster.count}
                                   />
                                   <Label className="text-sm">Service Call</Label>
                                 </div>
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="text-sm">F9 Note</Label>
                                 <Input
-                                  placeholder="Enter model and serial number..."
+                                  placeholder="Enter Model and Serial Number"
                                   value={unit.f9Note}
                                   onChange={(e) => {
                                     setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
-                                  className="border-border/60 bg-secondary/50"
+                                  className="border-border/60 bg-secondary/50 flex-1 min-w-[180px]"
                                 />
                               </div>
                             </div>
@@ -1124,13 +1108,14 @@ value={exterior.dumpster.count}
                           <>
                             <div className="space-y-2 min-w-[120px]">
                               <Label className="text-xs text-muted-foreground">Amperage</Label>
-                              <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(value) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
+                              <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(value) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: clearValue(value) } } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
-                                <SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
                                   {["70", "100", "125", "150", "200", "300"].map(a => (
-                                    <SelectItem key={a} value={a}>{a} Amp</SelectItem>
+                                    <SelectItem key={a} value={a}>{a} amps</SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
@@ -1204,10 +1189,12 @@ value={exterior.dumpster.count}
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
-                                <SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
                                   <SelectItem value="0.25">0.25</SelectItem>
                                   <SelectItem value="0.5">0.5</SelectItem>
-                                  <SelectItem value="W">W</SelectItem>
+                                  <SelectItem value="0.75">0.75</SelectItem>
+                                  <SelectItem value="1">1</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -1257,10 +1244,12 @@ value={exterior.dumpster.count}
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
-                                <SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
                                   <SelectItem value="0.25">0.25</SelectItem>
                                   <SelectItem value="0.5">0.5</SelectItem>
-                                  <SelectItem value="W">W</SelectItem>
+                                  <SelectItem value="0.75">0.75</SelectItem>
+                                  <SelectItem value="1">1</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -1291,7 +1280,7 @@ value={exterior.dumpster.count}
                               checked={foundation.crawlspace.enabled}
                               onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, enabled: checked } }); handleSave() }}
                             />
-                            <Label>Enable Crawlspace/Enclosure area</Label>
+                            <Label>Enable Crawlspace/Enclosure Area</Label>
                           </div>
                           <div className="flex items-center gap-2">
                             <Switch
@@ -1368,16 +1357,16 @@ value={exterior.dumpster.count}
                                 />
                                 <Label className="text-sm">House Rewire</Label>
                               </div>
-                              {foundation.crawlspace.houseRewire !== "" && (
-                                <Input
-                                  type="number"
-                                  min="0"
-                                  placeholder="Enter home SF"
-                                  value={foundation.crawlspace.houseRewire.trim()}
-                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50 w-32"
-                                />
-                              )}
+{foundation.crawlspace.houseRewire !== "" && (
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="Enter Home SF"
+                                value={foundation.crawlspace.houseRewire.trim()}
+                                onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
+                                className="border-border/60 bg-secondary/50 w-36"
+                              />
+                            )}
                             </div>
                             <div className="flex items-center gap-2">
                               <Switch
@@ -1405,15 +1394,15 @@ value={exterior.dumpster.count}
                                     <Label className="text-sm">Floor Insulation</Label>
                                   </div>
                                   {foundation.crawlspace.floorInsulation && (
-                                    <Select value={foundation.crawlspace.floorInsulationType} onValueChange={(value) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, floorInsulationType: value } }); handleSave() }}>
+                                    <Select value={foundation.crawlspace.floorInsulationType} onValueChange={(value) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, floorInsulationType: clearValue(value) } }); handleSave() }}>
                                       <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="spray-foam">Spray Foam</SelectItem>
-                                        <SelectItem value="r13">R-13</SelectItem>
-                                        <SelectItem value="r19">R-19</SelectItem>
-                                      </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="spray-foam">Spray Foam</SelectItem>
+                                  <SelectItem value="fiberglass-batt">Fiberglass Batt</SelectItem>
+                                </SelectContent>
                                     </Select>
                                   )}
                                 </div>
@@ -1595,11 +1584,12 @@ value={exterior.dumpster.count}
                           <>
                             <div className="space-y-2 min-w-[140px]">
                               <Label className="text-xs text-muted-foreground">Action</Label>
-                              <Select value={foundation.sumpPump.action} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, action: value } }); handleSave() }}>
+                              <Select value={foundation.sumpPump.action} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, action: clearValue(value) } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
                                   <SelectItem value="replace">Replace</SelectItem>
                                   <SelectItem value="detach-reset">Detach and Reset</SelectItem>
                                 </SelectContent>
@@ -1607,14 +1597,15 @@ value={exterior.dumpster.count}
                             </div>
                             <div className="space-y-2 min-w-[200px]">
                               <Label className="text-xs text-muted-foreground">Horsepower</Label>
-                              <Select value={foundation.sumpPump.hp} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, hp: value } }); handleSave() }}>
+                              <Select value={foundation.sumpPump.hp} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, hp: clearValue(value) } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
-                                <SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
                                   <SelectItem value="1/3">1/3 HP - up to 1 1/2 discharge</SelectItem>
-                                  <SelectItem value="1/2">1/2 HP - up to 1 1/2 discharge</SelectItem>
-                                  <SelectItem value="3/4">3/4 HP - up to 1 1/2 discharge</SelectItem>
+                                  <SelectItem value="1/2">1/2 HP - up to 2 1/2 discharge</SelectItem>
+                                  <SelectItem value="3/4">3/4 HP - up to 2 1/2 discharge</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -1699,65 +1690,68 @@ value={exterior.dumpster.count}
                               <div className="space-y-2 min-w-[160px]">
                                 <Label className="text-sm">Type</Label>
                                 <Select value={handler.type} onValueChange={(value) => {
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, type: value } : h) } })
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, type: clearValue(value) } : h) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="air-handler">Air Handler</SelectItem>
-                                    <SelectItem value="with-heat-element">With Heat Element</SelectItem>
-                                    <SelectItem value="with-heat-element-a-coil">With Heat Element & A-coil</SelectItem>
-                                  </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="air-handler">Air Handler</SelectItem>
+                                  <SelectItem value="gas-furnace">Gas Furnace</SelectItem>
+                                </SelectContent>
                                 </Select>
                               </div>
                               <div className="space-y-2 min-w-[100px]">
                                 <Label className="text-sm">Tonnage</Label>
                                 <Select value={handler.tonnage} onValueChange={(value) => {
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, tonnage: value } : h) } })
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, tonnage: clearValue(value) } : h) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
-                                  <SelectContent>
-                                    {["2", "2.5", "3", "4", "5"].map(t => (
-                                      <SelectItem key={t} value={t}>{t} Ton</SelectItem>
-                                    ))}
-                                  </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {["2", "2.5", "3", "4", "5"].map(t => (
+                                    <SelectItem key={t} value={t}>{t} Ton</SelectItem>
+                                  ))}
+                                </SelectContent>
                                 </Select>
                               </div>
                               <div className="space-y-2 min-w-[140px]">
                                 <Label className="text-sm">Action</Label>
                                 <Select value={handler.action} onValueChange={(value) => {
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, action: value } : h) } })
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, action: clearValue(value) } : h) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="replace">Replace</SelectItem>
-                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                  </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="replace">Replace</SelectItem>
+                                  <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                </SelectContent>
                                 </Select>
                               </div>
                               {(handler.type === "with-heat-element" || handler.type === "with-heat-element-a-coil") && (
                                 <div className="space-y-2 min-w-[100px]">
                                   <Label className="text-sm">With Heat Element</Label>
                                   <Select value={handler.heatElementCount} onValueChange={(value) => {
-                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, heatElementCount: value } : h) } })
+                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, heatElementCount: clearValue(value) } : h) } })
                                     handleSave()
                                   }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="QTY" />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                      {[1, 2, 3, 4, 5].map(n => (
-                                        <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                      ))}
-                                    </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {[1, 2, 3, 4, 5].map(n => (
+                                    <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                  ))}
+                                </SelectContent>
                                   </Select>
                                 </div>
                               )}
@@ -1855,15 +1849,18 @@ value={exterior.dumpster.count}
                                   {foundation.basement.drywallMeasureType === "sf" ? (
                                     <Select 
                                       value={foundation.basement.drywallValue} 
-                                      onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallValue: value } }); handleSave() }}
+                                      onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallValue: clearValue(value) } }); handleSave() }}
                                     >
                                       <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
                                         <SelectValue placeholder="SF" />
                                       </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="0.5">0.5</SelectItem>
-                                        <SelectItem value="W">W</SelectItem>
-                                      </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="0.5">0.5</SelectItem>
+                                  <SelectItem value="1">1</SelectItem>
+                                  <SelectItem value="1.5">1.5</SelectItem>
+                                  <SelectItem value="2">2</SelectItem>
+                                </SelectContent>
                                     </Select>
                                   ) : (
                                     <Input
@@ -1960,31 +1957,32 @@ value={exterior.dumpster.count}
                                 <div key={win.id} className="ml-8 flex flex-wrap items-center gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
                                   <span className="text-sm font-medium">Window {index + 1}</span>
                                   <Select value={win.type} onValueChange={(value) => {
-                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, type: value } : w) } })
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, type: clearValue(value) } : w) } })
                                     handleSave()
                                   }}>
                                     <SelectTrigger className="w-28 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Type" />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="casement">Casement</SelectItem>
-                                      <SelectItem value="single-hung">Single Hung</SelectItem>
-                                      <SelectItem value="double-hung">Double Hung</SelectItem>
-                                      <SelectItem value="slider">Slider</SelectItem>
-                                    </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="casement">Casement</SelectItem>
+                                  <SelectItem value="picture">Picture Window</SelectItem>
+                                </SelectContent>
                                   </Select>
                                   <Select value={win.size} onValueChange={(value) => {
-                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, size: value } : w) } })
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, size: clearValue(value) } : w) } })
                                     handleSave()
                                   }}>
                                     <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Size" />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="4-8">4-8 SF</SelectItem>
-                                      <SelectItem value="9-12">9-12 SF</SelectItem>
-                                      <SelectItem value="13-18">13-18 SF</SelectItem>
-                                    </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="18-20">18-20 CF</SelectItem>
+                                        <SelectItem value="21-24">21-24 CF</SelectItem>
+                                        <SelectItem value="25-28">25-28 CF</SelectItem>
+                                        <SelectItem value="29+">29+ CF</SelectItem>
+                                      </SelectContent>
                                   </Select>
                                   <div className="flex items-center gap-1">
                                     <Label className="text-xs">Qty</Label>
@@ -2001,17 +1999,18 @@ value={exterior.dumpster.count}
                                     />
                                   </div>
                                   <Select value={win.material} onValueChange={(value) => {
-                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, material: value } : w) } })
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, material: clearValue(value) } : w) } })
                                     handleSave()
                                   }}>
                                     <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Material" />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="vinyl">Vinyl</SelectItem>
-                                      <SelectItem value="aluminum">Aluminum</SelectItem>
-                                      <SelectItem value="wood">Wood</SelectItem>
-                                    </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="vinyl">Vinyl</SelectItem>
+                                  <SelectItem value="aluminum">Aluminum</SelectItem>
+                                  <SelectItem value="wood">Wood</SelectItem>
+                                </SelectContent>
                                   </Select>
                                   <Button
                                     type="button"
@@ -2037,14 +2036,15 @@ value={exterior.dumpster.count}
                                 />
                                 <Label>Enable Foundation Door</Label>
                                 {foundation.basement.foundationDoor && (
-                                  <Select value={foundation.basement.foundationDoorAction} onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoorAction: value } }); handleSave() }}>
+                                  <Select value={foundation.basement.foundationDoorAction} onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoorAction: clearValue(value) } }); handleSave() }}>
                                     <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="detach-reset-handle">Detach & Reset Handle</SelectItem>
-                                      <SelectItem value="replace-handle">Replace Handle</SelectItem>
-                                    </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="detach-reset-handle">Detach & Reset Handle</SelectItem>
+                                  <SelectItem value="detach-reset-flush-mount">Detach & Reset - Flush Mount</SelectItem>
+                                </SelectContent>
                                   </Select>
                                 )}
                               </div>
@@ -2073,67 +2073,72 @@ value={exterior.dumpster.count}
                         <div className="flex flex-wrap items-end gap-4">
                           <div className="space-y-2">
                             <Label>110 outlet</Label>
-                            <Select value={foundation.electrical.outlets110} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: value } }); handleSave() }}>
+                            <Select value={foundation.electrical.outlets110} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: clearValue(value) } }); handleSave() }}>
                               <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
-                              <SelectContent>
-                                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                ))}
-                              </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                                    <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                  ))}
+                                </SelectContent>
                             </Select>
                           </div>
                           <div className="space-y-2">
                             <Label>220 outlet</Label>
-                            <Select value={foundation.electrical.outlets220} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: value } }); handleSave() }}>
+                            <Select value={foundation.electrical.outlets220} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: clearValue(value) } }); handleSave() }}>
                               <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
-                              <SelectContent>
-                                {[0, 1, 2, 3, 4, 5].map(n => (
-                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                ))}
-                              </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {[0, 1, 2, 3, 4, 5].map(n => (
+                                    <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                  ))}
+                                </SelectContent>
                             </Select>
                           </div>
                           <div className="space-y-2">
                             <Label>GFI outlet</Label>
-                            <Select value={foundation.electrical.gfiOutlets} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: value } }); handleSave() }}>
+                            <Select value={foundation.electrical.gfiOutlets} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: clearValue(value) } }); handleSave() }}>
                               <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
-                              <SelectContent>
-                                {[0, 1, 2, 3, 4, 5].map(n => (
-                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                ))}
-                              </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {[0, 1, 2, 3, 4, 5].map(n => (
+                                    <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                  ))}
+                                </SelectContent>
                             </Select>
                           </div>
                           <div className="space-y-2">
                             <Label>Light Switch</Label>
-                            <Select value={foundation.electrical.lightSwitch} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: value } }); handleSave() }}>
+                            <Select value={foundation.electrical.lightSwitch} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: clearValue(value) } }); handleSave() }}>
                               <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
-                              <SelectContent>
-                                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(n => (
-                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                ))}
-                              </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(n => (
+                                    <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                  ))}
+                                </SelectContent>
                             </Select>
                           </div>
                           <div className="space-y-2">
                             <Label>Junction Box</Label>
-                            <Select value={foundation.electrical.junctionBox} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: value } }); handleSave() }}>
+                            <Select value={foundation.electrical.junctionBox} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: clearValue(value) } }); handleSave() }}>
                               <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
-                              <SelectContent>
-                                {[0, 1, 2, 3, 4, 5].map(n => (
-                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                              ))}
-                              </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {[0, 1, 2, 3, 4, 5].map(n => (
+                                    <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                  ))}
+                                </SelectContent>
                             </Select>
                           </div>
                         </div>
@@ -2150,15 +2155,16 @@ value={exterior.dumpster.count}
                             <div className="ml-8 flex items-center gap-4">
                               <div className="space-y-2">
                                 <Label className="text-sm">Amperage</Label>
-                                <Select value={foundation.electrical.breakerPanel.amps} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, amps: value } } }); handleSave() }}>
+                                <Select value={foundation.electrical.breakerPanel.amps} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, amps: clearValue(value) } } }); handleSave() }}>
                                   <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
-                                  <SelectContent>
-                                    {["100", "150", "200", "300"].map(a => (
-                                      <SelectItem key={a} value={a}>{a} Amp</SelectItem>
-                                    ))}
-                                  </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {["100", "150", "200", "300"].map(a => (
+                                    <SelectItem key={a} value={a}>{a} amps</SelectItem>
+                                  ))}
+                                </SelectContent>
                                 </Select>
                               </div>
                               <div className="flex items-center gap-2 pt-6">
@@ -2183,11 +2189,11 @@ value={exterior.dumpster.count}
                               <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="qty">QTY</SelectItem>
-                                <SelectItem value="1">1</SelectItem>
-                                <SelectItem value="2">2</SelectItem>
-                              </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="qty">QTY</SelectItem>
+                                  <SelectItem value="sf">SF</SelectItem>
+                                </SelectContent>
                             </Select>
                           )}
                         </div>
@@ -2264,7 +2270,7 @@ value={exterior.dumpster.count}
                                 <div className="space-y-2 min-w-[120px]">
                                   <Label>Room Type</Label>
                                   <Select value={room.type} onValueChange={(value) => {
-                                    const updates: Partial<Room> = { type: value }
+                                    const updates: Partial<Room> = { type: clearValue(value) }
                                     // Add bathroom-specific fields when changing to bathroom
                                     if (value === "bathroom" && !room.vanity) {
                                       Object.assign(updates, defaultBathroomExtras)
@@ -2278,11 +2284,11 @@ value={exterior.dumpster.count}
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="room">Room</SelectItem>
-                                      <SelectItem value="bathroom">Bathroom</SelectItem>
-                                      <SelectItem value="kitchen">Kitchen</SelectItem>
-                                    </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="pvc">PVC</SelectItem>
+                                  <SelectItem value="wood">Wood</SelectItem>
+                                </SelectContent>
                                   </Select>
                                 </div>
                               </div>
@@ -2448,23 +2454,19 @@ value={exterior.dumpster.count}
                                                 value={layer.type} 
                                                 onValueChange={(value) => {
                                                   const newLayers = [...(room.flooring.layers || [])]
-                                                  newLayers[layerIndex] = { ...layer, type: value, grade: "", application: "" }
+                                                  newLayers[layerIndex] = { ...layer, type: clearValue(value), grade: "", application: "" }
                                                   updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                 }}
                                               >
                                                 <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="vinyl-plank">Vinyl Plank</SelectItem>
-                                                  <SelectItem value="sheet-vinyl">Sheet Vinyl</SelectItem>
-                                                  <SelectItem value="laminate">Laminate</SelectItem>
-                                                  <SelectItem value="carpet">Carpet</SelectItem>
-                                                  <SelectItem value="carpet-glue-down">Carpet Glue Down</SelectItem>
-                                                  <SelectItem value="hardwood">Hardwood</SelectItem>
-                                                  <SelectItem value="tile">Tile</SelectItem>
-                                                  <SelectItem value="terrazzo">Terrazzo Floor</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="standard">Standard</SelectItem>
+                                        <SelectItem value="variable-speed">Variable Speed</SelectItem>
+                                        <SelectItem value="multi-stage">Multi-Stage</SelectItem>
+                                      </SelectContent>
                                               </Select>
                                             </div>
                                             {layer.type && layer.type !== "terrazzo" && (
@@ -2474,7 +2476,7 @@ value={exterior.dumpster.count}
                                                   value={layer.grade} 
                                                   onValueChange={(value) => {
                                                     const newLayers = [...(room.flooring.layers || [])]
-                                                    newLayers[layerIndex] = { ...layer, grade: value }
+                                                    newLayers[layerIndex] = { ...layer, grade: clearValue(value) }
                                                     updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                   }}
                                                 >
@@ -2482,6 +2484,7 @@ value={exterior.dumpster.count}
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
+                                                    <SelectItem value="__clear__">Clear</SelectItem>
                                                     {layer.type === "vinyl-plank" && (
                                                       <>
                                                         <SelectItem value="vinyl-plank">Vinyl Plank</SelectItem>
@@ -2552,7 +2555,7 @@ value={exterior.dumpster.count}
                                                   value={layer.application} 
                                                   onValueChange={(value) => {
                                                     const newLayers = [...(room.flooring.layers || [])]
-                                                    newLayers[layerIndex] = { ...layer, application: value }
+                                                    newLayers[layerIndex] = { ...layer, application: clearValue(value) }
                                                     updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                   }}
                                                 >
@@ -2560,6 +2563,7 @@ value={exterior.dumpster.count}
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
+                                                    <SelectItem value="__clear__">Clear</SelectItem>
                                                     {layer.type === "vinyl-plank" && (
                                                       <>
                                                         <SelectItem value="glue-down-concrete">Glue Down on Concrete</SelectItem>
@@ -2591,17 +2595,18 @@ value={exterior.dumpster.count}
                                                   value={layer.action} 
                                                   onValueChange={(value) => {
                                                     const newLayers = [...(room.flooring.layers || [])]
-                                                    newLayers[layerIndex] = { ...layer, action: value }
+                                                    newLayers[layerIndex] = { ...layer, action: clearValue(value) }
                                                     updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                   }}
                                                 >
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="remove">Remove</SelectItem>
-                                                    <SelectItem value="remove-replace">Remove & Replace</SelectItem>
-                                                  </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="remove">Remove</SelectItem>
+                                  <SelectItem value="remove-reinstall">R & R</SelectItem>
+                                </SelectContent>
                                                 </Select>
                                               </div>
                                             )}
@@ -2683,40 +2688,42 @@ value={exterior.dumpster.count}
                                   <div className="flex flex-wrap items-end gap-4">
                                     <div className="space-y-1 min-w-[120px]">
                                       <Label className="text-xs text-muted-foreground">Height</Label>
-                                      <Select value={room.trim.baseboardHeight} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, baseboardHeight: value } })}>
+                                      <Select value={room.trim.baseboardHeight} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, baseboardHeight: clearValue(value) } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
-                                        <SelectContent>
-                                          {["2", "3", "4", "5", "6"].map(h => (
-                                            <SelectItem key={h} value={h}>{h}&quot; Baseboard</SelectItem>
-                                          ))}
-                                        </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {["2", "3", "4", "5", "6"].map(h => (
+                                    <SelectItem key={h} value={h}>{h}</SelectItem>
+                                  ))}
+                                </SelectContent>
                                       </Select>
                                     </div>
                                     <div className="space-y-1 min-w-[100px]">
                                       <Label className="text-xs text-muted-foreground">Material</Label>
-                                      <Select value={room.trim.material} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, material: value } })}>
+                                      <Select value={room.trim.material} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, material: clearValue(value) } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="mdf">MDF</SelectItem>
-                                          <SelectItem value="hardwood">Hardwood</SelectItem>
-                                          <SelectItem value="builder">Builder Grade</SelectItem>
-                                        </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="mdf">MDF</SelectItem>
+                                  <SelectItem value="wood">Wood</SelectItem>
+                                </SelectContent>
                                       </Select>
                                     </div>
                                     <div className="space-y-1 min-w-[100px]">
                                       <Label className="text-xs text-muted-foreground">Finish</Label>
-                                      <Select value={room.trim.finish} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, finish: value } })}>
+                                      <Select value={room.trim.finish} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, finish: clearValue(value) } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="paint">Paint</SelectItem>
-                                          <SelectItem value="stain">Stain</SelectItem>
-                                        </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="paint">Paint</SelectItem>
+                                  <SelectItem value="stain">Stain</SelectItem>
+                                </SelectContent>
                                       </Select>
                                     </div>
                                     <div className="flex items-center gap-2 pb-1">
@@ -2735,14 +2742,15 @@ value={exterior.dumpster.count}
                                     </div>
                                     {room.trim.shoe && (
                                       <div className="space-y-1 min-w-[100px]">
-                                        <Select value={room.trim.shoeFinish} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, shoeFinish: value } })}>
+                                        <Select value={room.trim.shoeFinish} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, shoeFinish: clearValue(value) } })}>
                                           <SelectTrigger className="border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Finish" />
                                           </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="paint">Paint</SelectItem>
-                                            <SelectItem value="stain">Stain</SelectItem>
-                                          </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="paint">Paint</SelectItem>
+                                  <SelectItem value="stain">Stain</SelectItem>
+                                </SelectContent>
                                         </Select>
                                       </div>
                                     )}
@@ -2773,26 +2781,27 @@ value={exterior.dumpster.count}
                                     <div className="flex flex-wrap items-end gap-4">
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Material</Label>
-                                        <Select value={room.wallCovering.material} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, material: value, type: "", replacementHeight: "" } })}>
+                                        <Select value={room.wallCovering.material} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, material: clearValue(value), type: "", replacementHeight: "" } })}>
                                           <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="drywall-sf">Drywall (SF)</SelectItem>
-                                            <SelectItem value="drywall-lf">Drywall (LF)</SelectItem>
-                                            <SelectItem value="plaster">Plaster</SelectItem>
-                                            <SelectItem value="paneling">Paneling</SelectItem>
-                                          </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="drywall-sf">Drywall (SF)</SelectItem>
+                                  <SelectItem value="drywall-lf">Drywall (LF)</SelectItem>
+                                  <SelectItem value="paneling">Paneling</SelectItem>
+                                </SelectContent>
                                         </Select>
                                       </div>
                                       {room.wallCovering.material && (
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Type</Label>
-                                          <Select value={room.wallCovering.type} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, type: value } })}>
+                                          <Select value={room.wallCovering.type} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, type: clearValue(value) } })}>
                                             <SelectTrigger className="w-[280px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                              <SelectItem value="__clear__">Clear</SelectItem>
                                               {room.wallCovering.material === "drywall-sf" && (
                                                 <>
                                                   <SelectItem value="1/2-in">1/2 in</SelectItem>
@@ -2831,11 +2840,12 @@ value={exterior.dumpster.count}
                                       {room.wallCovering.material && room.wallCovering.material !== "paneling" && (
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Replacement Height</Label>
-                                          <Select value={room.wallCovering.replacementHeight} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: value } })}>
+                                          <Select value={room.wallCovering.replacementHeight} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: clearValue(value) } })}>
                                             <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                              <SelectItem value="__clear__">Clear</SelectItem>
                                               {room.wallCovering.material === "drywall-sf" && (
                                                 <>
                                                   <SelectItem value="0.5W">0.5W</SelectItem>
@@ -2869,16 +2879,15 @@ value={exterior.dumpster.count}
                                       </div>
                                       {room.wallCovering.texture && (
                                         <div className="space-y-1">
-                                          <Select value={room.wallCovering.textureType} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, textureType: value } })}>
+                                          <Select value={room.wallCovering.textureType} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, textureType: clearValue(value) } })}>
                                             <SelectTrigger className="w-[160px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
-                                            <SelectContent>
-                                              <SelectItem value="smooth">Smooth</SelectItem>
-                                              <SelectItem value="hand-texture">Hand texture</SelectItem>
-                                              <SelectItem value="machine-texture">Machine texture</SelectItem>
-                                              <SelectItem value="heavy-texture">Heavy texture</SelectItem>
-                                            </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="smooth">Smooth</SelectItem>
+                                  <SelectItem value="textured">Textured</SelectItem>
+                                </SelectContent>
                                           </Select>
                                         </div>
                                       )}
@@ -2905,36 +2914,38 @@ value={exterior.dumpster.count}
                                         <Label className="text-xs text-muted-foreground">Type</Label>
                                         <Select value={window.type} onValueChange={(value) => {
                                           const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, type: value, size: "", grade: "" }
+                                          newWindows[idx] = { ...window, type: clearValue(value), size: "", grade: "" }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
                                           <SelectTrigger className="w-[125px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="single-hung">Single Hung</SelectItem>
-                                            <SelectItem value="double-hung">Double Hung</SelectItem>
-                                            <SelectItem value="casement">Casement</SelectItem>
-                                            <SelectItem value="fixed">Fixed</SelectItem>
-                                            <SelectItem value="horizontal-slider">Horizontal Slider</SelectItem>
-                                          </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="single-hung">Single Hung</SelectItem>
+                                  <SelectItem value="double-hung">Double Hung</SelectItem>
+                                  <SelectItem value="casement">Casement</SelectItem>
+                                  <SelectItem value="picture">Picture</SelectItem>
+                                  <SelectItem value="slider">Slider</SelectItem>
+                                </SelectContent>
                                         </Select>
                                       </div>
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Material</Label>
                                         <Select value={window.material} onValueChange={(value) => {
                                           const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, material: value, size: "", grade: "" }
+                                          newWindows[idx] = { ...window, material: clearValue(value), size: "", grade: "" }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
                                           <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="aluminum">Aluminum</SelectItem>
-                                            <SelectItem value="vinyl">Vinyl</SelectItem>
-                                            <SelectItem value="wood">Wood</SelectItem>
-                                          </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="aluminum">Aluminum</SelectItem>
+                                  <SelectItem value="vinyl">Vinyl</SelectItem>
+                                  <SelectItem value="wood">Wood</SelectItem>
+                                </SelectContent>
                                         </Select>
                                       </div>
                                       {window.type && window.material && (
@@ -2942,13 +2953,14 @@ value={exterior.dumpster.count}
                                           <Label className="text-xs text-muted-foreground">Size</Label>
                                           <Select value={window.size} onValueChange={(value) => {
                                             const newWindows = [...room.windows]
-                                            newWindows[idx] = { ...window, size: value }
+                                            newWindows[idx] = { ...window, size: clearValue(value) }
                                             updateRoom(room.id, { windows: newWindows })
                                           }}>
                                             <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                              <SelectItem value="__clear__">Clear</SelectItem>
                                               {((window.material === "vinyl" && (window.type === "single-hung" || window.type === "double-hung")) ||
                                                 (window.material === "aluminum" && (window.type === "single-hung" || window.type === "double-hung")) ||
                                                 (window.material === "wood" && (window.type === "single-hung" || window.type === "double-hung"))) && (
@@ -3016,13 +3028,14 @@ value={exterior.dumpster.count}
                                           <Label className="text-xs text-muted-foreground">Grade</Label>
                                           <Select value={window.grade} onValueChange={(value) => {
                                             const newWindows = [...room.windows]
-                                            newWindows[idx] = { ...window, grade: value }
+                                            newWindows[idx] = { ...window, grade: clearValue(value) }
                                             updateRoom(room.id, { windows: newWindows })
                                           }}>
                                             <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                              <SelectItem value="__clear__">Clear</SelectItem>
                                               {window.material === "vinyl" && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
@@ -3067,68 +3080,69 @@ value={exterior.dumpster.count}
                                         <Label className="text-xs text-muted-foreground">Blinds</Label>
                                         <Select value={window.blinds} onValueChange={(value) => {
                                           const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, blinds: value }
+                                          newWindows[idx] = { ...window, blinds: clearValue(value) }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
                                           <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="pvc">PVC</SelectItem>
-                                            <SelectItem value="wood">Wood</SelectItem>
-                                            <SelectItem value="metal">Metal</SelectItem>
-                                            <SelectItem value="shutters">Shutters</SelectItem>
-                                          </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="mdf">MDF</SelectItem>
+                                  <SelectItem value="wood">Wood</SelectItem>
+                                </SelectContent>
                                         </Select>
                                       </div>
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Casing/Trim</Label>
                                         <Select value={window.casingTrim} onValueChange={(value) => {
                                           const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, casingTrim: value }
+                                          newWindows[idx] = { ...window, casingTrim: clearValue(value) }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
                                           <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="casing-stain">Casing - Stain</SelectItem>
-                                            <SelectItem value="casing-paint">Casing - Paint</SelectItem>
-                                          </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="casing-stain">Casing - Stain</SelectItem>
+                                  <SelectItem value="casing-paint">Casing - Paint</SelectItem>
+                                </SelectContent>
                                         </Select>
                                       </div>
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Finish</Label>
                                         <Select value={window.finish} onValueChange={(value) => {
                                           const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, finish: value }
+                                          newWindows[idx] = { ...window, finish: clearValue(value) }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
                                           <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="trimmed-window">Trimmed Window</SelectItem>
-                                            <SelectItem value="sill-apron">Sill and Apron</SelectItem>
-                                            <SelectItem value="marble-sill">Marble Sill</SelectItem>
-                                          </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="trimmed-window">Trimmed Window</SelectItem>
+                                  <SelectItem value="no-casing-window">No Casing Window</SelectItem>
+                                </SelectContent>
                                         </Select>
                                       </div>
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Quantity</Label>
                                         <Select value={window.quantity} onValueChange={(value) => {
                                           const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, quantity: value }
+                                          newWindows[idx] = { ...window, quantity: clearValue(value) }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
                                           <SelectTrigger className="w-[70px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
-                                          <SelectContent>
-                                            {Array.from({ length: 30 }, (_, i) => i + 1).map((num) => (
-                                              <SelectItem key={num} value={String(num)}>{num}</SelectItem>
-                                            ))}
-                                          </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {Array.from({ length: 30 }, (_, i) => i + 1).map((num) => (
+                                    <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                                  ))}
+                                </SelectContent>
                                         </Select>
                                       </div>
                                       {/* Toggles after dropdowns */}
@@ -3252,15 +3266,16 @@ value={exterior.dumpster.count}
                                     </div>
                                     <div className="space-y-1 min-w-[130px]">
                                       <Label className="text-xs text-muted-foreground">Bathroom Light Bar</Label>
-                                      <Select value={room.electrical.bathroomLightBar} onValueChange={(value) => updateRoom(room.id, { electrical: { ...room.electrical, bathroomLightBar: value } })}>
+                                      <Select value={room.electrical.bathroomLightBar} onValueChange={(value) => updateRoom(room.id, { electrical: { ...room.electrical, bathroomLightBar: clearValue(value) } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="1">1 light</SelectItem>
-                                          <SelectItem value="2">2 light</SelectItem>
-                                          <SelectItem value="3">3 light</SelectItem>
-                                        </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="1">1 light</SelectItem>
+                                  <SelectItem value="2">2 light</SelectItem>
+                                  <SelectItem value="3">3 light</SelectItem>
+                                </SelectContent>
                                       </Select>
                                     </div>
                                     <div className="space-y-1 w-[80px]">
@@ -3295,7 +3310,7 @@ value={exterior.dumpster.count}
                                         <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Size (LF)</Label>
-                                            <Select value={room.vanity.size} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, size: value } })}>
+                                            <Select value={room.vanity.size} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, size: clearValue(value) } })}>
                                               <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
@@ -3308,17 +3323,16 @@ value={exterior.dumpster.count}
                                           </div>
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Grade</Label>
-                                            <Select value={room.vanity.grade} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, grade: value } })}>
+                                            <Select value={room.vanity.grade} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, grade: clearValue(value) } })}>
                                               <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
-                                              <SelectContent>
-                                                <SelectItem value="base">Base</SelectItem>
-                                                <SelectItem value="standard">Standard</SelectItem>
-                                                <SelectItem value="high">High Grade</SelectItem>
-                                                <SelectItem value="premium">Premium</SelectItem>
-                                                <SelectItem value="custom">Custom</SelectItem>
-                                              </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="base">Base</SelectItem>
+                                  <SelectItem value="standard">Standard</SelectItem>
+                                  <SelectItem value="high-end">High End</SelectItem>
+                                </SelectContent>
                                             </Select>
                                           </div>
                                           <div className="flex items-center gap-2 pb-1">
@@ -3335,47 +3349,46 @@ value={exterior.dumpster.count}
                                           <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Type</Label>
-                                              <Select value={room.vanity.countertop.type} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, type: value } } })}>
+                                              <Select value={room.vanity.countertop.type} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, type: clearValue(value) } } })}>
                                                 <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="cultured-marble">Cultured Marble</SelectItem>
-                                                  <SelectItem value="laminate">Laminate</SelectItem>
-                                                  <SelectItem value="tile">Tile</SelectItem>
-                                                  <SelectItem value="granite">Granite</SelectItem>
-                                                  <SelectItem value="marble">Marble</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="standard">Standard</SelectItem>
+                                        <SelectItem value="variable-speed">Variable Speed</SelectItem>
+                                        <SelectItem value="multi-stage">Multi-Stage</SelectItem>
+                                      </SelectContent>
                                               </Select>
                                             </div>
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Grade</Label>
-                                              <Select value={room.vanity.countertop.grade} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, grade: value } } })}>
+                                              <Select value={room.vanity.countertop.grade} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, grade: clearValue(value) } } })}>
                                                 <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="base">Base</SelectItem>
-                                                  <SelectItem value="standard">Standard</SelectItem>
-                                                  <SelectItem value="high">High Grade</SelectItem>
-                                                  <SelectItem value="premium">Premium</SelectItem>
-                                                  <SelectItem value="custom">Custom</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="base">Base</SelectItem>
+                                  <SelectItem value="standard">Standard</SelectItem>
+                                  <SelectItem value="high-end">High End</SelectItem>
+                                </SelectContent>
                                               </Select>
                                             </div>
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">
                                                 Size ({room.vanity.countertop.type === "cultured-marble" || room.vanity.countertop.type === "laminate" ? "LF" : "SF"})
                                               </Label>
-                                              <Select value={room.vanity.countertop.size} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, size: value } } })}>
+                                              <Select value={room.vanity.countertop.size} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, size: clearValue(value) } } })}>
                                                 <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  {Array.from({ length: 15 }, (_, i) => i + 1).map((num) => (
-                                                    <SelectItem key={num} value={String(num)}>{num}</SelectItem>
-                                                  ))}
-                                                </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {Array.from({ length: 15 }, (_, i) => i + 1).map((num) => (
+                                    <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                                  ))}
+                                </SelectContent>
                                               </Select>
                                             </div>
                                             <div className="flex items-center gap-2 pb-1">
@@ -3411,14 +3424,16 @@ value={exterior.dumpster.count}
                                       <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Action</Label>
-                                          <Select value={room.toilet.action} onValueChange={(value) => updateRoom(room.id, { toilet: { ...room.toilet!, action: value } })}>
+                                          <Select value={room.toilet.action} onValueChange={(value) => updateRoom(room.id, { toilet: { ...room.toilet!, action: clearValue(value) } })}>
                                             <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
-                                            <SelectContent>
-                                              <SelectItem value="replace">Replace</SelectItem>
-                                              <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                            </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="single">Single</SelectItem>
+                                        <SelectItem value="double">Double</SelectItem>
+                                        <SelectItem value="microwave-combo">Microwave Combo</SelectItem>
+                                      </SelectContent>
                                           </Select>
                                         </div>
                                         <div className="flex items-center gap-2 pb-1">
@@ -3453,16 +3468,16 @@ value={exterior.dumpster.count}
                                         <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Type</Label>
-                                            <Select value={room.shower.type} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, type: value } })}>
+                                            <Select value={room.shower.type} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, type: clearValue(value) } })}>
                                               <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
-                                              <SelectContent>
-                                                <SelectItem value="fiberglass-tub-shower">Fiberglass Tub/Shwr Unit</SelectItem>
-                                                <SelectItem value="tub-tile-surround">Tub With Tiled Surround</SelectItem>
-                                                <SelectItem value="tub-cultured-marble">Tub With Cultured Marble</SelectItem>
-                                                <SelectItem value="tile-shower">Tile Shower</SelectItem>
-                                              </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="fiberglass-tub-shower">Fiberglass Tub/Shwr Unit</SelectItem>
+                                  <SelectItem value="fiberglass-shower">Fiberglass Shower Unit</SelectItem>
+                                  <SelectItem value="tile-shower">Tile Shower</SelectItem>
+                                </SelectContent>
                                             </Select>
                                           </div>
 
@@ -3478,14 +3493,15 @@ value={exterior.dumpster.count}
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">shower faucet</Label>
-                                                <Select value={room.shower.showerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: value } })}>
+                                                <Select value={room.shower.showerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: clearValue(value) } })}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
-                                                  </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                  <SelectItem value="replace">Replace</SelectItem>
+                                </SelectContent>
                                                 </Select>
                                               </div>
                                             </>
@@ -3496,39 +3512,44 @@ value={exterior.dumpster.count}
                                             <>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Action for tub</Label>
-                                                <Select value={room.shower.actionForTub} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, actionForTub: value } })}>
+                                                <Select value={room.shower.actionForTub} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, actionForTub: clearValue(value) } })}>
                                                   <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="detach-tub">Detach tub</SelectItem>
-                                                    <SelectItem value="replace-tub">Replace tub</SelectItem>
-                                                  </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="side-by-side">Side-by-Side</SelectItem>
+                                        <SelectItem value="french-door">French Door</SelectItem>
+                                        <SelectItem value="top-freezer">Top Freezer</SelectItem>
+                                        <SelectItem value="bottom-freezer">Bottom Freezer</SelectItem>
+                                      </SelectContent>
                                                 </Select>
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Surround</Label>
-                                                <Select value={room.shower.surround} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, surround: value } })}>
+                                                <Select value={room.shower.surround} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, surround: clearValue(value) } })}>
                                                   <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="up-to-60sf">Up to 60SF</SelectItem>
-                                                    <SelectItem value="61-100sf">61-100SF</SelectItem>
-                                                    <SelectItem value="over-100sf">Over 100SF</SelectItem>
-                                                  </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="up-to-60sf">Up to 60SF</SelectItem>
+                                  <SelectItem value="up-to-70sf">Up to 70SF</SelectItem>
+                                  <SelectItem value="up-to-80sf">Up to 80SF</SelectItem>
+                                </SelectContent>
                                                 </Select>
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">tub shower faucet</Label>
-                                                <Select value={room.shower.tubShowerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } })}>
+                                                <Select value={room.shower.tubShowerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: clearValue(value) } })}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
-                                                  </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                  <SelectItem value="replace">Replace</SelectItem>
+                                </SelectContent>
                                                 </Select>
                                               </div>
                                             </>
@@ -3539,26 +3560,30 @@ value={exterior.dumpster.count}
                                             <>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Action for tub</Label>
-                                                <Select value={room.shower.actionForTub} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, actionForTub: value } })}>
+                                                <Select value={room.shower.actionForTub} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, actionForTub: clearValue(value) } })}>
                                                   <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="detach-tub">Detach tub</SelectItem>
-                                                    <SelectItem value="replace-tub">Replace tub</SelectItem>
-                                                  </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="side-by-side">Side-by-Side</SelectItem>
+                                        <SelectItem value="french-door">French Door</SelectItem>
+                                        <SelectItem value="top-freezer">Top Freezer</SelectItem>
+                                        <SelectItem value="bottom-freezer">Bottom Freezer</SelectItem>
+                                      </SelectContent>
                                                 </Select>
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">tub shower faucet</Label>
-                                                <Select value={room.shower.tubShowerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } })}>
+                                                <Select value={room.shower.tubShowerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: clearValue(value) } })}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
-                                                  </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                  <SelectItem value="replace">Replace</SelectItem>
+                                </SelectContent>
                                                 </Select>
                                               </div>
                                             </>
@@ -3577,11 +3602,12 @@ value={exterior.dumpster.count}
                                               {room.shower.mortarBedReplace && (
                                                 <div className="space-y-1">
                                                   <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
-                                                  <Select value={room.shower.mortarBedSize} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedSize: value } })}>
+                                                  <Select value={room.shower.mortarBedSize} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedSize: clearValue(value) } })}>
                                                     <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                                       <SelectValue placeholder="Select" />
                                                     </SelectTrigger>
                                                     <SelectContent>
+                                                      <SelectItem value="__clear__">Clear</SelectItem>
                                                       <SelectItem value="1-100sf">1-100 SF</SelectItem>
                                                       <SelectItem value="101-200sf">101-200 SF</SelectItem>
                                                       <SelectItem value="over-200sf">Over 200 SF</SelectItem>
@@ -3591,27 +3617,29 @@ value={exterior.dumpster.count}
                                               )}
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Walls</Label>
-                                                <Select value={room.shower.walls} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, walls: value } })}>
+                                                <Select value={room.shower.walls} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, walls: clearValue(value) } })}>
                                                   <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="up-to-60sf">Up to 60SF</SelectItem>
-                                                    <SelectItem value="61-100sf">61-100SF</SelectItem>
-                                                    <SelectItem value="over-100sf">Over 100SF</SelectItem>
-                                                  </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="up-to-60sf">Up to 60SF</SelectItem>
+                                  <SelectItem value="up-to-70sf">Up to 70SF</SelectItem>
+                                  <SelectItem value="up-to-80sf">Up to 80SF</SelectItem>
+                                </SelectContent>
                                                 </Select>
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">shower faucet</Label>
-                                                <Select value={room.shower.showerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: value } })}>
+                                                <Select value={room.shower.showerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: clearValue(value) } })}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
-                                                  </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                  <SelectItem value="replace">Replace</SelectItem>
+                                </SelectContent>
                                                 </Select>
                                               </div>
                                             </>
@@ -3646,11 +3674,12 @@ value={exterior.dumpster.count}
                                                   />
                                                   <Label className="text-sm">Tile Niche</Label>
                                                   {room.shower.tileNiche && (
-                                                    <Select value={room.shower.tileNicheQty} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tileNicheQty: value } })}>
+                                                    <Select value={room.shower.tileNicheQty} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tileNicheQty: clearValue(value) } })}>
                                                       <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                                         <SelectValue placeholder="QTY" />
                                                       </SelectTrigger>
                                                       <SelectContent>
+                                                        <SelectItem value="__clear__">Clear</SelectItem>
                                                         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                                                           <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
                                                         ))}
@@ -3672,11 +3701,12 @@ value={exterior.dumpster.count}
                                                   />
                                                   <Label className="text-sm">Tile Soap dish</Label>
                                                   {room.shower.tileSoapDish && (
-                                                    <Select value={room.shower.tileSoapDishQty} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tileSoapDishQty: value } })}>
+                                                    <Select value={room.shower.tileSoapDishQty} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tileSoapDishQty: clearValue(value) } })}>
                                                       <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                                         <SelectValue placeholder="QTY" />
                                                       </SelectTrigger>
                                                       <SelectContent>
+                                                        <SelectItem value="__clear__">Clear</SelectItem>
                                                         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                                                           <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
                                                         ))}
@@ -3711,11 +3741,12 @@ value={exterior.dumpster.count}
                                       <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Size (LF)</Label>
-                                          <Select value={room.cabinets.size} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, size: value } })}>
+                                          <Select value={room.cabinets.size} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, size: clearValue(value) } })}>
                                             <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                              <SelectItem value="__clear__">Clear</SelectItem>
                                               {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
                                                 <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
                                               ))}
@@ -3724,11 +3755,12 @@ value={exterior.dumpster.count}
                                         </div>
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Grade</Label>
-                                          <Select value={room.cabinets.grade} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, grade: value } })}>
+                                          <Select value={room.cabinets.grade} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, grade: clearValue(value) } })}>
                                             <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                              <SelectItem value="__clear__">Clear</SelectItem>
                                               <SelectItem value="base">Base</SelectItem>
                                               <SelectItem value="standard">Standard</SelectItem>
                                               <SelectItem value="high">High Grade</SelectItem>
@@ -3746,11 +3778,12 @@ value={exterior.dumpster.count}
                                         </div>
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Toe Kick (LF)</Label>
-                                          <Select value={room.cabinets.toeKick.size} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, size: value } } })}>
+                                          <Select value={room.cabinets.toeKick.size} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, size: clearValue(value) } } })}>
                                             <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Size" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                              <SelectItem value="__clear__">Clear</SelectItem>
                                               {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
                                                 <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
                                               ))}
@@ -3766,26 +3799,26 @@ value={exterior.dumpster.count}
                                       <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Type</Label>
-                                          <Select value={room.countertop.type} onValueChange={(value) => updateRoom(room.id, { countertop: { ...room.countertop!, type: value } })}>
+                                          <Select value={room.countertop.type} onValueChange={(value) => updateRoom(room.id, { countertop: { ...room.countertop!, type: clearValue(value) } })}>
                                             <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
-                                            <SelectContent>
-                                              <SelectItem value="cultured-marble">Cultured Marble</SelectItem>
-                                              <SelectItem value="laminate">Laminate</SelectItem>
-                                              <SelectItem value="tile">Tile</SelectItem>
-                                              <SelectItem value="granite">Granite</SelectItem>
-                                              <SelectItem value="marble">Marble</SelectItem>
-                                            </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="cultured-marble">Cultured Marble</SelectItem>
+                                  <SelectItem value="laminate">Laminate</SelectItem>
+                                  <SelectItem value="solid-surface">Solid Surface</SelectItem>
+                                </SelectContent>
                                           </Select>
                                         </div>
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Grade</Label>
-                                          <Select value={room.countertop.grade} onValueChange={(value) => updateRoom(room.id, { countertop: { ...room.countertop!, grade: value } })}>
+                                          <Select value={room.countertop.grade} onValueChange={(value) => updateRoom(room.id, { countertop: { ...room.countertop!, grade: clearValue(value) } })}>
                                             <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                              <SelectItem value="__clear__">Clear</SelectItem>
                                               <SelectItem value="base">Base</SelectItem>
                                               <SelectItem value="standard">Standard</SelectItem>
                                               <SelectItem value="premium">Premium</SelectItem>
@@ -3796,11 +3829,12 @@ value={exterior.dumpster.count}
                                           <Label className="text-xs text-muted-foreground">
                                             Size ({room.countertop.type === "cultured-marble" || room.countertop.type === "laminate" ? "LF" : "SF"})
                                           </Label>
-                                          <Select value={room.countertop.size} onValueChange={(value) => updateRoom(room.id, { countertop: { ...room.countertop!, size: value } })}>
+                                          <Select value={room.countertop.size} onValueChange={(value) => updateRoom(room.id, { countertop: { ...room.countertop!, size: clearValue(value) } })}>
                                             <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                              <SelectItem value="__clear__">Clear</SelectItem>
                                               {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
                                                 <SelectItem key={num} value={String(num)}>{num}</SelectItem>
                                               ))}
@@ -3823,11 +3857,12 @@ value={exterior.dumpster.count}
                                       <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Type</Label>
-                                          <Select value={room.cabinets.toeKick.backSplash} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, backSplash: value } } })}>
+                                          <Select value={room.cabinets.toeKick.backSplash} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, backSplash: clearValue(value) } } })}>
                                             <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                              <SelectItem value="__clear__">Clear</SelectItem>
                                               <SelectItem value="tile">Tile</SelectItem>
                                               <SelectItem value="solid-surface">Solid surface</SelectItem>
                                               <SelectItem value="unattached">Unattached</SelectItem>
@@ -3836,11 +3871,12 @@ value={exterior.dumpster.count}
                                         </div>
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Grade</Label>
-                                          <Select value={room.cabinets.toeKick.grade} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, grade: value } } })}>
+                                          <Select value={room.cabinets.toeKick.grade} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, grade: clearValue(value) } } })}>
                                             <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                              <SelectItem value="__clear__">Clear</SelectItem>
                                               <SelectItem value="base">Base</SelectItem>
                                               <SelectItem value="standard">Standard</SelectItem>
                                               <SelectItem value="premium">Premium</SelectItem>
@@ -3894,15 +3930,16 @@ value={exterior.dumpster.count}
                                         />
                                         <Label className="text-sm whitespace-nowrap">Water supply line</Label>
                                         {room.plumbing.waterSupplyLine.enabled && (
-                                          <Select value={room.plumbing.waterSupplyLine.qty} onValueChange={(value) => updateRoom(room.id, { plumbing: { ...room.plumbing!, waterSupplyLine: { ...room.plumbing!.waterSupplyLine, qty: value } } })}>
+                                          <Select value={room.plumbing.waterSupplyLine.qty} onValueChange={(value) => updateRoom(room.id, { plumbing: { ...room.plumbing!, waterSupplyLine: { ...room.plumbing!.waterSupplyLine, qty: clearValue(value) } } })}>
                                             <SelectTrigger className="border-border/60 bg-secondary/50 w-[80px]">
                                               <SelectValue placeholder="QTY" />
                                             </SelectTrigger>
-                                            <SelectContent>
-                                              {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-                                                <SelectItem key={num} value={String(num)}>{num}</SelectItem>
-                                              ))}
-                                            </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  {Array.from({ length: 15 }, (_, i) => i + 1).map((num) => (
+                                    <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                                  ))}
+                                </SelectContent>
                                           </Select>
                                         )}
                                       </div>
@@ -3921,7 +3958,7 @@ value={exterior.dumpster.count}
                                         <>
 <div className="space-y-1">
   <Label className="text-xs text-muted-foreground">Action</Label>
-  <Select value={room.plumbing.reverseOsmosis.action} onValueChange={(value) => updateRoom(room.id, { plumbing: { ...room.plumbing!, reverseOsmosis: { ...room.plumbing!.reverseOsmosis, action: value } } })}>
+  <Select value={room.plumbing.reverseOsmosis.action} onValueChange={(value) => updateRoom(room.id, { plumbing: { ...room.plumbing!, reverseOsmosis: { ...room.plumbing!.reverseOsmosis, action: clearValue(value) } } })}>
   <SelectTrigger className="border-border/60 bg-secondary/50 w-[140px]">
   <SelectValue placeholder="Select" />
                                               </SelectTrigger>
@@ -3952,7 +3989,7 @@ value={exterior.dumpster.count}
                                       </div>
                                       {room.plumbing.garbageDisposal.enabled && (
                                         <>
-                                          <Select value={room.plumbing.garbageDisposal.action} onValueChange={(value) => updateRoom(room.id, { plumbing: { ...room.plumbing!, garbageDisposal: { ...room.plumbing!.garbageDisposal, action: value } } })}>
+                                          <Select value={room.plumbing.garbageDisposal.action} onValueChange={(value) => updateRoom(room.id, { plumbing: { ...room.plumbing!, garbageDisposal: { ...room.plumbing!.garbageDisposal, action: clearValue(value) } } })}>
                                             <SelectTrigger className="border-border/60 bg-secondary/50 w-[140px]">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
@@ -3995,7 +4032,7 @@ value={exterior.dumpster.count}
                                           </div>
                                           {room.appliances.refrigerator.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.refrigerator.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, type: value, size: "" } } })}>
+                                              <Select value={room.appliances.refrigerator.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, type: clearValue(value), size: "" } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[160px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
@@ -4008,7 +4045,7 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                               </Select>
                                               {room.appliances.refrigerator.type !== "compact" && (
-                                                <Select value={room.appliances.refrigerator.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, size: value } } })}>
+                                                <Select value={room.appliances.refrigerator.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, size: clearValue(value) } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                     <SelectValue placeholder="Size" />
                                                   </SelectTrigger>
@@ -4053,22 +4090,24 @@ value={exterior.dumpster.count}
                                                   </SelectContent>
                                                 </Select>
                                               )}
-                                              <Select value={room.appliances.refrigerator.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, grade: value } } })}>
+                                              <Select value={room.appliances.refrigerator.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, grade: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="base">Base</SelectItem>
-                                                  <SelectItem value="standard">Standard</SelectItem>
-                                                  <SelectItem value="high">High grade</SelectItem>
-                                                  <SelectItem value="premium">Premium</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="base">Base</SelectItem>
+                                        <SelectItem value="standard">Standard</SelectItem>
+                                        <SelectItem value="high">High Grade</SelectItem>
+                                        <SelectItem value="premium">Premium</SelectItem>
+                                      </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.refrigerator.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, action: value } } })}>
+                                              <Select value={room.appliances.refrigerator.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, action: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4095,21 +4134,23 @@ value={exterior.dumpster.count}
                                           </div>
                                           {room.appliances.dishwasher.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.dishwasher.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, grade: value } } })}>
+                                              <Select value={room.appliances.dishwasher.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, grade: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="standard">Standard</SelectItem>
-                                                  <SelectItem value="high">High</SelectItem>
-                                                  <SelectItem value="premium">Premium</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="standard">Standard</SelectItem>
+                                        <SelectItem value="convection">Convection</SelectItem>
+                                        <SelectItem value="self-cleaning">Self-Cleaning</SelectItem>
+                                      </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.dishwasher.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, action: value } } })}>
+                                              <Select value={room.appliances.dishwasher.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, action: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4136,16 +4177,18 @@ value={exterior.dumpster.count}
                                           </div>
                                           {room.appliances.range.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.range.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, type: value } } })}>
+                                              <Select value={room.appliances.range.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, type: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="gas">Gas</SelectItem>
-                                                  <SelectItem value="electric">Electric</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="gas">Gas</SelectItem>
+                                        <SelectItem value="oil">Oil</SelectItem>
+                                        <SelectItem value="electric">Electric</SelectItem>
+                                      </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.range.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, options: value } } })}>
+                                              <Select value={room.appliances.range.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, options: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Options" />
                                                 </SelectTrigger>
@@ -4155,21 +4198,23 @@ value={exterior.dumpster.count}
                                                   <SelectItem value="drop-in">Drop In</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.range.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, grade: value } } })}>
+                                              <Select value={room.appliances.range.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, grade: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="standard">Standard</SelectItem>
-                                                  <SelectItem value="high">High</SelectItem>
-                                                  <SelectItem value="premium">Premium</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="standard">Standard</SelectItem>
+                                        <SelectItem value="convection">Convection</SelectItem>
+                                        <SelectItem value="self-cleaning">Self-Cleaning</SelectItem>
+                                      </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.range.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, action: value } } })}>
+                                              <Select value={room.appliances.range.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, action: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4196,30 +4241,34 @@ value={exterior.dumpster.count}
                                           </div>
                                           {room.appliances.cooktop.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.cooktop.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, type: value } } })}>
+                                              <Select value={room.appliances.cooktop.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, type: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="gas">Gas</SelectItem>
-                                                  <SelectItem value="electric">Electric</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="gas">Gas</SelectItem>
+                                        <SelectItem value="oil">Oil</SelectItem>
+                                        <SelectItem value="electric">Electric</SelectItem>
+                                      </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.cooktop.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, grade: value } } })}>
+                                              <Select value={room.appliances.cooktop.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, grade: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="standard">Standard</SelectItem>
-                                                  <SelectItem value="high">High</SelectItem>
-                                                  <SelectItem value="premium">Premium</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="standard">Standard</SelectItem>
+                                        <SelectItem value="convection">Convection</SelectItem>
+                                        <SelectItem value="self-cleaning">Self-Cleaning</SelectItem>
+                                      </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.cooktop.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, action: value } } })}>
+                                              <Select value={room.appliances.cooktop.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, action: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4246,44 +4295,47 @@ value={exterior.dumpster.count}
                                           </div>
                                           {room.appliances.waterHeater.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.waterHeater.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, type: value } } })}>
+                                              <Select value={room.appliances.waterHeater.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, type: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="gas">Gas</SelectItem>
-                                                  <SelectItem value="electric">Electric</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="gas">Gas</SelectItem>
+                                        <SelectItem value="oil">Oil</SelectItem>
+                                        <SelectItem value="electric">Electric</SelectItem>
+                                      </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.waterHeater.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, size: value } } })}>
+                                              <Select value={room.appliances.waterHeater.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, size: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Size" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="20">20 gal</SelectItem>
-                                                  <SelectItem value="30">30 gal</SelectItem>
-                                                  <SelectItem value="40">40 gal</SelectItem>
-                                                  <SelectItem value="50">50 gal</SelectItem>
-                                                  <SelectItem value="60">60 gal</SelectItem>
-                                                  <SelectItem value="75">75 gal</SelectItem>
-                                                  <SelectItem value="80">80 gal</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="30">30 Gal</SelectItem>
+                                        <SelectItem value="40">40 Gal</SelectItem>
+                                        <SelectItem value="50">50 Gal</SelectItem>
+                                        <SelectItem value="75">75 Gal</SelectItem>
+                                        <SelectItem value="tankless">Tankless</SelectItem>
+                                      </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.waterHeater.rating} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, rating: value } } })}>
+                                              <Select value={room.appliances.waterHeater.rating} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, rating: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Rating" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="6">6 yr</SelectItem>
                                                   <SelectItem value="9">9 yr</SelectItem>
                                                   <SelectItem value="12">12 yr</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.waterHeater.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, action: value } } })}>
+                                              <Select value={room.appliances.waterHeater.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, action: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4310,11 +4362,12 @@ value={exterior.dumpster.count}
                                           </div>
                                           {room.appliances.wallOven.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.wallOven.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, type: value } } })}>
+                                              <Select value={room.appliances.wallOven.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, type: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[180px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="freestanding">Freestanding</SelectItem>
                                                   <SelectItem value="slide-in">Slide in</SelectItem>
                                                   <SelectItem value="drop-in">Drop in</SelectItem>
@@ -4323,21 +4376,23 @@ value={exterior.dumpster.count}
                                                   <SelectItem value="built-in-double">Built in double oven</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.wallOven.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, grade: value } } })}>
+                                              <Select value={room.appliances.wallOven.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, grade: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="standard">Standard</SelectItem>
-                                                  <SelectItem value="high">High</SelectItem>
-                                                  <SelectItem value="premium">Premium</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="standard">Standard</SelectItem>
+                                        <SelectItem value="convection">Convection</SelectItem>
+                                        <SelectItem value="self-cleaning">Self-Cleaning</SelectItem>
+                                      </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.wallOven.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, action: value } } })}>
+                                              <Select value={room.appliances.wallOven.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, action: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4364,32 +4419,35 @@ value={exterior.dumpster.count}
                                           </div>
                                           {room.appliances.airHandler.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.airHandler.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, type: value } } })}>
+                                              <Select value={room.appliances.airHandler.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, type: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="2-ton">2 ton</SelectItem>
                                                   <SelectItem value="3-ton">3 ton</SelectItem>
                                                   <SelectItem value="4-ton">4 ton</SelectItem>
                                                   <SelectItem value="5-ton">5 ton</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.airHandler.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, options: value } } })}>
+                                              <Select value={room.appliances.airHandler.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, options: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[200px]">
                                                   <SelectValue placeholder="Options" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="with-heating-element">With heating element</SelectItem>
                                                   <SelectItem value="with-a-coil">With A coil</SelectItem>
                                                   <SelectItem value="with-heating-and-coil">With heating element and a Coil</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.airHandler.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, action: value } } })}>
+                                              <Select value={room.appliances.airHandler.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, action: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4416,21 +4474,25 @@ value={exterior.dumpster.count}
                                           </div>
                                           {room.appliances.boiler.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.boiler.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, type: value } } })}>
+                                              <Select value={room.appliances.boiler.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, type: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="natural-gas">Natural Gas</SelectItem>
-                                                  <SelectItem value="electric">Electric</SelectItem>
-                                                  <SelectItem value="oil-fired">Oil fired</SelectItem>
-                                                </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="gas">Gas</SelectItem>
+                                        <SelectItem value="electric">Electric</SelectItem>
+                                        <SelectItem value="tankless-gas">Tankless Gas</SelectItem>
+                                        <SelectItem value="tankless-electric">Tankless Electric</SelectItem>
+                                        <SelectItem value="hybrid">Hybrid</SelectItem>
+                                      </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.boiler.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, action: value } } })}>
+                                              <Select value={room.appliances.boiler.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, action: clearValue(value) } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                  <SelectItem value="__clear__">Clear</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4486,13 +4548,14 @@ value={exterior.dumpster.count}
                                       <Badge variant="secondary" className="capitalize">{door.category}</Badge>
                                       <Select value={door.type} onValueChange={(value) => {
                                         const newDoors = [...room.doors]
-                                        newDoors[idx] = { ...door, type: value }
+                                        newDoors[idx] = { ...door, type: clearValue(value) }
                                         updateRoom(room.id, { doors: newDoors })
                                       }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[130px]">
                                           <SelectValue placeholder="Type" />
                                         </SelectTrigger>
                                         <SelectContent>
+                                          <SelectItem value="__clear__">Clear</SelectItem>
                                           {door.category === "interior" ? (
                                             <>
                                               <SelectItem value="6-panel">6 Panel</SelectItem>
@@ -4514,30 +4577,32 @@ value={exterior.dumpster.count}
                                       </Select>
                                       <Select value={door.grade} onValueChange={(value) => {
                                         const newDoors = [...room.doors]
-                                        newDoors[idx] = { ...door, grade: value }
+                                        newDoors[idx] = { ...door, grade: clearValue(value) }
                                         updateRoom(room.id, { doors: newDoors })
                                       }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                           <SelectValue placeholder="Grade" />
                                         </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="standard">Standard</SelectItem>
-                                          <SelectItem value="high">High</SelectItem>
-                                          <SelectItem value="premium">Premium</SelectItem>
-                                        </SelectContent>
+<SelectContent>
+                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="standard">Standard</SelectItem>
+                                        <SelectItem value="high-efficiency">High Efficiency</SelectItem>
+                                        <SelectItem value="energy-star">Energy Star</SelectItem>
+                                      </SelectContent>
                                       </Select>
                                       <Select value={door.handleAction} onValueChange={(value) => {
                                         const newDoors = [...room.doors]
-                                        newDoors[idx] = { ...door, handleAction: value }
+                                        newDoors[idx] = { ...door, handleAction: clearValue(value) }
                                         updateRoom(room.id, { doors: newDoors })
                                       }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                           <SelectValue placeholder="Handle" />
                                         </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="replace">Replace</SelectItem>
-                                          <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                        </SelectContent>
+<SelectContent>
+                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="replace">Replace</SelectItem>
+                                  <SelectItem value="service">Service Call</SelectItem>
+                                </SelectContent>
                                       </Select>
                                       <div className="flex-1"></div>
                                       <div className="flex items-center gap-2">
