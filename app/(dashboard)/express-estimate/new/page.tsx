@@ -2377,31 +2377,12 @@ value={exterior.dumpster.count}
                                     <p className="text-xs text-amber-500">Note: Please note carpet installed over flooring is a content item</p>
                                     <div className="space-y-4">
                                       {(room.flooring.layers || []).map((layer, layerIndex) => (
-                                        <div key={layer.id} className="space-y-2">
-                                          <div className="flex items-center justify-between">
+                                        <div key={layer.id} className="rounded-lg bg-secondary/30 p-3">
+                                          <div className="flex items-center gap-2 mb-2">
                                             <Label className="text-sm font-medium">{layerIndex === 0 ? "1st Layer" : `${layerIndex + 1}${layerIndex === 1 ? "nd" : layerIndex === 2 ? "rd" : "th"} Layer`}</Label>
-                                            {layerIndex > 0 && (
-                                              <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                                                onClick={() => {
-                                                  const newLayers = (room.flooring.layers || []).filter(l => l.id !== layer.id)
-                                                  updateRoom(room.id, { 
-                                                    flooring: { 
-                                                      ...room.flooring, 
-                                                      layers: newLayers, 
-                                                      multipleLayers: newLayers.length > 1 
-                                                    } 
-                                                  })
-                                                }}
-                                              >
-                                                <Trash2 className="h-4 w-4" />
-                                              </Button>
-                                            )}
                                           </div>
-                                          <div className="flex flex-wrap items-end gap-3">
+                                          <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                            {/* All dropdowns first */}
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Type</Label>
                                               <Select 
@@ -2412,7 +2393,7 @@ value={exterior.dumpster.count}
                                                   updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                 }}
                                               >
-                                                <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                                <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -2438,7 +2419,7 @@ value={exterior.dumpster.count}
                                                     updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                   }}
                                                 >
-                                                  <SelectTrigger className="w-[320px] border-border/60 bg-secondary/50">
+                                                  <SelectTrigger className="w-[280px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
@@ -2453,17 +2434,17 @@ value={exterior.dumpster.count}
                                                     {layer.type === "sheet-vinyl" && (
                                                       <>
                                                         <SelectItem value="sheet-vinyl">Vinyl Floor Covering (sheet Goods)</SelectItem>
-                                                        <SelectItem value="sheet-vinyl-standard">Vinyl Floor Covering (sheet Goods) - Standard Grade</SelectItem>
-                                                        <SelectItem value="sheet-vinyl-economy">Vinyl Floor Covering (sheet Goods) - Economy Grade</SelectItem>
-                                                        <SelectItem value="sheet-vinyl-high">Vinyl Floor Covering (sheet Goods) - High Grade</SelectItem>
-                                                        <SelectItem value="sheet-vinyl-premium">Vinyl Floor Covering (sheet Goods) - Premium Grade</SelectItem>
+                                                        <SelectItem value="sheet-vinyl-standard">Vinyl Floor Covering - Standard</SelectItem>
+                                                        <SelectItem value="sheet-vinyl-economy">Vinyl Floor Covering - Economy</SelectItem>
+                                                        <SelectItem value="sheet-vinyl-high">Vinyl Floor Covering - High Grade</SelectItem>
+                                                        <SelectItem value="sheet-vinyl-premium">Vinyl Floor Covering - Premium</SelectItem>
                                                       </>
                                                     )}
                                                     {layer.type === "laminate" && (
                                                       <>
-                                                        <SelectItem value="laminate">Snaplock Laminate - Simulated Wood Flooring</SelectItem>
-                                                        <SelectItem value="laminate-standard">Snaplock Laminate - Simulated Wood Flooring - Standard Grade</SelectItem>
-                                                        <SelectItem value="laminate-high">Snaplock Laminate - Simulated Wood Flooring - High Grade</SelectItem>
+                                                        <SelectItem value="laminate">Snaplock Laminate</SelectItem>
+                                                        <SelectItem value="laminate-standard">Snaplock Laminate - Standard</SelectItem>
+                                                        <SelectItem value="laminate-high">Snaplock Laminate - High Grade</SelectItem>
                                                       </>
                                                     )}
                                                     {layer.type === "carpet" && (
@@ -2478,9 +2459,9 @@ value={exterior.dumpster.count}
                                                     {layer.type === "carpet-glue-down" && (
                                                       <>
                                                         <SelectItem value="glue-down-carpet">Glue Down Carpet</SelectItem>
-                                                        <SelectItem value="glue-down-carpet-standard">Glue Down Carpet - Standard Grade</SelectItem>
+                                                        <SelectItem value="glue-down-carpet-standard">Glue Down Carpet - Standard</SelectItem>
                                                         <SelectItem value="glue-down-carpet-high">Glue Down Carpet - High Grade</SelectItem>
-                                                        <SelectItem value="glue-down-carpet-premium">Glue Down Carpet - Premium Grade</SelectItem>
+                                                        <SelectItem value="glue-down-carpet-premium">Glue Down Carpet - Premium</SelectItem>
                                                         <SelectItem value="glue-down-carpet-heavy">Glue Down Carpet - Heavy Traffic</SelectItem>
                                                       </>
                                                     )}
@@ -2495,10 +2476,10 @@ value={exterior.dumpster.count}
                                                     {layer.type === "tile" && (
                                                       <>
                                                         <SelectItem value="tile">Tile Floor Covering</SelectItem>
-                                                        <SelectItem value="tile-standard">Tile Floor Covering - Standard Grade</SelectItem>
-                                                        <SelectItem value="tile-economy">Tile Floor Covering - Economy Grade</SelectItem>
+                                                        <SelectItem value="tile-standard">Tile Floor Covering - Standard</SelectItem>
+                                                        <SelectItem value="tile-economy">Tile Floor Covering - Economy</SelectItem>
                                                         <SelectItem value="tile-high">Tile Floor Covering - High Grade</SelectItem>
-                                                        <SelectItem value="tile-premium">Tile Floor Covering - Premium Grade</SelectItem>
+                                                        <SelectItem value="tile-premium">Tile Floor Covering - Premium</SelectItem>
                                                       </>
                                                     )}
                                                   </SelectContent>
@@ -2516,7 +2497,7 @@ value={exterior.dumpster.count}
                                                     updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                   }}
                                                 >
-                                                  <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
+                                                  <SelectTrigger className="w-[160px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
@@ -2555,7 +2536,7 @@ value={exterior.dumpster.count}
                                                     updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                   }}
                                                 >
-                                                  <SelectTrigger className="w-[150px] border-border/60 bg-secondary/50">
+                                                  <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
@@ -2565,9 +2546,8 @@ value={exterior.dumpster.count}
                                                 </Select>
                                               </div>
                                             )}
-                                          </div>
-                                          <div className="flex items-center gap-6 mt-2">
-                                            <div className="flex items-center gap-2">
+                                            {/* Toggles after dropdowns */}
+                                            <div className="flex items-center gap-2 pb-1">
                                               <Switch
                                                 checked={layer.vaporBarrier}
                                                 onCheckedChange={(checked) => {
@@ -2576,9 +2556,9 @@ value={exterior.dumpster.count}
                                                   updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                 }}
                                               />
-                                              <Label className="text-sm">Vapor Barrier</Label>
+                                              <Label className="text-sm whitespace-nowrap">Vapor Barrier</Label>
                                             </div>
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2 pb-1">
                                               <Switch
                                                 checked={layer.subfloorReplacement}
                                                 onCheckedChange={(checked) => {
@@ -2587,8 +2567,32 @@ value={exterior.dumpster.count}
                                                   updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                 }}
                                               />
-                                              <Label className="text-sm">Subfloor Replacement</Label>
+                                              <Label className="text-sm whitespace-nowrap">Subfloor Replacement</Label>
                                             </div>
+                                            {/* Delete button at far right */}
+                                            {layerIndex > 0 && (
+                                              <>
+                                                <div className="flex-1" />
+                                                <Button
+                                                  type="button"
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                                  onClick={() => {
+                                                    const newLayers = (room.flooring.layers || []).filter(l => l.id !== layer.id)
+                                                    updateRoom(room.id, { 
+                                                      flooring: { 
+                                                        ...room.flooring, 
+                                                        layers: newLayers, 
+                                                        multipleLayers: newLayers.length > 1 
+                                                      } 
+                                                    })
+                                                  }}
+                                                >
+                                                  <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                              </>
+                                            )}
                                           </div>
                                         </div>
                                       ))}
