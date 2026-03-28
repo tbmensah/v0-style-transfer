@@ -700,19 +700,19 @@ const newDoor: DoorItem = {
                           <Label>Add Dumpster</Label>
                         </div>
                         {exterior.dumpster.enabled && (
-                          <div className="grid gap-4 sm:grid-cols-3">
-                            <div className="space-y-2">
+                          <div className="flex flex-wrap items-center gap-4">
+                            <div className="space-y-2 w-[100px]">
                               <Label># of Dumpsters</Label>
                               <Input
                                 type="number"
                                 min="1"
                                 max="20"
-value={exterior.dumpster.count}
-                              onChange={(e) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, count: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
+                                value={exterior.dumpster.count}
+                                onChange={(e) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, count: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
                                 className="border-border/60 bg-secondary/50"
                               />
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-2 w-[180px]">
                               <Label>Dumpster Size</Label>
                               <Select value={exterior.dumpster.size} onValueChange={(value) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, size: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
