@@ -2917,35 +2917,6 @@ value={exterior.dumpster.count}
                                           </SelectContent>
                                         </Select>
                                       </div>
-                                      <div className="space-y-1">
-                                        <Label className="text-xs text-muted-foreground">Finish</Label>
-                                        <Select value={window.finish} onValueChange={(value) => {
-                                          const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, finish: value }
-                                          updateRoom(room.id, { windows: newWindows })
-                                        }}>
-                                          <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
-                                            <SelectValue placeholder="Select" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="trimmed-window">Trimmed Window</SelectItem>
-                                            <SelectItem value="sill-apron">Sill and Apron</SelectItem>
-                                            <SelectItem value="marble-sill">Marble Sill</SelectItem>
-                                          </SelectContent>
-                                        </Select>
-                                      </div>
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                                        onClick={() => {
-                                          const newWindows = room.windows.filter(w => w.id !== window.id)
-                                          updateRoom(room.id, { windows: newWindows })
-                                        }}
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
                                     </div>
                                     <div className="flex flex-wrap items-end gap-3">
                                       <div className="space-y-1">
@@ -2982,6 +2953,23 @@ value={exterior.dumpster.count}
                                           </SelectContent>
                                         </Select>
                                       </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Finish</Label>
+                                        <Select value={window.finish} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, finish: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="trimmed-window">Trimmed Window</SelectItem>
+                                            <SelectItem value="sill-apron">Sill and Apron</SelectItem>
+                                            <SelectItem value="marble-sill">Marble Sill</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
                                       <div className="flex items-center gap-2 pb-1">
                                         <Switch
                                           checked={window.marbleSillReplace}
@@ -3004,6 +2992,19 @@ value={exterior.dumpster.count}
                                         />
                                         <Label className="text-sm">Marble window sill detach</Label>
                                       </div>
+                                      <div className="flex-1" />
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                        onClick={() => {
+                                          const newWindows = room.windows.filter(w => w.id !== window.id)
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
                                     </div>
                                   </div>
                                 ))}
