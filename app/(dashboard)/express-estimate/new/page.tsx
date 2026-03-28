@@ -2875,7 +2875,6 @@ value={exterior.dumpster.count}
                                             </SelectTrigger>
                                             <SelectContent>
                                               <SelectItem value="smooth">Smooth</SelectItem>
-                                              <SelectItem value="no-texture">No texture</SelectItem>
                                               <SelectItem value="hand-texture">Hand texture</SelectItem>
                                               <SelectItem value="machine-texture">Machine texture</SelectItem>
                                               <SelectItem value="heavy-texture">Heavy texture</SelectItem>
@@ -4637,6 +4636,7 @@ value={exterior.dumpster.count}
                                           </SelectContent>
                                         </Select>
                                       </div>
+                                      <div className="flex-1"></div>
                                       <div className="flex items-end gap-2 pb-1">
                                         <Button
                                           variant="ghost"
