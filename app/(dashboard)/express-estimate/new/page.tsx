@@ -577,7 +577,7 @@ const newDoor: DoorItem = {
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="dwelling">Dwelling</SelectItem>
                                   <SelectItem value="general-property">General Property</SelectItem>
                                   <SelectItem value="rcbap">RCBAP</SelectItem>
@@ -1190,7 +1190,7 @@ const newDoor: DoorItem = {
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="0.25">0.25</SelectItem>
                                   <SelectItem value="0.5">0.5</SelectItem>
                                   <SelectItem value="0.75">0.75</SelectItem>
@@ -1245,7 +1245,7 @@ const newDoor: DoorItem = {
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="0.25">0.25</SelectItem>
                                   <SelectItem value="0.5">0.5</SelectItem>
                                   <SelectItem value="0.75">0.75</SelectItem>
@@ -1399,7 +1399,7 @@ const newDoor: DoorItem = {
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="spray-foam">Spray Foam</SelectItem>
                                   <SelectItem value="fiberglass-batt">Fiberglass Batt</SelectItem>
                                 </SelectContent>
@@ -1589,7 +1589,7 @@ const newDoor: DoorItem = {
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="replace">Replace</SelectItem>
                                   <SelectItem value="detach-reset">Detach and Reset</SelectItem>
                                 </SelectContent>
@@ -1602,7 +1602,7 @@ const newDoor: DoorItem = {
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="1/3">1/3 HP - up to 1 1/2 discharge</SelectItem>
                                   <SelectItem value="1/2">1/2 HP - up to 2 1/2 discharge</SelectItem>
                                   <SelectItem value="3/4">3/4 HP - up to 2 1/2 discharge</SelectItem>
@@ -1697,7 +1697,7 @@ const newDoor: DoorItem = {
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="air-handler">Air Handler</SelectItem>
                                   <SelectItem value="gas-furnace">Gas Furnace</SelectItem>
                                 </SelectContent>
@@ -1713,7 +1713,7 @@ const newDoor: DoorItem = {
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {["2", "2.5", "3", "4", "5"].map(t => (
                                     <SelectItem key={t} value={t}>{t} Ton</SelectItem>
                                   ))}
@@ -1730,7 +1730,7 @@ const newDoor: DoorItem = {
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="replace">Replace</SelectItem>
                                   <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                 </SelectContent>
@@ -1747,7 +1747,7 @@ const newDoor: DoorItem = {
                                       <SelectValue placeholder="QTY" />
                                     </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {[1, 2, 3, 4, 5].map(n => (
                                     <SelectItem key={n} value={String(n)}>{n}</SelectItem>
                                   ))}
@@ -1855,7 +1855,7 @@ const newDoor: DoorItem = {
                                         <SelectValue placeholder="SF" />
                                       </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="0.5">0.5</SelectItem>
                                   <SelectItem value="1">1</SelectItem>
                                   <SelectItem value="1.5">1.5</SelectItem>
@@ -1964,7 +1964,7 @@ const newDoor: DoorItem = {
                                       <SelectValue placeholder="Type" />
                                     </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="casement">Casement</SelectItem>
                                   <SelectItem value="picture">Picture Window</SelectItem>
                                 </SelectContent>
@@ -1977,7 +1977,7 @@ const newDoor: DoorItem = {
                                       <SelectValue placeholder="Size" />
                                     </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="18-20">18-20 CF</SelectItem>
                                         <SelectItem value="21-24">21-24 CF</SelectItem>
                                         <SelectItem value="25-28">25-28 CF</SelectItem>
@@ -2006,7 +2006,7 @@ const newDoor: DoorItem = {
                                       <SelectValue placeholder="Material" />
                                     </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="vinyl">Vinyl</SelectItem>
                                   <SelectItem value="aluminum">Aluminum</SelectItem>
                                   <SelectItem value="wood">Wood</SelectItem>
@@ -2041,7 +2041,7 @@ const newDoor: DoorItem = {
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="detach-reset-handle">Detach & Reset Handle</SelectItem>
                                   <SelectItem value="detach-reset-flush-mount">Detach & Reset - Flush Mount</SelectItem>
                                 </SelectContent>
@@ -2078,7 +2078,7 @@ const newDoor: DoorItem = {
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
                                     <SelectItem key={n} value={String(n)}>{n}</SelectItem>
                                   ))}
@@ -2092,7 +2092,7 @@ const newDoor: DoorItem = {
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {[0, 1, 2, 3, 4, 5].map(n => (
                                     <SelectItem key={n} value={String(n)}>{n}</SelectItem>
                                   ))}
@@ -2106,7 +2106,7 @@ const newDoor: DoorItem = {
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {[0, 1, 2, 3, 4, 5].map(n => (
                                     <SelectItem key={n} value={String(n)}>{n}</SelectItem>
                                   ))}
@@ -2120,7 +2120,7 @@ const newDoor: DoorItem = {
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(n => (
                                     <SelectItem key={n} value={String(n)}>{n}</SelectItem>
                                   ))}
@@ -2134,7 +2134,7 @@ const newDoor: DoorItem = {
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {[0, 1, 2, 3, 4, 5].map(n => (
                                     <SelectItem key={n} value={String(n)}>{n}</SelectItem>
                                   ))}
@@ -2160,7 +2160,7 @@ const newDoor: DoorItem = {
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {["100", "150", "200", "300"].map(a => (
                                     <SelectItem key={a} value={a}>{a} amps</SelectItem>
                                   ))}
@@ -2190,7 +2190,7 @@ const newDoor: DoorItem = {
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="qty">QTY</SelectItem>
                                   <SelectItem value="sf">SF</SelectItem>
                                 </SelectContent>
@@ -2285,7 +2285,7 @@ const newDoor: DoorItem = {
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="pvc">PVC</SelectItem>
                                   <SelectItem value="wood">Wood</SelectItem>
                                 </SelectContent>
@@ -2462,7 +2462,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="standard">Standard</SelectItem>
                                         <SelectItem value="variable-speed">Variable Speed</SelectItem>
                                         <SelectItem value="multi-stage">Multi-Stage</SelectItem>
@@ -2484,7 +2484,7 @@ const newDoor: DoorItem = {
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__clear__">Clear</SelectItem>
+                                                    <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                     {layer.type === "vinyl-plank" && (
                                                       <>
                                                         <SelectItem value="vinyl-plank">Vinyl Plank</SelectItem>
@@ -2563,7 +2563,7 @@ const newDoor: DoorItem = {
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__clear__">Clear</SelectItem>
+                                                    <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                     {layer.type === "vinyl-plank" && (
                                                       <>
                                                         <SelectItem value="glue-down-concrete">Glue Down on Concrete</SelectItem>
@@ -2603,7 +2603,7 @@ const newDoor: DoorItem = {
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="remove">Remove</SelectItem>
                                   <SelectItem value="remove-reinstall">R & R</SelectItem>
                                 </SelectContent>
@@ -2693,7 +2693,7 @@ const newDoor: DoorItem = {
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {["2", "3", "4", "5", "6"].map(h => (
                                     <SelectItem key={h} value={h}>{h}</SelectItem>
                                   ))}
@@ -2707,7 +2707,7 @@ const newDoor: DoorItem = {
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="mdf">MDF</SelectItem>
                                   <SelectItem value="wood">Wood</SelectItem>
                                 </SelectContent>
@@ -2720,7 +2720,7 @@ const newDoor: DoorItem = {
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="paint">Paint</SelectItem>
                                   <SelectItem value="stain">Stain</SelectItem>
                                 </SelectContent>
@@ -2747,7 +2747,7 @@ const newDoor: DoorItem = {
                                             <SelectValue placeholder="Finish" />
                                           </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="paint">Paint</SelectItem>
                                   <SelectItem value="stain">Stain</SelectItem>
                                 </SelectContent>
@@ -2786,7 +2786,7 @@ const newDoor: DoorItem = {
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="drywall-sf">Drywall (SF)</SelectItem>
                                   <SelectItem value="drywall-lf">Drywall (LF)</SelectItem>
                                   <SelectItem value="paneling">Paneling</SelectItem>
@@ -2801,7 +2801,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__clear__">Clear</SelectItem>
+                                              <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                               {room.wallCovering.material === "drywall-sf" && (
                                                 <>
                                                   <SelectItem value="1/2-in">1/2 in</SelectItem>
@@ -2845,7 +2845,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__clear__">Clear</SelectItem>
+                                              <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                               {room.wallCovering.material === "drywall-sf" && (
                                                 <>
                                                   <SelectItem value="0.5W">0.5W</SelectItem>
@@ -2884,7 +2884,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="smooth">Smooth</SelectItem>
                                   <SelectItem value="textured">Textured</SelectItem>
                                 </SelectContent>
@@ -2921,7 +2921,7 @@ const newDoor: DoorItem = {
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="single-hung">Single Hung</SelectItem>
                                   <SelectItem value="double-hung">Double Hung</SelectItem>
                                   <SelectItem value="casement">Casement</SelectItem>
@@ -2941,7 +2941,7 @@ const newDoor: DoorItem = {
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="aluminum">Aluminum</SelectItem>
                                   <SelectItem value="vinyl">Vinyl</SelectItem>
                                   <SelectItem value="wood">Wood</SelectItem>
@@ -2960,7 +2960,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__clear__">Clear</SelectItem>
+                                              <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                               {((window.material === "vinyl" && (window.type === "single-hung" || window.type === "double-hung")) ||
                                                 (window.material === "aluminum" && (window.type === "single-hung" || window.type === "double-hung")) ||
                                                 (window.material === "wood" && (window.type === "single-hung" || window.type === "double-hung"))) && (
@@ -3035,7 +3035,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__clear__">Clear</SelectItem>
+                                              <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                               {window.material === "vinyl" && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
@@ -3087,7 +3087,7 @@ const newDoor: DoorItem = {
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="mdf">MDF</SelectItem>
                                   <SelectItem value="wood">Wood</SelectItem>
                                 </SelectContent>
@@ -3104,7 +3104,7 @@ const newDoor: DoorItem = {
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="casing-stain">Casing - Stain</SelectItem>
                                   <SelectItem value="casing-paint">Casing - Paint</SelectItem>
                                 </SelectContent>
@@ -3121,7 +3121,7 @@ const newDoor: DoorItem = {
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="trimmed-window">Trimmed Window</SelectItem>
                                   <SelectItem value="no-casing-window">No Casing Window</SelectItem>
                                 </SelectContent>
@@ -3138,7 +3138,7 @@ const newDoor: DoorItem = {
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {Array.from({ length: 30 }, (_, i) => i + 1).map((num) => (
                                     <SelectItem key={num} value={String(num)}>{num}</SelectItem>
                                   ))}
@@ -3271,7 +3271,7 @@ const newDoor: DoorItem = {
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="1">1 light</SelectItem>
                                   <SelectItem value="2">2 light</SelectItem>
                                   <SelectItem value="3">3 light</SelectItem>
@@ -3328,7 +3328,7 @@ const newDoor: DoorItem = {
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="base">Base</SelectItem>
                                   <SelectItem value="standard">Standard</SelectItem>
                                   <SelectItem value="high-end">High End</SelectItem>
@@ -3354,7 +3354,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="standard">Standard</SelectItem>
                                         <SelectItem value="variable-speed">Variable Speed</SelectItem>
                                         <SelectItem value="multi-stage">Multi-Stage</SelectItem>
@@ -3368,7 +3368,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="base">Base</SelectItem>
                                   <SelectItem value="standard">Standard</SelectItem>
                                   <SelectItem value="high-end">High End</SelectItem>
@@ -3384,7 +3384,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {Array.from({ length: 15 }, (_, i) => i + 1).map((num) => (
                                     <SelectItem key={num} value={String(num)}>{num}</SelectItem>
                                   ))}
@@ -3429,7 +3429,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="single">Single</SelectItem>
                                         <SelectItem value="double">Double</SelectItem>
                                         <SelectItem value="microwave-combo">Microwave Combo</SelectItem>
@@ -3473,7 +3473,7 @@ const newDoor: DoorItem = {
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="fiberglass-tub-shower">Fiberglass Tub/Shwr Unit</SelectItem>
                                   <SelectItem value="fiberglass-shower">Fiberglass Shower Unit</SelectItem>
                                   <SelectItem value="tile-shower">Tile Shower</SelectItem>
@@ -3498,7 +3498,7 @@ const newDoor: DoorItem = {
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                   <SelectItem value="replace">Replace</SelectItem>
                                 </SelectContent>
@@ -3517,7 +3517,7 @@ const newDoor: DoorItem = {
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="side-by-side">Side-by-Side</SelectItem>
                                         <SelectItem value="french-door">French Door</SelectItem>
                                         <SelectItem value="top-freezer">Top Freezer</SelectItem>
@@ -3532,7 +3532,7 @@ const newDoor: DoorItem = {
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="up-to-60sf">Up to 60SF</SelectItem>
                                   <SelectItem value="up-to-70sf">Up to 70SF</SelectItem>
                                   <SelectItem value="up-to-80sf">Up to 80SF</SelectItem>
@@ -3546,7 +3546,7 @@ const newDoor: DoorItem = {
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                   <SelectItem value="replace">Replace</SelectItem>
                                 </SelectContent>
@@ -3565,7 +3565,7 @@ const newDoor: DoorItem = {
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="side-by-side">Side-by-Side</SelectItem>
                                         <SelectItem value="french-door">French Door</SelectItem>
                                         <SelectItem value="top-freezer">Top Freezer</SelectItem>
@@ -3580,7 +3580,7 @@ const newDoor: DoorItem = {
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                   <SelectItem value="replace">Replace</SelectItem>
                                 </SelectContent>
@@ -3607,7 +3607,7 @@ const newDoor: DoorItem = {
                                                       <SelectValue placeholder="Select" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                      <SelectItem value="__clear__">Clear</SelectItem>
+                                                      <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                       <SelectItem value="1-100sf">1-100 SF</SelectItem>
                                                       <SelectItem value="101-200sf">101-200 SF</SelectItem>
                                                       <SelectItem value="over-200sf">Over 200 SF</SelectItem>
@@ -3622,7 +3622,7 @@ const newDoor: DoorItem = {
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="up-to-60sf">Up to 60SF</SelectItem>
                                   <SelectItem value="up-to-70sf">Up to 70SF</SelectItem>
                                   <SelectItem value="up-to-80sf">Up to 80SF</SelectItem>
@@ -3636,7 +3636,7 @@ const newDoor: DoorItem = {
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                   <SelectItem value="replace">Replace</SelectItem>
                                 </SelectContent>
@@ -3679,7 +3679,7 @@ const newDoor: DoorItem = {
                                                         <SelectValue placeholder="QTY" />
                                                       </SelectTrigger>
                                                       <SelectContent>
-                                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                                                           <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
                                                         ))}
@@ -3706,7 +3706,7 @@ const newDoor: DoorItem = {
                                                         <SelectValue placeholder="QTY" />
                                                       </SelectTrigger>
                                                       <SelectContent>
-                                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                                                           <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
                                                         ))}
@@ -3746,7 +3746,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__clear__">Clear</SelectItem>
+                                              <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                               {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
                                                 <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
                                               ))}
@@ -3760,7 +3760,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__clear__">Clear</SelectItem>
+                                              <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                               <SelectItem value="base">Base</SelectItem>
                                               <SelectItem value="standard">Standard</SelectItem>
                                               <SelectItem value="high">High Grade</SelectItem>
@@ -3783,7 +3783,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Size" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__clear__">Clear</SelectItem>
+                                              <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                               {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
                                                 <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
                                               ))}
@@ -3804,7 +3804,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="cultured-marble">Cultured Marble</SelectItem>
                                   <SelectItem value="laminate">Laminate</SelectItem>
                                   <SelectItem value="solid-surface">Solid Surface</SelectItem>
@@ -3818,7 +3818,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__clear__">Clear</SelectItem>
+                                              <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                               <SelectItem value="base">Base</SelectItem>
                                               <SelectItem value="standard">Standard</SelectItem>
                                               <SelectItem value="premium">Premium</SelectItem>
@@ -3834,7 +3834,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__clear__">Clear</SelectItem>
+                                              <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                               {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
                                                 <SelectItem key={num} value={String(num)}>{num}</SelectItem>
                                               ))}
@@ -3862,7 +3862,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__clear__">Clear</SelectItem>
+                                              <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                               <SelectItem value="tile">Tile</SelectItem>
                                               <SelectItem value="solid-surface">Solid surface</SelectItem>
                                               <SelectItem value="unattached">Unattached</SelectItem>
@@ -3876,7 +3876,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__clear__">Clear</SelectItem>
+                                              <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                               <SelectItem value="base">Base</SelectItem>
                                               <SelectItem value="standard">Standard</SelectItem>
                                               <SelectItem value="premium">Premium</SelectItem>
@@ -3935,7 +3935,7 @@ const newDoor: DoorItem = {
                                               <SelectValue placeholder="QTY" />
                                             </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   {Array.from({ length: 15 }, (_, i) => i + 1).map((num) => (
                                     <SelectItem key={num} value={String(num)}>{num}</SelectItem>
                                   ))}
@@ -4095,7 +4095,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="base">Base</SelectItem>
                                         <SelectItem value="standard">Standard</SelectItem>
                                         <SelectItem value="high">High Grade</SelectItem>
@@ -4107,7 +4107,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4139,7 +4139,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="standard">Standard</SelectItem>
                                         <SelectItem value="convection">Convection</SelectItem>
                                         <SelectItem value="self-cleaning">Self-Cleaning</SelectItem>
@@ -4150,7 +4150,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4182,7 +4182,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="gas">Gas</SelectItem>
                                         <SelectItem value="oil">Oil</SelectItem>
                                         <SelectItem value="electric">Electric</SelectItem>
@@ -4203,7 +4203,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="standard">Standard</SelectItem>
                                         <SelectItem value="convection">Convection</SelectItem>
                                         <SelectItem value="self-cleaning">Self-Cleaning</SelectItem>
@@ -4214,7 +4214,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4246,7 +4246,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="gas">Gas</SelectItem>
                                         <SelectItem value="oil">Oil</SelectItem>
                                         <SelectItem value="electric">Electric</SelectItem>
@@ -4257,7 +4257,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="standard">Standard</SelectItem>
                                         <SelectItem value="convection">Convection</SelectItem>
                                         <SelectItem value="self-cleaning">Self-Cleaning</SelectItem>
@@ -4268,7 +4268,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4300,7 +4300,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="gas">Gas</SelectItem>
                                         <SelectItem value="oil">Oil</SelectItem>
                                         <SelectItem value="electric">Electric</SelectItem>
@@ -4311,7 +4311,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Size" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="30">30 Gal</SelectItem>
                                         <SelectItem value="40">40 Gal</SelectItem>
                                         <SelectItem value="50">50 Gal</SelectItem>
@@ -4324,7 +4324,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Rating" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="6">6 yr</SelectItem>
                                                   <SelectItem value="9">9 yr</SelectItem>
                                                   <SelectItem value="12">12 yr</SelectItem>
@@ -4335,7 +4335,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4367,7 +4367,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="freestanding">Freestanding</SelectItem>
                                                   <SelectItem value="slide-in">Slide in</SelectItem>
                                                   <SelectItem value="drop-in">Drop in</SelectItem>
@@ -4381,7 +4381,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="standard">Standard</SelectItem>
                                         <SelectItem value="convection">Convection</SelectItem>
                                         <SelectItem value="self-cleaning">Self-Cleaning</SelectItem>
@@ -4392,7 +4392,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4424,7 +4424,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="2-ton">2 ton</SelectItem>
                                                   <SelectItem value="3-ton">3 ton</SelectItem>
                                                   <SelectItem value="4-ton">4 ton</SelectItem>
@@ -4436,7 +4436,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Options" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="with-heating-element">With heating element</SelectItem>
                                                   <SelectItem value="with-a-coil">With A coil</SelectItem>
                                                   <SelectItem value="with-heating-and-coil">With heating element and a Coil</SelectItem>
@@ -4447,7 +4447,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4479,7 +4479,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="gas">Gas</SelectItem>
                                         <SelectItem value="electric">Electric</SelectItem>
                                         <SelectItem value="tankless-gas">Tankless Gas</SelectItem>
@@ -4492,7 +4492,7 @@ const newDoor: DoorItem = {
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4555,7 +4555,7 @@ const newDoor: DoorItem = {
                                           <SelectValue placeholder="Type" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="__clear__">Clear</SelectItem>
+                                          <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                           {door.category === "interior" ? (
                                             <>
                                               <SelectItem value="6-panel">6 Panel</SelectItem>
@@ -4584,7 +4584,7 @@ const newDoor: DoorItem = {
                                           <SelectValue placeholder="Grade" />
                                         </SelectTrigger>
 <SelectContent>
-                                        <SelectItem value="__clear__">Clear</SelectItem>
+                                        <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                         <SelectItem value="standard">Standard</SelectItem>
                                         <SelectItem value="high-efficiency">High Efficiency</SelectItem>
                                         <SelectItem value="energy-star">Energy Star</SelectItem>
@@ -4599,7 +4599,7 @@ const newDoor: DoorItem = {
                                           <SelectValue placeholder="Handle" />
                                         </SelectTrigger>
 <SelectContent>
-                                  <SelectItem value="__clear__">Clear</SelectItem>
+                                  <SelectItem value="__clear__" className="italic text-muted-foreground/70">None</SelectItem>
                                   <SelectItem value="replace">Replace</SelectItem>
                                   <SelectItem value="service">Service Call</SelectItem>
                                 </SelectContent>
