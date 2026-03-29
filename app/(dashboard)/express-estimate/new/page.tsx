@@ -2733,8 +2733,8 @@ export default function NewExpressEstimatePage() {
                                         <SelectContent>
                                           <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           <SelectItem value="mdf">MDF</SelectItem>
-                                          <SelectItem value="hardwood">Hardwood</SelectItem>
-                                          <SelectItem value="builder">Builder Grade</SelectItem>
+                                          <SelectItem value="standard">Standard</SelectItem>
+                                          <SelectItem value="wood">Wood</SelectItem>
                                         </SelectContent>
                                       </Select>
                                     </div>
@@ -2816,6 +2816,8 @@ export default function NewExpressEstimatePage() {
                                             <SelectItem value="drywall-lf">Drywall (LF)</SelectItem>
                                             <SelectItem value="plaster">Plaster</SelectItem>
                                             <SelectItem value="paneling">Paneling</SelectItem>
+                                            <SelectItem value="tile-cement-board">Tile (Cement Board)</SelectItem>
+                                            <SelectItem value="tile-wire-lath">Tile (Over Wire Lath)</SelectItem>
                                           </SelectContent>
                                         </Select>
                                       </div>
@@ -3141,8 +3143,11 @@ export default function NewExpressEstimatePage() {
                                           </SelectTrigger>
                                           <SelectContent>
                                             <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="untrimmed">Untrimmed Window</SelectItem>
                                             <SelectItem value="casing-stain">Casing - Stain</SelectItem>
+                                            <SelectItem value="casing-apron-stain">Casing With Apron - Stain</SelectItem>
                                             <SelectItem value="casing-paint">Casing - Paint</SelectItem>
+                                            <SelectItem value="casing-apron-paint">Casing With Apron - Paint</SelectItem>
                                           </SelectContent>
                                         </Select>
                                       </div>
@@ -3522,7 +3527,7 @@ export default function NewExpressEstimatePage() {
                                                 <SelectItem value="fiberglass-tub-shower">Fiberglass Tub/Shwr Unit</SelectItem>
                                                 <SelectItem value="tub-tile-surround">Tub With Tiled Surround</SelectItem>
                                                 <SelectItem value="tub-cultured-marble">Tub With Cultured Marble</SelectItem>
-                                                <SelectItem value="tile-shower">Tile Shower</SelectItem>
+                                                <SelectItem value="tile-shower">Tiled Shower</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           </div>
@@ -3572,19 +3577,20 @@ export default function NewExpressEstimatePage() {
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Surround</Label>
                                                 <Select value={room.shower.surround} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, surround: value } }) }}>
-                                                  <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                                  <SelectTrigger className="w-[160px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="up-to-60sf">Up to 60SF</SelectItem>
-                                                    <SelectItem value="61-100sf">61-100SF</SelectItem>
-                                                    <SelectItem value="over-100sf">Over 100SF</SelectItem>
+                                                    <SelectItem value="up-to-60sf">Up to 60 SF</SelectItem>
+                                                    <SelectItem value="up-to-60sf-high">Up to 60 SF - High Grade</SelectItem>
+                                                    <SelectItem value="60-75sf">60-75 SF</SelectItem>
+                                                    <SelectItem value="60-75sf-high">60-75 SF - High Grade</SelectItem>
                                                   </SelectContent>
                                                 </Select>
                                               </div>
                                               <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">tub shower faucet</Label>
+                                                <Label className="text-xs text-muted-foreground">Tub Shower Faucet</Label>
                                                 <Select value={room.shower.tubShowerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } }) }}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
@@ -3616,7 +3622,7 @@ export default function NewExpressEstimatePage() {
                                                 </Select>
                                               </div>
                                               <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">tub shower faucet</Label>
+                                                <Label className="text-xs text-muted-foreground">Tub Shower Faucet</Label>
                                                 <Select value={room.shower.tubShowerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } }) }}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
@@ -3631,48 +3637,54 @@ export default function NewExpressEstimatePage() {
                                             </>
                                           )}
 
-                                          {/* Tile Shower fields */}
+                                          {/* Tiled Shower fields */}
                                           {room.shower.type === "tile-shower" && (
                                             <>
-                                              <div className="flex items-center gap-2 pb-1">
-                                                <Switch
-                                                  checked={room.shower.mortarBedReplace}
-                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedReplace: checked } })}
-                                                />
-                                                <Label className="text-sm whitespace-nowrap">Replace</Label>
+                                              <div className="space-y-1">
+                                                <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
+                                                <div className="flex items-center gap-2">
+                                                  <Switch
+                                                    checked={room.shower.mortarBedReplace}
+                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedReplace: checked } })}
+                                                  />
+                                                  <Label className="text-sm whitespace-nowrap">Replace</Label>
+                                                </div>
                                               </div>
                                               {room.shower.mortarBedReplace && (
                                                 <div className="space-y-1">
-                                                  <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
-                                                  <Select value={room.shower.mortarBedSize} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, mortarBedSize: value } }) }}>
-                                                    <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      <SelectItem value="1-100sf">1-100 SF</SelectItem>
-                                                      <SelectItem value="101-200sf">101-200 SF</SelectItem>
-                                                      <SelectItem value="over-200sf">Over 200 SF</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
+                                                  <Label className="text-xs text-muted-foreground">Size (SF)</Label>
+                                                  <Input
+                                                    type="number"
+                                                    min={1}
+                                                    max={100}
+                                                    value={room.shower.mortarBedSize || ""}
+                                                    onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedSize: e.target.value } })}
+                                                    className="w-[100px] border-border/60 bg-secondary/50"
+                                                    placeholder="1-100"
+                                                  />
                                                 </div>
                                               )}
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Walls</Label>
-                                                <Select value={room.shower.walls} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, walls: value } }) }}>
-                                                  <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                                <Select value={room.shower.surround} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, surround: value } }) }}>
+                                                  <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="up-to-60sf">Up to 60SF</SelectItem>
-                                                    <SelectItem value="61-100sf">61-100SF</SelectItem>
-                                                    <SelectItem value="over-100sf">Over 100SF</SelectItem>
+                                                    <SelectItem value="up-to-60sf">Up to 60 SF</SelectItem>
+                                                    <SelectItem value="up-to-60sf-high">Up to 60 SF - High Grade</SelectItem>
+                                                    <SelectItem value="61-100sf">61-100 SF</SelectItem>
+                                                    <SelectItem value="61-100sf-high">61-100 SF - High Grade</SelectItem>
+                                                    <SelectItem value="101-120sf">101-120 SF</SelectItem>
+                                                    <SelectItem value="101-120sf-high">101-120 SF - High Grade</SelectItem>
+                                                    <SelectItem value="121-150sf">121-150 SF</SelectItem>
+                                                    <SelectItem value="121-150sf-high">121-150 SF - High Grade</SelectItem>
                                                   </SelectContent>
                                                 </Select>
                                               </div>
                                               <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">shower faucet</Label>
+                                                <Label className="text-xs text-muted-foreground">Shower Faucet</Label>
                                                 <Select value={room.shower.showerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: value } }) }}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
@@ -3696,69 +3708,70 @@ export default function NewExpressEstimatePage() {
                                           <p className="text-xs text-amber-500">Note: If replacing please note fema requires photos of damage to warrant replacement</p>
                                         )}
                                         {room.shower.type === "tile-shower" && (
-                                          <>
-                                            <p className="text-xs text-amber-500">Note: includes cement board replacement</p>
-                                            {/* Tile Shower Misc section */}
-                                            <div className="border-t border-border/40 pt-3">
-                                              <Label className="text-xs text-muted-foreground mb-2 block">Misc</Label>
-                                              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                                                <div className="flex items-center gap-2">
-                                                  <Switch
-                                                    checked={room.shower.tileBench}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileBench: checked } })}
-                                                  />
-                                                  <Label className="text-sm">Tile Bench</Label>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                  <Switch
-                                                    checked={room.shower.tileNiche}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileNiche: checked } })}
-                                                  />
-                                                  <Label className="text-sm">Tile Niche</Label>
-                                                  {room.shower.tileNiche && (
-                                                    <Select value={room.shower.tileNicheQty} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tileNicheQty: value } }) }}>
-                                                      <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
-                                                        <SelectValue placeholder="QTY" />
-                                                      </SelectTrigger>
-                                                      <SelectContent>
-                                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                        {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-                                                          <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
-                                                        ))}
-                                                      </SelectContent>
-                                                    </Select>
-                                                  )}
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                  <Switch
-                                                    checked={room.shower.towelBar}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, towelBar: checked } })}
-                                                  />
-                                                  <Label className="text-sm">Towel Bar</Label>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                  <Switch
-                                                    checked={room.shower.tileSoapDish}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileSoapDish: checked } })}
-                                                  />
-                                                  <Label className="text-sm">Tile Soap dish</Label>
-                                                  {room.shower.tileSoapDish && (
-                                                    <Select value={room.shower.tileSoapDishQty} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tileSoapDishQty: value } }) }}>
-                                                      <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
-                                                        <SelectValue placeholder="QTY" />
-                                                      </SelectTrigger>
-                                                      <SelectContent>
-                                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                        {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-                                                          <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
-                                                        ))}
-                                                      </SelectContent>
-                                                    </Select>
-                                                  )}
-                                                </div>
+                                          <p className="text-xs text-amber-500">Note: includes cement board replacement</p>
+                                        )}
+
+                                        {/* Misc section - shown for all shower types */}
+                                        {room.shower.type && room.shower.type !== "__none__" && (
+                                          <div className="border-t border-border/40 pt-3">
+                                            <Label className="text-xs text-muted-foreground mb-2 block">Misc</Label>
+                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                              <div className="flex items-center gap-2">
+                                                <Switch
+                                                  checked={room.shower.tileBench}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileBench: checked } })}
+                                                />
+                                                <Label className="text-sm">Tile Bench</Label>
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <Switch
+                                                  checked={room.shower.tileNiche}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileNiche: checked } })}
+                                                />
+                                                <Label className="text-sm">Tile Niche</Label>
+                                                {room.shower.tileNiche && (
+                                                  <Select value={room.shower.tileNicheQty} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tileNicheQty: value } }) }}>
+                                                    <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
+                                                      <SelectValue placeholder="QTY" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                      {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                                                        <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
+                                                      ))}
+                                                    </SelectContent>
+                                                  </Select>
+                                                )}
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <Switch
+                                                  checked={room.shower.towelBar}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, towelBar: checked } })}
+                                                />
+                                                <Label className="text-sm">Towel Bar</Label>
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <Switch
+                                                  checked={room.shower.tileSoapDish}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileSoapDish: checked } })}
+                                                />
+                                                <Label className="text-sm">Tile Soap dish</Label>
+                                                {room.shower.tileSoapDish && (
+                                                  <Select value={room.shower.tileSoapDishQty} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tileSoapDishQty: value } }) }}>
+                                                    <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
+                                                      <SelectValue placeholder="QTY" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                      {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                                                        <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
+                                                      ))}
+                                                    </SelectContent>
+                                                  </Select>
+                                                )}
                                               </div>
                                             </div>
-                                          </>
+                                          </div>
                                         )}
                                       </div>
                                     )}
@@ -4091,7 +4104,7 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="side-by-side">Side by side</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              {room.appliances.refrigerator.type !== "compact" && (
+                                              {room.appliances.refrigerator.type && room.appliances.refrigerator.type !== "compact" && room.appliances.refrigerator.type !== "__none__" && (
                                                 <Select value={room.appliances.refrigerator.size} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, size: value } } }) }}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                     <SelectValue placeholder="Size" />
@@ -4100,18 +4113,18 @@ export default function NewExpressEstimatePage() {
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     {room.appliances.refrigerator.type === "top-freezer" && (
                                                       <>
-                                                        <SelectItem value="14-18">14-18 CF</SelectItem>
-                                                        <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                        <SelectItem value="23-26">23-26 CF</SelectItem>
-                                                        <SelectItem value="14-26">14-26 CF</SelectItem>
+                                                        <SelectItem value="14-18">14-18 cf</SelectItem>
+                                                        <SelectItem value="18-22">18-22 cf</SelectItem>
+                                                        <SelectItem value="22-24">22-24 cf</SelectItem>
+                                                        <SelectItem value="24-26">24-26 cf</SelectItem>
                                                       </>
                                                     )}
                                                     {room.appliances.refrigerator.type === "bottom-freezer" && (
                                                       <>
-                                                        <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                        <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                        <SelectItem value="25-30">25-30 CF</SelectItem>
-                                                        <SelectItem value="25-36">25-36 CF</SelectItem>
+                                                        <SelectItem value="18-22">18-22 cf</SelectItem>
+                                                        <SelectItem value="22-25">22-25 cf</SelectItem>
+                                                        <SelectItem value="25-30">25-30 cf</SelectItem>
+                                                        <SelectItem value="25-26">25-26 cf</SelectItem>
                                                       </>
                                                     )}
                                                     {room.appliances.refrigerator.type === "built-in" && (
@@ -4123,16 +4136,9 @@ export default function NewExpressEstimatePage() {
                                                     )}
                                                     {room.appliances.refrigerator.type === "side-by-side" && (
                                                       <>
-                                                        <SelectItem value="12-22">12-22 CF</SelectItem>
-                                                        <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                        <SelectItem value="25-30">25-30 CF</SelectItem>
-                                                      </>
-                                                    )}
-                                                    {!room.appliances.refrigerator.type && (
-                                                      <>
-                                                        <SelectItem value="14-18">14-18 CF</SelectItem>
-                                                        <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                        <SelectItem value="22-25">22-25 CF</SelectItem>
+                                                        <SelectItem value="12-22">12-22 cf</SelectItem>
+                                                        <SelectItem value="22-25">22-25 cf</SelectItem>
+                                                        <SelectItem value="25-30">25-30 cf</SelectItem>
                                                       </>
                                                     )}
                                                   </SelectContent>
@@ -4236,14 +4242,15 @@ export default function NewExpressEstimatePage() {
                                                 </SelectContent>
                                               </Select>
                                               <Select value={room.appliances.range.options} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, options: value } } }) }}>
-                                                <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
+                                                <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[180px]">
                                                   <SelectValue placeholder="Options" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="free-standing">Free Standing</SelectItem>
+                                                  <SelectItem value="freestanding">Freestanding</SelectItem>
                                                   <SelectItem value="slide-in">Slide In</SelectItem>
                                                   <SelectItem value="drop-in">Drop In</SelectItem>
+                                                  <SelectItem value="freestanding-double">Freestanding - Double Oven</SelectItem>
                                                 </SelectContent>
                                               </Select>
                                               <Select value={room.appliances.range.grade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, grade: value } } }) }}>
@@ -4566,6 +4573,18 @@ export default function NewExpressEstimatePage() {
                                               />
                                             </div>
                                           )}
+                                        </div>
+                                        
+                                        {/* Complete Button */}
+                                        <div className="flex justify-end pt-3 border-t border-border/40">
+                                          <Button 
+                                            type="button" 
+                                            onClick={() => { handleSave(); }}
+                                            className="gap-2"
+                                          >
+                                            <CheckCircle className="h-4 w-4" />
+                                            Complete
+                                          </Button>
                                         </div>
                                       </div>
                                     )}
