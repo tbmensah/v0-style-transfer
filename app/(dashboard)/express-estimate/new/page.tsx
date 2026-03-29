@@ -4242,14 +4242,15 @@ export default function NewExpressEstimatePage() {
                                                 </SelectContent>
                                               </Select>
                                               <Select value={room.appliances.range.options} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, options: value } } }) }}>
-                                                <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
+                                                <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[180px]">
                                                   <SelectValue placeholder="Options" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="free-standing">Free Standing</SelectItem>
+                                                  <SelectItem value="freestanding">Freestanding</SelectItem>
                                                   <SelectItem value="slide-in">Slide In</SelectItem>
                                                   <SelectItem value="drop-in">Drop In</SelectItem>
+                                                  <SelectItem value="freestanding-double">Freestanding - Double Oven</SelectItem>
                                                 </SelectContent>
                                               </Select>
                                               <Select value={room.appliances.range.grade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, grade: value } } }) }}>
@@ -4575,6 +4576,18 @@ export default function NewExpressEstimatePage() {
                                         </div>
                                       </div>
                                     )}
+                                    
+                                    {/* Complete Button */}
+                                    <div className="flex justify-end pt-3 border-t border-border/40">
+                                      <Button 
+                                        type="button" 
+                                        onClick={() => { handleSave(); }}
+                                        className="gap-2"
+                                      >
+                                        <CheckCircle className="h-4 w-4" />
+                                        Complete
+                                      </Button>
+                                    </div>
                                   </div>
                                 </>
                               )}
