@@ -1,5 +1,5 @@
 import Link from "next/link"
-import Image from "next/image"
+import { Zap } from "lucide-react"
 
 export function Footer() {
   return (
@@ -7,7 +7,9 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2">
-            <Image src="/icon.png" alt="AdjustAid Logo" width={28} height={28} className="rounded-lg" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary shadow-sm shadow-primary/20">
+              <Zap className="h-4 w-4 text-primary-foreground" />
+            </div>
             <span className="text-sm font-medium text-foreground">AdjustAid</span>
           </div>
           <nav className="flex gap-6">

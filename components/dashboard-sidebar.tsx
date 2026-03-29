@@ -1,10 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Upload, ClipboardList, Coins, Settings, HelpCircle, LogOut, History, ChevronLeft, ChevronRight } from "lucide-react"
+import { LayoutDashboard, Upload, ClipboardList, Coins, Settings, HelpCircle, LogOut, History, Zap, ChevronLeft, ChevronRight } from "lucide-react"
 import { createContext, useContext, useState, ReactNode } from "react"
 
 const navigation = [
@@ -61,7 +60,9 @@ export function DashboardSidebar() {
           isCollapsed ? "justify-center px-2" : "gap-2.5 px-6"
         )}
       >
-        <Image src="/icon.png" alt="AdjustAid Logo" width={36} height={36} className="rounded-lg" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary shadow-md shadow-sidebar-primary/30">
+          <Zap className="h-5 w-5 text-sidebar-primary-foreground" />
+        </div>
         {!isCollapsed && (
           <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">AdjustAid</span>
         )}
