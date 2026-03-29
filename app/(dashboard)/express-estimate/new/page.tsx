@@ -3590,7 +3590,7 @@ export default function NewExpressEstimatePage() {
                                                 </Select>
                                               </div>
                                               <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">tub shower faucet</Label>
+                                                <Label className="text-xs text-muted-foreground">Tub Shower Faucet</Label>
                                                 <Select value={room.shower.tubShowerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } }) }}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
@@ -3622,7 +3622,7 @@ export default function NewExpressEstimatePage() {
                                                 </Select>
                                               </div>
                                               <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">tub shower faucet</Label>
+                                                <Label className="text-xs text-muted-foreground">Tub Shower Faucet</Label>
                                                 <Select value={room.shower.tubShowerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } }) }}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
@@ -3640,31 +3640,32 @@ export default function NewExpressEstimatePage() {
                                           {/* Tiled Shower fields */}
                                           {room.shower.type === "tile-shower" && (
                                             <>
-                                              <div className="flex items-center gap-2 pb-1">
-                                                <Switch
-                                                  checked={room.shower.mortarBedReplace}
-                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedReplace: checked } })}
-                                                />
-                                                <Label className="text-sm whitespace-nowrap">Replace</Label>
+                                              <div className="space-y-1">
+                                                <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
+                                                <div className="flex items-center gap-2">
+                                                  <Switch
+                                                    checked={room.shower.mortarBedReplace}
+                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedReplace: checked } })}
+                                                  />
+                                                  <Label className="text-sm whitespace-nowrap">Replace</Label>
+                                                </div>
                                               </div>
                                               {room.shower.mortarBedReplace && (
                                                 <div className="space-y-1">
-                                                  <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
-                                                  <Select value={room.shower.mortarBedSize} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, mortarBedSize: value } }) }}>
-                                                    <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
-                                                      <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      <SelectItem value="1-100sf">1-100 SF</SelectItem>
-                                                      <SelectItem value="101-200sf">101-200 SF</SelectItem>
-                                                      <SelectItem value="over-200sf">Over 200 SF</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
+                                                  <Label className="text-xs text-muted-foreground">Size (SF)</Label>
+                                                  <Input
+                                                    type="number"
+                                                    min={1}
+                                                    max={100}
+                                                    value={room.shower.mortarBedSize || ""}
+                                                    onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedSize: e.target.value } })}
+                                                    className="w-[100px] border-border/60 bg-secondary/50"
+                                                    placeholder="1-100"
+                                                  />
                                                 </div>
                                               )}
                                               <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">Surround</Label>
+                                                <Label className="text-xs text-muted-foreground">Walls</Label>
                                                 <Select value={room.shower.surround} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, surround: value } }) }}>
                                                   <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
@@ -3683,7 +3684,7 @@ export default function NewExpressEstimatePage() {
                                                 </Select>
                                               </div>
                                               <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">shower faucet</Label>
+                                                <Label className="text-xs text-muted-foreground">Shower Faucet</Label>
                                                 <Select value={room.shower.showerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: value } }) }}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
