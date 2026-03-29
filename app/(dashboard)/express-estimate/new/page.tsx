@@ -2733,8 +2733,8 @@ export default function NewExpressEstimatePage() {
                                         <SelectContent>
                                           <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           <SelectItem value="mdf">MDF</SelectItem>
-                                          <SelectItem value="hardwood">Hardwood</SelectItem>
-                                          <SelectItem value="builder">Builder Grade</SelectItem>
+                                          <SelectItem value="standard">Standard</SelectItem>
+                                          <SelectItem value="wood">Wood</SelectItem>
                                         </SelectContent>
                                       </Select>
                                     </div>
@@ -2816,6 +2816,8 @@ export default function NewExpressEstimatePage() {
                                             <SelectItem value="drywall-lf">Drywall (LF)</SelectItem>
                                             <SelectItem value="plaster">Plaster</SelectItem>
                                             <SelectItem value="paneling">Paneling</SelectItem>
+                                            <SelectItem value="tile-cement-board">Tile (Cement Board)</SelectItem>
+                                            <SelectItem value="tile-wire-lath">Tile (Over Wire Lath)</SelectItem>
                                           </SelectContent>
                                         </Select>
                                       </div>
@@ -3141,8 +3143,11 @@ export default function NewExpressEstimatePage() {
                                           </SelectTrigger>
                                           <SelectContent>
                                             <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="untrimmed">Untrimmed Window</SelectItem>
                                             <SelectItem value="casing-stain">Casing - Stain</SelectItem>
+                                            <SelectItem value="casing-apron-stain">Casing With Apron - Stain</SelectItem>
                                             <SelectItem value="casing-paint">Casing - Paint</SelectItem>
+                                            <SelectItem value="casing-apron-paint">Casing With Apron - Paint</SelectItem>
                                           </SelectContent>
                                         </Select>
                                       </div>
