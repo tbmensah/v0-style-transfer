@@ -4574,20 +4574,20 @@ export default function NewExpressEstimatePage() {
                                             </div>
                                           )}
                                         </div>
+                                        
+                                        {/* Complete Button */}
+                                        <div className="flex justify-end pt-3 border-t border-border/40">
+                                          <Button 
+                                            type="button" 
+                                            onClick={() => { handleSave(); }}
+                                            className="gap-2"
+                                          >
+                                            <CheckCircle className="h-4 w-4" />
+                                            Complete
+                                          </Button>
+                                        </div>
                                       </div>
                                     )}
-                                    
-                                    {/* Complete Button */}
-                                    <div className="flex justify-end pt-3 border-t border-border/40">
-                                      <Button 
-                                        type="button" 
-                                        onClick={() => { handleSave(); }}
-                                        className="gap-2"
-                                      >
-                                        <CheckCircle className="h-4 w-4" />
-                                        Complete
-                                      </Button>
-                                    </div>
                                   </div>
                                 </>
                               )}
