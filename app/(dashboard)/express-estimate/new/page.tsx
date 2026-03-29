@@ -4104,7 +4104,7 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="side-by-side">Side by side</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              {room.appliances.refrigerator.type !== "compact" && (
+                                              {room.appliances.refrigerator.type && room.appliances.refrigerator.type !== "compact" && room.appliances.refrigerator.type !== "__none__" && (
                                                 <Select value={room.appliances.refrigerator.size} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, size: value } } }) }}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                     <SelectValue placeholder="Size" />
@@ -4113,18 +4113,18 @@ export default function NewExpressEstimatePage() {
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     {room.appliances.refrigerator.type === "top-freezer" && (
                                                       <>
-                                                        <SelectItem value="14-18">14-18 CF</SelectItem>
-                                                        <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                        <SelectItem value="23-26">23-26 CF</SelectItem>
-                                                        <SelectItem value="14-26">14-26 CF</SelectItem>
+                                                        <SelectItem value="14-18">14-18 cf</SelectItem>
+                                                        <SelectItem value="18-22">18-22 cf</SelectItem>
+                                                        <SelectItem value="22-24">22-24 cf</SelectItem>
+                                                        <SelectItem value="24-26">24-26 cf</SelectItem>
                                                       </>
                                                     )}
                                                     {room.appliances.refrigerator.type === "bottom-freezer" && (
                                                       <>
-                                                        <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                        <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                        <SelectItem value="25-30">25-30 CF</SelectItem>
-                                                        <SelectItem value="25-36">25-36 CF</SelectItem>
+                                                        <SelectItem value="18-22">18-22 cf</SelectItem>
+                                                        <SelectItem value="22-25">22-25 cf</SelectItem>
+                                                        <SelectItem value="25-30">25-30 cf</SelectItem>
+                                                        <SelectItem value="25-26">25-26 cf</SelectItem>
                                                       </>
                                                     )}
                                                     {room.appliances.refrigerator.type === "built-in" && (
@@ -4136,16 +4136,9 @@ export default function NewExpressEstimatePage() {
                                                     )}
                                                     {room.appliances.refrigerator.type === "side-by-side" && (
                                                       <>
-                                                        <SelectItem value="12-22">12-22 CF</SelectItem>
-                                                        <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                        <SelectItem value="25-30">25-30 CF</SelectItem>
-                                                      </>
-                                                    )}
-                                                    {!room.appliances.refrigerator.type && (
-                                                      <>
-                                                        <SelectItem value="14-18">14-18 CF</SelectItem>
-                                                        <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                        <SelectItem value="22-25">22-25 CF</SelectItem>
+                                                        <SelectItem value="12-22">12-22 cf</SelectItem>
+                                                        <SelectItem value="22-25">22-25 cf</SelectItem>
+                                                        <SelectItem value="25-30">25-30 cf</SelectItem>
                                                       </>
                                                     )}
                                                   </SelectContent>
