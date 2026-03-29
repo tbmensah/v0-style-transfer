@@ -12,11 +12,11 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import {
-  CheckCircle,
-  ChevronDown,
-  Plus,
-  Trash2,
+import { 
+  CheckCircle, 
+  ChevronDown, 
+  Plus, 
+  Trash2, 
   Copy,
   Home,
   Droplets,
@@ -72,15 +72,15 @@ interface FloorLayer {
   vaporBarrier: boolean
   subfloorReplacement: boolean
 }
-
-interface FlooringOptions {
+  
+  interface FlooringOptions {
   enabled: boolean
   multipleLayers: boolean
   layers: FloorLayer[]
   vaporBarrier: boolean
   subfloorReplacement: boolean
   f9Note: string
-}
+  }
 
 interface TrimOptions {
   enabled: boolean
@@ -239,22 +239,22 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
 }
 
 const defaultBathroomExtras = {
-  vanity: {
-    enabled: false,
-    size: "",
-    grade: "",
-    detachAndReset: false,
+  vanity: { 
+    enabled: false, 
+    size: "", 
+    grade: "", 
+    detachAndReset: false, 
     countertop: { type: "", grade: "", size: "", detachAndReset: false },
-    backsplashUnattached: false
+    backsplashUnattached: false 
   },
   toilet: { enabled: false, action: "", seatReplacement: false, supplyLine: false },
-  shower: {
-    enabled: false,
-    type: "",
-    detachAndReset: false,
-    showerFaucet: "",
-    actionForTub: "",
-    surround: "",
+  shower: { 
+    enabled: false, 
+    type: "", 
+    detachAndReset: false, 
+    showerFaucet: "", 
+    actionForTub: "", 
+    surround: "", 
     tubShowerFaucet: "",
     mortarBedReplace: false,
     mortarBedSize: "",
@@ -288,7 +288,7 @@ const defaultKitchenExtras = {
 export default function NewExpressEstimatePage() {
   const [activeTab, setActiveTab] = useState("exterior")
   const [isSaved, setIsSaved] = useState(true)
-
+  
   // Project Details
   const [projectDetails, setProjectDetails] = useState({
     projectName: "",
@@ -352,10 +352,10 @@ export default function NewExpressEstimatePage() {
     },
     sumpPump: { enabled: false, minorAdjustment: "", action: "", hp: "", f9Note: "" },
     hvac: {
-      airHandlers: [] as Array<{
-        id: number;
+      airHandlers: [] as Array<{ 
+        id: number; 
         type: string;
-        tonnage: string;
+        tonnage: string; 
         heatElementCount: string;
         action: string;
         f9Note: string;
@@ -481,16 +481,16 @@ export default function NewExpressEstimatePage() {
   const addDoor = (roomId: number, category: "interior" | "exterior") => {
     const room = rooms.find(r => r.id === roomId)
     if (room) {
-      const newDoor: DoorItem = {
-        id: Date.now(),
-        category,
-        type: "",
-        grade: "",
-        finish: "",
-        handleAction: "",
-        peepHole: false,
-        mailSlot: false,
-      }
+const newDoor: DoorItem = {
+      id: Date.now(),
+      category,
+      type: "",
+      grade: "",
+      finish: "",
+      handleAction: "",
+      peepHole: false,
+      mailSlot: false,
+    }
       updateRoom(roomId, { doors: [...room.doors, newDoor] })
     }
   }
@@ -569,16 +569,15 @@ export default function NewExpressEstimatePage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="propertyType" className="text-foreground">Property Type</Label>
-                  <Select value={projectDetails.propertyType} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setProjectDetails({ ...projectDetails, propertyType: value }); handleSave() } }>
+                  <Select value={projectDetails.propertyType} onValueChange={(value) => { setProjectDetails({ ...projectDetails, propertyType: value }); handleSave() }}>
                     <SelectTrigger className="border-border/60 bg-secondary/50">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                      <SelectItem value="dwelling">Dwelling</SelectItem>
-                      <SelectItem value="general-property">General Property</SelectItem>
-                      <SelectItem value="rcbap">RCBAP</SelectItem>
-                    </SelectContent>
+<SelectContent>
+                                  <SelectItem value="dwelling">Dwelling</SelectItem>
+                                  <SelectItem value="general-property">General Property</SelectItem>
+                                  <SelectItem value="rcbap">RCBAP</SelectItem>
+                                </SelectContent>
                   </Select>
                 </div>
               </div>
@@ -654,9 +653,9 @@ export default function NewExpressEstimatePage() {
                                 min="0"
                                 placeholder="Enter PF"
                                 value={exterior.pressureWash.perimeterFeet}
-                                onChange={(e) => {
+                                onChange={(e) => { 
                                   const val = e.target.value.replace(/^0+/, '') || ""
-                                  setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, perimeterFeet: val } }); handleSave()
+                                  setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, perimeterFeet: val } }); handleSave() 
                                 }}
                                 className="border-border/60 bg-secondary/50 w-32"
                               />
@@ -715,12 +714,11 @@ export default function NewExpressEstimatePage() {
                             </div>
                             <div className="space-y-2 w-[180px]">
                               <Label>Dumpster Size</Label>
-                              <Select value={exterior.dumpster.size} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, size: value } }); handleSave() } }>
+                              <Select value={exterior.dumpster.size} onValueChange={(value) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, size: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                   <SelectItem value="12">12 Yards</SelectItem>
                                   <SelectItem value="20">20 Yards</SelectItem>
                                   <SelectItem value="30">30 Yards</SelectItem>
@@ -742,7 +740,7 @@ export default function NewExpressEstimatePage() {
                       <div className="flex items-center gap-3">
                         <Wind className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">HVAC</span>
-                        {(exterior.hvac.condenserUnits.length > 0 || exterior.hvac.packageUnits.length > 0 || exterior.hvac.miniSplits.length > 0) &&
+                        {(exterior.hvac.condenserUnits.length > 0 || exterior.hvac.packageUnits.length > 0 || exterior.hvac.miniSplits.length > 0) && 
                           <Badge variant="secondary" className="text-xs">Saved</Badge>
                         }
                       </div>
@@ -786,33 +784,27 @@ export default function NewExpressEstimatePage() {
                                 </Button>
                               </div>
                               <div className="flex flex-wrap items-center gap-3">
-                                <Select value={unit.tonnage} onValueChange={(rawValue) => {
-                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
-                                    handleSave()
-                                  }
-                                }>
+                                <Select value={unit.tonnage} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
                                     <SelectValue placeholder="Tonnage" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     {["2", "2.5", "3", "4", "5"].map(t => (
                                       <SelectItem key={t} value={t}>{t} Ton</SelectItem>
                                     ))}
                                   </SelectContent>
                                 </Select>
-                                <Select value={unit.seer} onValueChange={(rawValue) => {
-                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
-                                    handleSave()
-                                  }
-                                }>
+                                <Select value={unit.seer} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
                                     <SelectValue placeholder="SEER" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     <SelectItem value="13">13</SelectItem>
                                     <SelectItem value="14-16">14-16</SelectItem>
                                   </SelectContent>
@@ -887,48 +879,39 @@ export default function NewExpressEstimatePage() {
                                 </Button>
                               </div>
                               <div className="flex flex-wrap items-center gap-3">
-                                <Select value={unit.unitType} onValueChange={(rawValue) => {
-                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
-                                    handleSave()
-                                  }
-                                }>
+                                <Select value={unit.unitType} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[160px]">
                                     <SelectValue placeholder="Unit Type" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     <SelectItem value="ac">AC Unit</SelectItem>
                                     <SelectItem value="gas-furnace-ac">Gas Furnace & AC Unit</SelectItem>
                                   </SelectContent>
                                 </Select>
-                                <Select value={unit.tonnage} onValueChange={(rawValue) => {
-                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
-                                    handleSave()
-                                  }
-                                }>
+                                <Select value={unit.tonnage} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
                                     <SelectValue placeholder="Tonnage" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     {["2", "2.5", "3", "4", "5"].map(t => (
                                       <SelectItem key={t} value={t}>{t} Ton</SelectItem>
                                     ))}
                                   </SelectContent>
                                 </Select>
-                                <Select value={unit.seer} onValueChange={(rawValue) => {
-                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
-                                    handleSave()
-                                  }
-                                }>
+                                <Select value={unit.seer} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
                                     <SelectValue placeholder="SEER" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     <SelectItem value="13">13</SelectItem>
                                     <SelectItem value="14-16">14-16</SelectItem>
                                   </SelectContent>
@@ -1003,17 +986,14 @@ export default function NewExpressEstimatePage() {
                                 </Button>
                               </div>
                               <div className="flex flex-wrap items-center gap-3">
-                                <Select value={unit.zones} onValueChange={(rawValue) => {
-                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
-                                    handleSave()
-                                  }
-                                }>
+                                <Select value={unit.zones} onValueChange={(value) => {
+                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
                                     <SelectValue placeholder="Zones" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     {["1", "2", "3", "4"].map(z => (
                                       <SelectItem key={z} value={z}>{z} Zone</SelectItem>
                                     ))}
@@ -1072,7 +1052,7 @@ export default function NewExpressEstimatePage() {
                       <div className="flex items-center gap-3">
                         <Zap className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Electrical</span>
-                        {(exterior.electrical.exteriorOutlets > 0 || exterior.electrical.breakerPanel.enabled) &&
+                        {(exterior.electrical.exteriorOutlets > 0 || exterior.electrical.breakerPanel.enabled) && 
                           <Badge variant="secondary" className="text-xs">Saved</Badge>
                         }
                       </div>
@@ -1117,12 +1097,11 @@ export default function NewExpressEstimatePage() {
                           <>
                             <div className="space-y-2 min-w-[120px]">
                               <Label className="text-xs text-muted-foreground">Amperage</Label>
-                              <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() } }>
+                              <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(value) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                   {["70", "100", "125", "150", "200", "300"].map(a => (
                                     <SelectItem key={a} value={a}>{a} Amp</SelectItem>
                                   ))}
@@ -1133,7 +1112,7 @@ export default function NewExpressEstimatePage() {
                               <Switch
                                 checked={exterior.electrical.breakerPanel.arcFaults}
                                 onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
-                              />
+                                />
                               <Label className="text-sm">With Arc Faults</Label>
                             </div>
                           </>
@@ -1188,20 +1167,17 @@ export default function NewExpressEstimatePage() {
                               ))}
                             </div>
                             <div className="space-y-2 min-w-[100px]">
-                              <Select
-                                value={exterior.finishes.find(f => f.type === "exterior-paint")?.value || ""}
-                                onValueChange={(rawValue) => {
-                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-paint" ? { ...f, value } : f) })
-                                    handleSave()
-                                  }
-                                }
+                              <Select 
+                                value={exterior.finishes.find(f => f.type === "exterior-paint")?.value || ""} 
+                                onValueChange={(value) => {
+                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-paint" ? { ...f, value } : f) })
+                                  handleSave()
+                                }}
                               >
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                   <SelectItem value="0.25">0.25</SelectItem>
                                   <SelectItem value="0.5">0.5</SelectItem>
                                   <SelectItem value="W">W</SelectItem>
@@ -1244,20 +1220,17 @@ export default function NewExpressEstimatePage() {
                               ))}
                             </div>
                             <div className="space-y-2 min-w-[100px]">
-                              <Select
-                                value={exterior.finishes.find(f => f.type === "exterior-siding")?.value || ""}
-                                onValueChange={(rawValue) => {
-                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-siding" ? { ...f, value } : f) })
-                                    handleSave()
-                                  }
-                                }
+                              <Select 
+                                value={exterior.finishes.find(f => f.type === "exterior-siding")?.value || ""} 
+                                onValueChange={(value) => {
+                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-siding" ? { ...f, value } : f) })
+                                  handleSave()
+                                }}
                               >
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                   <SelectItem value="0.25">0.25</SelectItem>
                                   <SelectItem value="0.5">0.5</SelectItem>
                                   <SelectItem value="W">W</SelectItem>
@@ -1368,16 +1341,16 @@ export default function NewExpressEstimatePage() {
                                 />
                                 <Label className="text-sm">House Rewire</Label>
                               </div>
-                              {foundation.crawlspace.houseRewire !== "" && (
-                                <Input
-                                  type="number"
-                                  min="0"
-                                  placeholder="Enter Home SF"
-                                  value={foundation.crawlspace.houseRewire.trim()}
-                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50 w-36"
-                                />
-                              )}
+{foundation.crawlspace.houseRewire !== "" && (
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="Enter Home SF"
+                                value={foundation.crawlspace.houseRewire.trim()}
+                                onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
+                                className="border-border/60 bg-secondary/50 w-36"
+                              />
+                            )}
                             </div>
                             <div className="flex items-center gap-2">
                               <Switch
@@ -1405,12 +1378,11 @@ export default function NewExpressEstimatePage() {
                                     <Label className="text-sm">Floor Insulation</Label>
                                   </div>
                                   {foundation.crawlspace.floorInsulation && (
-                                    <Select value={foundation.crawlspace.floorInsulationType} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, floorInsulationType: value } }); handleSave() } }>
+                                    <Select value={foundation.crawlspace.floorInsulationType} onValueChange={(value) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, floorInsulationType: value } }); handleSave() }}>
                                       <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                       <SelectContent>
-                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                         <SelectItem value="spray-foam">Spray Foam</SelectItem>
                                         <SelectItem value="r13">R-13</SelectItem>
                                         <SelectItem value="r19">R-19</SelectItem>
@@ -1596,12 +1568,11 @@ export default function NewExpressEstimatePage() {
                           <>
                             <div className="space-y-2 min-w-[140px]">
                               <Label className="text-xs text-muted-foreground">Action</Label>
-                              <Select value={foundation.sumpPump.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, action: value } }); handleSave() } }>
+                              <Select value={foundation.sumpPump.action} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, action: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                   <SelectItem value="replace">Replace</SelectItem>
                                   <SelectItem value="detach-reset">Detach and Reset</SelectItem>
                                 </SelectContent>
@@ -1609,12 +1580,11 @@ export default function NewExpressEstimatePage() {
                             </div>
                             <div className="space-y-2 min-w-[200px]">
                               <Label className="text-xs text-muted-foreground">Horsepower</Label>
-                              <Select value={foundation.sumpPump.hp} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, hp: value } }); handleSave() } }>
+                              <Select value={foundation.sumpPump.hp} onValueChange={(value) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, hp: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                   <SelectItem value="1/3">1/3 HP - up to 1 1/2 discharge</SelectItem>
                                   <SelectItem value="1/2">1/2 HP - up to 1 1/2 discharge</SelectItem>
                                   <SelectItem value="3/4">3/4 HP - up to 1 1/2 discharge</SelectItem>
@@ -1701,17 +1671,14 @@ export default function NewExpressEstimatePage() {
                             <div className="flex flex-wrap items-end gap-4">
                               <div className="space-y-2 min-w-[160px]">
                                 <Label className="text-sm">Type</Label>
-                                <Select value={handler.type} onValueChange={(rawValue) => {
-                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, type: value } : h) } })
-                                    handleSave()
-                                  }
-                                }>
+                                <Select value={handler.type} onValueChange={(value) => {
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, type: value } : h) } })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     <SelectItem value="air-handler">Air Handler</SelectItem>
                                     <SelectItem value="with-heat-element">With Heat Element</SelectItem>
                                     <SelectItem value="with-heat-element-a-coil">With Heat Element & A-coil</SelectItem>
@@ -1720,17 +1687,14 @@ export default function NewExpressEstimatePage() {
                               </div>
                               <div className="space-y-2 min-w-[100px]">
                                 <Label className="text-sm">Tonnage</Label>
-                                <Select value={handler.tonnage} onValueChange={(rawValue) => {
-                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, tonnage: value } : h) } })
-                                    handleSave()
-                                  }
-                                }>
+                                <Select value={handler.tonnage} onValueChange={(value) => {
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, tonnage: value } : h) } })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     {["2", "2.5", "3", "4", "5"].map(t => (
                                       <SelectItem key={t} value={t}>{t} Ton</SelectItem>
                                     ))}
@@ -1739,17 +1703,14 @@ export default function NewExpressEstimatePage() {
                               </div>
                               <div className="space-y-2 min-w-[140px]">
                                 <Label className="text-sm">Action</Label>
-                                <Select value={handler.action} onValueChange={(rawValue) => {
-                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, action: value } : h) } })
-                                    handleSave()
-                                  }
-                                }>
+                                <Select value={handler.action} onValueChange={(value) => {
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, action: value } : h) } })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     <SelectItem value="replace">Replace</SelectItem>
                                     <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                   </SelectContent>
@@ -1758,17 +1719,14 @@ export default function NewExpressEstimatePage() {
                               {(handler.type === "with-heat-element" || handler.type === "with-heat-element-a-coil") && (
                                 <div className="space-y-2 min-w-[100px]">
                                   <Label className="text-sm">With Heat Element</Label>
-                                  <Select value={handler.heatElementCount} onValueChange={(rawValue) => {
-                                    const value = rawValue === "__none__" ? "" : rawValue; {
-                                      setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, heatElementCount: value } : h) } })
-                                      handleSave()
-                                    }
-                                  }>
+                                  <Select value={handler.heatElementCount} onValueChange={(value) => {
+                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, heatElementCount: value } : h) } })
+                                    handleSave()
+                                  }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="QTY" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                       {[1, 2, 3, 4, 5].map(n => (
                                         <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
                                       ))}
@@ -1868,15 +1826,14 @@ export default function NewExpressEstimatePage() {
                                     </Button>
                                   </div>
                                   {foundation.basement.drywallMeasureType === "sf" ? (
-                                    <Select
-                                      value={foundation.basement.drywallValue}
-                                      onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallValue: value } }); handleSave() } }
+                                    <Select 
+                                      value={foundation.basement.drywallValue} 
+                                      onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, drywallValue: value } }); handleSave() }}
                                     >
                                       <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
                                         <SelectValue placeholder="SF" />
                                       </SelectTrigger>
                                       <SelectContent>
-                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                         <SelectItem value="0.5">0.5</SelectItem>
                                         <SelectItem value="W">W</SelectItem>
                                       </SelectContent>
@@ -1975,34 +1932,28 @@ export default function NewExpressEstimatePage() {
                               {foundation.basement.foundationWindows.map((win, index) => (
                                 <div key={win.id} className="ml-8 flex flex-wrap items-center gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
                                   <span className="text-sm font-medium">Window {index + 1}</span>
-                                  <Select value={win.type} onValueChange={(rawValue) => {
-                                    const value = rawValue === "__none__" ? "" : rawValue; {
-                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, type: value } : w) } })
-                                      handleSave()
-                                    }
-                                  }>
+                                  <Select value={win.type} onValueChange={(value) => {
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, type: value } : w) } })
+                                    handleSave()
+                                  }}>
                                     <SelectTrigger className="w-28 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                       <SelectItem value="casement">Casement</SelectItem>
                                       <SelectItem value="single-hung">Single Hung</SelectItem>
                                       <SelectItem value="double-hung">Double Hung</SelectItem>
                                       <SelectItem value="slider">Slider</SelectItem>
                                     </SelectContent>
                                   </Select>
-                                  <Select value={win.size} onValueChange={(rawValue) => {
-                                    const value = rawValue === "__none__" ? "" : rawValue; {
-                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, size: value } : w) } })
-                                      handleSave()
-                                    }
-                                  }>
+                                  <Select value={win.size} onValueChange={(value) => {
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, size: value } : w) } })
+                                    handleSave()
+                                  }}>
                                     <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Size" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                       <SelectItem value="4-8">4-8 SF</SelectItem>
                                       <SelectItem value="9-12">9-12 SF</SelectItem>
                                       <SelectItem value="13-18">13-18 SF</SelectItem>
@@ -2022,17 +1973,14 @@ export default function NewExpressEstimatePage() {
                                       className="w-14 border-border/60 bg-secondary/50"
                                     />
                                   </div>
-                                  <Select value={win.material} onValueChange={(rawValue) => {
-                                    const value = rawValue === "__none__" ? "" : rawValue; {
-                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, material: value } : w) } })
-                                      handleSave()
-                                    }
-                                  }>
+                                  <Select value={win.material} onValueChange={(value) => {
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, material: value } : w) } })
+                                    handleSave()
+                                  }}>
                                     <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Material" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                       <SelectItem value="vinyl">Vinyl</SelectItem>
                                       <SelectItem value="aluminum">Aluminum</SelectItem>
                                       <SelectItem value="wood">Wood</SelectItem>
@@ -2062,12 +2010,11 @@ export default function NewExpressEstimatePage() {
                                 />
                                 <Label>Enable Foundation Door</Label>
                                 {foundation.basement.foundationDoor && (
-                                  <Select value={foundation.basement.foundationDoorAction} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoorAction: value } }); handleSave() } }>
+                                  <Select value={foundation.basement.foundationDoorAction} onValueChange={(value) => { setFoundation({ ...foundation, basement: { ...foundation.basement, foundationDoorAction: value } }); handleSave() }}>
                                     <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                       <SelectItem value="detach-reset-handle">Detach & Reset Handle</SelectItem>
                                       <SelectItem value="replace-handle">Replace Handle</SelectItem>
                                     </SelectContent>
@@ -2099,12 +2046,11 @@ export default function NewExpressEstimatePage() {
                         <div className="flex flex-wrap items-end gap-4">
                           <div className="space-y-2">
                             <Label>110 outlet</Label>
-                            <Select value={foundation.electrical.outlets110} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: value } }); handleSave() } }>
+                            <Select value={foundation.electrical.outlets110} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: value } }); handleSave() }}>
                               <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
                                   <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
                                 ))}
@@ -2113,12 +2059,11 @@ export default function NewExpressEstimatePage() {
                           </div>
                           <div className="space-y-2">
                             <Label>220 outlet</Label>
-                            <Select value={foundation.electrical.outlets220} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: value } }); handleSave() } }>
+                            <Select value={foundation.electrical.outlets220} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: value } }); handleSave() }}>
                               <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                 {[0, 1, 2, 3, 4, 5].map(n => (
                                   <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
                                 ))}
@@ -2127,12 +2072,11 @@ export default function NewExpressEstimatePage() {
                           </div>
                           <div className="space-y-2">
                             <Label>GFI outlet</Label>
-                            <Select value={foundation.electrical.gfiOutlets} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: value } }); handleSave() } }>
+                            <Select value={foundation.electrical.gfiOutlets} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: value } }); handleSave() }}>
                               <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                 {[0, 1, 2, 3, 4, 5].map(n => (
                                   <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
                                 ))}
@@ -2141,12 +2085,11 @@ export default function NewExpressEstimatePage() {
                           </div>
                           <div className="space-y-2">
                             <Label>Light Switch</Label>
-                            <Select value={foundation.electrical.lightSwitch} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: value } }); handleSave() } }>
+                            <Select value={foundation.electrical.lightSwitch} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: value } }); handleSave() }}>
                               <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                 {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(n => (
                                   <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
                                 ))}
@@ -2155,15 +2098,14 @@ export default function NewExpressEstimatePage() {
                           </div>
                           <div className="space-y-2">
                             <Label>Junction Box</Label>
-                            <Select value={foundation.electrical.junctionBox} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: value } }); handleSave() } }>
+                            <Select value={foundation.electrical.junctionBox} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: value } }); handleSave() }}>
                               <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                 {[0, 1, 2, 3, 4, 5].map(n => (
                                   <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                ))}
+                              ))}
                               </SelectContent>
                             </Select>
                           </div>
@@ -2181,12 +2123,11 @@ export default function NewExpressEstimatePage() {
                             <div className="ml-8 flex items-center gap-4">
                               <div className="space-y-2">
                                 <Label className="text-sm">Amperage</Label>
-                                <Select value={foundation.electrical.breakerPanel.amps} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, amps: value } } }); handleSave() } }>
+                                <Select value={foundation.electrical.breakerPanel.amps} onValueChange={(value) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, amps: value } } }); handleSave() }}>
                                   <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     {["100", "150", "200", "300"].map(a => (
                                       <SelectItem key={a} value={a}>{a} Amp</SelectItem>
                                     ))}
@@ -2216,7 +2157,6 @@ export default function NewExpressEstimatePage() {
                                 <SelectValue placeholder="QTY" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                 <SelectItem value="qty">QTY</SelectItem>
                                 <SelectItem value="1">1</SelectItem>
                                 <SelectItem value="2">2</SelectItem>
@@ -2296,25 +2236,22 @@ export default function NewExpressEstimatePage() {
                                 </div>
                                 <div className="space-y-2 min-w-[120px]">
                                   <Label>Room Type</Label>
-                                  <Select value={room.type} onValueChange={(rawValue) => {
-                                    const value = rawValue === "__none__" ? "" : rawValue; {
-                                      const updates: Partial<Room> = { type: value }
-                                      // Add bathroom-specific fields when changing to bathroom
-                                      if (value === "bathroom" && !room.vanity) {
-                                        Object.assign(updates, defaultBathroomExtras)
-                                      }
-                                      // Add kitchen-specific fields when changing to kitchen
-                                      if (value === "kitchen" && !room.cabinets) {
-                                        Object.assign(updates, defaultKitchenExtras)
-                                      }
-                                      updateRoom(room.id, updates)
+                                  <Select value={room.type} onValueChange={(value) => {
+                                    const updates: Partial<Room> = { type: value }
+                                    // Add bathroom-specific fields when changing to bathroom
+                                    if (value === "bathroom" && !room.vanity) {
+                                      Object.assign(updates, defaultBathroomExtras)
                                     }
-                                  }>
+                                    // Add kitchen-specific fields when changing to kitchen
+                                    if (value === "kitchen" && !room.cabinets) {
+                                      Object.assign(updates, defaultKitchenExtras)
+                                    }
+                                    updateRoom(room.id, updates)
+                                  }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                       <SelectItem value="room">Room</SelectItem>
                                       <SelectItem value="bathroom">Bathroom</SelectItem>
                                       <SelectItem value="kitchen">Kitchen</SelectItem>
@@ -2455,11 +2392,11 @@ export default function NewExpressEstimatePage() {
                                       onClick={() => {
                                         const currentLayers = room.flooring.layers || []
                                         const newLayer = { id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }
-                                        updateRoom(room.id, {
-                                          flooring: {
-                                            ...room.flooring,
-                                            layers: [...currentLayers, newLayer]
-                                          }
+                                        updateRoom(room.id, { 
+                                          flooring: { 
+                                            ...room.flooring, 
+                                            layers: [...currentLayers, newLayer] 
+                                          } 
                                         })
                                       }}
                                     >
@@ -2480,21 +2417,18 @@ export default function NewExpressEstimatePage() {
                                             {/* All dropdowns first */}
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Type</Label>
-                                              <Select
-                                                value={layer.type}
-                                                onValueChange={(rawValue) => {
-                                                  const value = rawValue === "__none__" ? "" : rawValue; {
-                                                    const newLayers = [...(room.flooring.layers || [])]
-                                                    newLayers[layerIndex] = { ...layer, type: value, grade: "", application: "" }
-                                                    updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                                  }
-                                                }
+                                              <Select 
+                                                value={layer.type} 
+                                                onValueChange={(value) => {
+                                                  const newLayers = [...(room.flooring.layers || [])]
+                                                  newLayers[layerIndex] = { ...layer, type: value, grade: "", application: "" }
+                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                }}
                                               >
                                                 <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="vinyl-plank">Vinyl Plank</SelectItem>
                                                   <SelectItem value="sheet-vinyl">Sheet Vinyl</SelectItem>
                                                   <SelectItem value="laminate">Laminate</SelectItem>
@@ -2509,21 +2443,18 @@ export default function NewExpressEstimatePage() {
                                             {layer.type && layer.type !== "terrazzo" && (
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Grade</Label>
-                                                <Select
-                                                  value={layer.grade}
-                                                  onValueChange={(rawValue) => {
-                                                    const value = rawValue === "__none__" ? "" : rawValue; {
-                                                      const newLayers = [...(room.flooring.layers || [])]
-                                                      newLayers[layerIndex] = { ...layer, grade: value }
-                                                      updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                                    }
-                                                  }
+                                                <Select 
+                                                  value={layer.grade} 
+                                                  onValueChange={(value) => {
+                                                    const newLayers = [...(room.flooring.layers || [])]
+                                                    newLayers[layerIndex] = { ...layer, grade: value }
+                                                    updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                  }}
                                                 >
                                                   <SelectTrigger className="w-[280px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     {layer.type === "vinyl-plank" && (
                                                       <>
                                                         <SelectItem value="vinyl-plank">Vinyl Plank</SelectItem>
@@ -2590,21 +2521,18 @@ export default function NewExpressEstimatePage() {
                                             {(layer.type === "vinyl-plank" || layer.type === "hardwood" || layer.type === "terrazzo") && (
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Application</Label>
-                                                <Select
-                                                  value={layer.application}
-                                                  onValueChange={(rawValue) => {
-                                                    const value = rawValue === "__none__" ? "" : rawValue; {
-                                                      const newLayers = [...(room.flooring.layers || [])]
-                                                      newLayers[layerIndex] = { ...layer, application: value }
-                                                      updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                                    }
-                                                  }
+                                                <Select 
+                                                  value={layer.application} 
+                                                  onValueChange={(value) => {
+                                                    const newLayers = [...(room.flooring.layers || [])]
+                                                    newLayers[layerIndex] = { ...layer, application: value }
+                                                    updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                  }}
                                                 >
                                                   <SelectTrigger className="w-[160px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     {layer.type === "vinyl-plank" && (
                                                       <>
                                                         <SelectItem value="glue-down-concrete">Glue Down on Concrete</SelectItem>
@@ -2632,21 +2560,18 @@ export default function NewExpressEstimatePage() {
                                             {room.flooring.multipleLayers && (
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Action</Label>
-                                                <Select
-                                                  value={layer.action}
-                                                  onValueChange={(rawValue) => {
-                                                    const value = rawValue === "__none__" ? "" : rawValue; {
-                                                      const newLayers = [...(room.flooring.layers || [])]
-                                                      newLayers[layerIndex] = { ...layer, action: value }
-                                                      updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                                    }
-                                                  }
+                                                <Select 
+                                                  value={layer.action} 
+                                                  onValueChange={(value) => {
+                                                    const newLayers = [...(room.flooring.layers || [])]
+                                                    newLayers[layerIndex] = { ...layer, action: value }
+                                                    updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                  }}
                                                 >
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     <SelectItem value="remove">Remove</SelectItem>
                                                     <SelectItem value="remove-replace">Remove & Replace</SelectItem>
                                                   </SelectContent>
@@ -2687,12 +2612,12 @@ export default function NewExpressEstimatePage() {
                                                   className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                                                   onClick={() => {
                                                     const newLayers = (room.flooring.layers || []).filter(l => l.id !== layer.id)
-                                                    updateRoom(room.id, {
-                                                      flooring: {
-                                                        ...room.flooring,
-                                                        layers: newLayers,
-                                                        multipleLayers: newLayers.length > 1
-                                                      }
+                                                    updateRoom(room.id, { 
+                                                      flooring: { 
+                                                        ...room.flooring, 
+                                                        layers: newLayers, 
+                                                        multipleLayers: newLayers.length > 1 
+                                                      } 
                                                     })
                                                   }}
                                                 >
@@ -2731,12 +2656,11 @@ export default function NewExpressEstimatePage() {
                                   <div className="flex flex-wrap items-end gap-4">
                                     <div className="space-y-1 min-w-[120px]">
                                       <Label className="text-xs text-muted-foreground">Height</Label>
-                                      <Select value={room.trim.baseboardHeight} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { trim: { ...room.trim, baseboardHeight: value } }) }>
+                                      <Select value={room.trim.baseboardHeight} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, baseboardHeight: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           {["2", "3", "4", "5", "6"].map(h => (
                                             <SelectItem key={h} value={h}>{h}&quot; Baseboard</SelectItem>
                                           ))}
@@ -2745,12 +2669,11 @@ export default function NewExpressEstimatePage() {
                                     </div>
                                     <div className="space-y-1 min-w-[100px]">
                                       <Label className="text-xs text-muted-foreground">Material</Label>
-                                      <Select value={room.trim.material} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { trim: { ...room.trim, material: value } }) }>
+                                      <Select value={room.trim.material} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, material: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           <SelectItem value="mdf">MDF</SelectItem>
                                           <SelectItem value="hardwood">Hardwood</SelectItem>
                                           <SelectItem value="builder">Builder Grade</SelectItem>
@@ -2759,12 +2682,11 @@ export default function NewExpressEstimatePage() {
                                     </div>
                                     <div className="space-y-1 min-w-[100px]">
                                       <Label className="text-xs text-muted-foreground">Finish</Label>
-                                      <Select value={room.trim.finish} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { trim: { ...room.trim, finish: value } }) }>
+                                      <Select value={room.trim.finish} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, finish: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           <SelectItem value="paint">Paint</SelectItem>
                                           <SelectItem value="stain">Stain</SelectItem>
                                         </SelectContent>
@@ -2786,12 +2708,11 @@ export default function NewExpressEstimatePage() {
                                     </div>
                                     {room.trim.shoe && (
                                       <div className="space-y-1 min-w-[100px]">
-                                        <Select value={room.trim.shoeFinish} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { trim: { ...room.trim, shoeFinish: value } }) }>
+                                        <Select value={room.trim.shoeFinish} onValueChange={(value) => updateRoom(room.id, { trim: { ...room.trim, shoeFinish: value } })}>
                                           <SelectTrigger className="border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Finish" />
                                           </SelectTrigger>
                                           <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                             <SelectItem value="paint">Paint</SelectItem>
                                             <SelectItem value="stain">Stain</SelectItem>
                                           </SelectContent>
@@ -2825,12 +2746,11 @@ export default function NewExpressEstimatePage() {
                                     <div className="flex flex-wrap items-end gap-4">
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Material</Label>
-                                        <Select value={room.wallCovering.material} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { wallCovering: { ...room.wallCovering, material: value, type: "", replacementHeight: "" } }) }>
+                                        <Select value={room.wallCovering.material} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, material: value, type: "", replacementHeight: "" } })}>
                                           <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                             <SelectItem value="drywall-sf">Drywall (SF)</SelectItem>
                                             <SelectItem value="drywall-lf">Drywall (LF)</SelectItem>
                                             <SelectItem value="plaster">Plaster</SelectItem>
@@ -2841,12 +2761,11 @@ export default function NewExpressEstimatePage() {
                                       {room.wallCovering.material && (
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Type</Label>
-                                          <Select value={room.wallCovering.type} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { wallCovering: { ...room.wallCovering, type: value } }) }>
+                                          <Select value={room.wallCovering.type} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, type: value } })}>
                                             <SelectTrigger className="w-[280px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               {room.wallCovering.material === "drywall-sf" && (
                                                 <>
                                                   <SelectItem value="1/2-in">1/2 in</SelectItem>
@@ -2885,12 +2804,11 @@ export default function NewExpressEstimatePage() {
                                       {room.wallCovering.material && room.wallCovering.material !== "paneling" && (
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Replacement Height</Label>
-                                          <Select value={room.wallCovering.replacementHeight} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: value } }) }>
+                                          <Select value={room.wallCovering.replacementHeight} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: value } })}>
                                             <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               {room.wallCovering.material === "drywall-sf" && (
                                                 <>
                                                   <SelectItem value="0.5W">0.5W</SelectItem>
@@ -2924,12 +2842,11 @@ export default function NewExpressEstimatePage() {
                                       </div>
                                       {room.wallCovering.texture && (
                                         <div className="space-y-1">
-                                          <Select value={room.wallCovering.textureType} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { wallCovering: { ...room.wallCovering, textureType: value } }) }>
+                                          <Select value={room.wallCovering.textureType} onValueChange={(value) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, textureType: value } })}>
                                             <SelectTrigger className="w-[160px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               <SelectItem value="smooth">Smooth</SelectItem>
                                               <SelectItem value="hand-texture">Hand texture</SelectItem>
                                               <SelectItem value="machine-texture">Machine texture</SelectItem>
@@ -2959,18 +2876,15 @@ export default function NewExpressEstimatePage() {
                                       {/* All dropdowns first */}
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Type</Label>
-                                        <Select value={window.type} onValueChange={(rawValue) => {
-                                          const value = rawValue === "__none__" ? "" : rawValue; {
-                                            const newWindows = [...room.windows]
-                                            newWindows[idx] = { ...window, type: value, size: "", grade: "" }
-                                            updateRoom(room.id, { windows: newWindows })
-                                          }
-                                        }>
+                                        <Select value={window.type} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, type: value, size: "", grade: "" }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
                                           <SelectTrigger className="w-[125px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                             <SelectItem value="single-hung">Single Hung</SelectItem>
                                             <SelectItem value="double-hung">Double Hung</SelectItem>
                                             <SelectItem value="casement">Casement</SelectItem>
@@ -2981,18 +2895,15 @@ export default function NewExpressEstimatePage() {
                                       </div>
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Material</Label>
-                                        <Select value={window.material} onValueChange={(rawValue) => {
-                                          const value = rawValue === "__none__" ? "" : rawValue; {
-                                            const newWindows = [...room.windows]
-                                            newWindows[idx] = { ...window, material: value, size: "", grade: "" }
-                                            updateRoom(room.id, { windows: newWindows })
-                                          }
-                                        }>
+                                        <Select value={window.material} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, material: value, size: "", grade: "" }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
                                           <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                             <SelectItem value="aluminum">Aluminum</SelectItem>
                                             <SelectItem value="vinyl">Vinyl</SelectItem>
                                             <SelectItem value="wood">Wood</SelectItem>
@@ -3002,28 +2913,25 @@ export default function NewExpressEstimatePage() {
                                       {window.type && window.material && (
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Size</Label>
-                                          <Select value={window.size} onValueChange={(rawValue) => {
-                                            const value = rawValue === "__none__" ? "" : rawValue; {
-                                              const newWindows = [...room.windows]
-                                              newWindows[idx] = { ...window, size: value }
-                                              updateRoom(room.id, { windows: newWindows })
-                                            }
-                                          }>
+                                          <Select value={window.size} onValueChange={(value) => {
+                                            const newWindows = [...room.windows]
+                                            newWindows[idx] = { ...window, size: value }
+                                            updateRoom(room.id, { windows: newWindows })
+                                          }}>
                                             <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               {((window.material === "vinyl" && (window.type === "single-hung" || window.type === "double-hung")) ||
                                                 (window.material === "aluminum" && (window.type === "single-hung" || window.type === "double-hung")) ||
                                                 (window.material === "wood" && (window.type === "single-hung" || window.type === "double-hung"))) && (
-                                                  <>
-                                                    <SelectItem value="4-8">4-8 SF</SelectItem>
-                                                    <SelectItem value="9-12">9-12 SF</SelectItem>
-                                                    <SelectItem value="13-19">13-19 SF</SelectItem>
-                                                    <SelectItem value="20-28">20-28 SF</SelectItem>
-                                                  </>
-                                                )}
+                                                <>
+                                                  <SelectItem value="4-8">4-8 SF</SelectItem>
+                                                  <SelectItem value="9-12">9-12 SF</SelectItem>
+                                                  <SelectItem value="13-19">13-19 SF</SelectItem>
+                                                  <SelectItem value="20-28">20-28 SF</SelectItem>
+                                                </>
+                                              )}
                                               {((window.material === "vinyl" || window.material === "aluminum") && window.type === "casement") && (
                                                 <>
                                                   <SelectItem value="3-5">3-5 SF</SelectItem>
@@ -3079,18 +2987,15 @@ export default function NewExpressEstimatePage() {
                                       {window.type && window.material && (
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Grade</Label>
-                                          <Select value={window.grade} onValueChange={(rawValue) => {
-                                            const value = rawValue === "__none__" ? "" : rawValue; {
-                                              const newWindows = [...room.windows]
-                                              newWindows[idx] = { ...window, grade: value }
-                                              updateRoom(room.id, { windows: newWindows })
-                                            }
-                                          }>
+                                          <Select value={window.grade} onValueChange={(value) => {
+                                            const newWindows = [...room.windows]
+                                            newWindows[idx] = { ...window, grade: value }
+                                            updateRoom(room.id, { windows: newWindows })
+                                          }}>
                                             <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               {window.material === "vinyl" && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
@@ -3133,18 +3038,15 @@ export default function NewExpressEstimatePage() {
                                       )}
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Blinds</Label>
-                                        <Select value={window.blinds} onValueChange={(rawValue) => {
-                                          const value = rawValue === "__none__" ? "" : rawValue; {
-                                            const newWindows = [...room.windows]
-                                            newWindows[idx] = { ...window, blinds: value }
-                                            updateRoom(room.id, { windows: newWindows })
-                                          }
-                                        }>
+                                        <Select value={window.blinds} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, blinds: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
                                           <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                             <SelectItem value="pvc">PVC</SelectItem>
                                             <SelectItem value="wood">Wood</SelectItem>
                                             <SelectItem value="metal">Metal</SelectItem>
@@ -3154,18 +3056,15 @@ export default function NewExpressEstimatePage() {
                                       </div>
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Casing/Trim</Label>
-                                        <Select value={window.casingTrim} onValueChange={(rawValue) => {
-                                          const value = rawValue === "__none__" ? "" : rawValue; {
-                                            const newWindows = [...room.windows]
-                                            newWindows[idx] = { ...window, casingTrim: value }
-                                            updateRoom(room.id, { windows: newWindows })
-                                          }
-                                        }>
+                                        <Select value={window.casingTrim} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, casingTrim: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
                                           <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                             <SelectItem value="casing-stain">Casing - Stain</SelectItem>
                                             <SelectItem value="casing-paint">Casing - Paint</SelectItem>
                                           </SelectContent>
@@ -3173,18 +3072,15 @@ export default function NewExpressEstimatePage() {
                                       </div>
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Finish</Label>
-                                        <Select value={window.finish} onValueChange={(rawValue) => {
-                                          const value = rawValue === "__none__" ? "" : rawValue; {
-                                            const newWindows = [...room.windows]
-                                            newWindows[idx] = { ...window, finish: value }
-                                            updateRoom(room.id, { windows: newWindows })
-                                          }
-                                        }>
+                                        <Select value={window.finish} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, finish: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
                                           <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                             <SelectItem value="trimmed-window">Trimmed Window</SelectItem>
                                             <SelectItem value="sill-apron">Sill and Apron</SelectItem>
                                             <SelectItem value="marble-sill">Marble Sill</SelectItem>
@@ -3193,18 +3089,15 @@ export default function NewExpressEstimatePage() {
                                       </div>
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Quantity</Label>
-                                        <Select value={window.quantity} onValueChange={(rawValue) => {
-                                          const value = rawValue === "__none__" ? "" : rawValue; {
-                                            const newWindows = [...room.windows]
-                                            newWindows[idx] = { ...window, quantity: value }
-                                            updateRoom(room.id, { windows: newWindows })
-                                          }
-                                        }>
+                                        <Select value={window.quantity} onValueChange={(value) => {
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, quantity: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
                                           <SelectTrigger className="w-[70px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                             {Array.from({ length: 30 }, (_, i) => i + 1).map((num) => (
                                               <SelectItem key={num} value={String(num)}>{num}</SelectItem>
                                             ))}
@@ -3332,12 +3225,11 @@ export default function NewExpressEstimatePage() {
                                     </div>
                                     <div className="space-y-1 min-w-[130px]">
                                       <Label className="text-xs text-muted-foreground">Bathroom Light Bar</Label>
-                                      <Select value={room.electrical.bathroomLightBar} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { electrical: { ...room.electrical, bathroomLightBar: value } }) }>
+                                      <Select value={room.electrical.bathroomLightBar} onValueChange={(value) => updateRoom(room.id, { electrical: { ...room.electrical, bathroomLightBar: value } })}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           <SelectItem value="1">1 light</SelectItem>
                                           <SelectItem value="2">2 light</SelectItem>
                                           <SelectItem value="3">3 light</SelectItem>
@@ -3376,12 +3268,11 @@ export default function NewExpressEstimatePage() {
                                         <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Size (LF)</Label>
-                                            <Select value={room.vanity.size} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { vanity: { ...room.vanity!, size: value } }) }>
+                                            <Select value={room.vanity.size} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, size: value } })}>
                                               <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
                                               <SelectContent>
-                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                 {Array.from({ length: 15 }, (_, i) => i + 1).map((num) => (
                                                   <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
                                                 ))}
@@ -3390,12 +3281,11 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Grade</Label>
-                                            <Select value={room.vanity.grade} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { vanity: { ...room.vanity!, grade: value } }) }>
+                                            <Select value={room.vanity.grade} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, grade: value } })}>
                                               <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
                                               <SelectContent>
-                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                 <SelectItem value="base">Base</SelectItem>
                                                 <SelectItem value="standard">Standard</SelectItem>
                                                 <SelectItem value="high">High Grade</SelectItem>
@@ -3418,12 +3308,11 @@ export default function NewExpressEstimatePage() {
                                           <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Type</Label>
-                                              <Select value={room.vanity.countertop.type} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, type: value } } }) }>
+                                              <Select value={room.vanity.countertop.type} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, type: value } } })}>
                                                 <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="cultured-marble">Cultured Marble</SelectItem>
                                                   <SelectItem value="laminate">Laminate</SelectItem>
                                                   <SelectItem value="tile">Tile</SelectItem>
@@ -3434,12 +3323,11 @@ export default function NewExpressEstimatePage() {
                                             </div>
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Grade</Label>
-                                              <Select value={room.vanity.countertop.grade} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, grade: value } } }) }>
+                                              <Select value={room.vanity.countertop.grade} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, grade: value } } })}>
                                                 <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="base">Base</SelectItem>
                                                   <SelectItem value="standard">Standard</SelectItem>
                                                   <SelectItem value="high">High Grade</SelectItem>
@@ -3452,12 +3340,11 @@ export default function NewExpressEstimatePage() {
                                               <Label className="text-xs text-muted-foreground">
                                                 Size ({room.vanity.countertop.type === "cultured-marble" || room.vanity.countertop.type === "laminate" ? "LF" : "SF"})
                                               </Label>
-                                              <Select value={room.vanity.countertop.size} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, size: value } } }) }>
+                                              <Select value={room.vanity.countertop.size} onValueChange={(value) => updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, size: value } } })}>
                                                 <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   {Array.from({ length: 15 }, (_, i) => i + 1).map((num) => (
                                                     <SelectItem key={num} value={String(num)}>{num}</SelectItem>
                                                   ))}
@@ -3497,12 +3384,11 @@ export default function NewExpressEstimatePage() {
                                       <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Action</Label>
-                                          <Select value={room.toilet.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { toilet: { ...room.toilet!, action: value } }) }>
+                                          <Select value={room.toilet.action} onValueChange={(value) => updateRoom(room.id, { toilet: { ...room.toilet!, action: value } })}>
                                             <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               <SelectItem value="replace">Replace</SelectItem>
                                               <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                             </SelectContent>
@@ -3540,12 +3426,11 @@ export default function NewExpressEstimatePage() {
                                         <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Type</Label>
-                                            <Select value={room.shower.type} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, type: value } }) }>
+                                            <Select value={room.shower.type} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, type: value } })}>
                                               <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
                                               <SelectContent>
-                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                 <SelectItem value="fiberglass-tub-shower">Fiberglass Tub/Shwr Unit</SelectItem>
                                                 <SelectItem value="tub-tile-surround">Tub With Tiled Surround</SelectItem>
                                                 <SelectItem value="tub-cultured-marble">Tub With Cultured Marble</SelectItem>
@@ -3566,12 +3451,11 @@ export default function NewExpressEstimatePage() {
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">shower faucet</Label>
-                                                <Select value={room.shower.showerFaucet} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: value } }) }>
+                                                <Select value={room.shower.showerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: value } })}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                                     <SelectItem value="replace">Replace</SelectItem>
                                                   </SelectContent>
@@ -3585,12 +3469,11 @@ export default function NewExpressEstimatePage() {
                                             <>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Action for tub</Label>
-                                                <Select value={room.shower.actionForTub} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, actionForTub: value } }) }>
+                                                <Select value={room.shower.actionForTub} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, actionForTub: value } })}>
                                                   <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     <SelectItem value="detach-tub">Detach tub</SelectItem>
                                                     <SelectItem value="replace-tub">Replace tub</SelectItem>
                                                   </SelectContent>
@@ -3598,12 +3481,11 @@ export default function NewExpressEstimatePage() {
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Surround</Label>
-                                                <Select value={room.shower.surround} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, surround: value } }) }>
+                                                <Select value={room.shower.surround} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, surround: value } })}>
                                                   <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     <SelectItem value="up-to-60sf">Up to 60SF</SelectItem>
                                                     <SelectItem value="61-100sf">61-100SF</SelectItem>
                                                     <SelectItem value="over-100sf">Over 100SF</SelectItem>
@@ -3612,12 +3494,11 @@ export default function NewExpressEstimatePage() {
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">tub shower faucet</Label>
-                                                <Select value={room.shower.tubShowerFaucet} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } }) }>
+                                                <Select value={room.shower.tubShowerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } })}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                                     <SelectItem value="replace">Replace</SelectItem>
                                                   </SelectContent>
@@ -3631,12 +3512,11 @@ export default function NewExpressEstimatePage() {
                                             <>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Action for tub</Label>
-                                                <Select value={room.shower.actionForTub} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, actionForTub: value } }) }>
+                                                <Select value={room.shower.actionForTub} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, actionForTub: value } })}>
                                                   <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     <SelectItem value="detach-tub">Detach tub</SelectItem>
                                                     <SelectItem value="replace-tub">Replace tub</SelectItem>
                                                   </SelectContent>
@@ -3644,12 +3524,11 @@ export default function NewExpressEstimatePage() {
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">tub shower faucet</Label>
-                                                <Select value={room.shower.tubShowerFaucet} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } }) }>
+                                                <Select value={room.shower.tubShowerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } })}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                                     <SelectItem value="replace">Replace</SelectItem>
                                                   </SelectContent>
@@ -3671,12 +3550,11 @@ export default function NewExpressEstimatePage() {
                                               {room.shower.mortarBedReplace && (
                                                 <div className="space-y-1">
                                                   <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
-                                                  <Select value={room.shower.mortarBedSize} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, mortarBedSize: value } }) }>
+                                                  <Select value={room.shower.mortarBedSize} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedSize: value } })}>
                                                     <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                                       <SelectValue placeholder="Select" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                       <SelectItem value="1-100sf">1-100 SF</SelectItem>
                                                       <SelectItem value="101-200sf">101-200 SF</SelectItem>
                                                       <SelectItem value="over-200sf">Over 200 SF</SelectItem>
@@ -3686,12 +3564,11 @@ export default function NewExpressEstimatePage() {
                                               )}
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Walls</Label>
-                                                <Select value={room.shower.walls} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, walls: value } }) }>
+                                                <Select value={room.shower.walls} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, walls: value } })}>
                                                   <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     <SelectItem value="up-to-60sf">Up to 60SF</SelectItem>
                                                     <SelectItem value="61-100sf">61-100SF</SelectItem>
                                                     <SelectItem value="over-100sf">Over 100SF</SelectItem>
@@ -3700,12 +3577,11 @@ export default function NewExpressEstimatePage() {
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">shower faucet</Label>
-                                                <Select value={room.shower.showerFaucet} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: value } }) }>
+                                                <Select value={room.shower.showerFaucet} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: value } })}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                                     <SelectItem value="replace">Replace</SelectItem>
                                                   </SelectContent>
@@ -3743,12 +3619,11 @@ export default function NewExpressEstimatePage() {
                                                   />
                                                   <Label className="text-sm">Tile Niche</Label>
                                                   {room.shower.tileNiche && (
-                                                    <Select value={room.shower.tileNicheQty} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, tileNicheQty: value } }) }>
+                                                    <Select value={room.shower.tileNicheQty} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tileNicheQty: value } })}>
                                                       <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                                         <SelectValue placeholder="QTY" />
                                                       </SelectTrigger>
                                                       <SelectContent>
-                                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                                                           <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
                                                         ))}
@@ -3770,12 +3645,11 @@ export default function NewExpressEstimatePage() {
                                                   />
                                                   <Label className="text-sm">Tile Soap dish</Label>
                                                   {room.shower.tileSoapDish && (
-                                                    <Select value={room.shower.tileSoapDishQty} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { shower: { ...room.shower!, tileSoapDishQty: value } }) }>
+                                                    <Select value={room.shower.tileSoapDishQty} onValueChange={(value) => updateRoom(room.id, { shower: { ...room.shower!, tileSoapDishQty: value } })}>
                                                       <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                                         <SelectValue placeholder="QTY" />
                                                       </SelectTrigger>
                                                       <SelectContent>
-                                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                                                           <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
                                                         ))}
@@ -3810,12 +3684,11 @@ export default function NewExpressEstimatePage() {
                                       <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Size (LF)</Label>
-                                          <Select value={room.cabinets.size} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { cabinets: { ...room.cabinets!, size: value } }) }>
+                                          <Select value={room.cabinets.size} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, size: value } })}>
                                             <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
                                                 <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
                                               ))}
@@ -3824,12 +3697,11 @@ export default function NewExpressEstimatePage() {
                                         </div>
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Grade</Label>
-                                          <Select value={room.cabinets.grade} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { cabinets: { ...room.cabinets!, grade: value } }) }>
+                                          <Select value={room.cabinets.grade} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, grade: value } })}>
                                             <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               <SelectItem value="base">Base</SelectItem>
                                               <SelectItem value="standard">Standard</SelectItem>
                                               <SelectItem value="high">High Grade</SelectItem>
@@ -3847,12 +3719,11 @@ export default function NewExpressEstimatePage() {
                                         </div>
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Toe Kick (LF)</Label>
-                                          <Select value={room.cabinets.toeKick.size} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, size: value } } }) }>
+                                          <Select value={room.cabinets.toeKick.size} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, size: value } } })}>
                                             <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Size" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
                                                 <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
                                               ))}
@@ -3861,19 +3732,18 @@ export default function NewExpressEstimatePage() {
                                         </div>
                                       </div>
                                     </div>
-
+                                    
                                     {/* Countertop section */}
                                     <div className="rounded-md border border-border/30 bg-secondary/20 p-3 space-y-2">
                                       <Label className="text-xs font-medium text-muted-foreground">Countertop</Label>
                                       <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Type</Label>
-                                          <Select value={room.countertop.type} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { countertop: { ...room.countertop!, type: value } }) }>
+                                          <Select value={room.countertop.type} onValueChange={(value) => updateRoom(room.id, { countertop: { ...room.countertop!, type: value } })}>
                                             <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               <SelectItem value="cultured-marble">Cultured Marble</SelectItem>
                                               <SelectItem value="laminate">Laminate</SelectItem>
                                               <SelectItem value="tile">Tile</SelectItem>
@@ -3884,12 +3754,11 @@ export default function NewExpressEstimatePage() {
                                         </div>
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Grade</Label>
-                                          <Select value={room.countertop.grade} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { countertop: { ...room.countertop!, grade: value } }) }>
+                                          <Select value={room.countertop.grade} onValueChange={(value) => updateRoom(room.id, { countertop: { ...room.countertop!, grade: value } })}>
                                             <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               <SelectItem value="base">Base</SelectItem>
                                               <SelectItem value="standard">Standard</SelectItem>
                                               <SelectItem value="premium">Premium</SelectItem>
@@ -3900,12 +3769,11 @@ export default function NewExpressEstimatePage() {
                                           <Label className="text-xs text-muted-foreground">
                                             Size ({room.countertop.type === "cultured-marble" || room.countertop.type === "laminate" ? "LF" : "SF"})
                                           </Label>
-                                          <Select value={room.countertop.size} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { countertop: { ...room.countertop!, size: value } }) }>
+                                          <Select value={room.countertop.size} onValueChange={(value) => updateRoom(room.id, { countertop: { ...room.countertop!, size: value } })}>
                                             <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
                                                 <SelectItem key={num} value={String(num)}>{num}</SelectItem>
                                               ))}
@@ -3921,19 +3789,18 @@ export default function NewExpressEstimatePage() {
                                         </div>
                                       </div>
                                     </div>
-
+                                    
                                     {/* Backsplash section */}
                                     <div className="rounded-md border border-border/30 bg-secondary/20 p-3 space-y-2">
                                       <Label className="text-xs font-medium text-muted-foreground">Backsplash</Label>
                                       <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Type</Label>
-                                          <Select value={room.cabinets.toeKick.backSplash} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, backSplash: value } } }) }>
+                                          <Select value={room.cabinets.toeKick.backSplash} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, backSplash: value } } })}>
                                             <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               <SelectItem value="tile">Tile</SelectItem>
                                               <SelectItem value="solid-surface">Solid surface</SelectItem>
                                               <SelectItem value="unattached">Unattached</SelectItem>
@@ -3942,12 +3809,11 @@ export default function NewExpressEstimatePage() {
                                         </div>
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Grade</Label>
-                                          <Select value={room.cabinets.toeKick.grade} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, grade: value } } }) }>
+                                          <Select value={room.cabinets.toeKick.grade} onValueChange={(value) => updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, grade: value } } })}>
                                             <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               <SelectItem value="base">Base</SelectItem>
                                               <SelectItem value="standard">Standard</SelectItem>
                                               <SelectItem value="premium">Premium</SelectItem>
@@ -4001,12 +3867,11 @@ export default function NewExpressEstimatePage() {
                                         />
                                         <Label className="text-sm whitespace-nowrap">Water supply line</Label>
                                         {room.plumbing.waterSupplyLine.enabled && (
-                                          <Select value={room.plumbing.waterSupplyLine.qty} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { plumbing: { ...room.plumbing!, waterSupplyLine: { ...room.plumbing!.waterSupplyLine, qty: value } } }) }>
+                                          <Select value={room.plumbing.waterSupplyLine.qty} onValueChange={(value) => updateRoom(room.id, { plumbing: { ...room.plumbing!, waterSupplyLine: { ...room.plumbing!.waterSupplyLine, qty: value } } })}>
                                             <SelectTrigger className="border-border/60 bg-secondary/50 w-[80px]">
                                               <SelectValue placeholder="QTY" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                                                 <SelectItem key={num} value={String(num)}>{num}</SelectItem>
                                               ))}
@@ -4015,7 +3880,7 @@ export default function NewExpressEstimatePage() {
                                         )}
                                       </div>
                                     </div>
-
+                                    
                                     {/* Reverse Osmosis row */}
                                     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                                       <div className="flex items-center gap-2">
@@ -4027,14 +3892,13 @@ export default function NewExpressEstimatePage() {
                                       </div>
                                       {room.plumbing.reverseOsmosis.enabled && (
                                         <>
-                                          <div className="space-y-1">
-                                            <Label className="text-xs text-muted-foreground">Action</Label>
-                                            <Select value={room.plumbing.reverseOsmosis.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { plumbing: { ...room.plumbing!, reverseOsmosis: { ...room.plumbing!.reverseOsmosis, action: value } } }) }>
-                                              <SelectTrigger className="border-border/60 bg-secondary/50 w-[140px]">
-                                                <SelectValue placeholder="Select" />
+<div className="space-y-1">
+  <Label className="text-xs text-muted-foreground">Action</Label>
+  <Select value={room.plumbing.reverseOsmosis.action} onValueChange={(value) => updateRoom(room.id, { plumbing: { ...room.plumbing!, reverseOsmosis: { ...room.plumbing!.reverseOsmosis, action: value } } })}>
+  <SelectTrigger className="border-border/60 bg-secondary/50 w-[140px]">
+  <SelectValue placeholder="Select" />
                                               </SelectTrigger>
                                               <SelectContent>
-                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                 <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                                 <SelectItem value="replace">Replace</SelectItem>
                                               </SelectContent>
@@ -4061,12 +3925,11 @@ export default function NewExpressEstimatePage() {
                                       </div>
                                       {room.plumbing.garbageDisposal.enabled && (
                                         <>
-                                          <Select value={room.plumbing.garbageDisposal.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { plumbing: { ...room.plumbing!, garbageDisposal: { ...room.plumbing!.garbageDisposal, action: value } } }) }>
+                                          <Select value={room.plumbing.garbageDisposal.action} onValueChange={(value) => updateRoom(room.id, { plumbing: { ...room.plumbing!, garbageDisposal: { ...room.plumbing!.garbageDisposal, action: value } } })}>
                                             <SelectTrigger className="border-border/60 bg-secondary/50 w-[140px]">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               <SelectItem value="detach-reset">Detach and reset</SelectItem>
                                               <SelectItem value="replace">Replace</SelectItem>
                                             </SelectContent>
@@ -4091,7 +3954,7 @@ export default function NewExpressEstimatePage() {
                                       />
                                       <Label className="font-medium">Appliance / Misc Equipment</Label>
                                     </div>
-
+                                    
                                     {room.appliances.enabled && (
                                       <div className="space-y-3">
                                         {/* Refrigerator */}
@@ -4105,84 +3968,80 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                           {room.appliances.refrigerator.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.refrigerator.type} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, type: value, size: "" } } }) }>
+                                              <Select value={room.appliances.refrigerator.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, type: value, size: "" } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[160px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="top-freezer">Top Freezer</SelectItem>
-                                                  <SelectItem value="bottom-freezer">Bottom Freezer</SelectItem>
-                                                  <SelectItem value="built-in">Built In</SelectItem>
-                                                  <SelectItem value="compact">Compact (under counter)</SelectItem>
-                                                  <SelectItem value="side-by-side">Side by side</SelectItem>
-                                                </SelectContent>
+                                                    <SelectItem value="top-freezer">Top Freezer</SelectItem>
+                                                    <SelectItem value="bottom-freezer">Bottom Freezer</SelectItem>
+                                                    <SelectItem value="built-in">Built In</SelectItem>
+                                                    <SelectItem value="compact">Compact (under counter)</SelectItem>
+                                                    <SelectItem value="side-by-side">Side by side</SelectItem>
+                                                  </SelectContent>
                                               </Select>
                                               {room.appliances.refrigerator.type !== "compact" && (
-                                                <Select value={room.appliances.refrigerator.size} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, size: value } } }) }>
+                                                <Select value={room.appliances.refrigerator.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, size: value } } })}>
                                                   <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                     <SelectValue placeholder="Size" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    {room.appliances.refrigerator.type === "top-freezer" && (
-                                                      <>
-                                                        <SelectItem value="14-18">14-18 CF</SelectItem>
-                                                        <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                        <SelectItem value="23-26">23-26 CF</SelectItem>
-                                                        <SelectItem value="14-26">14-26 CF</SelectItem>
-                                                      </>
-                                                    )}
-                                                    {room.appliances.refrigerator.type === "bottom-freezer" && (
-                                                      <>
-                                                        <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                        <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                        <SelectItem value="25-30">25-30 CF</SelectItem>
-                                                        <SelectItem value="25-36">25-36 CF</SelectItem>
-                                                      </>
-                                                    )}
-                                                    {room.appliances.refrigerator.type === "built-in" && (
-                                                      <>
-                                                        <SelectItem value="36">36&quot;</SelectItem>
-                                                        <SelectItem value="42">42&quot;</SelectItem>
-                                                        <SelectItem value="48">48&quot;</SelectItem>
-                                                      </>
-                                                    )}
-                                                    {room.appliances.refrigerator.type === "side-by-side" && (
-                                                      <>
-                                                        <SelectItem value="12-22">12-22 CF</SelectItem>
-                                                        <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                        <SelectItem value="25-30">25-30 CF</SelectItem>
-                                                      </>
-                                                    )}
-                                                    {!room.appliances.refrigerator.type && (
-                                                      <>
-                                                        <SelectItem value="14-18">14-18 CF</SelectItem>
-                                                        <SelectItem value="18-22">18-22 CF</SelectItem>
-                                                        <SelectItem value="22-25">22-25 CF</SelectItem>
-                                                      </>
-                                                    )}
+                                                      {room.appliances.refrigerator.type === "top-freezer" && (
+                                                        <>
+                                                          <SelectItem value="14-18">14-18 CF</SelectItem>
+                                                          <SelectItem value="18-22">18-22 CF</SelectItem>
+                                                          <SelectItem value="23-26">23-26 CF</SelectItem>
+                                                          <SelectItem value="14-26">14-26 CF</SelectItem>
+                                                        </>
+                                                      )}
+                                                      {room.appliances.refrigerator.type === "bottom-freezer" && (
+                                                        <>
+                                                          <SelectItem value="18-22">18-22 CF</SelectItem>
+                                                          <SelectItem value="22-25">22-25 CF</SelectItem>
+                                                          <SelectItem value="25-30">25-30 CF</SelectItem>
+                                                          <SelectItem value="25-36">25-36 CF</SelectItem>
+                                                        </>
+                                                      )}
+                                                      {room.appliances.refrigerator.type === "built-in" && (
+                                                        <>
+                                                          <SelectItem value="36">36&quot;</SelectItem>
+                                                          <SelectItem value="42">42&quot;</SelectItem>
+                                                          <SelectItem value="48">48&quot;</SelectItem>
+                                                        </>
+                                                      )}
+                                                      {room.appliances.refrigerator.type === "side-by-side" && (
+                                                        <>
+                                                          <SelectItem value="12-22">12-22 CF</SelectItem>
+                                                          <SelectItem value="22-25">22-25 CF</SelectItem>
+                                                          <SelectItem value="25-30">25-30 CF</SelectItem>
+                                                        </>
+                                                      )}
+                                                      {!room.appliances.refrigerator.type && (
+                                                        <>
+                                                          <SelectItem value="14-18">14-18 CF</SelectItem>
+                                                          <SelectItem value="18-22">18-22 CF</SelectItem>
+                                                          <SelectItem value="22-25">22-25 CF</SelectItem>
+                                                        </>
+                                                      )}
                                                   </SelectContent>
                                                 </Select>
                                               )}
-                                              <Select value={room.appliances.refrigerator.grade} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, grade: value } } }) }>
+                                              <Select value={room.appliances.refrigerator.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, grade: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="base">Base</SelectItem>
                                                   <SelectItem value="standard">Standard</SelectItem>
                                                   <SelectItem value="high">High grade</SelectItem>
                                                   <SelectItem value="premium">Premium</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.refrigerator.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, action: value } } }) }>
+                                              <Select value={room.appliances.refrigerator.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, refrigerator: { ...room.appliances!.refrigerator, action: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4209,23 +4068,21 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                           {room.appliances.dishwasher.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.dishwasher.grade} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, grade: value } } }) }>
+                                              <Select value={room.appliances.dishwasher.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, grade: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="standard">Standard</SelectItem>
                                                   <SelectItem value="high">High</SelectItem>
                                                   <SelectItem value="premium">Premium</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.dishwasher.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, action: value } } }) }>
+                                              <Select value={room.appliances.dishwasher.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, dishwasher: { ...room.appliances!.dishwasher, action: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4252,44 +4109,40 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                           {room.appliances.range.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.range.type} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, type: value } } }) }>
+                                              <Select value={room.appliances.range.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, type: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="gas">Gas</SelectItem>
                                                   <SelectItem value="electric">Electric</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.range.options} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, options: value } } }) }>
+                                              <Select value={room.appliances.range.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, options: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Options" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="free-standing">Free Standing</SelectItem>
                                                   <SelectItem value="slide-in">Slide In</SelectItem>
                                                   <SelectItem value="drop-in">Drop In</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.range.grade} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, grade: value } } }) }>
+                                              <Select value={room.appliances.range.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, grade: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="standard">Standard</SelectItem>
                                                   <SelectItem value="high">High</SelectItem>
                                                   <SelectItem value="premium">Premium</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.range.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, action: value } } }) }>
+                                              <Select value={room.appliances.range.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, range: { ...room.appliances!.range, action: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4316,33 +4169,30 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                           {room.appliances.cooktop.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.cooktop.type} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, type: value } } }) }>
+                                              <Select value={room.appliances.cooktop.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, type: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="gas">Gas</SelectItem>
                                                   <SelectItem value="electric">Electric</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.cooktop.grade} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, grade: value } } }) }>
+                                              <Select value={room.appliances.cooktop.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, grade: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="standard">Standard</SelectItem>
                                                   <SelectItem value="high">High</SelectItem>
                                                   <SelectItem value="premium">Premium</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.cooktop.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, action: value } } }) }>
+                                              <Select value={room.appliances.cooktop.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, cooktop: { ...room.appliances!.cooktop, action: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4369,22 +4219,20 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                           {room.appliances.waterHeater.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.waterHeater.type} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, type: value } } }) }>
+                                              <Select value={room.appliances.waterHeater.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, type: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="gas">Gas</SelectItem>
                                                   <SelectItem value="electric">Electric</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.waterHeater.size} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, size: value } } }) }>
+                                              <Select value={room.appliances.waterHeater.size} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, size: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Size" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="20">20 gal</SelectItem>
                                                   <SelectItem value="30">30 gal</SelectItem>
                                                   <SelectItem value="40">40 gal</SelectItem>
@@ -4394,23 +4242,21 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="80">80 gal</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.waterHeater.rating} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, rating: value } } }) }>
+                                              <Select value={room.appliances.waterHeater.rating} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, rating: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Rating" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="6">6 yr</SelectItem>
                                                   <SelectItem value="9">9 yr</SelectItem>
                                                   <SelectItem value="12">12 yr</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.waterHeater.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, action: value } } }) }>
+                                              <Select value={room.appliances.waterHeater.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, action: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4437,12 +4283,11 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                           {room.appliances.wallOven.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.wallOven.type} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, type: value } } }) }>
+                                              <Select value={room.appliances.wallOven.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, type: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[180px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="freestanding">Freestanding</SelectItem>
                                                   <SelectItem value="slide-in">Slide in</SelectItem>
                                                   <SelectItem value="drop-in">Drop in</SelectItem>
@@ -4451,23 +4296,21 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="built-in-double">Built in double oven</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.wallOven.grade} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, grade: value } } }) }>
+                                              <Select value={room.appliances.wallOven.grade} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, grade: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Grade" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="standard">Standard</SelectItem>
                                                   <SelectItem value="high">High</SelectItem>
                                                   <SelectItem value="premium">Premium</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.wallOven.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, action: value } } }) }>
+                                              <Select value={room.appliances.wallOven.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, wallOven: { ...room.appliances!.wallOven, action: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4494,35 +4337,32 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                           {room.appliances.airHandler.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.airHandler.type} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, type: value } } }) }>
+                                              <Select value={room.appliances.airHandler.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, type: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="2-ton">2 ton</SelectItem>
                                                   <SelectItem value="3-ton">3 ton</SelectItem>
                                                   <SelectItem value="4-ton">4 ton</SelectItem>
                                                   <SelectItem value="5-ton">5 ton</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.airHandler.options} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, options: value } } }) }>
+                                              <Select value={room.appliances.airHandler.options} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, options: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[200px]">
                                                   <SelectValue placeholder="Options" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="with-heating-element">With heating element</SelectItem>
                                                   <SelectItem value="with-a-coil">With A coil</SelectItem>
                                                   <SelectItem value="with-heating-and-coil">With heating element and a Coil</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.airHandler.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, action: value } } }) }>
+                                              <Select value={room.appliances.airHandler.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, action: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4549,23 +4389,21 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                           {room.appliances.boiler.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.boiler.type} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, type: value } } }) }>
+                                              <Select value={room.appliances.boiler.type} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, type: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="natural-gas">Natural Gas</SelectItem>
                                                   <SelectItem value="electric">Electric</SelectItem>
                                                   <SelectItem value="oil-fired">Oil fired</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.boiler.action} onValueChange={(rawValue) => { const value = rawValue === "__none__" ? "" : rawValue; updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, action: value } } }) }>
+                                              <Select value={room.appliances.boiler.action} onValueChange={(value) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, action: value } } })}>
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                   <SelectValue placeholder="Action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
@@ -4619,18 +4457,15 @@ export default function NewExpressEstimatePage() {
                                   <div key={door.id} className="space-y-3 rounded-lg bg-secondary/30 p-3">
                                     <div className="flex flex-wrap items-center gap-3">
                                       <Badge variant="secondary" className="capitalize">{door.category}</Badge>
-                                      <Select value={door.type} onValueChange={(rawValue) => {
-                                        const value = rawValue === "__none__" ? "" : rawValue; {
-                                          const newDoors = [...room.doors]
-                                          newDoors[idx] = { ...door, type: value }
-                                          updateRoom(room.id, { doors: newDoors })
-                                        }
-                                      }>
+                                      <Select value={door.type} onValueChange={(value) => {
+                                        const newDoors = [...room.doors]
+                                        newDoors[idx] = { ...door, type: value }
+                                        updateRoom(room.id, { doors: newDoors })
+                                      }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[130px]">
                                           <SelectValue placeholder="Type" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           {door.category === "interior" ? (
                                             <>
                                               <SelectItem value="6-panel">6 Panel</SelectItem>
@@ -4650,35 +4485,29 @@ export default function NewExpressEstimatePage() {
                                           )}
                                         </SelectContent>
                                       </Select>
-                                      <Select value={door.grade} onValueChange={(rawValue) => {
-                                        const value = rawValue === "__none__" ? "" : rawValue; {
-                                          const newDoors = [...room.doors]
-                                          newDoors[idx] = { ...door, grade: value }
-                                          updateRoom(room.id, { doors: newDoors })
-                                        }
-                                      }>
+                                      <Select value={door.grade} onValueChange={(value) => {
+                                        const newDoors = [...room.doors]
+                                        newDoors[idx] = { ...door, grade: value }
+                                        updateRoom(room.id, { doors: newDoors })
+                                      }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                           <SelectValue placeholder="Grade" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           <SelectItem value="standard">Standard</SelectItem>
                                           <SelectItem value="high">High</SelectItem>
                                           <SelectItem value="premium">Premium</SelectItem>
                                         </SelectContent>
                                       </Select>
-                                      <Select value={door.handleAction} onValueChange={(rawValue) => {
-                                        const value = rawValue === "__none__" ? "" : rawValue; {
-                                          const newDoors = [...room.doors]
-                                          newDoors[idx] = { ...door, handleAction: value }
-                                          updateRoom(room.id, { doors: newDoors })
-                                        }
-                                      }>
+                                      <Select value={door.handleAction} onValueChange={(value) => {
+                                        const newDoors = [...room.doors]
+                                        newDoors[idx] = { ...door, handleAction: value }
+                                        updateRoom(room.id, { doors: newDoors })
+                                      }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
                                           <SelectValue placeholder="Handle" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           <SelectItem value="replace">Replace</SelectItem>
                                           <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                         </SelectContent>
