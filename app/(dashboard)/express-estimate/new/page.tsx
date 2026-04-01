@@ -1309,10 +1309,11 @@ export default function NewExpressEstimatePage() {
                                 <Input
                                   type="number"
                                   min="0"
+                                  step="1"
                                   placeholder="PF"
                                   value={foundation.crawlspace.perimeterFeet}
-                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, perimeterFeet: e.target.value.replace(/^0+/, '') } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50 w-24"
+                                  onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, perimeterFeet: e.target.value } }); handleSave() }}
+                                  className="border-border/60 bg-secondary/50 w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:appearance-auto"
                                 />
                               </div>
                               <div className="space-y-2">
@@ -1399,14 +1400,13 @@ export default function NewExpressEstimatePage() {
                                   </div>
                                   {foundation.crawlspace.floorInsulation && (
                                     <Select value={foundation.crawlspace.floorInsulationType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, floorInsulationType: value } }); handleSave() }}>
-                                      <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
+                                      <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                       <SelectContent>
                                         <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        <SelectItem value="spray-foam">Spray Foam</SelectItem>
-                                        <SelectItem value="r13">R-13</SelectItem>
-                                        <SelectItem value="r19">R-19</SelectItem>
+                                        <SelectItem value="r13">{"4' - R-13 Unfaced Batt"}</SelectItem>
+                                        <SelectItem value="r19">{"6' - R-19 Unfaced Batt"}</SelectItem>
                                       </SelectContent>
                                     </Select>
                                   )}
@@ -1571,7 +1571,7 @@ export default function NewExpressEstimatePage() {
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
                       <div className="flex items-center gap-3">
                         <Droplets className="h-5 w-5 text-primary" />
-                        <span className="font-medium text-foreground">Sump Pump</span>
+                        <span className="font-medium text-foreground">Plumbing - Water Heater / Sump Pump / Water Softener</span>
                         {foundation.sumpPump.enabled && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
@@ -1614,21 +1614,19 @@ export default function NewExpressEstimatePage() {
                                 </SelectContent>
                               </Select>
                             </div>
+                            <div className="space-y-2 flex-1 min-w-[150px]">
+                              <Label className="text-xs text-muted-foreground">F9 Model/Serial...</Label>
+                              <Input
+                                type="text"
+                                placeholder="Enter model and serial..."
+                                value={foundation.sumpPump.f9Note}
+                                onChange={(e) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, f9Note: e.target.value } }); handleSave() }}
+                                className="border-border/60 bg-secondary/50"
+                              />
+                            </div>
                           </>
                         )}
                       </div>
-                      {foundation.sumpPump.enabled && (
-                        <div className="mt-4 space-y-2">
-                          <Label className="text-sm">F9 Note</Label>
-                          <Input
-                            type="text"
-                            placeholder="Enter model and serial number..."
-                            value={foundation.sumpPump.f9Note}
-                            onChange={(e) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, f9Note: e.target.value } }); handleSave() }}
-                            className="border-border/60 bg-secondary/50"
-                          />
-                        </div>
-                      )}
                     </CollapsibleContent>
                   </Collapsible>
 
@@ -1745,6 +1743,19 @@ export default function NewExpressEstimatePage() {
                                   </SelectContent>
                                 </Select>
                               </div>
+                              <div className="space-y-2 flex-1 min-w-[150px]">
+                                <Label className="text-sm">F9 Model/Serial...</Label>
+                                <Input
+                                  type="text"
+                                  placeholder="Enter model and serial..."
+                                  value={handler.f9Note}
+                                  onChange={(e) => {
+                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, f9Note: e.target.value } : h) } })
+                                    handleSave()
+                                  }}
+                                  className="border-border/60 bg-secondary/50"
+                                />
+                              </div>
                               {(handler.type === "with-heat-element" || handler.type === "with-heat-element-a-coil") && (
                                 <div className="space-y-2 min-w-[100px]">
                                   <Label className="text-sm">With Heat Element</Label>
@@ -1799,10 +1810,11 @@ export default function NewExpressEstimatePage() {
                                 <Input
                                   type="number"
                                   min="0"
+                                  step="1"
                                   placeholder="PF"
                                   value={foundation.basement.wallCleanPf}
-                                  onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, wallCleanPf: e.target.value.replace(/^0+/, '') } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50 w-24"
+                                  onChange={(e) => { setFoundation({ ...foundation, basement: { ...foundation.basement, wallCleanPf: e.target.value } }); handleSave() }}
+                                  className="border-border/60 bg-secondary/50 w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:appearance-auto"
                                 />
                               </div>
                               <div className="flex items-center gap-2 pb-2">
@@ -1962,8 +1974,9 @@ export default function NewExpressEstimatePage() {
                                 )}
                               </div>
                               {foundation.basement.foundationWindows.map((win, index) => (
-                                <div key={win.id} className="ml-8 flex flex-wrap items-center gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
-                                  <span className="text-sm font-medium">Window {index + 1}</span>
+                                <div key={win.id} className="ml-8 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
+                                  <div className="flex flex-wrap items-center gap-3">
+                                    <span className="text-sm font-medium">Window {index + 1}</span>
                                   <Select value={win.type} onValueChange={(__v) => {
                                     const value = __v === "__none__" ? "" : __v;
                                     setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, type: value } : w) } })
@@ -2024,11 +2037,12 @@ export default function NewExpressEstimatePage() {
                                       <SelectItem value="wood">Wood</SelectItem>
                                     </SelectContent>
                                   </Select>
+                                  </div>
                                   <Button
                                     type="button"
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                    className="h-8 w-8 p-0 text-destructive hover:text-destructive ml-auto"
                                     onClick={() => {
                                       setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.filter(w => w.id !== win.id) } })
                                       handleSave()
