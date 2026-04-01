@@ -319,10 +319,9 @@ export default function NewExpressEstimatePage() {
     },
     finishes: [] as Array<{
       id: number;
-      type: "siding" | "house-wrap" | "backer-board" | "wall-insulation";
-      perimeterFeet?: string;
-      replacementHeight?: string;
-      sprayFoam?: boolean;
+      type: string;
+      measureType: "pf" | "sf" | "lf";
+      value: string;
     }>,
   })
 
@@ -1077,7 +1076,7 @@ export default function NewExpressEstimatePage() {
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="flex flex-wrap items-end gap-4">
                         <div className="space-y-2">
-                          <Label className="text-xs text-muted-foreground">Exterior Orders</Label>
+                          <Label className="text-xs text-muted-foreground">Exterior Outlets</Label>
                           <Input
                             type="number"
                             min="0"
@@ -1149,171 +1148,117 @@ export default function NewExpressEstimatePage() {
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
-                      <div className="space-y-4">
-                        {/* Siding */}
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={exterior.finishes.some(f => f.type === "siding")}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "siding", perimeterFeet: "" }] })
-                                } else {
-                                  setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "siding") })
-                                }
-                                handleSave()
-                              }}
-                            />
-                            <Label className="text-sm font-medium">Siding</Label>
-                          </div>
-                          {exterior.finishes.some(f => f.type === "siding") && (
-                            <div className="ml-6 space-y-2">
-                              <Label className="text-xs text-muted-foreground">Perimeter Feet</Label>
-                              <Input
-                                type="number"
-                                min="0"
-                                placeholder="Enter perimeter"
-                                value={exterior.finishes.find(f => f.type === "siding")?.perimeterFeet || ""}
-                                onChange={(e) => {
-                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "siding" ? { ...f, perimeterFeet: e.target.value } : f) })
-                                  handleSave()
-                                }}
-                                className="border-border/60 bg-secondary/50 w-32"
-                              />
-                            </div>
-                          )}
+                      <div className="flex flex-wrap items-end gap-4">
+                        <div className="flex items-center gap-2 pb-2">
+                          <Switch
+                            checked={exterior.finishes.some(f => f.type === "exterior-paint")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-paint", measureType: "pf", value: "" }] })
+                              } else {
+                                setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-paint") })
+                              }
+                              handleSave()
+                            }}
+                          />
+                          <Label className="text-sm">Exterior Paint</Label>
                         </div>
-
-                        {/* House Wrap */}
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={exterior.finishes.some(f => f.type === "house-wrap")}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "house-wrap", replacementHeight: "" }] })
-                                } else {
-                                  setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "house-wrap") })
-                                }
-                                handleSave()
-                              }}
-                            />
-                            <Label className="text-sm font-medium">House Wrap</Label>
-                          </div>
-                          {exterior.finishes.some(f => f.type === "house-wrap") && (
-                            <div className="ml-6 space-y-2 min-w-[160px]">
-                              <Label className="text-xs text-muted-foreground">Replacement Height</Label>
-                              <Select
-                                value={exterior.finishes.find(f => f.type === "house-wrap")?.replacementHeight || ""}
-                                onValueChange={(value) => {
-                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "house-wrap" ? { ...f, replacementHeight: value } : f) })
-                                  handleSave()
-                                }}
-                              >
-                                <SelectTrigger className="border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select height" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="1-pf">1 PF</SelectItem>
-                                  <SelectItem value="2-pf">2 PF</SelectItem>
-                                  <SelectItem value="3-pf">3 PF</SelectItem>
-                                  <SelectItem value="4-pf">4 PF</SelectItem>
-                                  <SelectItem value="full">Full</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Backer Board Behind Brick */}
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={exterior.finishes.some(f => f.type === "backer-board")}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "backer-board", replacementHeight: "" }] })
-                                } else {
-                                  setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "backer-board") })
-                                }
-                                handleSave()
-                              }}
-                            />
-                            <Label className="text-sm font-medium">Backer Board Behind Brick</Label>
-                          </div>
-                          {exterior.finishes.some(f => f.type === "backer-board") && (
-                            <div className="ml-6 space-y-2 min-w-[160px]">
-                              <Label className="text-xs text-muted-foreground">Replacement Height</Label>
-                              <Select
-                                value={exterior.finishes.find(f => f.type === "backer-board")?.replacementHeight || ""}
-                                onValueChange={(value) => {
-                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "backer-board" ? { ...f, replacementHeight: value } : f) })
-                                  handleSave()
-                                }}
-                              >
-                                <SelectTrigger className="border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select height" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="2-pf">2 PF</SelectItem>
-                                  <SelectItem value="3-pf">3 PF</SelectItem>
-                                  <SelectItem value="4-pf">4 PF</SelectItem>
-                                  <SelectItem value="full">Full</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Wall Insulation */}
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={exterior.finishes.some(f => f.type === "wall-insulation")}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "wall-insulation", sprayFoam: false, replacementHeight: "" }] })
-                                } else {
-                                  setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "wall-insulation") })
-                                }
-                                handleSave()
-                              }}
-                            />
-                            <Label className="text-sm font-medium">Wall Insulation</Label>
-                          </div>
-                          {exterior.finishes.some(f => f.type === "wall-insulation") && (
-                            <div className="ml-6 space-y-3">
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={exterior.finishes.find(f => f.type === "wall-insulation")?.sprayFoam || false}
-                                  onCheckedChange={(checked) => {
-                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "wall-insulation" ? { ...f, sprayFoam: checked } : f) })
-                                    handleSave()
-                                  }}
-                                />
-                                <Label className="text-sm">Spray Foam</Label>
-                              </div>
-                              <div className="space-y-2 min-w-[160px]">
-                                <Label className="text-xs text-muted-foreground">Replacement Height</Label>
-                                <Select
-                                  value={exterior.finishes.find(f => f.type === "wall-insulation")?.replacementHeight || ""}
-                                  onValueChange={(value) => {
-                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "wall-insulation" ? { ...f, replacementHeight: value } : f) })
+                        {exterior.finishes.some(f => f.type === "exterior-paint") && (
+                          <>
+                            <div className="flex items-center gap-2">
+                              {(["pf", "sf"] as const).map((mt) => (
+                                <Button
+                                  key={mt}
+                                  type="button"
+                                  variant={exterior.finishes.find(f => f.type === "exterior-paint")?.measureType === mt ? "default" : "outline"}
+                                  size="sm"
+                                  className="h-7 px-2 text-xs"
+                                  onClick={() => {
+                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-paint" ? { ...f, measureType: mt } : f) })
                                     handleSave()
                                   }}
                                 >
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="Select height" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="4-pf">4 PF</SelectItem>
-                                    <SelectItem value="8-pf">8 PF</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
+                                  {mt.toUpperCase()}
+                                </Button>
+                              ))}
                             </div>
-                          )}
+                            <div className="space-y-2 min-w-[100px]">
+                              <Select
+                                value={exterior.finishes.find(f => f.type === "exterior-paint")?.value || ""}
+                                onValueChange={(__v) => {
+                                  const value = __v === "__none__" ? "" : __v;
+                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-paint" ? { ...f, value } : f) })
+                                  handleSave()
+                                }}
+                              >
+                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                  <SelectItem value="0.25">0.25</SelectItem>
+                                  <SelectItem value="0.5">0.5</SelectItem>
+                                  <SelectItem value="W">W</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </>
+                        )}
+                        <div className="flex items-center gap-2 pb-2">
+                          <Switch
+                            checked={exterior.finishes.some(f => f.type === "exterior-siding")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-siding", measureType: "sf", value: "" }] })
+                              } else {
+                                setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-siding") })
+                              }
+                              handleSave()
+                            }}
+                          />
+                          <Label className="text-sm">Exterior Siding</Label>
                         </div>
+                        {exterior.finishes.some(f => f.type === "exterior-siding") && (
+                          <>
+                            <div className="flex items-center gap-2">
+                              {(["pf", "sf"] as const).map((mt) => (
+                                <Button
+                                  key={mt}
+                                  type="button"
+                                  variant={exterior.finishes.find(f => f.type === "exterior-siding")?.measureType === mt ? "default" : "outline"}
+                                  size="sm"
+                                  className="h-7 px-2 text-xs"
+                                  onClick={() => {
+                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-siding" ? { ...f, measureType: mt } : f) })
+                                    handleSave()
+                                  }}
+                                >
+                                  {mt.toUpperCase()}
+                                </Button>
+                              ))}
+                            </div>
+                            <div className="space-y-2 min-w-[100px]">
+                              <Select
+                                value={exterior.finishes.find(f => f.type === "exterior-siding")?.value || ""}
+                                onValueChange={(__v) => {
+                                  const value = __v === "__none__" ? "" : __v;
+                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-siding" ? { ...f, value } : f) })
+                                  handleSave()
+                                }}
+                              >
+                                <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                  <SelectItem value="0.25">0.25</SelectItem>
+                                  <SelectItem value="0.5">0.5</SelectItem>
+                                  <SelectItem value="W">W</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -2032,66 +1977,66 @@ export default function NewExpressEstimatePage() {
                                 <div key={win.id} className="ml-8 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border/40 bg-secondary/30 p-3">
                                   <div className="flex flex-wrap items-center gap-3">
                                     <span className="text-sm font-medium">Window {index + 1}</span>
-                                    <Select value={win.type} onValueChange={(__v) => {
-                                      const value = __v === "__none__" ? "" : __v;
-                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, type: value } : w) } })
-                                      handleSave()
-                                    }}>
-                                      <SelectTrigger className="w-28 border-border/60 bg-secondary/50">
-                                        <SelectValue placeholder="Type" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        <SelectItem value="casement">Casement</SelectItem>
-                                        <SelectItem value="single-hung">Single Hung</SelectItem>
-                                        <SelectItem value="double-hung">Double Hung</SelectItem>
-                                        <SelectItem value="slider">Slider</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                    <Select value={win.size} onValueChange={(__v) => {
-                                      const value = __v === "__none__" ? "" : __v;
-                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, size: value } : w) } })
-                                      handleSave()
-                                    }}>
-                                      <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
-                                        <SelectValue placeholder="Size" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        <SelectItem value="4-8">4-8 SF</SelectItem>
-                                        <SelectItem value="9-12">9-12 SF</SelectItem>
-                                        <SelectItem value="13-18">13-18 SF</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                    <div className="flex items-center gap-1">
-                                      <Label className="text-xs">Qty</Label>
-                                      <Input
-                                        type="text"
-                                        inputMode="numeric"
-                                        placeholder="QTY"
-                                        value={win.quantity}
-                                        onChange={(e) => {
-                                          setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, quantity: e.target.value.replace(/^0+/, '') || "" } : w) } })
-                                          handleSave()
-                                        }}
-                                        className="w-14 border-border/60 bg-secondary/50"
-                                      />
-                                    </div>
-                                    <Select value={win.material} onValueChange={(__v) => {
-                                      const value = __v === "__none__" ? "" : __v;
-                                      setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, material: value } : w) } })
-                                      handleSave()
-                                    }}>
-                                      <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
-                                        <SelectValue placeholder="Material" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        <SelectItem value="vinyl">Vinyl</SelectItem>
-                                        <SelectItem value="aluminum">Aluminum</SelectItem>
-                                        <SelectItem value="wood">Wood</SelectItem>
-                                      </SelectContent>
-                                    </Select>
+                                  <Select value={win.type} onValueChange={(__v) => {
+                                    const value = __v === "__none__" ? "" : __v;
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, type: value } : w) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="w-28 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="casement">Casement</SelectItem>
+                                      <SelectItem value="single-hung">Single Hung</SelectItem>
+                                      <SelectItem value="double-hung">Double Hung</SelectItem>
+                                      <SelectItem value="slider">Slider</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Select value={win.size} onValueChange={(__v) => {
+                                    const value = __v === "__none__" ? "" : __v;
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, size: value } : w) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Size" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="4-8">4-8 SF</SelectItem>
+                                      <SelectItem value="9-12">9-12 SF</SelectItem>
+                                      <SelectItem value="13-18">13-18 SF</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <div className="flex items-center gap-1">
+                                    <Label className="text-xs">Qty</Label>
+                                    <Input
+                                      type="text"
+                                      inputMode="numeric"
+                                      placeholder="QTY"
+                                      value={win.quantity}
+                                      onChange={(e) => {
+                                        setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, quantity: e.target.value.replace(/^0+/, '') || "" } : w) } })
+                                        handleSave()
+                                      }}
+                                      className="w-14 border-border/60 bg-secondary/50"
+                                    />
+                                  </div>
+                                  <Select value={win.material} onValueChange={(__v) => {
+                                    const value = __v === "__none__" ? "" : __v;
+                                    setFoundation({ ...foundation, basement: { ...foundation.basement, foundationWindows: foundation.basement.foundationWindows.map(w => w.id === win.id ? { ...w, material: value } : w) } })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Material" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="vinyl">Vinyl</SelectItem>
+                                      <SelectItem value="aluminum">Aluminum</SelectItem>
+                                      <SelectItem value="wood">Wood</SelectItem>
+                                    </SelectContent>
+                                  </Select>
                                   </div>
                                   <Button
                                     type="button"
@@ -4643,11 +4588,11 @@ export default function NewExpressEstimatePage() {
                                             </div>
                                           )}
                                         </div>
-
+                                        
                                         {/* Complete Button */}
                                         <div className="flex justify-end pt-3 border-t border-border/40">
-                                          <Button
-                                            type="button"
+                                          <Button 
+                                            type="button" 
                                             onClick={() => { handleSave(); }}
                                             className="gap-2"
                                           >
