@@ -3228,22 +3228,23 @@ export default function NewExpressEstimatePage() {
                                       <Select value={door.type} onValueChange={(__v) => {
                                         const value = __v === "__none__" ? "" : __v;
                                         const newDoors = [...room.doors]
-                                        newDoors[idx] = { ...door, type: value }
+                                        newDoors[idx] = { ...door, type: value, grade: "" }
                                         updateRoom(room.id, { doors: newDoors })
                                       }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[130px]">
+                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[150px]">
                                           <SelectValue placeholder="Type" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           {door.category === "interior" ? (
                                             <>
-                                              <SelectItem value="6-panel">6 Panel</SelectItem>
-                                              <SelectItem value="8ft-paneled">8ft Paneled</SelectItem>
-                                              <SelectItem value="french">French</SelectItem>
-                                              <SelectItem value="bifold-single">Bifold Single</SelectItem>
-                                              <SelectItem value="bifold-double">Bifold Double</SelectItem>
-                                              <SelectItem value="pocket-single">Pocket Single</SelectItem>
+                                              <SelectItem value="standard-6-panel">Standard - 6 Panel</SelectItem>
+                                              <SelectItem value="8ft-wood-door">8ft Wood Door</SelectItem>
+                                              <SelectItem value="french-door">French Door</SelectItem>
+                                              <SelectItem value="louvered">Louvered Door</SelectItem>
+                                              <SelectItem value="bifold">Bifold</SelectItem>
+                                              <SelectItem value="bypass">Bypass</SelectItem>
+                                              <SelectItem value="pocket">Pocket</SelectItem>
                                             </>
                                           ) : (
                                             <>
@@ -3261,16 +3262,97 @@ export default function NewExpressEstimatePage() {
                                         newDoors[idx] = { ...door, grade: value }
                                         updateRoom(room.id, { doors: newDoors })
                                       }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
+                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[200px]">
                                           <SelectValue placeholder="Grade" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                          <SelectItem value="standard">Standard</SelectItem>
-                                          <SelectItem value="high">High</SelectItem>
-                                          <SelectItem value="premium">Premium</SelectItem>
+                                          {door.category === "interior" && door.type === "standard-6-panel" && (
+                                            <>
+                                              <SelectItem value="base">Base</SelectItem>
+                                              <SelectItem value="standard">Standard</SelectItem>
+                                              <SelectItem value="high">High</SelectItem>
+                                              <SelectItem value="premium">Premium</SelectItem>
+                                            </>
+                                          )}
+                                          {door.category === "interior" && door.type === "8ft-wood-door" && (
+                                            <>
+                                              <SelectItem value="solid-adler-paneled">Solid Adler - Paneled</SelectItem>
+                                              <SelectItem value="colonist">Colonist</SelectItem>
+                                            </>
+                                          )}
+                                          {door.category === "interior" && door.type === "french-door" && (
+                                            <>
+                                              <SelectItem value="single-prehung">Single - Pre Hung</SelectItem>
+                                              <SelectItem value="double-prehung">Double - Pre Hung</SelectItem>
+                                              <SelectItem value="8-single-prehung">8&apos; Single - Pre Hung</SelectItem>
+                                              <SelectItem value="8-double-prehung">8&apos; Double - Pre Hung</SelectItem>
+                                            </>
+                                          )}
+                                          {door.category === "interior" && door.type === "louvered" && (
+                                            <>
+                                              <SelectItem value="single-half-louvered">Single - Half Louvered</SelectItem>
+                                              <SelectItem value="single-full-louvered">Single - Full Louvered</SelectItem>
+                                              <SelectItem value="double-half-louvered">Double - Half Louvered</SelectItem>
+                                              <SelectItem value="double-full-louvered">Double - Full Louvered</SelectItem>
+                                            </>
+                                          )}
+                                          {door.category === "interior" && door.type === "bifold" && (
+                                            <>
+                                              <SelectItem value="colonist-double">Colonist - Double</SelectItem>
+                                              <SelectItem value="colonist-single">Colonist - Single</SelectItem>
+                                              <SelectItem value="solid-core-double-half-louvered">Solid Core - Double Half Louvered</SelectItem>
+                                              <SelectItem value="solid-core-single-half-louvered">Solid Core - Single Half Louvered</SelectItem>
+                                              <SelectItem value="full-louvered-double">Full Louvered - Double</SelectItem>
+                                              <SelectItem value="full-louvered-single">Full Louvered - Single</SelectItem>
+                                              <SelectItem value="mirrored-single">Mirrored - Single</SelectItem>
+                                              <SelectItem value="mirrored-double">Mirrored - Double</SelectItem>
+                                            </>
+                                          )}
+                                          {door.category === "interior" && door.type === "bypass" && (
+                                            <>
+                                              <SelectItem value="colonist">Colonist</SelectItem>
+                                              <SelectItem value="lauan-mahogany">Lauan / Mahogany</SelectItem>
+                                              <SelectItem value="birch">Birch</SelectItem>
+                                              <SelectItem value="panel">Panel</SelectItem>
+                                              <SelectItem value="mirrored-door-set">Mirrored Door Set</SelectItem>
+                                              <SelectItem value="mirrored-door-set-high">Mirrored Door Set - High Grade</SelectItem>
+                                            </>
+                                          )}
+                                          {door.category === "interior" && door.type === "pocket" && (
+                                            <>
+                                              <SelectItem value="colonist">Colonist</SelectItem>
+                                              <SelectItem value="lauan-mahogany">Lauan / Mahogany</SelectItem>
+                                              <SelectItem value="birch">Birch</SelectItem>
+                                              <SelectItem value="panel">Panel</SelectItem>
+                                            </>
+                                          )}
+                                          {door.category === "exterior" && (
+                                            <>
+                                              <SelectItem value="standard">Standard</SelectItem>
+                                              <SelectItem value="high">High</SelectItem>
+                                              <SelectItem value="premium">Premium</SelectItem>
+                                            </>
+                                          )}
                                         </SelectContent>
                                       </Select>
+                                      {door.category === "interior" && (
+                                        <Select value={door.finish} onValueChange={(__v) => {
+                                          const value = __v === "__none__" ? "" : __v;
+                                          const newDoors = [...room.doors]
+                                          newDoors[idx] = { ...door, finish: value }
+                                          updateRoom(room.id, { doors: newDoors })
+                                        }}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
+                                            <SelectValue placeholder="Finish" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="paint">Paint</SelectItem>
+                                            <SelectItem value="stain">Stain</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      )}
                                       <Select value={door.handleAction} onValueChange={(__v) => {
                                         const value = __v === "__none__" ? "" : __v;
                                         const newDoors = [...room.doors]
@@ -3287,7 +3369,18 @@ export default function NewExpressEstimatePage() {
                                         </SelectContent>
                                       </Select>
                                       <div className="flex-1"></div>
-                                      <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-9 w-9 text-muted-foreground hover:bg-secondary"
+                                          onClick={() => {
+                                            const copiedDoor = { ...door, id: Date.now() }
+                                            updateRoom(room.id, { doors: [...room.doors, copiedDoor] })
+                                          }}
+                                        >
+                                          <Copy className="h-4 w-4" />
+                                        </Button>
                                         <Button
                                           variant="ghost"
                                           size="icon"
