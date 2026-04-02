@@ -3019,7 +3019,7 @@ const newDoor: DoorItem = {
                                               <Label className="text-xs text-muted-foreground">Sink</Label>
                                               <Select value={room.vanity.countertop.sink} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, sink: value } } }) }}>
                                                 <SelectTrigger className="w-[150px] border-border/60 bg-secondary/50">
-                                                  <SelectValue placeholder="Single" />
+                                                  <SelectValue placeholder="Select sink" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
@@ -3034,7 +3034,7 @@ const newDoor: DoorItem = {
                                               <Label className="text-xs text-muted-foreground">Action</Label>
                                               <Select value={room.vanity.countertop.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, action: value } } }) }}>
                                                 <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
-                                                  <SelectValue placeholder="Detach and reset" />
+                                                  <SelectValue placeholder="Select action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
@@ -3058,7 +3058,7 @@ const newDoor: DoorItem = {
                                               <Label className="text-xs text-muted-foreground">Faucet Action</Label>
                                               <Select value={room.vanity.countertop.faucetAction} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, faucetAction: value } } }) }}>
                                                 <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
-                                                  <SelectValue placeholder="Detach and reset" />
+                                                  <SelectValue placeholder="Select action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
@@ -3082,7 +3082,7 @@ const newDoor: DoorItem = {
                                                 <Label className="text-xs text-muted-foreground">Action</Label>
                                                 <Select value={room.vanity.backsplashAction} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { vanity: { ...room.vanity!, backsplashAction: value } }) }}>
                                                   <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
-                                                    <SelectValue placeholder="Detach and reset" />
+                                                    <SelectValue placeholder="Select action" />
                                                   </SelectTrigger>
                                                   <SelectContent>
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
