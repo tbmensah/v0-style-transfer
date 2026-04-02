@@ -327,7 +327,7 @@ export default function NewExpressEstimatePage() {
     },
     finishes: {
       exteriorPaint: false,
-      siding: { enabled: false, perimeterFeet: "", sidingEnabled: false, squareFeet: "" },
+      siding: { enabled: false, measureUnit: "pf", value: "" },
       sheathing: { enabled: false, type: "", replacementHeight: "" },
       houseWrap: { enabled: false, replacementHeight: "" },
       backerBoard: { enabled: false, replacementHeight: "" },
@@ -1142,10 +1142,10 @@ export default function NewExpressEstimatePage() {
                               checked={exterior.finishes.exteriorPaint}
                               onCheckedChange={(checked) => { setExterior({ ...exterior, finishes: { ...exterior.finishes, exteriorPaint: checked } }); handleSave() }}
                             />
-                            <Label className="text-sm font-medium">Exterior Paint</Label>
+                            <Label className="text-sm">Exterior Paint</Label>
                           </div>
                           {exterior.finishes.exteriorPaint && (
-                            <p className="ml-11 text-xs text-muted-foreground">Note: This option is for full wall of paint</p>
+                            <p className="ml-11 text-xs text-amber-500">Note: This option is for full wall of paint</p>
                           )}
                         </div>
 
@@ -1159,32 +1159,31 @@ export default function NewExpressEstimatePage() {
                             <Label className="text-sm font-medium">Siding</Label>
                           </div>
                           {exterior.finishes.siding.enabled && (
-                            <div className="ml-11 flex flex-wrap items-end gap-4">
+                            <div className="ml-11 flex flex-wrap items-center gap-4">
+                              <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-secondary/30 p-1">
+                                <button
+                                  type="button"
+                                  className={`px-3 py-1 text-xs rounded-md transition-colors ${exterior.finishes.siding.measureUnit === "pf" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary"}`}
+                                  onClick={() => { setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, measureUnit: "pf" } } }); handleSave() }}
+                                >
+                                  Perimeter Feet (PF)
+                                </button>
+                                <button
+                                  type="button"
+                                  className={`px-3 py-1 text-xs rounded-md transition-colors ${exterior.finishes.siding.measureUnit === "sf" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary"}`}
+                                  onClick={() => { setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, measureUnit: "sf" } } }); handleSave() }}
+                                >
+                                  Square Feet (SF)
+                                </button>
+                              </div>
                               <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground">Perimeter Feet</Label>
+                                <Label className="text-xs text-muted-foreground">{exterior.finishes.siding.measureUnit === "pf" ? "Perimeter Feet" : "Square Feet"}</Label>
                                 <Input
                                   type="number"
                                   min="0"
-                                  placeholder="Enter PF"
-                                  value={exterior.finishes.siding.perimeterFeet}
-                                  onChange={(e) => { setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, perimeterFeet: e.target.value } } }); handleSave() }}
-                                  className="border-border/60 bg-secondary/50 w-28"
-                                />
-                              </div>
-                              <div className="flex items-center gap-2 pb-1">
-                                <Switch
-                                  checked={exterior.finishes.siding.sidingEnabled}
-                                  onCheckedChange={(checked) => { setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, sidingEnabled: checked } } }); handleSave() }}
-                                />
-                              </div>
-                              <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground">Square Feet</Label>
-                                <Input
-                                  type="number"
-                                  min="0"
-                                  placeholder="0"
-                                  value={exterior.finishes.siding.squareFeet}
-                                  onChange={(e) => { setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeet: e.target.value } } }); handleSave() }}
+                                  placeholder={exterior.finishes.siding.measureUnit === "pf" ? "Enter PF" : "Enter SF"}
+                                  value={exterior.finishes.siding.value}
+                                  onChange={(e) => { setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, value: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-28"
                                 />
                               </div>
@@ -1295,7 +1294,7 @@ export default function NewExpressEstimatePage() {
                           <div className="flex items-center gap-3">
                             <Switch
                               checked={exterior.finishes.wallInsulation.enabled}
-                              onCheckedChange={(checked) => { setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, enabled: checked } } }); handleSave() }}
+                              onCheckedChange={(checked) => { setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, enabled: checked, insulationType: checked ? "sheathing-height" : exterior.finishes.wallInsulation.insulationType } } }); handleSave() }}
                             />
                             <Label className="text-sm font-medium">Wall Insulation</Label>
                           </div>
@@ -1303,12 +1302,12 @@ export default function NewExpressEstimatePage() {
                             <div className="ml-11 flex flex-wrap items-end gap-4">
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Type</Label>
-                                <Select value={exterior.finishes.wallInsulation.insulationType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, insulationType: value } } }); handleSave() }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[160px]">
+                                <Select value={exterior.finishes.wallInsulation.insulationType || "sheathing-height"} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, insulationType: value } } }); handleSave() }}>
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[220px]">
                                     <SelectValue placeholder="Select insulation type" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="sheathing-height">Replacement Height for Sheathing</SelectItem>
                                     <SelectItem value="spray-foam">Spray Foam</SelectItem>
                                     <SelectItem value="batt">Batt</SelectItem>
                                     <SelectItem value="rigid-board">Rigid Board</SelectItem>
@@ -1326,7 +1325,6 @@ export default function NewExpressEstimatePage() {
                                   onChange={(e) => { setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, replacementHeight: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
                                 />
-                                <p className="text-xs text-muted-foreground">Usually 1 ft above waterline</p>
                               </div>
                             </div>
                           )}
