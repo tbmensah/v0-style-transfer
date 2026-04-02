@@ -152,7 +152,12 @@ interface DoorItem {
   size: string
   action: string
   sensors: string
-  }
+  // Panel replacement for exterior doors
+  panelReplacement: boolean
+  panelReplacementQty: string
+  panelReplacementSize: string
+  panelReplacementGrade: string
+}
 
 interface VanityOptions {
   enabled: boolean
@@ -549,6 +554,10 @@ const newDoor: DoorItem = {
   size: "",
   action: "",
   sensors: "",
+  panelReplacement: false,
+  panelReplacementQty: "",
+  panelReplacementSize: "",
+  panelReplacementGrade: "",
   }
   updateRoom(roomId, { doors: [...room.doors, newDoor] })
     }
@@ -4946,6 +4955,63 @@ const newDoor: DoorItem = {
                                             }}
                                           />
                                           <Label className="text-sm">Retrofit in Stucco</Label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Switch
+                                            checked={door.panelReplacement}
+                                            onCheckedChange={(checked) => {
+                                              const newDoors = [...room.doors]
+                                              newDoors[idx] = { ...door, panelReplacement: checked, panelReplacementQty: checked ? door.panelReplacementQty : "", panelReplacementSize: checked ? door.panelReplacementSize : "", panelReplacementGrade: checked ? door.panelReplacementGrade : "" }
+                                              updateRoom(room.id, { doors: newDoors })
+                                            }}
+                                          />
+                                          <Label className="text-sm">Panel Replacement</Label>
+                                          {door.panelReplacement && (
+                                            <>
+                                              <Input
+                                                type="number"
+                                                min="1"
+                                                placeholder="QTY"
+                                                value={door.panelReplacementQty}
+                                                onChange={(e) => {
+                                                  const newDoors = [...room.doors]
+                                                  newDoors[idx] = { ...door, panelReplacementQty: e.target.value }
+                                                  updateRoom(room.id, { doors: newDoors })
+                                                }}
+                                                className="border-border/60 bg-secondary/50 w-16 h-8 text-sm"
+                                              />
+                                              <Select value={door.panelReplacementSize} onValueChange={(value) => {
+                                                const newDoors = [...room.doors]
+                                                newDoors[idx] = { ...door, panelReplacementSize: value === "__none__" ? "" : value }
+                                                updateRoom(room.id, { doors: newDoors })
+                                              }}>
+                                                <SelectTrigger className="w-[90px] h-8 text-sm border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Size" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                  {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
+                                                    <SelectItem key={num} value={String(num)}>{num}&apos;</SelectItem>
+                                                  ))}
+                                                </SelectContent>
+                                              </Select>
+                                              <Select value={door.panelReplacementGrade} onValueChange={(value) => {
+                                                const newDoors = [...room.doors]
+                                                newDoors[idx] = { ...door, panelReplacementGrade: value === "__none__" ? "" : value }
+                                                updateRoom(room.id, { doors: newDoors })
+                                              }}>
+                                                <SelectTrigger className="w-[110px] h-8 text-sm border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Grade" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                  <SelectItem value="base">Base</SelectItem>
+                                                  <SelectItem value="high">High Grade</SelectItem>
+                                                  <SelectItem value="premium">Premium</SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </>
+                                          )}
                                         </div>
                                       </div>
                                     )}
