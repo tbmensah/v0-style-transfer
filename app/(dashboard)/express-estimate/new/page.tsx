@@ -213,12 +213,11 @@ interface CabinetOptions {
   size: string
   grade: string
   detachAndReset: boolean
-  toeKick: {
+  toeKick: string
+  upperCabinets: {
+    enabled: boolean
     size: string
-    backSplash: string
     grade: string
-    glass: boolean
-    diagonalInstallation: boolean
   }
 }
 
@@ -228,6 +227,13 @@ interface CountertopOptions {
   grade: string
   size: string
   detachAndReset: boolean
+  backSplash: {
+    enabled: boolean
+    type: string
+    grade: string
+    glass: boolean
+    diagonalInstallation: boolean
+  }
 }
 
 interface PlumbingOptions {
@@ -310,8 +316,8 @@ const defaultBathroomExtras = {
 }
 
 const defaultKitchenExtras = {
-  cabinets: { enabled: false, size: "", grade: "", detachAndReset: false, toeKick: { size: "", backSplash: "", grade: "", glass: false, diagonalInstallation: false } },
-  countertop: { enabled: false, type: "", grade: "", size: "", detachAndReset: false },
+  cabinets: { enabled: false, size: "", grade: "", detachAndReset: false, toeKick: "", upperCabinets: { enabled: false, size: "", grade: "" } },
+  countertop: { enabled: false, type: "", grade: "", size: "", detachAndReset: false, backSplash: { enabled: false, type: "", grade: "", glass: false, diagonalInstallation: false } },
   plumbing: { replaceFaucetSink: false, drFaucetSink: false, waterSupplyLine: { enabled: false, qty: "" }, reverseOsmosis: { enabled: false, action: "", f9Note: "" }, garbageDisposal: { enabled: false, action: "", f9Note: "" } },
   appliances: {
     enabled: false,
@@ -3526,106 +3532,216 @@ const newDoor: DoorItem = {
                                 <>
                                   {/* Kitchen Cabinetry */}
                                   <div className="space-y-3 rounded-lg border border-border/40 p-4">
-                                    <div className="flex items-center gap-3">
-                                      <Switch
-                                        checked={room.cabinets.enabled}
-                                        onCheckedChange={(checked) => updateRoom(room.id, { cabinets: { ...room.cabinets!, enabled: checked } })}
-                                      />
-                                      <Label className="font-medium">Cabinetry</Label>
-                                    </div>
-                                    {room.cabinets.enabled && (
-                                      <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
-                                        <div className="space-y-1">
-                                          <Label className="text-xs text-muted-foreground">Size (LF)</Label>
-                                          <Select value={room.cabinets.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { cabinets: { ...room.cabinets!, size: value } }) }}>
-                                            <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
-                                              <SelectValue placeholder="Select" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                              {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
-                                                <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
-                                              ))}
-                                            </SelectContent>
-                                          </Select>
-                                        </div>
-                                        <div className="space-y-1">
-                                          <Label className="text-xs text-muted-foreground">Grade</Label>
-                                          <Select value={room.cabinets.grade} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { cabinets: { ...room.cabinets!, grade: value } }) }}>
-                                            <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
-                                              <SelectValue placeholder="Select" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                              <SelectItem value="base">Base</SelectItem>
-                                              <SelectItem value="standard">Standard</SelectItem>
-                                              <SelectItem value="high">High Grade</SelectItem>
-                                              <SelectItem value="premium">Premium</SelectItem>
-                                              <SelectItem value="custom">Custom</SelectItem>
-                                            </SelectContent>
-                                          </Select>
-                                        </div>
-                                        <div className="flex items-center gap-2 pb-1">
-                                          <Switch
-                                            checked={room.cabinets.detachAndReset}
-                                            onCheckedChange={(checked) => updateRoom(room.id, { cabinets: { ...room.cabinets!, detachAndReset: checked } })}
-                                          />
-                                          <Label className="text-xs whitespace-nowrap">Detach and reset</Label>
-                                        </div>
+                                    <Label className="font-medium">Cabinetry</Label>
+                                    <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Size</Label>
+                                        <Select value={room.cabinets!.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { cabinets: { ...room.cabinets!, size: value } }) }}>
+                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
+                                              <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
                                       </div>
-                                    )}
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Grade</Label>
+                                        <Select value={room.cabinets!.grade} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { cabinets: { ...room.cabinets!, grade: value } }) }}>
+                                          <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="standard">Standard</SelectItem>
+                                            <SelectItem value="high">High Grade</SelectItem>
+                                            <SelectItem value="premium">Premium</SelectItem>
+                                            <SelectItem value="custom">Custom</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="flex items-center gap-2 pb-1">
+                                        <Switch
+                                          checked={room.cabinets!.detachAndReset}
+                                          onCheckedChange={(checked) => updateRoom(room.id, { cabinets: { ...room.cabinets!, detachAndReset: checked } })}
+                                        />
+                                        <Label className="text-xs whitespace-nowrap">Detach and reset</Label>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Toe Kick</Label>
+                                        <Select value={room.cabinets!.toeKick} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: value } }) }}>
+                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
+                                              <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                    </div>
+                                    {/* Upper Cabinets */}
+                                    <div className="flex flex-wrap items-end gap-x-3 gap-y-2 pt-2">
+                                      <div className="flex items-center gap-2">
+                                        <Switch
+                                          checked={room.cabinets!.upperCabinets.enabled}
+                                          onCheckedChange={(checked) => updateRoom(room.id, { cabinets: { ...room.cabinets!, upperCabinets: { ...room.cabinets!.upperCabinets, enabled: checked } } })}
+                                        />
+                                        <Label className="text-sm">Upper Cabinets</Label>
+                                      </div>
+                                      {room.cabinets!.upperCabinets.enabled && (
+                                        <>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Size</Label>
+                                            <Select value={room.cabinets!.upperCabinets.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { cabinets: { ...room.cabinets!, upperCabinets: { ...room.cabinets!.upperCabinets, size: value } } }) }}>
+                                              <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
+                                                  <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
+                                                ))}
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Grade</Label>
+                                            <Select value={room.cabinets!.upperCabinets.grade} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { cabinets: { ...room.cabinets!, upperCabinets: { ...room.cabinets!.upperCabinets, grade: value } } }) }}>
+                                              <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="standard">Standard</SelectItem>
+                                                <SelectItem value="high">High Grade</SelectItem>
+                                                <SelectItem value="premium">Premium</SelectItem>
+                                                <SelectItem value="custom">Custom</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                        </>
+                                      )}
+                                    </div>
                                   </div>
 
                                   {/* Kitchen Countertop */}
                                   <div className="space-y-3 rounded-lg border border-border/40 p-4">
-                                    <div className="flex items-center gap-3">
-                                      <Switch
-                                        checked={room.countertop.enabled}
-                                        onCheckedChange={(checked) => updateRoom(room.id, { countertop: { ...room.countertop!, enabled: checked } })}
-                                      />
-                                      <Label className="font-medium">Countertop</Label>
-                                    </div>
-                                    {room.countertop.enabled && (
-                                      <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
-                                        <div className="space-y-1">
-                                          <Label className="text-xs text-muted-foreground">Type</Label>
-                                          <Select value={room.countertop.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { countertop: { ...room.countertop!, type: value } }) }}>
-                                            <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
-                                              <SelectValue placeholder="Select" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                              <SelectItem value="cultured-marble">Cultured Marble</SelectItem>
-                                              <SelectItem value="laminate">Laminate</SelectItem>
-                                              <SelectItem value="tile">Tile</SelectItem>
-                                              <SelectItem value="granite">Granite</SelectItem>
-                                              <SelectItem value="marble">Marble</SelectItem>
-                                            </SelectContent>
-                                          </Select>
-                                        </div>
-                                        <div className="space-y-1">
-                                          <Label className="text-xs text-muted-foreground">Grade</Label>
-                                          <Select value={room.countertop.grade} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { countertop: { ...room.countertop!, grade: value } }) }}>
-                                            <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
-                                              <SelectValue placeholder="Select" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                              <SelectItem value="base">Base</SelectItem>
-                                              <SelectItem value="standard">Standard</SelectItem>
-                                              <SelectItem value="premium">Premium</SelectItem>
-                                            </SelectContent>
-                                          </Select>
-                                        </div>
-                                        <div className="flex items-center gap-2 pb-1">
-                                          <Switch
-                                            checked={room.countertop.detachAndReset}
-                                            onCheckedChange={(checked) => updateRoom(room.id, { countertop: { ...room.countertop!, detachAndReset: checked } })}
-                                          />
-                                          <Label className="text-xs whitespace-nowrap">Detach and reset</Label>
-                                        </div>
+                                    <Label className="font-medium">Countertop</Label>
+                                    <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Type</Label>
+                                        <Select value={room.countertop!.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { countertop: { ...room.countertop!, type: value } }) }}>
+                                          <SelectTrigger className="w-[150px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select type" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="cultured-marble">Cultured Marble</SelectItem>
+                                            <SelectItem value="laminate">Laminate</SelectItem>
+                                            <SelectItem value="tile">Tile</SelectItem>
+                                            <SelectItem value="granite">Granite</SelectItem>
+                                            <SelectItem value="quartz">Quartz</SelectItem>
+                                            <SelectItem value="marble">Marble</SelectItem>
+                                          </SelectContent>
+                                        </Select>
                                       </div>
-                                    )}
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Grade</Label>
+                                        <Select value={room.countertop!.grade} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { countertop: { ...room.countertop!, grade: value } }) }}>
+                                          <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="standard">Standard</SelectItem>
+                                            <SelectItem value="high">High Grade</SelectItem>
+                                            <SelectItem value="premium">Premium</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Size</Label>
+                                        <Select value={room.countertop!.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { countertop: { ...room.countertop!, size: value } }) }}>
+                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
+                                              <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="flex items-center gap-2 pb-1">
+                                        <Switch
+                                          checked={room.countertop!.detachAndReset}
+                                          onCheckedChange={(checked) => updateRoom(room.id, { countertop: { ...room.countertop!, detachAndReset: checked } })}
+                                        />
+                                        <Label className="text-xs whitespace-nowrap">Detach and reset</Label>
+                                      </div>
+                                    </div>
+                                    {/* Back Splash */}
+                                    <div className="flex flex-wrap items-end gap-x-3 gap-y-2 pt-2">
+                                      <div className="flex items-center gap-2">
+                                        <Switch
+                                          checked={room.countertop!.backSplash.enabled}
+                                          onCheckedChange={(checked) => updateRoom(room.id, { countertop: { ...room.countertop!, backSplash: { ...room.countertop!.backSplash, enabled: checked } } })}
+                                        />
+                                        <Label className="text-sm">Detach and reset</Label>
+                                      </div>
+                                    </div>
+                                    {/* Back Splash Details */}
+                                    <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Back Splash</Label>
+                                        <Select value={room.countertop!.backSplash.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { countertop: { ...room.countertop!, backSplash: { ...room.countertop!.backSplash, type: value } } }) }}>
+                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="tile">Tile</SelectItem>
+                                            <SelectItem value="stone">Stone</SelectItem>
+                                            <SelectItem value="glass">Glass</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Grade</Label>
+                                        <Select value={room.countertop!.backSplash.grade} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { countertop: { ...room.countertop!, backSplash: { ...room.countertop!.backSplash, grade: value } } }) }}>
+                                          <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="standard">Standard</SelectItem>
+                                            <SelectItem value="high">High Grade</SelectItem>
+                                            <SelectItem value="premium">Premium</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="flex items-center gap-2 pb-1">
+                                        <Switch
+                                          checked={room.countertop!.backSplash.glass}
+                                          onCheckedChange={(checked) => updateRoom(room.id, { countertop: { ...room.countertop!, backSplash: { ...room.countertop!.backSplash, glass: checked } } })}
+                                        />
+                                        <Label className="text-xs">Glass</Label>
+                                      </div>
+                                      <div className="flex items-center gap-2 pb-1">
+                                        <Switch
+                                          checked={room.countertop!.backSplash.diagonalInstallation}
+                                          onCheckedChange={(checked) => updateRoom(room.id, { countertop: { ...room.countertop!, backSplash: { ...room.countertop!.backSplash, diagonalInstallation: checked } } })}
+                                        />
+                                        <Label className="text-xs">Diagonal installation</Label>
+                                      </div>
+                                    </div>
                                   </div>
 
                                   {/* Kitchen Plumbing */}
@@ -3634,7 +3750,7 @@ const newDoor: DoorItem = {
                                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                                       <div className="flex items-center gap-2">
                                         <Switch
-                                          checked={room.plumbing.replaceFaucetSink}
+                                          checked={room.plumbing!.replaceFaucetSink}
                                           onCheckedChange={(checked) => updateRoom(room.id, { plumbing: { ...room.plumbing!, replaceFaucetSink: checked, drFaucetSink: checked ? false : room.plumbing!.drFaucetSink } })}
                                         />
                                         <Label className="text-sm whitespace-nowrap">Replace faucet/sink</Label>
@@ -3642,11 +3758,91 @@ const newDoor: DoorItem = {
                                       <span className="text-muted-foreground text-sm">or</span>
                                       <div className="flex items-center gap-2">
                                         <Switch
-                                          checked={room.plumbing.drFaucetSink}
+                                          checked={room.plumbing!.drFaucetSink}
                                           onCheckedChange={(checked) => updateRoom(room.id, { plumbing: { ...room.plumbing!, drFaucetSink: checked, replaceFaucetSink: checked ? false : room.plumbing!.replaceFaucetSink } })}
                                         />
                                         <Label className="text-sm whitespace-nowrap">D/R faucet/sink</Label>
                                       </div>
+                                      <div className="flex items-center gap-2">
+                                        <Switch
+                                          checked={room.plumbing!.waterSupplyLine.enabled}
+                                          onCheckedChange={(checked) => updateRoom(room.id, { plumbing: { ...room.plumbing!, waterSupplyLine: { ...room.plumbing!.waterSupplyLine, enabled: checked } } })}
+                                        />
+                                        <Label className="text-sm whitespace-nowrap">Water supply line</Label>
+                                        {room.plumbing!.waterSupplyLine.enabled && (
+                                          <Select value={room.plumbing!.waterSupplyLine.qty} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { plumbing: { ...room.plumbing!, waterSupplyLine: { ...room.plumbing!.waterSupplyLine, qty: value } } }) }}>
+                                            <SelectTrigger className="w-[80px] border-border/60 bg-secondary/50">
+                                              <SelectValue placeholder="QTY" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                              {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                                                <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                                              ))}
+                                            </SelectContent>
+                                          </Select>
+                                        )}
+                                      </div>
+                                    </div>
+                                    {/* Reverse Osmosis */}
+                                    <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                      <div className="flex items-center gap-2">
+                                        <Switch
+                                          checked={room.plumbing!.reverseOsmosis.enabled}
+                                          onCheckedChange={(checked) => updateRoom(room.id, { plumbing: { ...room.plumbing!, reverseOsmosis: { ...room.plumbing!.reverseOsmosis, enabled: checked } } })}
+                                        />
+                                        <Label className="text-sm">Reverse osmosis</Label>
+                                      </div>
+                                      {room.plumbing!.reverseOsmosis.enabled && (
+                                        <>
+                                          <Select value={room.plumbing!.reverseOsmosis.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { plumbing: { ...room.plumbing!, reverseOsmosis: { ...room.plumbing!.reverseOsmosis, action: value } } }) }}>
+                                            <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                              <SelectValue placeholder="Select action" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                              <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                              <SelectItem value="replace">Replace</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                          <Input
+                                            placeholder="F# Model/serial..."
+                                            value={room.plumbing!.reverseOsmosis.f9Note}
+                                            onChange={(e) => updateRoom(room.id, { plumbing: { ...room.plumbing!, reverseOsmosis: { ...room.plumbing!.reverseOsmosis, f9Note: e.target.value } } })}
+                                            className="w-[180px] border-border/60 bg-secondary/50"
+                                          />
+                                        </>
+                                      )}
+                                    </div>
+                                    {/* Garbage Disposal */}
+                                    <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                      <div className="flex items-center gap-2">
+                                        <Switch
+                                          checked={room.plumbing!.garbageDisposal.enabled}
+                                          onCheckedChange={(checked) => updateRoom(room.id, { plumbing: { ...room.plumbing!, garbageDisposal: { ...room.plumbing!.garbageDisposal, enabled: checked } } })}
+                                        />
+                                        <Label className="text-sm">Garbage Disposal</Label>
+                                      </div>
+                                      {room.plumbing!.garbageDisposal.enabled && (
+                                        <>
+                                          <Select value={room.plumbing!.garbageDisposal.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { plumbing: { ...room.plumbing!, garbageDisposal: { ...room.plumbing!.garbageDisposal, action: value } } }) }}>
+                                            <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                              <SelectValue placeholder="Select action" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                              <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                              <SelectItem value="replace">Replace</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                          <Input
+                                            placeholder="F# Model/serial..."
+                                            value={room.plumbing!.garbageDisposal.f9Note}
+                                            onChange={(e) => updateRoom(room.id, { plumbing: { ...room.plumbing!, garbageDisposal: { ...room.plumbing!.garbageDisposal, f9Note: e.target.value } } })}
+                                            className="w-[180px] border-border/60 bg-secondary/50"
+                                          />
+                                        </>
+                                      )}
                                     </div>
                                   </div>
 
