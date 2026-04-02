@@ -2160,8 +2160,9 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="carpet">Carpet</SelectItem>
                                                   <SelectItem value="carpet-glue-down">Carpet Glue Down</SelectItem>
                                                   <SelectItem value="hardwood">Hardwood</SelectItem>
-                                                  <SelectItem value="tile">Tile</SelectItem>
-                                                  <SelectItem value="terrazzo">Terrazzo Floor</SelectItem>
+<SelectItem value="tile">Tile</SelectItem>
+  <SelectItem value="terrazzo">Terrazzo Floor</SelectItem>
+  <SelectItem value="epoxy">Epoxy</SelectItem>
                                                 </SelectContent>
                                               </Select>
                                             </div>
@@ -2232,15 +2233,23 @@ export default function NewExpressEstimatePage() {
                                                         <SelectItem value="oak-clear">Oak Flooring - Clear Grade</SelectItem>
                                                       </>
                                                     )}
-                                                    {layer.type === "tile" && (
-                                                      <>
-                                                        <SelectItem value="tile">Tile Floor Covering</SelectItem>
-                                                        <SelectItem value="tile-standard">Tile Floor Covering - Standard</SelectItem>
-                                                        <SelectItem value="tile-economy">Tile Floor Covering - Economy</SelectItem>
-                                                        <SelectItem value="tile-high">Tile Floor Covering - High Grade</SelectItem>
-                                                        <SelectItem value="tile-premium">Tile Floor Covering - Premium</SelectItem>
-                                                      </>
-                                                    )}
+{layer.type === "tile" && (
+  <>
+  <SelectItem value="tile">Tile Floor Covering</SelectItem>
+  <SelectItem value="tile-standard">Tile Floor Covering - Standard</SelectItem>
+  <SelectItem value="tile-economy">Tile Floor Covering - Economy</SelectItem>
+  <SelectItem value="tile-high">Tile Floor Covering - High Grade</SelectItem>
+  <SelectItem value="tile-premium">Tile Floor Covering - Premium</SelectItem>
+  <SelectItem value="tile-clean-regrout">Clean and Regrout</SelectItem>
+  </>
+  )}
+{layer.type === "epoxy" && (
+  <>
+  <SelectItem value="epoxy-one-coat">One Coat Over Concrete</SelectItem>
+  <SelectItem value="epoxy-two-coat">Two Coats Over Concrete</SelectItem>
+  <SelectItem value="epoxy-two-coat-nonslip">Two Coats Over Concrete - Non Slip</SelectItem>
+  </>
+  )}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
@@ -2265,7 +2274,7 @@ export default function NewExpressEstimatePage() {
                                                     {layer.type === "vinyl-plank" && (
                                                       <>
                                                         <SelectItem value="glue-down-concrete">Glue Down on Concrete</SelectItem>
-                                                        <SelectItem value="glue-down-wood">Glue Down on Wood</SelectItem>
+                                                        <SelectItem value="over-subfloor">Installed over Subfloor</SelectItem>
                                                         <SelectItem value="floating">Floating</SelectItem>
                                                       </>
                                                     )}
