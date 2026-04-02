@@ -86,6 +86,7 @@ interface TrimOptions {
   enabled: boolean
   baseboardHeight: string
   material: string
+  woodType: string
   finish: string
   cap: boolean
   shoe: boolean
@@ -98,6 +99,7 @@ interface WallCoveringOptions {
   material: string
   type: string
   replacementHeight: string
+  panelingFinish: string
   texture: boolean
   textureType: string
 }
@@ -231,8 +233,8 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
   sqft: "",
   nfipCleaning: { enabled: false, wall: { height: "", wallType: "", ceilingAffected: false }, floor: { type: "", areaOnCrawlspace: false } },
   flooring: { enabled: false, multipleLayers: false, layers: [{ id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }], vaporBarrier: false, subfloorReplacement: false, f9Note: "" },
-  trim: { enabled: false, baseboardHeight: "", material: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
-  wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", texture: false, textureType: "" },
+  trim: { enabled: false, baseboardHeight: "", material: "", woodType: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
+  wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", panelingFinish: "", texture: false, textureType: "" },
   electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
   windows: [],
   doors: [],
@@ -2395,22 +2397,26 @@ export default function NewExpressEstimatePage() {
                                 {room.trim.enabled && (
                                   <div className="flex flex-wrap items-end gap-4">
                                     <div className="space-y-1 min-w-[120px]">
-                                      <Label className="text-xs text-muted-foreground">Height</Label>
+                                      <Label className="text-xs text-muted-foreground">Height (Inches)</Label>
                                       <Select value={room.trim.baseboardHeight} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { trim: { ...room.trim, baseboardHeight: value } }) }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                          {["2", "3", "4", "5", "6"].map(h => (
-                                            <SelectItem key={h} value={h}>{h}&quot; Baseboard</SelectItem>
-                                          ))}
+                                          <SelectItem value="2-1/4">2 1/4&quot;</SelectItem>
+                                          <SelectItem value="3-1/4">3 1/4&quot;</SelectItem>
+                                          <SelectItem value="4-1/4">4 1/4&quot;</SelectItem>
+                                          <SelectItem value="5-1/4">5 1/4&quot;</SelectItem>
+                                          <SelectItem value="6">6&quot;</SelectItem>
+                                          <SelectItem value="7-1/4">7 1/4&quot;</SelectItem>
+                                          <SelectItem value="8">8&quot;</SelectItem>
                                         </SelectContent>
                                       </Select>
                                     </div>
                                     <div className="space-y-1 min-w-[100px]">
                                       <Label className="text-xs text-muted-foreground">Material</Label>
-                                      <Select value={room.trim.material} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { trim: { ...room.trim, material: value } }) }}>
+                                      <Select value={room.trim.material} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { trim: { ...room.trim, material: value, woodType: "" } }) }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
                                         </SelectTrigger>
@@ -2422,6 +2428,23 @@ export default function NewExpressEstimatePage() {
                                         </SelectContent>
                                       </Select>
                                     </div>
+                                    {room.trim.material === "wood" && (
+                                      <div className="space-y-1 min-w-[220px]">
+                                        <Label className="text-xs text-muted-foreground">Type</Label>
+                                        <Select value={room.trim.woodType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { trim: { ...room.trim, woodType: value } }) }}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="2-1/4-hardwood-molded">2 1/4 Hardwood - Molded w/ Detail</SelectItem>
+                                            <SelectItem value="3-1/4-hardwood-molded">3 1/4 Hardwood - Molded w/ Detail</SelectItem>
+                                            <SelectItem value="6-hardwood-molded">6 Hardwood - Molded w/ Detail</SelectItem>
+                                            <SelectItem value="7-1/4-hardwood-molded">7 1/4 Hardwood - Molded w/ Detail</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                    )}
                                     <div className="space-y-1 min-w-[100px]">
                                       <Label className="text-xs text-muted-foreground">Finish</Label>
                                       <Select value={room.trim.finish} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { trim: { ...room.trim, finish: value } }) }}>
@@ -2543,6 +2566,8 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="paneling-high">Paneling High Grade</SelectItem>
                                                   <SelectItem value="paneling-premium">Paneling Premium Grade</SelectItem>
                                                   <SelectItem value="paneling-mobile-home">Paneling - Mobile Home</SelectItem>
+                                                  <SelectItem value="paneling-unfinished">Paneling - Unfinished</SelectItem>
+                                                  <SelectItem value="judges">Judges</SelectItem>
                                                 </>
                                               )}
                                             </SelectContent>
@@ -2578,6 +2603,21 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="W">W</SelectItem>
                                                 </>
                                               )}
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                      )}
+                                      {room.wallCovering.type === "paneling-unfinished" && (
+                                        <div className="space-y-1">
+                                          <Label className="text-xs text-muted-foreground">Finish</Label>
+                                          <Select value={room.wallCovering.panelingFinish} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingFinish: value } }) }}>
+                                            <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                              <SelectValue placeholder="Select" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                              <SelectItem value="paint">Paint</SelectItem>
+                                              <SelectItem value="stain">Stain</SelectItem>
                                             </SelectContent>
                                           </Select>
                                         </div>
