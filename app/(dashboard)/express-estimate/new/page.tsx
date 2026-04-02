@@ -57,6 +57,7 @@ interface Room {
   toilet?: ToiletOptions
   shower?: ShowerOptions
   // Kitchen specific
+  kitchenEnabled?: boolean
   cabinets?: CabinetOptions
   countertop?: CountertopOptions
   plumbing?: PlumbingOptions
@@ -316,6 +317,7 @@ const defaultBathroomExtras = {
 }
 
 const defaultKitchenExtras = {
+  kitchenEnabled: true,
   cabinets: { enabled: false, size: "", grade: "", detachAndReset: false, toeKick: "", upperCabinets: { enabled: false, size: "", grade: "" } },
   countertop: { enabled: false, type: "", grade: "", size: "", detachAndReset: false, backSplash: { enabled: false, type: "", grade: "", glass: false, diagonalInstallation: false } },
   plumbing: { replaceFaucetSink: false, drFaucetSink: false, waterSupplyLine: { enabled: false, qty: "" }, reverseOsmosis: { enabled: false, action: "", f9Note: "" }, garbageDisposal: { enabled: false, action: "", f9Note: "" } },
@@ -3530,23 +3532,31 @@ const newDoor: DoorItem = {
                               {/* KITCHEN SPECIFIC SECTIONS */}
                               {room.type === "kitchen" && room.cabinets && room.countertop && room.plumbing && room.appliances && (
                                 <>
+                                  {/* Kitchen Toggle */}
+                                  <div className="flex items-center gap-3 rounded-lg border border-border/40 p-4">
+                                    <Switch
+                                      checked={room.kitchenEnabled ?? true}
+                                      onCheckedChange={(checked) => updateRoom(room.id, { kitchenEnabled: checked })}
+                                    />
+                                    <Label className="font-medium">Kitchen</Label>
+                                  </div>
+
+                                  {(room.kitchenEnabled ?? true) && (
+                                    <>
                                   {/* Kitchen Cabinetry */}
                                   <div className="space-y-3 rounded-lg border border-border/40 p-4">
                                     <Label className="font-medium">Cabinetry</Label>
                                     <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                       <div className="space-y-1">
-                                        <Label className="text-xs text-muted-foreground">Size</Label>
-                                        <Select value={room.cabinets!.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { cabinets: { ...room.cabinets!, size: value } }) }}>
-                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
-                                            <SelectValue placeholder="Select" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                            {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
-                                              <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
+                                        <Label className="text-xs text-muted-foreground">Size (LF)</Label>
+                                        <Input
+                                          type="number"
+                                          placeholder="LF"
+                                          value={room.cabinets!.size}
+                                          onChange={(e) => updateRoom(room.id, { cabinets: { ...room.cabinets!, size: e.target.value } })}
+                                          className="w-[80px] border-border/60 bg-secondary/50"
+                                          min="0"
+                                        />
                                       </div>
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Grade</Label>
@@ -3571,18 +3581,15 @@ const newDoor: DoorItem = {
                                         <Label className="text-xs whitespace-nowrap">Detach and reset</Label>
                                       </div>
                                       <div className="space-y-1">
-                                        <Label className="text-xs text-muted-foreground">Toe Kick</Label>
-                                        <Select value={room.cabinets!.toeKick} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: value } }) }}>
-                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
-                                            <SelectValue placeholder="Select" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                            {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
-                                              <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
+                                        <Label className="text-xs text-muted-foreground">Toe Kick (LF)</Label>
+                                        <Input
+                                          type="number"
+                                          placeholder="LF"
+                                          value={room.cabinets!.toeKick}
+                                          onChange={(e) => updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: e.target.value } })}
+                                          className="w-[80px] border-border/60 bg-secondary/50"
+                                          min="0"
+                                        />
                                       </div>
                                     </div>
                                     {/* Upper Cabinets */}
@@ -3597,18 +3604,15 @@ const newDoor: DoorItem = {
                                       {room.cabinets!.upperCabinets.enabled && (
                                         <>
                                           <div className="space-y-1">
-                                            <Label className="text-xs text-muted-foreground">Size</Label>
-                                            <Select value={room.cabinets!.upperCabinets.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { cabinets: { ...room.cabinets!, upperCabinets: { ...room.cabinets!.upperCabinets, size: value } } }) }}>
-                                              <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
-                                                <SelectValue placeholder="Select" />
-                                              </SelectTrigger>
-                                              <SelectContent>
-                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
-                                                  <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
-                                                ))}
-                                              </SelectContent>
-                                            </Select>
+                                            <Label className="text-xs text-muted-foreground">Size (LF)</Label>
+                                            <Input
+                                              type="number"
+                                              placeholder="LF"
+                                              value={room.cabinets!.upperCabinets.size}
+                                              onChange={(e) => updateRoom(room.id, { cabinets: { ...room.cabinets!, upperCabinets: { ...room.cabinets!.upperCabinets, size: e.target.value } } })}
+                                              className="w-[80px] border-border/60 bg-secondary/50"
+                                              min="0"
+                                            />
                                           </div>
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Grade</Label>
@@ -3666,18 +3670,15 @@ const newDoor: DoorItem = {
                                         </Select>
                                       </div>
                                       <div className="space-y-1">
-                                        <Label className="text-xs text-muted-foreground">Size</Label>
-                                        <Select value={room.countertop!.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { countertop: { ...room.countertop!, size: value } }) }}>
-                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
-                                            <SelectValue placeholder="Select" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                            {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
-                                              <SelectItem key={num} value={String(num)}>{num} LF</SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
+                                        <Label className="text-xs text-muted-foreground">Size (LF)</Label>
+                                        <Input
+                                          type="number"
+                                          placeholder="LF"
+                                          value={room.countertop!.size}
+                                          onChange={(e) => updateRoom(room.id, { countertop: { ...room.countertop!, size: e.target.value } })}
+                                          className="w-[80px] border-border/60 bg-secondary/50"
+                                          min="0"
+                                        />
                                       </div>
                                       <div className="flex items-center gap-2 pb-1">
                                         <Switch
@@ -3845,8 +3846,10 @@ const newDoor: DoorItem = {
                                       )}
                                     </div>
                                   </div>
+                                    </>
+                                  )}
 
-                                  </>
+                                </>
                               )}
 
                               {/* Appliances / Misc Equipment - Available to all rooms */}
