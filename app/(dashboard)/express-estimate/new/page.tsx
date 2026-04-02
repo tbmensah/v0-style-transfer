@@ -3677,34 +3677,109 @@ const newDoor: DoorItem = {
                                         <div className="flex flex-wrap items-end gap-3">
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Type</Label>
-                                            <Select value={room.appliances.refrigerator.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { appliances: { ...room.appliances, refrigerator: { ...room.appliances.refrigerator, type: value } } }) }}>
-                                              <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
+                                            <Select value={room.appliances.refrigerator.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { appliances: { ...room.appliances, refrigerator: { ...room.appliances.refrigerator, type: value, size: "" } } }) }}>
+                                              <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
                                                 <SelectValue placeholder="Select type" />
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                 <SelectItem value="top-freezer">Top Freezer</SelectItem>
-                                                <SelectItem value="bottom-freezer">Bottom Freezer</SelectItem>
-                                                <SelectItem value="side-by-side">Side by Side</SelectItem>
-                                                <SelectItem value="french-door">French Door</SelectItem>
+                                                <SelectItem value="bottom-freezer">Bottom freezer</SelectItem>
+                                                <SelectItem value="built-in">Built In</SelectItem>
+                                                <SelectItem value="compact">Compact (under counter)</SelectItem>
+                                                <SelectItem value="side-by-side">Side by side</SelectItem>
+                                                <SelectItem value="french-door">French door / bottom freezer</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           </div>
-                                          <div className="space-y-1">
-                                            <Label className="text-xs text-muted-foreground">Size</Label>
-                                            <Select value={room.appliances.refrigerator.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { appliances: { ...room.appliances, refrigerator: { ...room.appliances.refrigerator, size: value } } }) }}>
-                                              <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
-                                                <SelectValue placeholder="Select size" />
-                                              </SelectTrigger>
-                                              <SelectContent>
-                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="14-18cf">14-18 CF</SelectItem>
-                                                <SelectItem value="19-22cf">19-22 CF</SelectItem>
-                                                <SelectItem value="23-26cf">23-26 CF</SelectItem>
-                                                <SelectItem value="27+cf">27+ CF</SelectItem>
-                                              </SelectContent>
-                                            </Select>
-                                          </div>
+                                          {/* Top Freezer sizes */}
+                                          {room.appliances.refrigerator.type === "top-freezer" && (
+                                            <div className="space-y-1">
+                                              <Label className="text-xs text-muted-foreground">Size</Label>
+                                              <Select value={room.appliances.refrigerator.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { appliances: { ...room.appliances, refrigerator: { ...room.appliances.refrigerator, size: value } } }) }}>
+                                                <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Select size" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                  <SelectItem value="14-18cf">14-18 CF</SelectItem>
+                                                  <SelectItem value="18-22cf">18-22 CF</SelectItem>
+                                                  <SelectItem value="22-24cf">22-24 CF</SelectItem>
+                                                  <SelectItem value="24-26cf">24-26 CF</SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                          )}
+                                          {/* Bottom Freezer sizes */}
+                                          {room.appliances.refrigerator.type === "bottom-freezer" && (
+                                            <div className="space-y-1">
+                                              <Label className="text-xs text-muted-foreground">Size</Label>
+                                              <Select value={room.appliances.refrigerator.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { appliances: { ...room.appliances, refrigerator: { ...room.appliances.refrigerator, size: value } } }) }}>
+                                                <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Select size" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                  <SelectItem value="18-22cf">18-22 CF</SelectItem>
+                                                  <SelectItem value="22-25cf">22-25 CF</SelectItem>
+                                                  <SelectItem value="25-30cf">25-30 CF</SelectItem>
+                                                  <SelectItem value="25-26cf">25-26 CF</SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                          )}
+                                          {/* Built In sizes */}
+                                          {room.appliances.refrigerator.type === "built-in" && (
+                                            <div className="space-y-1">
+                                              <Label className="text-xs text-muted-foreground">Size</Label>
+                                              <Select value={room.appliances.refrigerator.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { appliances: { ...room.appliances, refrigerator: { ...room.appliances.refrigerator, size: value } } }) }}>
+                                                <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Select size" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                  <SelectItem value="36in">36&apos;</SelectItem>
+                                                  <SelectItem value="42in">42&apos;</SelectItem>
+                                                  <SelectItem value="48in">48&apos;</SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                          )}
+                                          {/* Side by Side sizes */}
+                                          {room.appliances.refrigerator.type === "side-by-side" && (
+                                            <div className="space-y-1">
+                                              <Label className="text-xs text-muted-foreground">Size</Label>
+                                              <Select value={room.appliances.refrigerator.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { appliances: { ...room.appliances, refrigerator: { ...room.appliances.refrigerator, size: value } } }) }}>
+                                                <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Select size" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                  <SelectItem value="12-22cf">12-22 CF</SelectItem>
+                                                  <SelectItem value="22-25cf">22-25 CF</SelectItem>
+                                                  <SelectItem value="25-30cf">25-30 CF</SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                          )}
+                                          {/* French Door / Bottom Freezer sizes */}
+                                          {room.appliances.refrigerator.type === "french-door" && (
+                                            <div className="space-y-1">
+                                              <Label className="text-xs text-muted-foreground">Size</Label>
+                                              <Select value={room.appliances.refrigerator.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { appliances: { ...room.appliances, refrigerator: { ...room.appliances.refrigerator, size: value } } }) }}>
+                                                <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Select size" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                  <SelectItem value="18-22cf">18-22 CF</SelectItem>
+                                                  <SelectItem value="22-25cf">22-25 CF</SelectItem>
+                                                  <SelectItem value="25-30cf">25-30 CF</SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                          )}
+                                          {/* Compact has no size, only grade - no size dropdown needed */}
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Grade</Label>
                                             <Select value={room.appliances.refrigerator.grade} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; updateRoom(room.id, { appliances: { ...room.appliances, refrigerator: { ...room.appliances.refrigerator, grade: value } } }) }}>
@@ -3727,7 +3802,8 @@ const newDoor: DoorItem = {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                <SelectItem value="service-call">Service Call</SelectItem>
                                                 <SelectItem value="replace">Replace</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -3778,7 +3854,8 @@ const newDoor: DoorItem = {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                <SelectItem value="service-call">Service Call</SelectItem>
                                                 <SelectItem value="replace">Replace</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -3856,7 +3933,8 @@ const newDoor: DoorItem = {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                <SelectItem value="service-call">Service Call</SelectItem>
                                                 <SelectItem value="replace">Replace</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -3920,7 +3998,8 @@ const newDoor: DoorItem = {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                <SelectItem value="service-call">Service Call</SelectItem>
                                                 <SelectItem value="replace">Replace</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -4001,7 +4080,8 @@ const newDoor: DoorItem = {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                <SelectItem value="service-call">Service Call</SelectItem>
                                                 <SelectItem value="replace">Replace</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -4066,7 +4146,8 @@ const newDoor: DoorItem = {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                <SelectItem value="service-call">Service Call</SelectItem>
                                                 <SelectItem value="replace">Replace</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -4133,7 +4214,8 @@ const newDoor: DoorItem = {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                <SelectItem value="service-call">Service Call</SelectItem>
                                                 <SelectItem value="replace">Replace</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -4185,7 +4267,8 @@ const newDoor: DoorItem = {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                  <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                  <SelectItem value="service-call">Service Call</SelectItem>
                                                   <SelectItem value="replace">Replace</SelectItem>
                                                 </SelectContent>
                                               </Select>
