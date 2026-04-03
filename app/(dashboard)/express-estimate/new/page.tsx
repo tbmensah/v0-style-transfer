@@ -444,6 +444,20 @@ export default function NewExpressEstimatePage() {
         action: string;
         f9Note: string;
       }>,
+      boiler: {
+        enabled: false,
+        type: "",
+        action: "",
+        f9Note: "",
+        expansionTank: false,
+        circulatorPump: false,
+      },
+      baseboardHeat: {
+        enabled: false,
+        type: "",
+        size: "",
+        action: "",
+      },
     },
     basement: {
       enabled: false,
@@ -2016,28 +2030,24 @@ const newDoor: DoorItem = {
                                     </SelectContent>
                                   </Select>
                                 </div>
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={foundation.subgradeAreaCoverage.drywall.measureType === "sf"}
+                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, measureType: checked ? "sf" : "lf" } } }); handleSave() }}
+                                  />
+                                  <Label className="text-sm">Square Feet</Label>
+                                </div>
+                                <span className="text-xs text-muted-foreground">or</span>
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={foundation.subgradeAreaCoverage.drywall.measureType === "lf"}
+                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, measureType: checked ? "lf" : "sf" } } }); handleSave() }}
+                                  />
+                                  <Label className="text-sm">Linear Feet</Label>
+                                </div>
                               </>
                             )}
                           </div>
-                          {foundation.subgradeAreaCoverage.drywall.enabled && (
-                            <div className="flex items-center gap-4 pl-6">
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={foundation.subgradeAreaCoverage.drywall.measureType === "sf"}
-                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, measureType: checked ? "sf" : "lf" } } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Square Feet</Label>
-                              </div>
-                              <span className="text-xs text-muted-foreground">or</span>
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={foundation.subgradeAreaCoverage.drywall.measureType === "lf"}
-                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, measureType: checked ? "lf" : "sf" } } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Linear Feet</Label>
-                              </div>
-                            </div>
-                          )}
                         </div>
 
                         {/* Enable Wall Insulation */}
@@ -2211,92 +2221,76 @@ const newDoor: DoorItem = {
                     </CollapsibleContent>
                   </Collapsible>
 
-                  {/* HVAC (Air Handler) */}
+                  {/* HVAC */}
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
                       <div className="flex items-center gap-3">
                         <Wind className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">HVAC</span>
-                        {foundation.hvac.airHandlers.length > 0 && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                        {(foundation.hvac.airHandlers.length > 0 || foundation.hvac.boiler.enabled || foundation.hvac.baseboardHeat.enabled) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={foundation.hvac.airHandlers.length > 0}
-                              onCheckedChange={(checked) => {
-                                if (checked && foundation.hvac.airHandlers.length === 0) {
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [{ id: Date.now(), type: "", tonnage: "", heatElementCount: "", action: "", f9Note: "" }] } })
-                                } else if (!checked) {
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [] } })
-                                }
-                                handleSave()
-                              }}
-                            />
-                            <Label>Enable Air Handler</Label>
-                          </div>
-                          {foundation.hvac.airHandlers.length > 0 && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="gap-1 border-border/60"
-                              onClick={() => {
-                                setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [...foundation.hvac.airHandlers, { id: Date.now(), type: "", tonnage: "", heatElementCount: "", action: "", f9Note: "" }] } })
-                                handleSave()
-                              }}
-                            >
-                              <Plus className="h-3 w-3" /> Add Air Handler
-                            </Button>
-                          )}
-                        </div>
-                        {foundation.hvac.airHandlers.map((handler, index) => (
-                          <div key={handler.id} className="ml-4 rounded-lg border border-border/40 bg-secondary/30 p-4 space-y-3">
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm font-medium text-foreground">Air Handler {index + 1}</span>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                                onClick={() => {
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.filter(h => h.id !== handler.id) } })
+                        {/* Enable Air Handler */}
+                        <div className="space-y-3">
+                          <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={foundation.hvac.airHandlers.length > 0}
+                                onCheckedChange={(checked) => {
+                                  if (checked && foundation.hvac.airHandlers.length === 0) {
+                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [{ id: Date.now(), type: "", tonnage: "", heatElementCount: "", action: "", f9Note: "" }] } })
+                                  } else if (!checked) {
+                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [] } })
+                                  }
                                   handleSave()
                                 }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                              />
+                              <Label className="text-sm">Enable Air Handler</Label>
                             </div>
-                            <div className="flex flex-wrap items-end gap-4">
-                              <div className="space-y-2 min-w-[160px]">
-                                <Label className="text-sm">Type</Label>
-                                <Select value={handler.type} onValueChange={(__v) => {
+                            {foundation.hvac.airHandlers.length > 0 && (
+                              <Input
+                                type="text"
+                                placeholder="F9 Model/serial..."
+                                value={foundation.hvac.airHandlers[0]?.f9Note || ""}
+                                onChange={(e) => {
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, f9Note: e.target.value } : h) } })
+                                  handleSave()
+                                }}
+                                className="border-border/60 bg-secondary/50 w-48"
+                              />
+                            )}
+                          </div>
+                          {foundation.hvac.airHandlers.length > 0 && (
+                            <div className="flex flex-wrap items-end gap-4 pl-6">
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Type</Label>
+                                <Select value={foundation.hvac.airHandlers[0]?.type || ""} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, type: value } : h) } })
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, type: value } : h) } })
                                   handleSave()
                                 }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="Select" />
+                                  <SelectTrigger className="w-40 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select type" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     <SelectItem value="air-handler">Air Handler</SelectItem>
-                                    <SelectItem value="with-heat-element">With Heat Element</SelectItem>
+                                    <SelectItem value="with-heat-element">With heat Element</SelectItem>
                                     <SelectItem value="with-heat-element-a-coil">With Heat Element & A-coil</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="space-y-2 min-w-[100px]">
-                                <Label className="text-sm">Tonnage</Label>
-                                <Select value={handler.tonnage} onValueChange={(__v) => {
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Tonnage</Label>
+                                <Select value={foundation.hvac.airHandlers[0]?.tonnage || ""} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, tonnage: value } : h) } })
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, tonnage: value } : h) } })
                                   handleSave()
                                 }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -2307,14 +2301,14 @@ const newDoor: DoorItem = {
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="space-y-2 min-w-[140px]">
-                                <Label className="text-sm">Action</Label>
-                                <Select value={handler.action} onValueChange={(__v) => {
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Action</Label>
+                                <Select value={foundation.hvac.airHandlers[0]?.action || ""} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, action: value } : h) } })
+                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, action: value } : h) } })
                                   handleSave()
                                 }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50">
+                                  <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -2324,42 +2318,146 @@ const newDoor: DoorItem = {
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="space-y-2 flex-1 min-w-[150px]">
-                                <Label className="text-sm">F9 Model/Serial...</Label>
-                                <Input
-                                  type="text"
-                                  placeholder="Enter model and serial..."
-                                  value={handler.f9Note}
-                                  onChange={(e) => {
-                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, f9Note: e.target.value } : h) } })
-                                    handleSave()
-                                  }}
-                                  className="border-border/60 bg-secondary/50"
-                                />
-                              </div>
-                              {(handler.type === "with-heat-element" || handler.type === "with-heat-element-a-coil") && (
-                                <div className="space-y-2 min-w-[100px]">
-                                  <Label className="text-sm">With Heat Element</Label>
-                                  <Select value={handler.heatElementCount} onValueChange={(__v) => {
-                                    const value = __v === "__none__" ? "" : __v;
-                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map(h => h.id === handler.id ? { ...h, heatElementCount: value } : h) } })
-                                    handleSave()
-                                  }}>
-                                    <SelectTrigger className="border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="QTY" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Boiler */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={foundation.hvac.boiler.enabled}
+                              onCheckedChange={(checked) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, enabled: checked } } }); handleSave() }}
+                            />
+                            <Label className="text-sm">Boiler</Label>
+                          </div>
+                          {foundation.hvac.boiler.enabled && (
+                            <div className="space-y-3 pl-6">
+                              <div className="flex flex-wrap items-end gap-4">
+                                <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">Type</Label>
+                                  <Select value={foundation.hvac.boiler.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, type: value } } }); handleSave() }}>
+                                    <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                      {[1, 2, 3, 4, 5].map(n => (
-                                        <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                      ))}
+                                      <SelectItem value="natural-gas">Natural Gas</SelectItem>
+                                      <SelectItem value="electric">Electric</SelectItem>
+                                      <SelectItem value="oil">Oil</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
-                              )}
+                                <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">Action</Label>
+                                  <Select value={foundation.hvac.boiler.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, action: value } } }); handleSave() }}>
+                                    <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select action" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="replace">Replace</SelectItem>
+                                      <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <Input
+                                  type="text"
+                                  placeholder="F9 Model/serial..."
+                                  value={foundation.hvac.boiler.f9Note}
+                                  onChange={(e) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, f9Note: e.target.value } } }); handleSave() }}
+                                  className="border-border/60 bg-secondary/50 w-48"
+                                />
+                              </div>
+                              <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={foundation.hvac.boiler.expansionTank}
+                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, expansionTank: checked } } }); handleSave() }}
+                                  />
+                                  <Label className="text-sm">Expansion Tank</Label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={foundation.hvac.boiler.circulatorPump}
+                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, circulatorPump: checked } } }); handleSave() }}
+                                  />
+                                  <Label className="text-sm">Circulator pump</Label>
+                                </div>
+                              </div>
                             </div>
+                          )}
+                        </div>
+
+                        {/* Baseboard Heat */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={foundation.hvac.baseboardHeat.enabled}
+                              onCheckedChange={(checked) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, enabled: checked } } }); handleSave() }}
+                            />
+                            <Label className="text-sm">Baseboard Heat</Label>
                           </div>
-                        ))}
+                          {foundation.hvac.baseboardHeat.enabled && (
+                            <div className="flex flex-wrap items-end gap-4 pl-6">
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Type</Label>
+                                <Select value={foundation.hvac.baseboardHeat.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, type: value, size: "" } } }); handleSave() }}>
+                                  <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="electric">Electric</SelectItem>
+                                    <SelectItem value="steam-hot-water">Steam or Hot Water</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Size</Label>
+                                {foundation.hvac.baseboardHeat.type === "electric" ? (
+                                  <Select value={foundation.hvac.baseboardHeat.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, size: value } } }); handleSave() }}>
+                                    <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="--" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
+                                      <SelectItem value="2">2&apos;</SelectItem>
+                                      <SelectItem value="3">3&apos;</SelectItem>
+                                      <SelectItem value="4">4&apos;</SelectItem>
+                                      <SelectItem value="5">5&apos;</SelectItem>
+                                      <SelectItem value="6">6&apos;</SelectItem>
+                                      <SelectItem value="8">8&apos;</SelectItem>
+                                      <SelectItem value="10">10&apos;</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                ) : (
+                                  <Input
+                                    type="number"
+                                    min={1}
+                                    value={foundation.hvac.baseboardHeat.size}
+                                    onChange={(e) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, size: e.target.value } } }); handleSave() }}
+                                    placeholder="LF"
+                                    className="border-border/60 bg-secondary/50 w-20"
+                                  />
+                                )}
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Action</Label>
+                                <Select value={foundation.hvac.baseboardHeat.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, action: value } } }); handleSave() }}>
+                                  <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="replace">Replace</SelectItem>
+                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
