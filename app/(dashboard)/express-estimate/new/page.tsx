@@ -88,12 +88,13 @@ interface TrimOptions {
   enabled: boolean
   baseboardHeight: string
   material: string
+  detail: string
   finish: string
   cap: boolean
   shoe: boolean
   shoeFinish: string
   subtractCabinetry: boolean
-}
+  }
 
 interface WallCoveringOptions {
   enabled: boolean
@@ -233,7 +234,7 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
   sqft: "",
   nfipCleaning: { enabled: false, wall: { height: "", wallType: "", ceilingAffected: false }, floor: { type: "", areaOnCrawlspace: false } },
   flooring: { enabled: false, multipleLayers: false, layers: [{ id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }], vaporBarrier: false, subfloorReplacement: false, f9Note: "" },
-  trim: { enabled: false, baseboardHeight: "", material: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
+  trim: { enabled: false, baseboardHeight: "", material: "", detail: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
   wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", texture: false, textureType: "" },
   electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
   windowsEnabled: false,
@@ -2955,7 +2956,7 @@ export default function NewExpressEstimatePage() {
                                 {room.trim.enabled && (
                                   <div className="flex flex-wrap items-end gap-4">
                                     <div className="space-y-1 min-w-[120px]">
-                                      <Label className="text-xs text-muted-foreground">Height</Label>
+                                      <Label className="text-xs text-muted-foreground">Size</Label>
                                       <Select value={room.trim.baseboardHeight} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { trim: { ...room.trim, baseboardHeight: value } }) }}>
                                         <SelectTrigger className="border-border/60 bg-secondary/50">
                                           <SelectValue placeholder="Select" />
@@ -2982,6 +2983,23 @@ export default function NewExpressEstimatePage() {
                                         </SelectContent>
                                       </Select>
                                     </div>
+                                    {room.trim.material === "wood" && (
+                                      <div className="space-y-1 min-w-[220px]">
+                                        <Label className="text-xs text-muted-foreground">Detail</Label>
+                                        <Select value={room.trim.detail} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { trim: { ...room.trim, detail: value } }) }}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="2-1/4-molded">2 1/4 Hardwood Molded w/Detail</SelectItem>
+                                            <SelectItem value="3-1/4-molded">3 1/4 Hardwood - Molded w/ Detail</SelectItem>
+                                            <SelectItem value="6-molded">6 Hardwood - Molded w/ Detail</SelectItem>
+                                            <SelectItem value="7-1/4-molded">7 1/4 Hardwood - Molded w/ Detail</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                    )}
                                     <div className="space-y-1 min-w-[100px]">
                                       <Label className="text-xs text-muted-foreground">Finish</Label>
                                       <Select value={room.trim.finish} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { trim: { ...room.trim, finish: value } }) }}>
