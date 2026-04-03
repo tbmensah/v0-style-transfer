@@ -2722,6 +2722,7 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="hardwood">Hardwood</SelectItem>
                                                   <SelectItem value="tile">Tile</SelectItem>
                                                   <SelectItem value="terrazzo">Terrazzo Floor</SelectItem>
+                                                  <SelectItem value="epoxy">Epoxy</SelectItem>
                                                 </SelectContent>
                                               </Select>
                                             </div>
@@ -2799,6 +2800,14 @@ export default function NewExpressEstimatePage() {
                                                         <SelectItem value="tile-economy">Tile Floor Covering - Economy</SelectItem>
                                                         <SelectItem value="tile-high">Tile Floor Covering - High Grade</SelectItem>
                                                         <SelectItem value="tile-premium">Tile Floor Covering - Premium</SelectItem>
+                                                        <SelectItem value="tile-clean-regrout">Clean and Regrout</SelectItem>
+                                                      </>
+                                                    )}
+                                                    {layer.type === "epoxy" && (
+                                                      <>
+                                                        <SelectItem value="epoxy-one-coat">One Coat Over Concrete</SelectItem>
+                                                        <SelectItem value="epoxy-two-coat">Two Coats Over Concrete</SelectItem>
+                                                        <SelectItem value="epoxy-two-coat-nonslip">Two Coats Over Concrete - Non Slip</SelectItem>
                                                       </>
                                                     )}
                                                   </SelectContent>
@@ -2825,7 +2834,7 @@ export default function NewExpressEstimatePage() {
                                                     {layer.type === "vinyl-plank" && (
                                                       <>
                                                         <SelectItem value="glue-down-concrete">Glue Down on Concrete</SelectItem>
-                                                        <SelectItem value="glue-down-wood">Glue Down on Wood</SelectItem>
+                                                        <SelectItem value="installed-over-subfloor">Installed over Subfloor</SelectItem>
                                                         <SelectItem value="floating">Floating</SelectItem>
                                                       </>
                                                     )}
@@ -2953,7 +2962,7 @@ export default function NewExpressEstimatePage() {
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                          {["2", "3", "4", "5", "6"].map(h => (
+                                          {["2 1/4", "3 1/4", "4 1/4", "5 1/4", "6", "7 1/4", "8"].map(h => (
                                             <SelectItem key={h} value={h}>{h}&quot; Baseboard</SelectItem>
                                           ))}
                                         </SelectContent>
