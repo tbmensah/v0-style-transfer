@@ -140,12 +140,17 @@ interface DoorItem {
   id: number
   category: "interior" | "exterior"
   type: string
+  size: string
   grade: string
   finish: string
   handleAction: string
   peepHole: boolean
   mailSlot: boolean
   nonCased: boolean
+  sidelites: boolean
+  sidelitesQty: string
+  stormdoorAssembly: boolean
+  retrofitInStucco: boolean
   }
 
 interface VanityOptions {
@@ -500,12 +505,17 @@ const newDoor: DoorItem = {
   id: Date.now(),
   category,
   type: "",
+  size: "",
   grade: "",
   finish: "",
   handleAction: "",
   peepHole: false,
   mailSlot: false,
   nonCased: false,
+  sidelites: false,
+  sidelitesQty: "",
+  stormdoorAssembly: false,
+  retrofitInStucco: false,
   }
       updateRoom(roomId, { doors: [...room.doors, newDoor] })
     }
@@ -5308,7 +5318,7 @@ const newDoor: DoorItem = {
                                           <Select value={door.type} onValueChange={(__v) => {
                                             const value = __v === "__none__" ? "" : __v;
                                             const newDoors = [...room.doors]
-                                            newDoors[idx] = { ...door, type: value, grade: "" }
+                                            newDoors[idx] = { ...door, type: value, grade: "", size: "" }
                                             updateRoom(room.id, { doors: newDoors })
                                           }}>
                                             <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
@@ -5316,26 +5326,91 @@ const newDoor: DoorItem = {
                                             </SelectTrigger>
                                             <SelectContent>
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                              <SelectItem value="wood-door">Wood Door</SelectItem>
-                                              <SelectItem value="metal-door">Metal Door</SelectItem>
-                                              <SelectItem value="french-wood">French Wood</SelectItem>
-                                              <SelectItem value="french-metal">French Metal</SelectItem>
+                                              <SelectItem value="solid-wood">Solid Wood</SelectItem>
+                                              <SelectItem value="french">French</SelectItem>
+                                              <SelectItem value="metal">Metal</SelectItem>
+                                              <SelectItem value="overhead">Overhead Door</SelectItem>
                                             </SelectContent>
                                           </Select>
+                                          {/* Size field for Overhead Door only */}
+                                          {door.type === "overhead" && (
+                                            <Select value={door.size} onValueChange={(__v) => {
+                                              const value = __v === "__none__" ? "" : __v;
+                                              const newDoors = [...room.doors]
+                                              newDoors[idx] = { ...door, size: value }
+                                              updateRoom(room.id, { doors: newDoors })
+                                            }}>
+                                              <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
+                                                <SelectValue placeholder="Size" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="10x7">10x7</SelectItem>
+                                                <SelectItem value="10x8">10x8</SelectItem>
+                                                <SelectItem value="10x9">10x9</SelectItem>
+                                                <SelectItem value="10x10">10x10</SelectItem>
+                                                <SelectItem value="10x11">10x11</SelectItem>
+                                                <SelectItem value="10x12">10x12</SelectItem>
+                                                <SelectItem value="12x7">12x7</SelectItem>
+                                                <SelectItem value="12x8">12x8</SelectItem>
+                                                <SelectItem value="16x7">16x7</SelectItem>
+                                                <SelectItem value="16x8">16x8</SelectItem>
+                                                <SelectItem value="18x7">18x7</SelectItem>
+                                                <SelectItem value="18x8">18x8</SelectItem>
+                                                <SelectItem value="8x10">8x10</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          )}
                                           <Select value={door.grade} onValueChange={(__v) => {
                                             const value = __v === "__none__" ? "" : __v;
                                             const newDoors = [...room.doors]
                                             newDoors[idx] = { ...door, grade: value }
                                             updateRoom(room.id, { doors: newDoors })
                                           }}>
-                                            <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
+                                            <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[220px]">
                                               <SelectValue placeholder="Grade" />
                                             </SelectTrigger>
                                             <SelectContent>
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                              <SelectItem value="standard">Standard</SelectItem>
-                                              <SelectItem value="high">High</SelectItem>
-                                              <SelectItem value="premium">Premium</SelectItem>
+                                              {/* Solid Wood */}
+                                              {door.type === "solid-wood" && (
+                                                <>
+                                                  <SelectItem value="paneled">Paneled</SelectItem>
+                                                  <SelectItem value="paneled-radial-top">Paneled Radial Top</SelectItem>
+                                                  <SelectItem value="paneled-8ft">Paneled 8ft</SelectItem>
+                                                  <SelectItem value="double-paneled">Double Door - Paneled</SelectItem>
+                                                  <SelectItem value="double-paneled-radial">Double Door Paneled - Radial Top</SelectItem>
+                                                  <SelectItem value="double-8ft-paneled">Double Door 8ft - Paneled</SelectItem>
+                                                  <SelectItem value="deluxe-wood-detail">Deluxe Grade - Wood w/Detail</SelectItem>
+                                                </>
+                                              )}
+                                              {/* French */}
+                                              {door.type === "french" && (
+                                                <>
+                                                  <SelectItem value="single">Single</SelectItem>
+                                                  <SelectItem value="double-door">Double Door</SelectItem>
+                                                  <SelectItem value="double-metal">Double Metal Door</SelectItem>
+                                                  <SelectItem value="single-8-metal">Single 8&apos; Metal</SelectItem>
+                                                </>
+                                              )}
+                                              {/* Metal */}
+                                              {door.type === "metal" && (
+                                                <>
+                                                  <SelectItem value="metal-flush-panel">Metal Flush Panel</SelectItem>
+                                                  <SelectItem value="metal-flush-high">Metal Flush Panel - High Grade</SelectItem>
+                                                  <SelectItem value="metal-flush-8ft">Metal Flush Panel - 8&apos;</SelectItem>
+                                                  <SelectItem value="fiberglass-premium">Fiberglass - Premium Grade</SelectItem>
+                                                  <SelectItem value="double-metal-flush">Double Metal Flush Panel</SelectItem>
+                                                </>
+                                              )}
+                                              {/* Overhead Door */}
+                                              {door.type === "overhead" && (
+                                                <>
+                                                  <SelectItem value="base">Base</SelectItem>
+                                                  <SelectItem value="high">High Grade</SelectItem>
+                                                  <SelectItem value="premium">Premium</SelectItem>
+                                                </>
+                                              )}
                                             </SelectContent>
                                           </Select>
                                           <Select value={door.finish} onValueChange={(__v) => {
@@ -5395,7 +5470,7 @@ const newDoor: DoorItem = {
                                           </div>
                                         </div>
                                         {/* Misc options for Exterior doors */}
-                                        <div className="flex items-center gap-4 pt-2 border-t border-border/20">
+                                        <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-border/20">
                                           <Label className="text-sm font-medium">Misc</Label>
                                           <div className="flex items-center gap-2">
                                             <Switch
@@ -5418,6 +5493,60 @@ const newDoor: DoorItem = {
                                               }}
                                             />
                                             <Label className="text-sm">Mail Slot</Label>
+                                          </div>
+                                        </div>
+                                        {/* Sidelites row */}
+                                        <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-border/20">
+                                          <div className="flex items-center gap-2">
+                                            <Switch
+                                              checked={door.sidelites}
+                                              onCheckedChange={(checked) => {
+                                                const newDoors = [...room.doors]
+                                                newDoors[idx] = { ...door, sidelites: checked, sidelitesQty: checked ? door.sidelitesQty : "" }
+                                                updateRoom(room.id, { doors: newDoors })
+                                              }}
+                                            />
+                                            <Label className="text-sm">Sidelites</Label>
+                                          </div>
+                                          {door.sidelites && (
+                                            <Select value={door.sidelitesQty} onValueChange={(__v) => {
+                                              const value = __v === "__none__" ? "" : __v;
+                                              const newDoors = [...room.doors]
+                                              newDoors[idx] = { ...door, sidelitesQty: value }
+                                              updateRoom(room.id, { doors: newDoors })
+                                            }}>
+                                              <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[80px]">
+                                                <SelectValue placeholder="QTY" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                                                  <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                                                ))}
+                                              </SelectContent>
+                                            </Select>
+                                          )}
+                                          <div className="flex items-center gap-2">
+                                            <Switch
+                                              checked={door.stormdoorAssembly}
+                                              onCheckedChange={(checked) => {
+                                                const newDoors = [...room.doors]
+                                                newDoors[idx] = { ...door, stormdoorAssembly: checked }
+                                                updateRoom(room.id, { doors: newDoors })
+                                              }}
+                                            />
+                                            <Label className="text-sm whitespace-nowrap">Stormdoor Assembly</Label>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <Switch
+                                              checked={door.retrofitInStucco}
+                                              onCheckedChange={(checked) => {
+                                                const newDoors = [...room.doors]
+                                                newDoors[idx] = { ...door, retrofitInStucco: checked }
+                                                updateRoom(room.id, { doors: newDoors })
+                                              }}
+                                            />
+                                            <Label className="text-sm whitespace-nowrap">Retrofit in Stucco</Label>
                                           </div>
                                         </div>
                                       </div>
