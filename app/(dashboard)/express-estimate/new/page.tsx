@@ -190,20 +190,25 @@ interface ShowerOptions {
   showerFaucet: string
   // Tub with Tile Surround fields
   actionForTub: string
+  jetted: boolean
+  jettedMotorReplace: boolean
   surround: string
   tubShowerFaucet: string
   // Tile Shower fields
   mortarBedReplace: boolean
   mortarBedSize: string
   walls: string
-  // Tile Shower Misc
+  // Misc fields
   tileBench: boolean
   tileNiche: boolean
   tileNicheQty: string
   towelBar: boolean
   tileSoapDish: boolean
   tileSoapDishQty: string
-}
+  grabBar: boolean
+  grabBarQty: string
+  tileFeatureStrip: boolean
+  }
 
 interface CabinetOptions {
   enabled: boolean
@@ -273,23 +278,28 @@ vanity: {
   backsplashAction: ""
   },
   toilet: { enabled: false, action: "", seatReplacement: false, supplyLine: false },
-  shower: {
-    enabled: false,
-    type: "",
-    detachAndReset: false,
-    showerFaucet: "",
-    actionForTub: "",
-    surround: "",
-    tubShowerFaucet: "",
-    mortarBedReplace: false,
-    mortarBedSize: "",
-    walls: "",
-    tileBench: false,
-    tileNiche: false,
-    tileNicheQty: "",
-    towelBar: false,
-    tileSoapDish: false,
-    tileSoapDishQty: ""
+shower: {
+  enabled: false,
+  type: "",
+  detachAndReset: false,
+  showerFaucet: "",
+  actionForTub: "",
+  jetted: false,
+  jettedMotorReplace: false,
+  surround: "",
+  tubShowerFaucet: "",
+  mortarBedReplace: false,
+  mortarBedSize: "",
+  walls: "",
+  tileBench: false,
+  tileNiche: false,
+  tileNicheQty: "",
+  towelBar: false,
+  tileSoapDish: false,
+  tileSoapDishQty: "",
+  grabBar: false,
+  grabBarQty: "",
+  tileFeatureStrip: false
   },
 }
 
@@ -4161,10 +4171,24 @@ const newDoor: DoorItem = {
                                                   </SelectContent>
                                                 </Select>
                                               </div>
+                                              <div className="flex items-center gap-2 pb-1">
+                                                <Switch
+                                                  checked={room.shower.jetted}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, jetted: checked } })}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Jetted</Label>
+                                              </div>
+                                              <div className="flex items-center gap-2 pb-1">
+                                                <Switch
+                                                  checked={room.shower.jettedMotorReplace}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, jettedMotorReplace: checked } })}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Jetted tub motor replace</Label>
+                                              </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Surround</Label>
                                                 <Select value={room.shower.surround} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, surround: value } }) }}>
-                                                  <SelectTrigger className="w-[160px] border-border/60 bg-secondary/50">
+                                                  <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
@@ -4179,7 +4203,7 @@ const newDoor: DoorItem = {
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Tub Shower Faucet</Label>
                                                 <Select value={room.shower.tubShowerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } }) }}>
-                                                  <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                                  <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
@@ -4191,6 +4215,69 @@ const newDoor: DoorItem = {
                                               </div>
                                             </>
                                           )}
+                                        </div>
+                                        {/* FEMA Note - only when Replace tub is selected for Tub With Tiled Surround */}
+                                        {room.shower.type === "tub-tile-surround" && room.shower.actionForTub === "replace-tub" && (
+                                          <span className="text-xs text-orange-400">Note: If replacing tub please note fema requires photos of damage to warrant replacement</span>
+                                        )}
+                                        {/* Misc row for Tub With Tiled Surround */}
+                                        {room.shower.type === "tub-tile-surround" && (
+                                          <div className="space-y-2">
+                                            <Label className="text-xs font-medium text-muted-foreground">Misc</Label>
+                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                              <div className="flex items-center gap-2">
+                                                <Switch
+                                                  checked={room.shower.tileNiche}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileNiche: checked, tileNicheQty: checked ? room.shower!.tileNicheQty : "" } })}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Tile Niche</Label>
+                                              </div>
+                                              {room.shower.tileNiche && (
+                                                <Input
+                                                  type="number"
+                                                  min={1}
+                                                  value={room.shower.tileNicheQty || ""}
+                                                  onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, tileNicheQty: e.target.value } })}
+                                                  className="w-[70px] border-border/60 bg-secondary/50"
+                                                  placeholder="QTY"
+                                                />
+                                              )}
+                                              <div className="flex items-center gap-2">
+                                                <Switch
+                                                  checked={room.shower.grabBar}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, grabBar: checked, grabBarQty: checked ? room.shower!.grabBarQty : "" } })}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Grab Bar</Label>
+                                              </div>
+                                              {room.shower.grabBar && (
+                                                <Input
+                                                  type="number"
+                                                  min={1}
+                                                  value={room.shower.grabBarQty || ""}
+                                                  onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, grabBarQty: e.target.value } })}
+                                                  className="w-[70px] border-border/60 bg-secondary/50"
+                                                  placeholder="QTY"
+                                                />
+                                              )}
+                                              <div className="flex items-center gap-2">
+                                                <Switch
+                                                  checked={room.shower.tileSoapDish}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileSoapDish: checked } })}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Tile Soap dish</Label>
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <Switch
+                                                  checked={room.shower.tileFeatureStrip}
+                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileFeatureStrip: checked } })}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Tile Feature Strip</Label>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                        {room.shower.type !== "tub-tile-surround" && (
+                                        <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
 
                                           {/* Tub With Cultured Marble fields */}
                                           {room.shower.type === "tub-cultured-marble" && (
@@ -4286,20 +4373,18 @@ const newDoor: DoorItem = {
                                             </>
                                           )}
                                         </div>
+                                        )}
 
                                         {/* Notes for different types */}
                                         {room.shower.type === "fiberglass-tub-shower" && (
                                           <p className="text-xs text-amber-500">Note: Includes the shower/tub unit and faucets</p>
                                         )}
-                                        {room.shower.type === "tub-tile-surround" && (
-                                          <p className="text-xs text-amber-500">Note: If replacing please note fema requires photos of damage to warrant replacement</p>
-                                        )}
                                         {room.shower.type === "tile-shower" && (
                                           <p className="text-xs text-amber-500">Note: includes cement board replacement</p>
                                         )}
 
-                                        {/* Misc section - shown for all shower types */}
-                                        {room.shower.type && room.shower.type !== "__none__" && (
+                                        {/* Misc section - shown for non tub-tile-surround types (tub-tile-surround has its own Misc above) */}
+                                        {room.shower.type && room.shower.type !== "__none__" && room.shower.type !== "tub-tile-surround" && (
                                           <div className="border-t border-border/40 pt-3">
                                             <Label className="text-xs text-muted-foreground mb-2 block">Misc</Label>
                                             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -4317,17 +4402,14 @@ const newDoor: DoorItem = {
                                                 />
                                                 <Label className="text-sm">Tile Niche</Label>
                                                 {room.shower.tileNiche && (
-                                                  <Select value={room.shower.tileNicheQty} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tileNicheQty: value } }) }}>
-                                                    <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
-                                                      <SelectValue placeholder="QTY" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-                                                        <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
-                                                      ))}
-                                                    </SelectContent>
-                                                  </Select>
+                                                  <Input
+                                                    type="number"
+                                                    min={1}
+                                                    value={room.shower.tileNicheQty || ""}
+                                                    onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, tileNicheQty: e.target.value } })}
+                                                    className="w-[70px] border-border/60 bg-secondary/50"
+                                                    placeholder="QTY"
+                                                  />
                                                 )}
                                               </div>
                                               <div className="flex items-center gap-2">
@@ -4344,17 +4426,14 @@ const newDoor: DoorItem = {
                                                 />
                                                 <Label className="text-sm">Tile Soap dish</Label>
                                                 {room.shower.tileSoapDish && (
-                                                  <Select value={room.shower.tileSoapDishQty} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tileSoapDishQty: value } }) }}>
-                                                    <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
-                                                      <SelectValue placeholder="QTY" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-                                                        <SelectItem key={num} value={String(num)}>{num} QTY</SelectItem>
-                                                      ))}
-                                                    </SelectContent>
-                                                  </Select>
+                                                  <Input
+                                                    type="number"
+                                                    min={1}
+                                                    value={room.shower.tileSoapDishQty || ""}
+                                                    onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, tileSoapDishQty: e.target.value } })}
+                                                    className="w-[70px] border-border/60 bg-secondary/50"
+                                                    placeholder="QTY"
+                                                  />
                                                 )}
                                               </div>
                                             </div>
