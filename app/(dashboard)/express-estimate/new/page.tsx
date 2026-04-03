@@ -2709,28 +2709,12 @@ const newDoor: DoorItem = {
                         </div>
                         {/* Breaker Panel */}
                         <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <Switch
-                                checked={foundation.electrical.breakerPanel.enabled}
-                                onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
-                              />
-                              <Label>Enable Breaker Panel</Label>
-                            </div>
-                            {foundation.electrical.breakerPanel.enabled && (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="gap-1 border-border/60"
-                                onClick={() => {
-                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: [...foundation.electrical.breakerPanel.circuits, { id: Date.now(), type: "", qty: "" }] } } })
-                                  handleSave()
-                                }}
-                              >
-                                <Plus className="h-3 w-3" /> Add Circuit
-                              </Button>
-                            )}
+                          <div className="flex items-center gap-3">
+                            <Switch
+                              checked={foundation.electrical.breakerPanel.enabled}
+                              onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
+                            />
+                            <Label>Enable Breaker Panel</Label>
                           </div>
                           {foundation.electrical.breakerPanel.enabled && (
                             <div className="ml-8 space-y-4">
@@ -2750,8 +2734,8 @@ const newDoor: DoorItem = {
                                 </Select>
                               </div>
                               {foundation.electrical.breakerPanel.circuits.map((circuit, index) => (
-                                <div key={circuit.id} className="flex flex-wrap items-end gap-4 rounded-lg border border-border/40 bg-secondary/30 p-3">
-                                  <div className="space-y-2 flex-1 min-w-[180px]">
+                                <div key={circuit.id} className="flex items-end gap-3">
+                                  <div className="space-y-2">
                                     <Label className="text-sm">Breaker Circuit Replacement</Label>
                                     <Select value={circuit.type} onValueChange={(__v) => {
                                       const value = __v === "__none__" ? "" : __v;
@@ -2792,7 +2776,7 @@ const newDoor: DoorItem = {
                                     type="button"
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                    className="h-9 w-9 p-0 text-destructive hover:text-destructive"
                                     onClick={() => {
                                       setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: foundation.electrical.breakerPanel.circuits.filter(c => c.id !== circuit.id) } } })
                                       handleSave()
@@ -2802,6 +2786,18 @@ const newDoor: DoorItem = {
                                   </Button>
                                 </div>
                               ))}
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="gap-1 border-border/60"
+                                onClick={() => {
+                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: [...foundation.electrical.breakerPanel.circuits, { id: Date.now(), type: "", qty: "" }] } } })
+                                  handleSave()
+                                }}
+                              >
+                                <Plus className="h-3 w-3" /> Add Circuit
+                              </Button>
                             </div>
                           )}
                         </div>
