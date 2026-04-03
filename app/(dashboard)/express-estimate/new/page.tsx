@@ -4687,6 +4687,21 @@ export default function NewExpressEstimatePage() {
                                           <SelectItem value="premium">Premium</SelectItem>
                                         </SelectContent>
                                       </Select>
+                                      <Select value={door.finish} onValueChange={(__v) => {
+                                        const value = __v === "__none__" ? "" : __v;
+                                        const newDoors = [...room.doors]
+                                        newDoors[idx] = { ...door, finish: value }
+                                        updateRoom(room.id, { doors: newDoors })
+                                      }}>
+                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
+                                          <SelectValue placeholder="Finish" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                          <SelectItem value="paint">Paint</SelectItem>
+                                          <SelectItem value="stain">Stain</SelectItem>
+                                        </SelectContent>
+                                      </Select>
                                       <Select value={door.handleAction} onValueChange={(__v) => {
                                         const value = __v === "__none__" ? "" : __v;
                                         const newDoors = [...room.doors]
