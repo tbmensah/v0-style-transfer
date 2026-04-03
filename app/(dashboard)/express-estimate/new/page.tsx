@@ -1584,11 +1584,12 @@ const newDoor: DoorItem = {
                           <div className="space-y-1">
                             <Label className="text-xs text-muted-foreground">Foundation Wall Clean (PF)</Label>
                             <Input
-                              type="text"
+                              type="number"
+                              min="0"
                               placeholder="enter PF"
                               value={foundation.crawlspace.perimeterFeet}
                               onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, perimeterFeet: e.target.value } }); handleSave() }}
-                              className="border-border/60 bg-secondary/50 w-24"
+                              className="border-border/60 bg-secondary/50 w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:appearance-auto"
                             />
                           </div>
                           <div className="space-y-1">
@@ -1669,39 +1670,33 @@ const newDoor: DoorItem = {
                           <Label className="text-sm">Enable Stair Cleaning</Label>
                         </div>
                         {foundation.crawlspace.stairCleaning && (
-                          <div className="space-y-3 pl-6">
-                            <div className="flex flex-wrap items-center gap-4">
-                              <div className="flex items-center gap-2">
-                                <Label className="text-xs text-muted-foreground"># of stairs submerged</Label>
-                                <Select value={foundation.crawlspace.stairsSubmerged} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, stairsSubmerged: value } }); handleSave() }}>
-                                  <SelectTrigger className="w-16 border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="--" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
-                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((n) => (
-                                      <SelectItem key={n} value={String(n)}>{n}</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Label className="text-xs text-muted-foreground">width of treads</Label>
-                                <Select value={foundation.crawlspace.treadWidth} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, treadWidth: value } }); handleSave() }}>
-                                  <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="--" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
-                                    {[1, 2, 3, 4, 5].map((n) => (
-                                      <SelectItem key={n} value={String(n)}>{n} ft</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
+                          <div className="flex flex-wrap items-center gap-4 pl-6">
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs text-muted-foreground"># of Stairs Submerged</Label>
+                              <Input
+                                type="number"
+                                min="1"
+                                value={foundation.crawlspace.stairsSubmerged}
+                                onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, stairsSubmerged: e.target.value } }); handleSave() }}
+                                className="border-border/60 bg-secondary/50 w-16"
+                              />
                             </div>
                             <div className="flex items-center gap-2">
-                              <Label className="text-xs text-muted-foreground">Total length of stringers submerged</Label>
+                              <Label className="text-xs text-muted-foreground">Width of Treads (ft)</Label>
+                              <Select value={foundation.crawlspace.treadWidth} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, treadWidth: value } }); handleSave() }}>
+                                <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="--" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
+                                  {[1, 2, 3, 4, 5].map((n) => (
+                                    <SelectItem key={n} value={String(n)}>{n} ft</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs text-muted-foreground">Total Length of Stringers Submerged (ft)</Label>
                               <Select value={foundation.crawlspace.stringersLength} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, stringersLength: value } }); handleSave() }}>
                                 <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="--" />
@@ -1717,68 +1712,7 @@ const newDoor: DoorItem = {
                           </div>
                         )}
 
-                        {/* House Rewire */}
-                        <div className="flex flex-wrap items-center gap-4">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={foundation.crawlspace.houseRewire !== ""}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: checked ? " " : "" } }); handleSave() }}
-                            />
-                            <Label className="text-sm">House Rewire</Label>
-                          </div>
-                          {foundation.crawlspace.houseRewire !== "" && (
-                            <Input
-                              type="number"
-                              min="0"
-                              placeholder="Enter Home SF"
-                              value={foundation.crawlspace.houseRewire.trim()}
-                              onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, houseRewire: e.target.value } }); handleSave() }}
-                              className="border-border/60 bg-secondary/50 w-36"
-                            />
-                          )}
-                        </div>
 
-                        {/* Pre-FIRM */}
-                        <div className="flex items-center gap-2">
-                          <Switch
-                            checked={foundation.crawlspace.preFirm}
-                            onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, preFirm: checked } }); handleSave() }}
-                          />
-                          <Label className="text-sm">Pre-FIRM</Label>
-                        </div>
-                        {foundation.crawlspace.preFirm && (
-                          <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 space-y-3">
-                            <p className="text-sm font-medium text-foreground">Pre-FIRM Options</p>
-                            <div className="flex flex-wrap items-center gap-4">
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={foundation.crawlspace.bellyPaper}
-                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, bellyPaper: checked } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Belly Paper</Label>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={foundation.crawlspace.floorInsulation}
-                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, floorInsulation: checked } }); handleSave() }}
-                                />
-                                <Label className="text-sm">Floor Insulation</Label>
-                              </div>
-                              {foundation.crawlspace.floorInsulation && (
-                                <Select value={foundation.crawlspace.floorInsulationType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, floorInsulationType: value } }); handleSave() }}>
-                                  <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="Select" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="r13">{"4' - R-13 Unfaced Batt"}</SelectItem>
-                                    <SelectItem value="r19">{"6' - R-19 Unfaced Batt"}</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              )}
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
