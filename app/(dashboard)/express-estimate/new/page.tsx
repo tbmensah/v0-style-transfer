@@ -62,6 +62,7 @@ interface Room {
   cabinets?: CabinetOptions
   countertop?: CountertopOptions
   plumbing?: PlumbingOptions
+  // All room types
   appliances?: ApplianceOptions
 }
 
@@ -308,10 +309,7 @@ shower: {
   },
 }
 
-const defaultKitchenExtras = {
-  cabinets: { enabled: false, size: "", grade: "", detachAndReset: false, toeKick: { size: "", backSplash: "", grade: "", glass: false, diagonalInstallation: false } },
-  countertop: { enabled: false, type: "", grade: "", size: "", detachAndReset: false },
-  plumbing: { replaceFaucetSink: false, drFaucetSink: false, waterSupplyLine: { enabled: false, qty: "" }, reverseOsmosis: { enabled: false, action: "", f9Note: "" }, garbageDisposal: { enabled: false, action: "", f9Note: "" } },
+const defaultAppliancesExtras = {
   appliances: {
     enabled: false,
     refrigerator: { enabled: false, type: "", size: "", grade: "", action: "", f9Note: "" },
@@ -324,6 +322,13 @@ const defaultKitchenExtras = {
     boiler: { enabled: false, type: "", action: "", f9Note: "", expansionTank: false, circulatorPump: false },
     baseboardHeat: { enabled: false, type: "", size: "", action: "" },
   },
+}
+
+const defaultKitchenExtras = {
+  cabinets: { enabled: false, size: "", grade: "", detachAndReset: false, toeKick: { size: "", backSplash: "", grade: "", glass: false, diagonalInstallation: false } },
+  countertop: { enabled: false, type: "", grade: "", size: "", detachAndReset: false },
+  plumbing: { replaceFaucetSink: false, drFaucetSink: false, waterSupplyLine: { enabled: false, qty: "" }, reverseOsmosis: { enabled: false, action: "", f9Note: "" }, garbageDisposal: { enabled: false, action: "", f9Note: "" } },
+  ...defaultAppliancesExtras,
 }
 
 export default function NewExpressEstimatePage() {
@@ -468,14 +473,15 @@ export default function NewExpressEstimatePage() {
           roomName = `Room ${rooms.filter(r => r.type === "room").length + 1}`
       }
     }
-    const newRoom: Room = {
-      id: Date.now(),
-      name: roomName,
-      ...defaultRoom,
-      type,
-      ...(type === "bathroom" ? defaultBathroomExtras : {}),
-      ...(type === "kitchen" ? defaultKitchenExtras : {}),
-    }
+  const newRoom: Room = {
+  id: Date.now(),
+  name: roomName,
+  ...defaultRoom,
+  type,
+  ...defaultAppliancesExtras,
+  ...(type === "bathroom" ? defaultBathroomExtras : {}),
+  ...(type === "kitchen" ? defaultKitchenExtras : {}),
+  }
     setRooms([...rooms, newRoom])
     handleSave()
   }
