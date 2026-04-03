@@ -50,7 +50,9 @@ interface Room {
   trim: TrimOptions
   wallCovering: WallCoveringOptions
   electrical: ElectricalOptions
+  windowsEnabled: boolean
   windows: WindowItem[]
+  doorsEnabled: boolean
   doors: DoorItem[]
   // Bathroom specific
   vanity?: VanityOptions
@@ -234,7 +236,9 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
   trim: { enabled: false, baseboardHeight: "", material: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
   wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", texture: false, textureType: "" },
   electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
+  windowsEnabled: false,
   windows: [],
+  doorsEnabled: false,
   doors: [],
 }
 
@@ -753,7 +757,7 @@ export default function NewExpressEstimatePage() {
                       <div className="space-y-6">
                         {/* Condenser Units */}
                         <div className="space-y-3">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
                             <Label className="font-medium">Condenser Unit / AC Unit</Label>
                             <Button
                               type="button"
@@ -852,7 +856,7 @@ export default function NewExpressEstimatePage() {
 
                         {/* Package Units */}
                         <div className="space-y-3">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
                             <Label className="font-medium">Package Unit</Label>
                             <Button
                               type="button"
@@ -965,7 +969,7 @@ export default function NewExpressEstimatePage() {
 
                         {/* Mini Splits */}
                         <div className="space-y-3">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
                             <Label className="font-medium">Mini Split / Duct-Free System</Label>
                             <Button
                               type="button"
@@ -2943,14 +2947,20 @@ export default function NewExpressEstimatePage() {
 
                               {/* Windows */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <Switch
+                                    checked={room.windowsEnabled}
+                                    onCheckedChange={(checked) => { updateRoom(room.id, { windowsEnabled: checked }) }}
+                                  />
                                   <Label className="font-medium">Windows ({room.windows.length})</Label>
-                                  <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addWindow(room.id)}>
-                                    <Plus className="h-3 w-3" />
-                                    Add Window
-                                  </Button>
+                                  {room.windowsEnabled && (
+                                    <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addWindow(room.id)}>
+                                      <Plus className="h-3 w-3" />
+                                      Add Window
+                                    </Button>
+                                  )}
                                 </div>
-                                {room.windows.map((window, idx) => (
+                                {room.windowsEnabled && room.windows.map((window, idx) => (
                                   <div key={window.id} className="rounded-lg bg-secondary/30 p-3">
                                     <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                       {/* All dropdowns first */}
@@ -3226,20 +3236,34 @@ export default function NewExpressEstimatePage() {
                                         />
                                         <Label className="text-sm whitespace-nowrap">Marble sill detach</Label>
                                       </div>
-                                      {/* Delete button at far right */}
+                                      {/* Copy and Delete buttons at far right */}
                                       <div className="flex-1" />
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                                        onClick={() => {
-                                          const newWindows = room.windows.filter(w => w.id !== window.id)
-                                          updateRoom(room.id, { windows: newWindows })
-                                        }}
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
+                                          onClick={() => {
+                                            const newWindow = { ...window, id: Date.now() }
+                                            updateRoom(room.id, { windows: [...room.windows, newWindow] })
+                                          }}
+                                        >
+                                          <Copy className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                          onClick={() => {
+                                            const newWindows = room.windows.filter(w => w.id !== window.id)
+                                            updateRoom(room.id, { windows: newWindows })
+                                          }}
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </div>
                                     </div>
                                   </div>
                                 ))}
@@ -4608,20 +4632,26 @@ export default function NewExpressEstimatePage() {
 
                               {/* Doors - Always last */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <Switch
+                                    checked={room.doorsEnabled}
+                                    onCheckedChange={(checked) => { updateRoom(room.id, { doorsEnabled: checked }) }}
+                                  />
                                   <Label className="font-medium">Doors ({room.doors.length})</Label>
-                                  <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "interior")}>
-                                      <Plus className="h-3 w-3" />
-                                      Interior
-                                    </Button>
-                                    <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "exterior")}>
-                                      <Plus className="h-3 w-3" />
-                                      Exterior
-                                    </Button>
-                                  </div>
+                                  {room.doorsEnabled && (
+                                    <div className="flex gap-2">
+                                      <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "interior")}>
+                                        <Plus className="h-3 w-3" />
+                                        Interior
+                                      </Button>
+                                      <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "exterior")}>
+                                        <Plus className="h-3 w-3" />
+                                        Exterior
+                                      </Button>
+                                    </div>
+                                  )}
                                 </div>
-                                {room.doors.map((door, idx) => (
+                                {room.doorsEnabled && room.doors.map((door, idx) => (
                                   <div key={door.id} className="space-y-3 rounded-lg bg-secondary/30 p-3">
                                     <div className="flex flex-wrap items-center gap-3">
                                       <Badge variant="secondary" className="capitalize">{door.category}</Badge>
@@ -4671,6 +4701,21 @@ export default function NewExpressEstimatePage() {
                                           <SelectItem value="premium">Premium</SelectItem>
                                         </SelectContent>
                                       </Select>
+                                      <Select value={door.finish} onValueChange={(__v) => {
+                                        const value = __v === "__none__" ? "" : __v;
+                                        const newDoors = [...room.doors]
+                                        newDoors[idx] = { ...door, finish: value }
+                                        updateRoom(room.id, { doors: newDoors })
+                                      }}>
+                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
+                                          <SelectValue placeholder="Finish" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                          <SelectItem value="paint">Paint</SelectItem>
+                                          <SelectItem value="stain">Stain</SelectItem>
+                                        </SelectContent>
+                                      </Select>
                                       <Select value={door.handleAction} onValueChange={(__v) => {
                                         const value = __v === "__none__" ? "" : __v;
                                         const newDoors = [...room.doors]
@@ -4687,7 +4732,18 @@ export default function NewExpressEstimatePage() {
                                         </SelectContent>
                                       </Select>
                                       <div className="flex-1"></div>
-                                      <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-9 w-9 text-muted-foreground hover:text-primary"
+                                          onClick={() => {
+                                            const newDoor = { ...door, id: Date.now() }
+                                            updateRoom(room.id, { doors: [...room.doors, newDoor] })
+                                          }}
+                                        >
+                                          <Copy className="h-4 w-4" />
+                                        </Button>
                                         <Button
                                           variant="ghost"
                                           size="icon"
