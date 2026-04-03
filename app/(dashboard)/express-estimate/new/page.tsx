@@ -50,7 +50,9 @@ interface Room {
   trim: TrimOptions
   wallCovering: WallCoveringOptions
   electrical: ElectricalOptions
+  windowsEnabled: boolean
   windows: WindowItem[]
+  doorsEnabled: boolean
   doors: DoorItem[]
   // Bathroom specific
   vanity?: VanityOptions
@@ -234,7 +236,9 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
   trim: { enabled: false, baseboardHeight: "", material: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
   wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", texture: false, textureType: "" },
   electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
+  windowsEnabled: false,
   windows: [],
+  doorsEnabled: false,
   doors: [],
 }
 
@@ -2943,14 +2947,20 @@ export default function NewExpressEstimatePage() {
 
                               {/* Windows */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <Switch
+                                    checked={room.windowsEnabled}
+                                    onCheckedChange={(checked) => { updateRoom(room.id, { windowsEnabled: checked }) }}
+                                  />
                                   <Label className="font-medium">Windows ({room.windows.length})</Label>
-                                  <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addWindow(room.id)}>
-                                    <Plus className="h-3 w-3" />
-                                    Add Window
-                                  </Button>
+                                  {room.windowsEnabled && (
+                                    <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addWindow(room.id)}>
+                                      <Plus className="h-3 w-3" />
+                                      Add Window
+                                    </Button>
+                                  )}
                                 </div>
-                                {room.windows.map((window, idx) => (
+                                {room.windowsEnabled && room.windows.map((window, idx) => (
                                   <div key={window.id} className="rounded-lg bg-secondary/30 p-3">
                                     <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                       {/* All dropdowns first */}
@@ -4608,20 +4618,26 @@ export default function NewExpressEstimatePage() {
 
                               {/* Doors - Always last */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <Switch
+                                    checked={room.doorsEnabled}
+                                    onCheckedChange={(checked) => { updateRoom(room.id, { doorsEnabled: checked }) }}
+                                  />
                                   <Label className="font-medium">Doors ({room.doors.length})</Label>
-                                  <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "interior")}>
-                                      <Plus className="h-3 w-3" />
-                                      Interior
-                                    </Button>
-                                    <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "exterior")}>
-                                      <Plus className="h-3 w-3" />
-                                      Exterior
-                                    </Button>
-                                  </div>
+                                  {room.doorsEnabled && (
+                                    <div className="flex gap-2">
+                                      <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "interior")}>
+                                        <Plus className="h-3 w-3" />
+                                        Interior
+                                      </Button>
+                                      <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "exterior")}>
+                                        <Plus className="h-3 w-3" />
+                                        Exterior
+                                      </Button>
+                                    </div>
+                                  )}
                                 </div>
-                                {room.doors.map((door, idx) => (
+                                {room.doorsEnabled && room.doors.map((door, idx) => (
                                   <div key={door.id} className="space-y-3 rounded-lg bg-secondary/30 p-3">
                                     <div className="flex flex-wrap items-center gap-3">
                                       <Badge variant="secondary" className="capitalize">{door.category}</Badge>
