@@ -753,7 +753,7 @@ export default function NewExpressEstimatePage() {
                       <div className="space-y-6">
                         {/* Condenser Units */}
                         <div className="space-y-3">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
                             <Label className="font-medium">Condenser Unit / AC Unit</Label>
                             <Button
                               type="button"
@@ -852,7 +852,7 @@ export default function NewExpressEstimatePage() {
 
                         {/* Package Units */}
                         <div className="space-y-3">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
                             <Label className="font-medium">Package Unit</Label>
                             <Button
                               type="button"
@@ -965,7 +965,7 @@ export default function NewExpressEstimatePage() {
 
                         {/* Mini Splits */}
                         <div className="space-y-3">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
                             <Label className="font-medium">Mini Split / Duct-Free System</Label>
                             <Button
                               type="button"
