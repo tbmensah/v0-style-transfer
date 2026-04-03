@@ -121,31 +121,31 @@ export function RoomCard({
           {/* NFIP Cleaning */}
           <NFIPCleaningSection
             nfipCleaning={room.nfipCleaning}
-            onUpdate={(updates) => onUpdate({ nfipCleaning: { ...room.nfipCleaning, ...updates } })}
+            onChange={(updates) => onUpdate({ nfipCleaning: { ...room.nfipCleaning, ...updates } })}
           />
 
           {/* Flooring */}
           <FlooringSection
             flooring={room.flooring}
-            onUpdate={(updates) => onUpdate({ flooring: { ...room.flooring, ...updates } })}
+            onChange={(updates) => onUpdate({ flooring: { ...room.flooring, ...updates } })}
           />
 
           {/* Trim */}
           <TrimSection
             trim={room.trim}
-            onUpdate={(updates) => onUpdate({ trim: { ...room.trim, ...updates } })}
+            onChange={(updates) => onUpdate({ trim: { ...room.trim, ...updates } })}
           />
 
           {/* Wall Covering */}
           <WallCoveringSection
             wallCovering={room.wallCovering}
-            onUpdate={(updates) => onUpdate({ wallCovering: { ...room.wallCovering, ...updates } })}
+            onChange={(updates) => onUpdate({ wallCovering: { ...room.wallCovering, ...updates } })}
           />
 
           {/* Electrical */}
           <ElectricalSection
             electrical={room.electrical}
-            onUpdate={(updates) => onUpdate({ electrical: { ...room.electrical, ...updates } })}
+            onChange={(updates) => onUpdate({ electrical: { ...room.electrical, ...updates } })}
           />
 
           {/* BATHROOM SPECIFIC SECTIONS */}
@@ -153,15 +153,15 @@ export function RoomCard({
             <>
               <VanitySection
                 vanity={room.vanity}
-                onUpdate={(updates) => onUpdate({ vanity: { ...room.vanity!, ...updates } })}
+                onChange={(updates) => onUpdate({ vanity: { ...room.vanity!, ...updates } })}
               />
               <ToiletSection
                 toilet={room.toilet}
-                onUpdate={(updates) => onUpdate({ toilet: { ...room.toilet!, ...updates } })}
+                onChange={(updates) => onUpdate({ toilet: { ...room.toilet!, ...updates } })}
               />
               <ShowerSection
                 shower={room.shower}
-                onUpdate={(updates) => onUpdate({ shower: { ...room.shower!, ...updates } })}
+                onChange={(updates) => onUpdate({ shower: { ...room.shower!, ...updates } })}
               />
             </>
           )}
