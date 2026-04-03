@@ -3380,9 +3380,9 @@ export default function NewExpressEstimatePage() {
                                   )}
                                 </div>
                                 {room.windowsEnabled && room.windows.map((window, idx) => (
-                                  <div key={window.id} className="rounded-lg bg-secondary/30 p-3">
+                                  <div key={window.id} className="rounded-lg bg-secondary/30 p-3 space-y-2">
+                                    {/* First row: Type, Material, Size, Grade, QTY */}
                                     <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
-                                      {/* All dropdowns first */}
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Type</Label>
                                         <Select value={window.type} onValueChange={(__v) => {
@@ -3391,7 +3391,7 @@ export default function NewExpressEstimatePage() {
                                           newWindows[idx] = { ...window, type: value, size: "", grade: "" }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
-                                          <SelectTrigger className="w-[125px] border-border/60 bg-secondary/50">
+                                          <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -3417,8 +3417,8 @@ export default function NewExpressEstimatePage() {
                                           </SelectTrigger>
                                           <SelectContent>
                                             <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                            <SelectItem value="aluminum">Aluminum</SelectItem>
                                             <SelectItem value="vinyl">Vinyl</SelectItem>
+                                            <SelectItem value="aluminum">Aluminum</SelectItem>
                                             <SelectItem value="wood">Wood</SelectItem>
                                           </SelectContent>
                                         </Select>
@@ -3432,28 +3432,38 @@ export default function NewExpressEstimatePage() {
                                             newWindows[idx] = { ...window, size: value }
                                             updateRoom(room.id, { windows: newWindows })
                                           }}>
-                                            <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
+                                            <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                              {((window.material === "vinyl" && (window.type === "single-hung" || window.type === "double-hung")) ||
-                                                (window.material === "aluminum" && (window.type === "single-hung" || window.type === "double-hung")) ||
-                                                (window.material === "wood" && (window.type === "single-hung" || window.type === "double-hung"))) && (
-                                                  <>
-                                                    <SelectItem value="4-8">4-8 SF</SelectItem>
-                                                    <SelectItem value="9-12">9-12 SF</SelectItem>
-                                                    <SelectItem value="13-19">13-19 SF</SelectItem>
-                                                    <SelectItem value="20-28">20-28 SF</SelectItem>
-                                                  </>
-                                                )}
-                                              {((window.material === "vinyl" || window.material === "aluminum") && window.type === "casement") && (
+                                              {/* Vinyl - Single Hung */}
+                                              {window.material === "vinyl" && window.type === "single-hung" && (
+                                                <>
+                                                  <SelectItem value="4-8">4-8 SF</SelectItem>
+                                                  <SelectItem value="9-12">9-12 SF</SelectItem>
+                                                  <SelectItem value="13-19">13-19 SF</SelectItem>
+                                                  <SelectItem value="20-28">20-28 SF</SelectItem>
+                                                </>
+                                              )}
+                                              {/* Vinyl - Double Hung */}
+                                              {window.material === "vinyl" && window.type === "double-hung" && (
+                                                <>
+                                                  <SelectItem value="9-12">9-12 SF</SelectItem>
+                                                  <SelectItem value="4-8">4-8 SF</SelectItem>
+                                                  <SelectItem value="13-19">13-19 SF</SelectItem>
+                                                  <SelectItem value="20-28">20-28 SF</SelectItem>
+                                                </>
+                                              )}
+                                              {/* Vinyl - Casement */}
+                                              {window.material === "vinyl" && window.type === "casement" && (
                                                 <>
                                                   <SelectItem value="3-5">3-5 SF</SelectItem>
                                                   <SelectItem value="6-8">6-8 SF</SelectItem>
                                                   <SelectItem value="9-13">9-13 SF</SelectItem>
                                                 </>
                                               )}
+                                              {/* Aluminum - Horizontal Slider */}
                                               {window.material === "aluminum" && window.type === "horizontal-slider" && (
                                                 <>
                                                   <SelectItem value="3-11">3-11 SF</SelectItem>
@@ -3462,6 +3472,15 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="33-40">33-40 SF</SelectItem>
                                                 </>
                                               )}
+                                              {/* Aluminum - Casement */}
+                                              {window.material === "aluminum" && window.type === "casement" && (
+                                                <>
+                                                  <SelectItem value="3-5">3-5 SF</SelectItem>
+                                                  <SelectItem value="6-8">6-8 SF</SelectItem>
+                                                  <SelectItem value="9-13">9-13 SF</SelectItem>
+                                                </>
+                                              )}
+                                              {/* Aluminum - Fixed */}
                                               {window.material === "aluminum" && window.type === "fixed" && (
                                                 <>
                                                   <SelectItem value="3-11">3-11 SF</SelectItem>
@@ -3470,7 +3489,26 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="33-40">33-40 SF</SelectItem>
                                                 </>
                                               )}
-                                              {window.material === "wood" && (window.type === "casement" || window.type === "horizontal-slider") && (
+                                              {/* Aluminum - Single Hung */}
+                                              {window.material === "aluminum" && window.type === "single-hung" && (
+                                                <>
+                                                  <SelectItem value="4-8">4-8 SF</SelectItem>
+                                                  <SelectItem value="9-12">9-12 SF</SelectItem>
+                                                  <SelectItem value="13-19">13-19 SF</SelectItem>
+                                                  <SelectItem value="20-28">20-28 SF</SelectItem>
+                                                </>
+                                              )}
+                                              {/* Aluminum - Double Hung */}
+                                              {window.material === "aluminum" && window.type === "double-hung" && (
+                                                <>
+                                                  <SelectItem value="4-8">4-8 SF</SelectItem>
+                                                  <SelectItem value="9-12">9-12 SF</SelectItem>
+                                                  <SelectItem value="13-19">13-19 SF</SelectItem>
+                                                  <SelectItem value="20-28">20-28 SF</SelectItem>
+                                                </>
+                                              )}
+                                              {/* Wood - Casement */}
+                                              {window.material === "wood" && window.type === "casement" && (
                                                 <>
                                                   <SelectItem value="3-11">3-11 SF</SelectItem>
                                                   <SelectItem value="12-23">12-23 SF</SelectItem>
@@ -3478,6 +3516,25 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="33-40">33-40 SF</SelectItem>
                                                 </>
                                               )}
+                                              {/* Wood - Double Hung */}
+                                              {window.material === "wood" && window.type === "double-hung" && (
+                                                <>
+                                                  <SelectItem value="4-8">4-8 SF</SelectItem>
+                                                  <SelectItem value="9-12">9-12 SF</SelectItem>
+                                                  <SelectItem value="13-19">13-19 SF</SelectItem>
+                                                  <SelectItem value="20-28">20-28 SF</SelectItem>
+                                                </>
+                                              )}
+                                              {/* Wood - Horizontal Slider */}
+                                              {window.material === "wood" && window.type === "horizontal-slider" && (
+                                                <>
+                                                  <SelectItem value="3-11">3-11 SF</SelectItem>
+                                                  <SelectItem value="12-23">12-23 SF</SelectItem>
+                                                  <SelectItem value="24-32">24-32 SF</SelectItem>
+                                                  <SelectItem value="33-40">33-40 SF</SelectItem>
+                                                </>
+                                              )}
+                                              {/* Wood - Fixed */}
                                               {window.material === "wood" && window.type === "fixed" && (
                                                 <>
                                                   <SelectItem value="3-11">3-11 SF</SelectItem>
@@ -3487,7 +3544,8 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="44-55">44-55 SF</SelectItem>
                                                 </>
                                               )}
-                                              {window.material === "vinyl" && (window.type === "horizontal-slider" || window.type === "fixed") && (
+                                              {/* Wood - Single Hung */}
+                                              {window.material === "wood" && window.type === "single-hung" && (
                                                 <>
                                                   <SelectItem value="4-8">4-8 SF</SelectItem>
                                                   <SelectItem value="9-12">9-12 SF</SelectItem>
@@ -3508,11 +3566,12 @@ export default function NewExpressEstimatePage() {
                                             newWindows[idx] = { ...window, grade: value }
                                             updateRoom(room.id, { windows: newWindows })
                                           }}>
-                                            <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
+                                            <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
                                             <SelectContent>
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                              {/* Vinyl - all types */}
                                               {window.material === "vinyl" && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
@@ -3520,31 +3579,35 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="premium">Premium Grade</SelectItem>
                                                 </>
                                               )}
-                                              {window.material === "aluminum" && window.type !== "casement" && (
+                                              {/* Aluminum - Horizontal Slider, Fixed, Single Hung, Double Hung */}
+                                              {window.material === "aluminum" && (window.type === "horizontal-slider" || window.type === "fixed") && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
                                                   <SelectItem value="2-pane">2 Pane</SelectItem>
-                                                  <SelectItem value="2-pane-thermal">2 Pane w/thermal</SelectItem>
+                                                  <SelectItem value="2-pane-thermal">2 Pane w/Thermal</SelectItem>
                                                 </>
                                               )}
-                                              {window.material === "aluminum" && window.type === "casement" && (
+                                              {/* Aluminum - Casement, Single Hung, Double Hung */}
+                                              {window.material === "aluminum" && (window.type === "casement" || window.type === "single-hung" || window.type === "double-hung") && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
                                                   <SelectItem value="high">High Grade</SelectItem>
                                                   <SelectItem value="premium">Premium Grade</SelectItem>
                                                 </>
                                               )}
-                                              {window.material === "wood" && window.type !== "casement" && (
-                                                <>
-                                                  <SelectItem value="base">Base</SelectItem>
-                                                  <SelectItem value="standard">Standard Grade</SelectItem>
-                                                  <SelectItem value="high">High Grade</SelectItem>
-                                                  <SelectItem value="premium">Premium Grade</SelectItem>
-                                                </>
-                                              )}
+                                              {/* Wood - Casement */}
                                               {window.material === "wood" && window.type === "casement" && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
+                                                  <SelectItem value="high">High Grade</SelectItem>
+                                                  <SelectItem value="premium">Premium Grade</SelectItem>
+                                                </>
+                                              )}
+                                              {/* Wood - Double Hung, Horizontal Slider, Fixed, Single Hung */}
+                                              {window.material === "wood" && (window.type === "double-hung" || window.type === "horizontal-slider" || window.type === "fixed" || window.type === "single-hung") && (
+                                                <>
+                                                  <SelectItem value="base">Base</SelectItem>
+                                                  <SelectItem value="standard">Standard Grade</SelectItem>
                                                   <SelectItem value="high">High Grade</SelectItem>
                                                   <SelectItem value="premium">Premium Grade</SelectItem>
                                                 </>
@@ -3554,67 +3617,7 @@ export default function NewExpressEstimatePage() {
                                         </div>
                                       )}
                                       <div className="space-y-1">
-                                        <Label className="text-xs text-muted-foreground">Blinds</Label>
-                                        <Select value={window.blinds} onValueChange={(__v) => {
-                                          const value = __v === "__none__" ? "" : __v;
-                                          const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, blinds: value }
-                                          updateRoom(room.id, { windows: newWindows })
-                                        }}>
-                                          <SelectTrigger className="w-[90px] border-border/60 bg-secondary/50">
-                                            <SelectValue placeholder="Select" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                            <SelectItem value="pvc">PVC</SelectItem>
-                                            <SelectItem value="wood">Wood</SelectItem>
-                                            <SelectItem value="metal">Metal</SelectItem>
-                                            <SelectItem value="shutters">Shutters</SelectItem>
-                                          </SelectContent>
-                                        </Select>
-                                      </div>
-                                      <div className="space-y-1">
-                                        <Label className="text-xs text-muted-foreground">Casing/Trim</Label>
-                                        <Select value={window.casingTrim} onValueChange={(__v) => {
-                                          const value = __v === "__none__" ? "" : __v;
-                                          const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, casingTrim: value }
-                                          updateRoom(room.id, { windows: newWindows })
-                                        }}>
-                                          <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
-                                            <SelectValue placeholder="Select" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                            <SelectItem value="untrimmed">Untrimmed Window</SelectItem>
-                                            <SelectItem value="casing-stain">Casing - Stain</SelectItem>
-                                            <SelectItem value="casing-apron-stain">Casing With Apron - Stain</SelectItem>
-                                            <SelectItem value="casing-paint">Casing - Paint</SelectItem>
-                                            <SelectItem value="casing-apron-paint">Casing With Apron - Paint</SelectItem>
-                                          </SelectContent>
-                                        </Select>
-                                      </div>
-                                      <div className="space-y-1">
-                                        <Label className="text-xs text-muted-foreground">Finish</Label>
-                                        <Select value={window.finish} onValueChange={(__v) => {
-                                          const value = __v === "__none__" ? "" : __v;
-                                          const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, finish: value }
-                                          updateRoom(room.id, { windows: newWindows })
-                                        }}>
-                                          <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
-                                            <SelectValue placeholder="Select" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                            <SelectItem value="trimmed-window">Trimmed Window</SelectItem>
-                                            <SelectItem value="sill-apron">Sill and Apron</SelectItem>
-                                            <SelectItem value="marble-sill">Marble Sill</SelectItem>
-                                          </SelectContent>
-                                        </Select>
-                                      </div>
-                                      <div className="space-y-1">
-                                        <Label className="text-xs text-muted-foreground">Quantity</Label>
+                                        <Label className="text-xs text-muted-foreground">QTY</Label>
                                         <Select value={window.quantity} onValueChange={(__v) => {
                                           const value = __v === "__none__" ? "" : __v;
                                           const newWindows = [...room.windows]
@@ -3632,30 +3635,7 @@ export default function NewExpressEstimatePage() {
                                           </SelectContent>
                                         </Select>
                                       </div>
-                                      {/* Toggles after dropdowns */}
-                                      <div className="flex items-center gap-2 pb-1">
-                                        <Switch
-                                          checked={window.marbleSillReplace}
-                                          onCheckedChange={(checked) => {
-                                            const newWindows = [...room.windows]
-                                            newWindows[idx] = { ...window, marbleSillReplace: checked }
-                                            updateRoom(room.id, { windows: newWindows })
-                                          }}
-                                        />
-                                        <Label className="text-sm whitespace-nowrap">Marble sill replace</Label>
-                                      </div>
-                                      <div className="flex items-center gap-2 pb-1">
-                                        <Switch
-                                          checked={window.marbleSillDetach}
-                                          onCheckedChange={(checked) => {
-                                            const newWindows = [...room.windows]
-                                            newWindows[idx] = { ...window, marbleSillDetach: checked }
-                                            updateRoom(room.id, { windows: newWindows })
-                                          }}
-                                        />
-                                        <Label className="text-sm whitespace-nowrap">Marble sill detach</Label>
-                                      </div>
-                                      {/* Copy and Delete buttons at far right */}
+                                      {/* Copy and Delete buttons */}
                                       <div className="flex-1" />
                                       <div className="flex items-center gap-1">
                                         <Button
@@ -3682,6 +3662,72 @@ export default function NewExpressEstimatePage() {
                                         >
                                           <Trash2 className="h-4 w-4" />
                                         </Button>
+                                      </div>
+                                    </div>
+                                    {/* Second row: Blinds, Casing/Trim, Marble Sill Replace, Marble Sill Detach */}
+                                    <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Blinds</Label>
+                                        <Select value={window.blinds} onValueChange={(__v) => {
+                                          const value = __v === "__none__" ? "" : __v;
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, blinds: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="pvc">PVC</SelectItem>
+                                            <SelectItem value="wood">Wood</SelectItem>
+                                            <SelectItem value="metal">Metal</SelectItem>
+                                            <SelectItem value="shutters">Shutters</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Casing/Trim</Label>
+                                        <Select value={window.casingTrim} onValueChange={(__v) => {
+                                          const value = __v === "__none__" ? "" : __v;
+                                          const newWindows = [...room.windows]
+                                          newWindows[idx] = { ...window, casingTrim: value }
+                                          updateRoom(room.id, { windows: newWindows })
+                                        }}>
+                                          <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="untrimmed">Untrimmed Window</SelectItem>
+                                            <SelectItem value="casing-stain">Casing - Stain</SelectItem>
+                                            <SelectItem value="casing-apron-stain">Casing With Apron - Stain</SelectItem>
+                                            <SelectItem value="casing-paint">Casing - Paint</SelectItem>
+                                            <SelectItem value="casing-apron-paint">Casing With Apron - Paint</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      <div className="flex items-center gap-2 pb-1">
+                                        <Switch
+                                          checked={window.marbleSillReplace}
+                                          onCheckedChange={(checked) => {
+                                            const newWindows = [...room.windows]
+                                            newWindows[idx] = { ...window, marbleSillReplace: checked }
+                                            updateRoom(room.id, { windows: newWindows })
+                                          }}
+                                        />
+                                        <Label className="text-sm whitespace-nowrap">Marble Sill Replace</Label>
+                                      </div>
+                                      <div className="flex items-center gap-2 pb-1">
+                                        <Switch
+                                          checked={window.marbleSillDetach}
+                                          onCheckedChange={(checked) => {
+                                            const newWindows = [...room.windows]
+                                            newWindows[idx] = { ...window, marbleSillDetach: checked }
+                                            updateRoom(room.id, { windows: newWindows })
+                                          }}
+                                        />
+                                        <Label className="text-sm whitespace-nowrap">Marble Sill Detach</Label>
                                       </div>
                                     </div>
                                   </div>
