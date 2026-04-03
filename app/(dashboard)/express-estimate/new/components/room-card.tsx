@@ -30,6 +30,7 @@ interface RoomCardProps {
   onUpdate: (updates: Partial<Room>) => void
   onCopy: () => void
   onRemove: () => void
+  onSave?: () => void
 }
 
 export function RoomCard({
@@ -37,6 +38,7 @@ export function RoomCard({
   onUpdate,
   onCopy,
   onRemove,
+  onSave,
 }: RoomCardProps) {
   const roomTypes = [
     { value: "room", label: "Room" },
