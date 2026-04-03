@@ -1539,12 +1539,12 @@ const newDoor: DoorItem = {
 
                 {/* FOUNDATION TAB */}
                 <TabsContent value="foundation" className="mt-6 space-y-4">
-                  {/* Crawlspace / PFE Enclosure */}
+                  {/* NFIP Cleaning */}
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
                       <div className="flex items-center gap-3">
                         <Droplets className="h-5 w-5 text-primary" />
-                        <span className="font-medium text-foreground">Crawlspace / PFE Enclosure</span>
+                        <span className="font-medium text-foreground">NFIP Cleaning</span>
                         {foundation.crawlspace.enabled && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
@@ -1567,13 +1567,16 @@ const newDoor: DoorItem = {
                             <Label className="text-sm">AC Controlled Space</Label>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Switch
-                              checked={foundation.crawlspace.heavyCleanArea}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, heavyCleanArea: checked } }); handleSave() }}
-                            />
-                            <Label className="text-sm">Heavy Clean Area</Label>
-                          </div>
-                        </div>
+                                            <Switch
+                                              checked={foundation.crawlspace.heavyCleanArea}
+                                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, heavyCleanArea: checked } }); handleSave() }}
+                                            />
+                                            <Label className="text-sm">Heavy Clean Area</Label>
+                                          </div>
+                                        </div>
+                                        {foundation.crawlspace.heavyCleanArea && (
+                                          <p className="text-xs text-amber-500">Note: Heavy clean will be applied to all cleaning items below</p>
+                                        )}
                         {foundation.crawlspace.enabled && (
                           <div className="space-y-4">
                             <div className="flex flex-wrap items-end gap-4">
