@@ -95,6 +95,7 @@ export function FlooringSection({ flooring, onChange }: FlooringSectionProps) {
 
       {flooring.enabled && (
         <div className="space-y-3">
+          <p className="text-xs text-amber-500">Note: Please note carpet installed over flooring is a content item</p>
           {/* Floor Layers */}
           {(flooring.layers || []).map((layer, layerIndex) => (
             <FloorLayerItemComponent

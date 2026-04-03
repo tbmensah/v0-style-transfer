@@ -382,15 +382,15 @@ export function ShowerSection({ shower, onChange }: ShowerSectionProps) {
             )}
           </div>
 
-          {/* Description text */}
+          {/* Notes for different types */}
           {shower.type === "fiberglass-tub-shower" && (
-            <p className="text-xs text-muted-foreground">Includes: 60&quot; fiberglass tub/shower combo</p>
+            <p className="text-xs text-amber-500">Note: Includes the shower/tub unit and faucets</p>
           )}
           {shower.type === "tub-tile-surround" && (
-            <p className="text-xs text-muted-foreground">Includes: Standard tub with tile surround</p>
+            <p className="text-xs text-amber-500">Note: If replacing please note FEMA requires photos of damage to warrant replacement</p>
           )}
           {shower.type === "tile-shower" && (
-            <p className="text-xs text-muted-foreground">Includes: Custom tile shower with pan</p>
+            <p className="text-xs text-amber-500">Note: Includes cement board replacement</p>
           )}
 
           {/* Additional accessories */}

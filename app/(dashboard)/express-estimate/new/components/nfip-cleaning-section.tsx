@@ -105,6 +105,9 @@ export function NFIPCleaningSection({ nfipCleaning, onChange }: NFIPCleaningSect
           </div>
         </div>
       )}
+      {nfipCleaning.enabled && (
+        <p className="text-xs text-amber-500">Note: Section includes standard method 1 SF drycut.</p>
+      )}
       {nfipCleaning.enabled && nfipCleaning.floor.type === "muck-heavy" && (
         <p className="text-xs text-amber-500">Note: NFIP requires photos of standing mud to endorse for heavy Muck</p>
       )}
