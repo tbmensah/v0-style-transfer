@@ -320,6 +320,7 @@ export default function NewExpressEstimatePage() {
       disconnect30Amp: "",
       breakerPanel: { enabled: false, amps: "", arcFaults: false },
       meterBox: false,
+      circuits: [] as Array<{ id: number; amps: string; note: string }>,
     },
     finishes: [] as Array<{
       id: number;
@@ -1137,6 +1138,77 @@ export default function NewExpressEstimatePage() {
                             </div>
                           </>
                         )}
+                        
+                        {/* Circuits Section */}
+                        <div className="w-full border-t border-border/40 pt-4 mt-2">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Label className="font-medium">Circuits ({exterior.electrical.circuits.length})</Label>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-2 border-border/60"
+                              onClick={() => {
+                                setExterior({
+                                  ...exterior,
+                                  electrical: {
+                                    ...exterior.electrical,
+                                    circuits: [...exterior.electrical.circuits, { id: Date.now(), amps: "", note: "" }]
+                                  }
+                                })
+                                handleSave()
+                              }}
+                            >
+                              <Plus className="h-3 w-3" />
+                              Add Circuit
+                            </Button>
+                          </div>
+                          {exterior.electrical.circuits.map((circuit, idx) => (
+                            <div key={circuit.id} className="flex flex-wrap items-center gap-3 mb-2 p-2 rounded bg-secondary/30">
+                              <Select value={circuit.amps} onValueChange={(v) => {
+                                const value = v === "__none__" ? "" : v
+                                const newCircuits = [...exterior.electrical.circuits]
+                                newCircuits[idx] = { ...circuit, amps: value }
+                                setExterior({ ...exterior, electrical: { ...exterior.electrical, circuits: newCircuits } })
+                                handleSave()
+                              }}>
+                                <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Amps" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                  <SelectItem value="15">15 Amp</SelectItem>
+                                  <SelectItem value="20">20 Amp</SelectItem>
+                                  <SelectItem value="30">30 Amp</SelectItem>
+                                  <SelectItem value="40">40 Amp</SelectItem>
+                                  <SelectItem value="50">50 Amp</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Input
+                                placeholder="Note..."
+                                value={circuit.note}
+                                onChange={(e) => {
+                                  const newCircuits = [...exterior.electrical.circuits]
+                                  newCircuits[idx] = { ...circuit, note: e.target.value }
+                                  setExterior({ ...exterior, electrical: { ...exterior.electrical, circuits: newCircuits } })
+                                  handleSave()
+                                }}
+                                className="flex-1 min-w-[150px] border-border/60 bg-secondary/50"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:bg-destructive/20"
+                                onClick={() => {
+                                  const newCircuits = exterior.electrical.circuits.filter(c => c.id !== circuit.id)
+                                  setExterior({ ...exterior, electrical: { ...exterior.electrical, circuits: newCircuits } })
+                                  handleSave()
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
