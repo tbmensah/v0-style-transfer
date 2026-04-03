@@ -434,7 +434,9 @@ export default function NewExpressEstimatePage() {
         material: string;
       }>,
     },
-    sumpPump: { enabled: false, minorAdjustment: "", action: "", hp: "", f9Note: "" },
+    sumpPump: { enabled: false, action: "", hp: "", f9Note: "" },
+    waterHeater: { enabled: false, type: "", size: "", rating: "", action: "", f9Note: "" },
+    waterSoftener: { enabled: false, type: "", size: "", action: "", f9Note: "" },
     hvac: {
       airHandlers: [] as Array<{
         id: number;
@@ -1926,68 +1928,222 @@ const newDoor: DoorItem = {
                     </CollapsibleContent>
                   </Collapsible>
 
-                  {/* Sump Pump */}
+                  {/* Plumbing */}
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
                       <div className="flex items-center gap-3">
                         <Droplets className="h-5 w-5 text-primary" />
-                        <span className="font-medium text-foreground">Plumbing - Water Heater / Sump Pump / Water Softener</span>
-                        {foundation.sumpPump.enabled && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                        <span className="font-medium text-foreground">Plumbing</span>
+                        {(foundation.sumpPump.enabled || foundation.waterHeater.enabled || foundation.waterSoftener.enabled) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
-                      <div className="flex flex-wrap items-end gap-4">
-                        <div className="flex items-center gap-2 pb-2">
-                          <Switch
-                            checked={foundation.sumpPump.enabled}
-                            onCheckedChange={(checked) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, enabled: checked } }); handleSave() }}
-                          />
-                          <Label>Enable Sump Pump</Label>
-                        </div>
-                        {foundation.sumpPump.enabled && (
-                          <>
-                            <div className="space-y-2 min-w-[140px]">
-                              <Label className="text-xs text-muted-foreground">Action</Label>
-                              <Select value={foundation.sumpPump.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, action: value } }); handleSave() }}>
-                                <SelectTrigger className="border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="replace">Replace</SelectItem>
-                                  <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                </SelectContent>
-                              </Select>
+                      <div className="space-y-4">
+                        {/* Sump Pump */}
+                        <div className="space-y-3">
+                          <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={foundation.sumpPump.enabled}
+                                onCheckedChange={(checked) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, enabled: checked } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Sump Pump</Label>
                             </div>
-                            <div className="space-y-2 min-w-[100px]">
-                              <Label className="text-xs text-muted-foreground">HP</Label>
-                              <Select value={foundation.sumpPump.hp} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, hp: value } }); handleSave() }}>
-                                <SelectTrigger className="border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="1/4">1/4 HP</SelectItem>
-                                  <SelectItem value="1/3">1/3 HP</SelectItem>
-                                  <SelectItem value="1/2">1/2 HP</SelectItem>
-                                  <SelectItem value="3/4">3/4 HP</SelectItem>
-                                  <SelectItem value="1">1 HP</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div className="space-y-2 flex-1 min-w-[150px]">
-                              <Label className="text-xs text-muted-foreground">F9 Note</Label>
+                            {foundation.sumpPump.enabled && (
                               <Input
                                 type="text"
-                                placeholder="Enter model/serial..."
+                                placeholder="F9 Model/serial..."
                                 value={foundation.sumpPump.f9Note}
                                 onChange={(e) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, f9Note: e.target.value } }); handleSave() }}
-                                className="border-border/60 bg-secondary/50"
+                                className="border-border/60 bg-secondary/50 w-48"
                               />
+                            )}
+                          </div>
+                          {foundation.sumpPump.enabled && (
+                            <div className="flex flex-wrap items-end gap-4 pl-6">
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Horsepower</Label>
+                                <Select value={foundation.sumpPump.hp} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, hp: value } }); handleSave() }}>
+                                  <SelectTrigger className="w-56 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select horsepower" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="1/3-hp">1/3 HP - up to 1 1/2 discharge</SelectItem>
+                                    <SelectItem value="1/2-hp">1/2 HP - up to 1 1/2 discharge</SelectItem>
+                                    <SelectItem value="3/4-hp">3/4 HP - up to 1 1/2 discharge</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Action</Label>
+                                <Select value={foundation.sumpPump.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, action: value } }); handleSave() }}>
+                                  <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="replace">Replace</SelectItem>
+                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                    <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
                             </div>
-                          </>
-                        )}
+                          )}
+                        </div>
+
+                        {/* Water Heater */}
+                        <div className="space-y-3">
+                          <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={foundation.waterHeater.enabled}
+                                onCheckedChange={(checked) => { setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, enabled: checked } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Water Heater</Label>
+                            </div>
+                            {foundation.waterHeater.enabled && (
+                              <Input
+                                type="text"
+                                placeholder="F9 Model/serial..."
+                                value={foundation.waterHeater.f9Note}
+                                onChange={(e) => { setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, f9Note: e.target.value } }); handleSave() }}
+                                className="border-border/60 bg-secondary/50 w-48"
+                              />
+                            )}
+                          </div>
+                          {foundation.waterHeater.enabled && (
+                            <div className="flex flex-wrap items-end gap-4 pl-6">
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Type</Label>
+                                <Select value={foundation.waterHeater.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, type: value } }); handleSave() }}>
+                                  <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="gas">Gas</SelectItem>
+                                    <SelectItem value="electric">Electric</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Size</Label>
+                                <Select value={foundation.waterHeater.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, size: value } }); handleSave() }}>
+                                  <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="20gal">20 gal</SelectItem>
+                                    <SelectItem value="30gal">30 gal</SelectItem>
+                                    <SelectItem value="40gal">40 gal</SelectItem>
+                                    <SelectItem value="50gal">50 gal</SelectItem>
+                                    <SelectItem value="75gal">75 gal</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Rating</Label>
+                                <Select value={foundation.waterHeater.rating} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, rating: value } }); handleSave() }}>
+                                  <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="--" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
+                                    <SelectItem value="6yr">6 yr</SelectItem>
+                                    <SelectItem value="9yr">9 yr</SelectItem>
+                                    <SelectItem value="12yr">12 yr</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Action</Label>
+                                <Select value={foundation.waterHeater.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, action: value } }); handleSave() }}>
+                                  <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="replace">Replace</SelectItem>
+                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                    <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Water Softener */}
+                        <div className="space-y-3">
+                          <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={foundation.waterSoftener.enabled}
+                                onCheckedChange={(checked) => { setFoundation({ ...foundation, waterSoftener: { ...foundation.waterSoftener, enabled: checked } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Water Softener</Label>
+                            </div>
+                            {foundation.waterSoftener.enabled && (
+                              <Input
+                                type="text"
+                                placeholder="F9 Model/serial..."
+                                value={foundation.waterSoftener.f9Note}
+                                onChange={(e) => { setFoundation({ ...foundation, waterSoftener: { ...foundation.waterSoftener, f9Note: e.target.value } }); handleSave() }}
+                                className="border-border/60 bg-secondary/50 w-48"
+                              />
+                            )}
+                          </div>
+                          {foundation.waterSoftener.enabled && (
+                            <div className="flex flex-wrap items-end gap-4 pl-6">
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Type</Label>
+                                <Select value={foundation.waterSoftener.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterSoftener: { ...foundation.waterSoftener, type: value } }); handleSave() }}>
+                                  <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="manual-timer">Manual Timer</SelectItem>
+                                    <SelectItem value="electronically-metered">Electronically Metered</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Size</Label>
+                                <Select value={foundation.waterSoftener.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterSoftener: { ...foundation.waterSoftener, size: value } }); handleSave() }}>
+                                  <SelectTrigger className="w-28 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="small">Small</SelectItem>
+                                    <SelectItem value="standard">Standard</SelectItem>
+                                    <SelectItem value="large">Large</SelectItem>
+                                    <SelectItem value="extra-large">Extra Large</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Action</Label>
+                                <Select value={foundation.waterSoftener.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterSoftener: { ...foundation.waterSoftener, action: value } }); handleSave() }}>
+                                  <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="replace">Replace</SelectItem>
+                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                    <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
