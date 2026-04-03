@@ -1237,7 +1237,7 @@ export default function NewExpressEstimatePage() {
                             />
                             <Label className="text-sm">Exterior Paint</Label>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1 ml-10">Note: This option is for full wall of for paint</p>
+                          <p className="text-[10px] text-amber-500 mt-1 ml-10">Note: This option is for full wall of for paint</p>
                         </div>
 
                         {/* Siding */}
@@ -1255,18 +1255,14 @@ export default function NewExpressEstimatePage() {
                           {exterior.finishes.siding.enabled && (
                             <>
                               <div className="flex items-center gap-2">
-                                <Label className="text-xs text-muted-foreground">Perimeter Feet</Label>
-                                <Input
-                                  type="number"
-                                  min="0"
-                                  placeholder="0"
-                                  value={exterior.finishes.siding.perimeterFeet}
-                                  onChange={(e) => {
-                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, perimeterFeet: e.target.value } } })
+                                <Switch
+                                  checked={!exterior.finishes.siding.squareFeetEnabled}
+                                  onCheckedChange={(checked) => {
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeetEnabled: !checked } } })
                                     handleSave()
                                   }}
-                                  className="w-16 h-8 border-border/60 bg-secondary/50 text-sm"
                                 />
+                                <Label className="text-xs text-muted-foreground">Perimeter Feet</Label>
                               </div>
                               <span className="text-xs text-muted-foreground">Or</span>
                               <div className="flex items-center gap-2">
@@ -1278,18 +1274,22 @@ export default function NewExpressEstimatePage() {
                                   }}
                                 />
                                 <Label className="text-xs text-muted-foreground">Square Feet</Label>
-                                <Input
-                                  type="number"
-                                  min="0"
-                                  placeholder="0"
-                                  value={exterior.finishes.siding.squareFeet}
-                                  onChange={(e) => {
-                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeet: e.target.value } } })
-                                    handleSave()
-                                  }}
-                                  className="w-16 h-8 border-border/60 bg-secondary/50 text-sm"
-                                />
                               </div>
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="0"
+                                value={exterior.finishes.siding.squareFeetEnabled ? exterior.finishes.siding.squareFeet : exterior.finishes.siding.perimeterFeet}
+                                onChange={(e) => {
+                                  if (exterior.finishes.siding.squareFeetEnabled) {
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeet: e.target.value } } })
+                                  } else {
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, perimeterFeet: e.target.value } } })
+                                  }
+                                  handleSave()
+                                }}
+                                className="w-16 h-8 border-border/60 bg-secondary/50 text-sm"
+                              />
                             </>
                           )}
                         </div>
@@ -1323,11 +1323,10 @@ export default function NewExpressEstimatePage() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="1/4">1/4</SelectItem>
-                                    <SelectItem value="3/8">3/8</SelectItem>
                                     <SelectItem value="1/2">1/2</SelectItem>
-                                    <SelectItem value="5/8">5/8</SelectItem>
                                     <SelectItem value="3/4">3/4</SelectItem>
+                                    <SelectItem value="3/8">3/8</SelectItem>
+                                    <SelectItem value="5/8">5/8</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -1346,10 +1345,9 @@ export default function NewExpressEstimatePage() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="1">1 PF</SelectItem>
-                                    <SelectItem value="2">2 PF</SelectItem>
                                     <SelectItem value="4">4 PF</SelectItem>
                                     <SelectItem value="8">8 PF</SelectItem>
+                                    <SelectItem value="12">12 PF</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -1385,10 +1383,9 @@ export default function NewExpressEstimatePage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="1">1 PF</SelectItem>
-                                  <SelectItem value="2">2 PF</SelectItem>
                                   <SelectItem value="4">4 PF</SelectItem>
                                   <SelectItem value="8">8 PF</SelectItem>
+                                  <SelectItem value="12">12 PF</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -1423,10 +1420,9 @@ export default function NewExpressEstimatePage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="1">1 PF</SelectItem>
-                                  <SelectItem value="2">2 PF</SelectItem>
                                   <SelectItem value="4">4 PF</SelectItem>
                                   <SelectItem value="8">8 PF</SelectItem>
+                                  <SelectItem value="12">12 PF</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -1468,25 +1464,18 @@ export default function NewExpressEstimatePage() {
                               </Select>
                               <div className="flex items-center gap-2">
                                 <Label className="text-xs text-muted-foreground">Replacement Height</Label>
-                                <Select
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="0"
                                   value={exterior.finishes.wallInsulation.replacementHeight}
-                                  onValueChange={(v) => {
-                                    const value = v === "__none__" ? "" : v
-                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, replacementHeight: value } } })
+                                  onChange={(e) => {
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, replacementHeight: e.target.value } } })
                                     handleSave()
                                   }}
-                                >
-                                  <SelectTrigger className="w-[80px] h-8 border-border/60 bg-secondary/50 text-sm">
-                                    <SelectValue placeholder="Height" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="1">1 PF</SelectItem>
-                                    <SelectItem value="2">2 PF</SelectItem>
-                                    <SelectItem value="4">4 PF</SelectItem>
-                                    <SelectItem value="8">8 PF</SelectItem>
-                                  </SelectContent>
-                                </Select>
+                                  className="w-16 h-8 border-border/60 bg-secondary/50 text-sm"
+                                />
+                                <span className="text-xs text-muted-foreground">PF</span>
                               </div>
                             </>
                           )}
