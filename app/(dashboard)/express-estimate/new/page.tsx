@@ -273,9 +273,9 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
   trim: { enabled: false, baseboardHeight: "", material: "", woodType: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
   wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", panelingStyle: "", panelingFinish: "", judgesStyle: "", judgesGrade: "", judgesFinish: "", texture: false, textureType: "" },
   electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
-  windowsEnabled: true,
+  windowsEnabled: false,
   windows: [],
-  doorsEnabled: true,
+  doorsEnabled: false,
   doors: [],
   appliances: {
     enabled: false,
