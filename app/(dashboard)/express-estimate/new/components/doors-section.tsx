@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Plus } from "lucide-react"
 import type { DoorItem } from "../types"
-import { createDoorItem } from "../defaults"
+import { createDoor } from "../defaults"
 import { DoorItemComponent } from "./door-item"
 
 interface DoorsSectionProps {
@@ -24,9 +24,7 @@ export function DoorsSection({ doors, onChange }: DoorsSectionProps) {
   }
 
   const handleAddDoor = (category: "interior" | "exterior") => {
-    const newDoor = createDoorItem()
-    newDoor.category = category
-    onChange([...doors, newDoor])
+    onChange([...doors, createDoor(category)])
   }
 
   return (

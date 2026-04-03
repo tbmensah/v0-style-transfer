@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Plus } from "lucide-react"
 import type { WindowItem } from "../types"
-import { createWindowItem } from "../defaults"
+import { createWindow } from "../defaults"
 import { WindowItemComponent } from "./window-item"
 
 interface WindowsSectionProps {
@@ -24,7 +24,7 @@ export function WindowsSection({ windows, onChange }: WindowsSectionProps) {
   }
 
   const handleAddWindow = () => {
-    onChange([...windows, createWindowItem()])
+    onChange([...windows, createWindow()])
   }
 
   return (

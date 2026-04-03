@@ -26,264 +26,21 @@ import {
   X
 } from "lucide-react"
 
-// Types
-interface NFIPCleaningOptions {
-  enabled: boolean
-  wall: {
-    height: string
-    wallType: string
-    ceilingAffected: boolean
-  }
-  floor: {
-    type: string
-    areaOnCrawlspace: boolean
-  }
-}
-
-interface Room {
-  id: number
-  name: string
-  type: string
-  sqft: string
-  nfipCleaning: NFIPCleaningOptions
-  flooring: FlooringOptions
-  trim: TrimOptions
-  wallCovering: WallCoveringOptions
-  electrical: ElectricalOptions
-  windows: WindowItem[]
-  doors: DoorItem[]
-  // Bathroom specific
-  vanity?: VanityOptions
-  toilet?: ToiletOptions
-  shower?: ShowerOptions
-  // Kitchen specific
-  cabinets?: CabinetOptions
-  countertop?: CountertopOptions
-  plumbing?: PlumbingOptions
-  appliances?: ApplianceOptions
-}
-
-interface FloorLayer {
-  id: number
-  type: string
-  grade: string
-  application: string
-  action: string
-  vaporBarrier: boolean
-  subfloorReplacement: boolean
-}
-
-interface FlooringOptions {
-  enabled: boolean
-  multipleLayers: boolean
-  layers: FloorLayer[]
-  vaporBarrier: boolean
-  subfloorReplacement: boolean
-  f9Note: string
-}
-
-interface TrimOptions {
-  enabled: boolean
-  baseboardHeight: string
-  material: string
-  finish: string
-  cap: boolean
-  shoe: boolean
-  shoeFinish: string
-  subtractCabinetry: boolean
-}
-
-interface WallCoveringOptions {
-  enabled: boolean
-  material: string
-  type: string
-  replacementHeight: string
-  texture: boolean
-  textureType: string
-}
-
-interface ElectricalOptions {
-  enabled: boolean
-  outlets110: number
-  outlets220: number
-  gfiOutlets: number
-  lightSwitches: number
-  ceilingLights: number
-  ceilingFans: number
-  bathroomLightBar: string
-  bathroomLightBarQty: number
-}
-
-interface WindowItem {
-  id: number
-  type: string
-  material: string
-  size: string
-  grade: string
-  quantity: string
-  finish: string
-  blinds: string
-  casingTrim: string
-  marbleSillReplace: boolean
-  marbleSillDetach: boolean
-}
-
-interface DoorItem {
-  id: number
-  category: "interior" | "exterior"
-  type: string
-  grade: string
-  finish: string
-  handleAction: string
-  peepHole: boolean
-  mailSlot: boolean
-}
-
-interface VanityOptions {
-  enabled: boolean
-  size: string
-  grade: string
-  detachAndReset: boolean
-  countertop: {
-    type: string
-    grade: string
-    size: string
-    detachAndReset: boolean
-  }
-  backsplashUnattached: boolean
-}
-
-interface ToiletOptions {
-  enabled: boolean
-  action: string
-  seatReplacement: boolean
-  supplyLine: boolean
-}
-
-interface ShowerOptions {
-  enabled: boolean
-  type: string
-  // Fiberglass Tub/Shower Unit fields
-  detachAndReset: boolean
-  showerFaucet: string
-  // Tub with Tile Surround fields
-  actionForTub: string
-  surround: string
-  tubShowerFaucet: string
-  // Tile Shower fields
-  mortarBedReplace: boolean
-  mortarBedSize: string
-  walls: string
-  // Tile Shower Misc
-  tileBench: boolean
-  tileNiche: boolean
-  tileNicheQty: string
-  towelBar: boolean
-  tileSoapDish: boolean
-  tileSoapDishQty: string
-}
-
-interface CabinetOptions {
-  enabled: boolean
-  size: string
-  grade: string
-  detachAndReset: boolean
-  toeKick: {
-    size: string
-    backSplash: string
-    grade: string
-    glass: boolean
-    diagonalInstallation: boolean
-  }
-}
-
-interface CountertopOptions {
-  enabled: boolean
-  type: string
-  grade: string
-  size: string
-  detachAndReset: boolean
-}
-
-interface PlumbingOptions {
-  replaceFaucetSink: boolean
-  drFaucetSink: boolean
-  waterSupplyLine: { enabled: boolean; qty: string }
-  reverseOsmosis: { enabled: boolean; action: string; f9Note: string }
-  garbageDisposal: { enabled: boolean; action: string; f9Note: string }
-}
-
-interface ApplianceOptions {
-  enabled: boolean
-  refrigerator: { enabled: boolean; type: string; size: string; grade: string; action: string; f9Note: string }
-  dishwasher: { enabled: boolean; grade: string; action: string; f9Note: string }
-  range: { enabled: boolean; type: string; options: string; grade: string; action: string; f9Note: string }
-  cooktop: { enabled: boolean; type: string; grade: string; action: string; f9Note: string }
-  waterHeater: { enabled: boolean; type: string; size: string; rating: string; action: string; f9Note: string }
-  wallOven: { enabled: boolean; type: string; grade: string; action: string; f9Note: string }
-  airHandler: { enabled: boolean; type: string; options: string; action: string; f9Note: string }
-  boiler: { enabled: boolean; type: string; action: string; f9Note: string; expansionTank: boolean; circulatorPump: boolean }
-}
-
-// Default values
-const defaultRoom: Omit<Room, "id" | "name"> = {
-  type: "room",
-  sqft: "",
-  nfipCleaning: { enabled: false, wall: { height: "", wallType: "", ceilingAffected: false }, floor: { type: "", areaOnCrawlspace: false } },
-  flooring: { enabled: false, multipleLayers: false, layers: [{ id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }], vaporBarrier: false, subfloorReplacement: false, f9Note: "" },
-  trim: { enabled: false, baseboardHeight: "", material: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
-  wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", texture: false, textureType: "" },
-  electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
-  windows: [],
-  doors: [],
-}
-
-const defaultBathroomExtras = {
-  vanity: {
-    enabled: false,
-    size: "",
-    grade: "",
-    detachAndReset: false,
-    countertop: { type: "", grade: "", size: "", detachAndReset: false },
-    backsplashUnattached: false
-  },
-  toilet: { enabled: false, action: "", seatReplacement: false, supplyLine: false },
-  shower: {
-    enabled: false,
-    type: "",
-    detachAndReset: false,
-    showerFaucet: "",
-    actionForTub: "",
-    surround: "",
-    tubShowerFaucet: "",
-    mortarBedReplace: false,
-    mortarBedSize: "",
-    walls: "",
-    tileBench: false,
-    tileNiche: false,
-    tileNicheQty: "",
-    towelBar: false,
-    tileSoapDish: false,
-    tileSoapDishQty: ""
-  },
-}
-
-const defaultKitchenExtras = {
-  cabinets: { enabled: false, size: "", grade: "", detachAndReset: false, toeKick: { size: "", backSplash: "", grade: "", glass: false, diagonalInstallation: false } },
-  countertop: { enabled: false, type: "", grade: "", size: "", detachAndReset: false },
-  plumbing: { replaceFaucetSink: false, drFaucetSink: false, waterSupplyLine: { enabled: false, qty: "" }, reverseOsmosis: { enabled: false, action: "", f9Note: "" }, garbageDisposal: { enabled: false, action: "", f9Note: "" } },
-  appliances: {
-    enabled: false,
-    refrigerator: { enabled: false, type: "", size: "", grade: "", action: "", f9Note: "" },
-    dishwasher: { enabled: false, grade: "", action: "", f9Note: "" },
-    range: { enabled: false, type: "", options: "", grade: "", action: "", f9Note: "" },
-    cooktop: { enabled: false, type: "", grade: "", action: "", f9Note: "" },
-    waterHeater: { enabled: false, type: "", size: "", rating: "", action: "", f9Note: "" },
-    wallOven: { enabled: false, type: "", grade: "", action: "", f9Note: "" },
-    airHandler: { enabled: false, type: "", options: "", action: "", f9Note: "" },
-    boiler: { enabled: false, type: "", action: "", f9Note: "", expansionTank: false, circulatorPump: false },
-  },
-}
+// Types and Defaults from extracted modules
+import type {
+  Room,
+  FloorLayer,
+  WindowItem,
+  DoorItem,
+} from "./types"
+import {
+  defaultRoom,
+  defaultBathroomExtras,
+  defaultKitchenExtras,
+  createFloorLayer,
+  createWindow,
+  createDoor,
+} from "./defaults"
 
 export default function NewExpressEstimatePage() {
   const [activeTab, setActiveTab] = useState("exterior")
@@ -462,37 +219,14 @@ export default function NewExpressEstimatePage() {
   const addWindow = (roomId: number) => {
     const room = rooms.find(r => r.id === roomId)
     if (room) {
-      const newWindow: WindowItem = {
-        id: Date.now(),
-        type: "",
-        material: "",
-        size: "",
-        grade: "",
-        quantity: "",
-        finish: "",
-        blinds: "",
-        casingTrim: "",
-        marbleSillReplace: false,
-        marbleSillDetach: false,
-      }
-      updateRoom(roomId, { windows: [...room.windows, newWindow] })
+      updateRoom(roomId, { windows: [...room.windows, createWindow()] })
     }
   }
 
   const addDoor = (roomId: number, category: "interior" | "exterior") => {
     const room = rooms.find(r => r.id === roomId)
     if (room) {
-      const newDoor: DoorItem = {
-        id: Date.now(),
-        category,
-        type: "",
-        grade: "",
-        finish: "",
-        handleAction: "",
-        peepHole: false,
-        mailSlot: false,
-      }
-      updateRoom(roomId, { doors: [...room.doors, newDoor] })
+      updateRoom(roomId, { doors: [...room.doors, createDoor(category)] })
     }
   }
 
@@ -2427,7 +2161,7 @@ export default function NewExpressEstimatePage() {
                                         onCheckedChange={(checked) => {
                                           const newFlooring = { ...room.flooring, enabled: checked }
                                           if (checked && (!newFlooring.layers || newFlooring.layers.length === 0)) {
-                                            newFlooring.layers = [{ id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }]
+                                            newFlooring.layers = [createFloorLayer()]
                                           }
                                           updateRoom(room.id, { flooring: newFlooring })
                                         }}
@@ -2453,7 +2187,7 @@ export default function NewExpressEstimatePage() {
                                       className="gap-1 border-border/60"
                                       onClick={() => {
                                         const currentLayers = room.flooring.layers || []
-                                        const newLayer = { id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }
+                                        const newLayer = createFloorLayer()
                                         updateRoom(room.id, {
                                           flooring: {
                                             ...room.flooring,

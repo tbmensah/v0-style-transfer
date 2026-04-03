@@ -58,9 +58,7 @@ export const defaultRoom: Omit<Room, "id" | "name"> = {
     bathroomLightBar: "",
     bathroomLightBarQty: 0
   },
-  windowsEnabled: false,
   windows: [],
-  doorsEnabled: false,
   doors: [],
 }
 
@@ -104,13 +102,11 @@ export const defaultBathroomExtras: {
 }
 
 export const defaultKitchenExtras: {
-  kitchenEnabled: boolean
   cabinets: CabinetOptions
   countertop: CountertopOptions
   plumbing: PlumbingOptions
   appliances: ApplianceOptions
 } = {
-  kitchenEnabled: true,
   cabinets: {
     enabled: false,
     size: "",

@@ -185,16 +185,13 @@ export interface Room {
   trim: TrimOptions
   wallCovering: WallCoveringOptions
   electrical: ElectricalOptions
-  windowsEnabled: boolean
   windows: WindowItem[]
-  doorsEnabled: boolean
   doors: DoorItem[]
   // Bathroom specific
   vanity?: VanityOptions
   toilet?: ToiletOptions
   shower?: ShowerOptions
   // Kitchen specific
-  kitchenEnabled?: boolean
   cabinets?: CabinetOptions
   countertop?: CountertopOptions
   plumbing?: PlumbingOptions

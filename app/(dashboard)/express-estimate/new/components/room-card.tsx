@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { ChevronDown, Copy, Trash2, Home } from "lucide-react"
-import type { Room, WindowItem, DoorItem, FloorLayer } from "../types"
+import type { Room } from "../types"
+import { defaultBathroomExtras, defaultKitchenExtras } from "../defaults"
 
 // Section Components
 import { NFIPCleaningSection } from "./nfip-cleaning-section"
@@ -29,15 +30,6 @@ interface RoomCardProps {
   onUpdate: (updates: Partial<Room>) => void
   onCopy: () => void
   onRemove: () => void
-  onAddWindow: () => void
-  onAddDoor: (category: "interior" | "exterior") => void
-  onUpdateWindow: (windowId: number, updates: Partial<WindowItem>) => void
-  onRemoveWindow: (windowId: number) => void
-  onUpdateDoor: (doorId: number, updates: Partial<DoorItem>) => void
-  onRemoveDoor: (doorId: number) => void
-  onUpdateFloorLayer: (layerId: number, updates: Partial<FloorLayer>) => void
-  onRemoveFloorLayer: (layerId: number) => void
-  onAddFloorLayer: () => void
 }
 
 export function RoomCard({
@@ -45,32 +37,28 @@ export function RoomCard({
   onUpdate,
   onCopy,
   onRemove,
-  onAddWindow,
-  onAddDoor,
-  onUpdateWindow,
-  onRemoveWindow,
-  onUpdateDoor,
-  onRemoveDoor,
-  onUpdateFloorLayer,
-  onRemoveFloorLayer,
-  onAddFloorLayer,
 }: RoomCardProps) {
   const roomTypes = [
     { value: "room", label: "Room" },
     { value: "bathroom", label: "Bathroom" },
     { value: "kitchen", label: "Kitchen" },
-    { value: "living-room", label: "Living Room" },
-    { value: "bedroom", label: "Bedroom" },
-    { value: "dining-room", label: "Dining Room" },
-    { value: "laundry", label: "Laundry" },
-    { value: "garage", label: "Garage" },
-    { value: "basement", label: "Basement" },
-    { value: "attic", label: "Attic" },
-    { value: "hallway", label: "Hallway" },
-    { value: "closet", label: "Closet" },
-    { value: "office", label: "Office" },
-    { value: "utility", label: "Utility" },
   ]
+
+  const handleTypeChange = (value: string) => {
+    const newType = nv(value)
+    const updates: Partial<Room> = { type: newType }
+    
+    // Add bathroom-specific fields when changing to bathroom
+    if (newType === "bathroom" && !room.vanity) {
+      Object.assign(updates, defaultBathroomExtras)
+    }
+    // Add kitchen-specific fields when changing to kitchen
+    if (newType === "kitchen" && !room.cabinets) {
+      Object.assign(updates, defaultKitchenExtras)
+    }
+    
+    onUpdate(updates)
+  }
 
   return (
     <Collapsible defaultOpen>
@@ -100,42 +88,31 @@ export function RoomCard({
           <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
         </div>
       </CollapsibleTrigger>
-      <CollapsibleContent>
-        <div className="space-y-4 rounded-b-lg border border-t-0 border-border/40 bg-card/50 p-4">
-          {/* Basic Room Info */}
-          <div className="flex flex-wrap gap-4">
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">Room Name</Label>
+      <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
+        <div className="space-y-6">
+          {/* Room Name & Type */}
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="space-y-2 min-w-[160px]">
+              <Label>Room Name</Label>
               <Input
                 value={room.name}
                 onChange={(e) => onUpdate({ name: e.target.value })}
-                placeholder="Enter room name"
-                className="w-[180px] border-border/60 bg-secondary/50"
+                className="border-border/60 bg-secondary/50"
               />
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">Type</Label>
-              <Select value={room.type} onValueChange={(v) => onUpdate({ type: nv(v) })}>
-                <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
-                  <SelectValue placeholder="Select type" />
+            <div className="space-y-2 min-w-[120px]">
+              <Label>Room Type</Label>
+              <Select value={room.type} onValueChange={handleTypeChange}>
+                <SelectTrigger className="border-border/60 bg-secondary/50">
+                  <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                   {roomTypes.map((type) => (
                     <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">Square Feet</Label>
-              <Input
-                type="number"
-                value={room.sqft}
-                onChange={(e) => onUpdate({ sqft: e.target.value })}
-                placeholder="0"
-                className="w-[100px] border-border/60 bg-secondary/50"
-                min="0"
-              />
             </div>
           </div>
 
@@ -149,9 +126,6 @@ export function RoomCard({
           <FlooringSection
             flooring={room.flooring}
             onUpdate={(updates) => onUpdate({ flooring: { ...room.flooring, ...updates } })}
-            onUpdateLayer={onUpdateFloorLayer}
-            onRemoveLayer={onRemoveFloorLayer}
-            onAddLayer={onAddFloorLayer}
           />
 
           {/* Trim */}
@@ -215,21 +189,13 @@ export function RoomCard({
           {/* Windows */}
           <WindowsSection
             windows={room.windows}
-            windowsEnabled={room.windowsEnabled}
-            onToggle={(enabled) => onUpdate({ windowsEnabled: enabled })}
-            onAddWindow={onAddWindow}
-            onUpdateWindow={onUpdateWindow}
-            onRemoveWindow={onRemoveWindow}
+            onChange={(windows) => onUpdate({ windows })}
           />
 
           {/* Doors */}
           <DoorsSection
             doors={room.doors}
-            doorsEnabled={room.doorsEnabled}
-            onToggle={(enabled) => onUpdate({ doorsEnabled: enabled })}
-            onAddDoor={onAddDoor}
-            onUpdateDoor={onUpdateDoor}
-            onRemoveDoor={onRemoveDoor}
+            onChange={(doors) => onUpdate({ doors })}
           />
         </div>
       </CollapsibleContent>
