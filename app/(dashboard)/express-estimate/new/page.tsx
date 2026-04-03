@@ -3089,7 +3089,7 @@ export default function NewExpressEstimatePage() {
                                           </SelectContent>
                                         </Select>
                                       </div>
-                                      {room.wallCovering.material && (
+                                      {room.wallCovering.material && room.wallCovering.material !== "bead-board" && (
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Type</Label>
                                           <Select value={room.wallCovering.type} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, type: value } }) }}>
@@ -3357,7 +3357,9 @@ export default function NewExpressEstimatePage() {
                                       )}
 
                                     </div>
-                                    <p className="text-xs text-amber-500">Note: Some carriers require drywall calculated in SF instead of LF, please check with current guidelines of carriers</p>
+                                    {(room.wallCovering.material === "drywall-sf" || room.wallCovering.material === "drywall-lf") && (
+                                      <p className="text-xs text-amber-500">Note: Some carriers require drywall calculated in SF instead of LF, please check with current guidelines of carriers</p>
+                                    )}
                                   </div>
                                 )}
                               </div>
