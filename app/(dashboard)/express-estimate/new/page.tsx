@@ -3236,20 +3236,34 @@ export default function NewExpressEstimatePage() {
                                         />
                                         <Label className="text-sm whitespace-nowrap">Marble sill detach</Label>
                                       </div>
-                                      {/* Delete button at far right */}
+                                      {/* Copy and Delete buttons at far right */}
                                       <div className="flex-1" />
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                                        onClick={() => {
-                                          const newWindows = room.windows.filter(w => w.id !== window.id)
-                                          updateRoom(room.id, { windows: newWindows })
-                                        }}
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
+                                          onClick={() => {
+                                            const newWindow = { ...window, id: Date.now() }
+                                            updateRoom(room.id, { windows: [...room.windows, newWindow] })
+                                          }}
+                                        >
+                                          <Copy className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                          onClick={() => {
+                                            const newWindows = room.windows.filter(w => w.id !== window.id)
+                                            updateRoom(room.id, { windows: newWindows })
+                                          }}
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </div>
                                     </div>
                                   </div>
                                 ))}
@@ -4718,7 +4732,18 @@ export default function NewExpressEstimatePage() {
                                         </SelectContent>
                                       </Select>
                                       <div className="flex-1"></div>
-                                      <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-9 w-9 text-muted-foreground hover:text-primary"
+                                          onClick={() => {
+                                            const newDoor = { ...door, id: Date.now() }
+                                            updateRoom(room.id, { doors: [...room.doors, newDoor] })
+                                          }}
+                                        >
+                                          <Copy className="h-4 w-4" />
+                                        </Button>
                                         <Button
                                           variant="ghost"
                                           size="icon"
