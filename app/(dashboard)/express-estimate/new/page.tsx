@@ -106,6 +106,8 @@ interface WallCoveringOptions {
   panelingStyle: string
   panelingFinish: string
   panelingGrade: string
+  chairRailAction: string
+  chairRailFinish: string
   }
 
 interface ElectricalOptions {
@@ -238,7 +240,7 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
   nfipCleaning: { enabled: false, wall: { height: "", wallType: "", ceilingAffected: false }, floor: { type: "", areaOnCrawlspace: false } },
   flooring: { enabled: false, multipleLayers: false, layers: [{ id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }], vaporBarrier: false, subfloorReplacement: false, f9Note: "" },
   trim: { enabled: false, baseboardHeight: "", material: "", detail: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
-  wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", texture: false, textureType: "", panelingStyle: "", panelingFinish: "", panelingGrade: "" },
+  wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", texture: false, textureType: "", panelingStyle: "", panelingFinish: "", panelingGrade: "", chairRailAction: "", chairRailFinish: "" },
   electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
   windowsEnabled: false,
   windows: [],
@@ -3081,6 +3083,7 @@ export default function NewExpressEstimatePage() {
                                             <SelectItem value="drywall-lf">Drywall (LF)</SelectItem>
                                             <SelectItem value="plaster">Plaster</SelectItem>
                                             <SelectItem value="paneling">Paneling</SelectItem>
+                                            <SelectItem value="bead-board">Bead Board</SelectItem>
                                             <SelectItem value="tile-cement-board">Tile (Cement Board)</SelectItem>
                                             <SelectItem value="tile-wire-lath">Tile (Over Wire Lath)</SelectItem>
                                           </SelectContent>
@@ -3126,7 +3129,6 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="paneling-mobile-home">Paneling - Mobile Home</SelectItem>
                                                   <SelectItem value="paneling-unfinished">Paneling - Unfinished</SelectItem>
                                                   <SelectItem value="judges">Judges</SelectItem>
-                                                  <SelectItem value="bead-board">Bead Board</SelectItem>
                                                 </>
                                               )}
                                             </SelectContent>
@@ -3187,22 +3189,23 @@ export default function NewExpressEstimatePage() {
                                             </Select>
                                           </div>
                                           <div className="space-y-1">
-                                            <Label className="text-xs text-muted-foreground">Grade</Label>
-                                            <Select value={room.wallCovering.panelingGrade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingGrade: value } }) }}>
-                                              <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
+                                            <Label className="text-xs text-muted-foreground">Finish</Label>
+                                            <Select value={room.wallCovering.panelingFinish} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingFinish: value } }) }}>
+                                              <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="paint-grade">Paint Grade</SelectItem>
-                                                <SelectItem value="hardwood">Hardwood</SelectItem>
+                                                <SelectItem value="none">None</SelectItem>
+                                                <SelectItem value="paint">Paint</SelectItem>
+                                                <SelectItem value="stain">Stain</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           </div>
                                         </>
                                       )}
                                       {/* Bead Board fields */}
-                                      {room.wallCovering.type === "bead-board" && (
+                                      {room.wallCovering.material === "bead-board" && (
                                         <>
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Style</Label>
@@ -3246,7 +3249,39 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                         </>
                                       )}
-                                      {room.wallCovering.material && room.wallCovering.material !== "paneling" && (
+                                      {/* Chair Rail for Drywall */}
+                                      {(room.wallCovering.material === "drywall-sf" || room.wallCovering.material === "drywall-lf") && (
+                                        <>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Chair Rail Action</Label>
+                                            <Select value={room.wallCovering.chairRailAction} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, chairRailAction: value } }) }}>
+                                              <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="replace">Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach & reset</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Chair Rail Finish</Label>
+                                            <Select value={room.wallCovering.chairRailFinish} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, chairRailFinish: value } }) }}>
+                                              <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="none">None</SelectItem>
+                                                <SelectItem value="paint">Paint</SelectItem>
+                                                <SelectItem value="stain">Stain</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                        </>
+                                      )}
+                                      {room.wallCovering.material && room.wallCovering.material !== "paneling" && room.wallCovering.material !== "bead-board" && (
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Replacement Height</Label>
                                           <Select value={room.wallCovering.replacementHeight} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: value } }) }}>
