@@ -497,6 +497,13 @@ export default function NewExpressEstimatePage() {
       meterBox: false,
       houseRewire: { enabled: false, homeSf: "" },
     },
+    stairs: {
+      stairsForReplacement: "",
+      sizeOfTreads: "",
+      risers: false,
+      stringersLength: "",
+      landingReplacement: false,
+    },
   })
 
   // Interior Rooms
@@ -2842,6 +2849,89 @@ const newDoor: DoorItem = {
                             />
                           )}
                         </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+
+                  {/* Stairs */}
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
+                      <div className="flex items-center gap-3">
+                        <svg className="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 20h4v-4h4v-4h4v-4h4V4" /></svg>
+                        <span className="font-medium text-foreground">Stairs</span>
+                        {(foundation.stairs.stairsForReplacement || foundation.stairs.landingReplacement) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
+                      <div className="space-y-4">
+                        {/* Row 1: # of stairs, Size of Treads, Risers */}
+                        <div className="flex flex-wrap items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <Label className="text-sm whitespace-nowrap"># of stairs For Replacement</Label>
+                            <Input
+                              type="number"
+                              min={0}
+                              value={foundation.stairs.stairsForReplacement}
+                              onChange={(e) => { setFoundation({ ...foundation, stairs: { ...foundation.stairs, stairsForReplacement: e.target.value } }); handleSave() }}
+                              placeholder="--"
+                              className="w-16 border-border/60 bg-secondary/50"
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-sm whitespace-nowrap">Size of Treads</Label>
+                            <Select value={foundation.stairs.sizeOfTreads} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, stairs: { ...foundation.stairs, sizeOfTreads: value } }); handleSave() }}>
+                              <SelectTrigger className="w-56 border-border/60 bg-secondary/50">
+                                <SelectValue placeholder="Select size" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                <SelectItem value="up-to-4ft">Up to 4ft</SelectItem>
+                                <SelectItem value="up-to-4ft-stain-grade">Up to 4ft Stain Grade</SelectItem>
+                                <SelectItem value="greater-4-up-to-8">{"Greater than 4' up to 8'"}</SelectItem>
+                                <SelectItem value="hardwood-up-to-4ft">Hardwood - up to 4ft</SelectItem>
+                                <SelectItem value="hardwood-up-to-4ft-high-grade">Hardwood - up to 4ft High Grade</SelectItem>
+                                <SelectItem value="hardwood-greater-4-up-to-8">{"Hardwood - Greater than 4' up to 8'"}</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={foundation.stairs.risers}
+                              onCheckedChange={(checked) => { setFoundation({ ...foundation, stairs: { ...foundation.stairs, risers: checked } }); handleSave() }}
+                            />
+                            <Label className="text-sm">Risers</Label>
+                          </div>
+                        </div>
+
+                        {/* Row 2: Total length of stringers */}
+                        <div className="flex items-center gap-2">
+                          <Label className="text-sm whitespace-nowrap">Total length of stringers For Replacement</Label>
+                          <div className="relative">
+                            <Input
+                              type="number"
+                              min={0}
+                              value={foundation.stairs.stringersLength}
+                              onChange={(e) => { setFoundation({ ...foundation, stairs: { ...foundation.stairs, stringersLength: e.target.value } }); handleSave() }}
+                              placeholder="--"
+                              className="w-20 border-border/60 bg-secondary/50 pr-7"
+                            />
+                            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">ft</span>
+                          </div>
+                        </div>
+
+                        {/* Row 3: Landing Replacement */}
+                        <div className="flex items-center gap-2">
+                          <Label className="text-sm">Landing Replacement</Label>
+                          <Switch
+                            checked={foundation.stairs.landingReplacement}
+                            onCheckedChange={(checked) => { setFoundation({ ...foundation, stairs: { ...foundation.stairs, landingReplacement: checked } }); handleSave() }}
+                          />
+                          {foundation.stairs.landingReplacement && <span className="text-sm text-foreground">Yes</span>}
+                        </div>
+
+                        {/* Note */}
+                        <p className="text-xs text-amber-500">Note: NFIP covers a 16 sf landing for replacement if damaged</p>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
