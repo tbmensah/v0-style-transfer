@@ -208,6 +208,8 @@ interface ShowerOptions {
   grabBar: boolean
   grabBarQty: string
   tileFeatureStrip: boolean
+  glassDoor: boolean
+  glassDoorAction: string
   }
 
 interface CabinetOptions {
@@ -299,7 +301,9 @@ shower: {
   tileSoapDishQty: "",
   grabBar: false,
   grabBarQty: "",
-  tileFeatureStrip: false
+  tileFeatureStrip: false,
+  glassDoor: false,
+  glassDoorAction: ""
   },
 }
 
@@ -4316,7 +4320,7 @@ const newDoor: DoorItem = {
                                             <>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-2 pt-1">
                                                   <Switch
                                                     checked={room.shower.mortarBedReplace}
                                                     onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedReplace: checked } })}
@@ -4324,23 +4328,9 @@ const newDoor: DoorItem = {
                                                   <Label className="text-sm whitespace-nowrap">Replace</Label>
                                                 </div>
                                               </div>
-                                              {room.shower.mortarBedReplace && (
-                                                <div className="space-y-1">
-                                                  <Label className="text-xs text-muted-foreground">Size (SF)</Label>
-                                                  <Input
-                                                    type="number"
-                                                    min={1}
-                                                    max={100}
-                                                    value={room.shower.mortarBedSize || ""}
-                                                    onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedSize: e.target.value } })}
-                                                    className="w-[100px] border-border/60 bg-secondary/50"
-                                                    placeholder="1-100"
-                                                  />
-                                                </div>
-                                              )}
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Walls</Label>
-                                                <Select value={room.shower.surround} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, surround: value } }) }}>
+                                                <Select value={room.shower.walls} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, walls: value } }) }}>
                                                   <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
@@ -4360,7 +4350,7 @@ const newDoor: DoorItem = {
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Shower Faucet</Label>
                                                 <Select value={room.shower.showerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: value } }) }}>
-                                                  <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                                  <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
                                                     <SelectValue placeholder="Select" />
                                                   </SelectTrigger>
                                                   <SelectContent>
@@ -4385,58 +4375,117 @@ const newDoor: DoorItem = {
 
                                         {/* Misc section - shown for non tub-tile-surround types (tub-tile-surround has its own Misc above) */}
                                         {room.shower.type && room.shower.type !== "__none__" && room.shower.type !== "tub-tile-surround" && (
-                                          <div className="border-t border-border/40 pt-3">
-                                            <Label className="text-xs text-muted-foreground mb-2 block">Misc</Label>
-                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                                              <div className="flex items-center gap-2">
-                                                <Switch
-                                                  checked={room.shower.tileBench}
-                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileBench: checked } })}
-                                                />
-                                                <Label className="text-sm">Tile Bench</Label>
-                                              </div>
-                                              <div className="flex items-center gap-2">
-                                                <Switch
-                                                  checked={room.shower.tileNiche}
-                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileNiche: checked } })}
-                                                />
-                                                <Label className="text-sm">Tile Niche</Label>
-                                                {room.shower.tileNiche && (
-                                                  <Input
-                                                    type="number"
-                                                    min={1}
-                                                    value={room.shower.tileNicheQty || ""}
-                                                    onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, tileNicheQty: e.target.value } })}
-                                                    className="w-[70px] border-border/60 bg-secondary/50"
-                                                    placeholder="QTY"
+                                          <div className="space-y-3">
+                                            <div>
+                                              <Label className="text-xs text-muted-foreground mb-2 block">Misc</Label>
+                                              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                                <div className="flex items-center gap-2">
+                                                  <Switch
+                                                    checked={room.shower.tileBench}
+                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileBench: checked } })}
                                                   />
+                                                  <Label className="text-sm">Tile Bench</Label>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                  <Switch
+                                                    checked={room.shower.tileNiche}
+                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileNiche: checked } })}
+                                                  />
+                                                  <Label className="text-sm">Tile Niche</Label>
+                                                  {room.shower.tileNiche && (
+                                                    <Input
+                                                      type="number"
+                                                      min={1}
+                                                      value={room.shower.tileNicheQty || ""}
+                                                      onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, tileNicheQty: e.target.value } })}
+                                                      className="w-[70px] border-border/60 bg-secondary/50"
+                                                      placeholder="QTY"
+                                                    />
+                                                  )}
+                                                </div>
+                                                {room.shower.type === "tile-shower" && (
+                                                  <div className="flex items-center gap-2">
+                                                    <Switch
+                                                      checked={room.shower.grabBar}
+                                                      onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, grabBar: checked, grabBarQty: checked ? room.shower!.grabBarQty : "" } })}
+                                                    />
+                                                    <Label className="text-sm">Grab Bar</Label>
+                                                    {room.shower.grabBar && (
+                                                      <Input
+                                                        type="number"
+                                                        min={1}
+                                                        value={room.shower.grabBarQty || ""}
+                                                        onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, grabBarQty: e.target.value } })}
+                                                        className="w-[70px] border-border/60 bg-secondary/50"
+                                                        placeholder="QTY"
+                                                      />
+                                                    )}
+                                                  </div>
                                                 )}
-                                              </div>
-                                              <div className="flex items-center gap-2">
-                                                <Switch
-                                                  checked={room.shower.towelBar}
-                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, towelBar: checked } })}
-                                                />
-                                                <Label className="text-sm">Towel Bar</Label>
-                                              </div>
-                                              <div className="flex items-center gap-2">
-                                                <Switch
-                                                  checked={room.shower.tileSoapDish}
-                                                  onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileSoapDish: checked } })}
-                                                />
-                                                <Label className="text-sm">Tile Soap dish</Label>
-                                                {room.shower.tileSoapDish && (
-                                                  <Input
-                                                    type="number"
-                                                    min={1}
-                                                    value={room.shower.tileSoapDishQty || ""}
-                                                    onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, tileSoapDishQty: e.target.value } })}
-                                                    className="w-[70px] border-border/60 bg-secondary/50"
-                                                    placeholder="QTY"
+                                                {room.shower.type !== "tile-shower" && (
+                                                  <div className="flex items-center gap-2">
+                                                    <Switch
+                                                      checked={room.shower.towelBar}
+                                                      onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, towelBar: checked } })}
+                                                    />
+                                                    <Label className="text-sm">Towel Bar</Label>
+                                                  </div>
+                                                )}
+                                                <div className="flex items-center gap-2">
+                                                  <Switch
+                                                    checked={room.shower.tileSoapDish}
+                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileSoapDish: checked } })}
                                                   />
+                                                  <Label className="text-sm">Tile Soap dish</Label>
+                                                  {room.shower.tileSoapDish && room.shower.type !== "tile-shower" && (
+                                                    <Input
+                                                      type="number"
+                                                      min={1}
+                                                      value={room.shower.tileSoapDishQty || ""}
+                                                      onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, tileSoapDishQty: e.target.value } })}
+                                                      className="w-[70px] border-border/60 bg-secondary/50"
+                                                      placeholder="QTY"
+                                                    />
+                                                  )}
+                                                </div>
+                                                {room.shower.type === "tile-shower" && (
+                                                  <div className="flex items-center gap-2">
+                                                    <Switch
+                                                      checked={room.shower.tileFeatureStrip}
+                                                      onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, tileFeatureStrip: checked } })}
+                                                    />
+                                                    <Label className="text-sm">Tile Feature Strip</Label>
+                                                  </div>
                                                 )}
                                               </div>
                                             </div>
+                                            {/* Glass door row - only for tile-shower */}
+                                            {room.shower.type === "tile-shower" && (
+                                              <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
+                                                <div className="flex items-center gap-2">
+                                                  <Switch
+                                                    checked={room.shower.glassDoor}
+                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, glassDoor: checked, glassDoorAction: checked ? room.shower!.glassDoorAction : "" } })}
+                                                  />
+                                                  <Label className="text-sm">Glass door</Label>
+                                                </div>
+                                                {room.shower.glassDoor && (
+                                                  <div className="space-y-1">
+                                                    <Label className="text-xs text-muted-foreground">Action for Glass door</Label>
+                                                    <Select value={room.shower.glassDoorAction} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, glassDoorAction: value } }) }}>
+                                                      <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
+                                                        <SelectValue placeholder="Select" />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                        <SelectItem value="replace">Replace</SelectItem>
+                                                        <SelectItem value="clean">Clean</SelectItem>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            )}
                                           </div>
                                         )}
                                       </div>
