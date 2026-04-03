@@ -3189,6 +3189,19 @@ export default function NewExpressEstimatePage() {
                                             </Select>
                                           </div>
                                           <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Grade</Label>
+                                            <Select value={room.wallCovering.panelingGrade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingGrade: value } }) }}>
+                                              <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="paint-grade">Paint Grade</SelectItem>
+                                                <SelectItem value="hardwood">Hardwood</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Finish</Label>
                                             <Select value={room.wallCovering.panelingFinish} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingFinish: value } }) }}>
                                               <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
