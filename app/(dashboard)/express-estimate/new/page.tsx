@@ -504,6 +504,7 @@ export default function NewExpressEstimatePage() {
       stringersLength: "",
       landingReplacement: false,
     },
+    elevator: false,
   })
 
   // Interior Rooms
@@ -2935,6 +2936,20 @@ const newDoor: DoorItem = {
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
+
+                  {/* Elevator */}
+                  <div className="rounded-lg border border-border/60 bg-secondary/30 p-4">
+                    <div className="flex items-center gap-3">
+                      <Switch
+                        checked={foundation.elevator}
+                        onCheckedChange={(checked) => { setFoundation({ ...foundation, elevator: checked }); handleSave() }}
+                      />
+                      <Label>Elevator</Label>
+                    </div>
+                    {foundation.elevator && (
+                      <p className="mt-3 text-xs text-amber-500">Note: Elevators are not available at this time. Please refer to the policy for coverage.</p>
+                    )}
+                  </div>
                 </TabsContent>
 
                 {/* INTERIOR TAB */}
