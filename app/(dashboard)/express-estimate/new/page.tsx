@@ -202,6 +202,7 @@ export default function NewExpressEstimatePage() {
   }
 
   const updateRoom = (roomId: number, updates: Partial<Room>) => {
+    console.log("[v0] updateRoom called for room:", roomId, "with updates:", updates)
     setRooms(rooms.map(r => r.id === roomId ? { ...r, ...updates } : r))
     handleSave()
   }

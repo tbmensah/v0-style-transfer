@@ -288,6 +288,249 @@ export function AppliancesSection({ appliances, onUpdate }: AppliancesSectionPro
               )}
             </CollapsibleContent>
           </Collapsible>
+
+          {/* Cooktop */}
+          <Collapsible>
+            <CollapsibleTrigger className="group flex w-full items-center justify-between rounded border border-border/40 p-2 hover:bg-secondary/30">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={appliances.cooktop.enabled}
+                  onCheckedChange={(checked) => onUpdate({ cooktop: { ...appliances.cooktop, enabled: checked } })}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <Label className="text-sm">Cooktop</Label>
+              </div>
+              <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-2 pl-4">
+              {appliances.cooktop.enabled && (
+                <div className="flex flex-wrap gap-2">
+                  <Select value={appliances.cooktop.type} onValueChange={(v) => onUpdate({ cooktop: { ...appliances.cooktop, type: nv(v) } })}>
+                    <SelectTrigger className="w-[100px] h-8 text-sm border-border/60 bg-secondary/50">
+                      <SelectValue placeholder="Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                      <SelectItem value="gas">Gas</SelectItem>
+                      <SelectItem value="electric">Electric</SelectItem>
+                      <SelectItem value="induction">Induction</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={appliances.cooktop.grade} onValueChange={(v) => onUpdate({ cooktop: { ...appliances.cooktop, grade: nv(v) } })}>
+                    <SelectTrigger className="w-[100px] h-8 text-sm border-border/60 bg-secondary/50">
+                      <SelectValue placeholder="Grade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                      <SelectItem value="standard">Standard</SelectItem>
+                      <SelectItem value="high">High Grade</SelectItem>
+                      <SelectItem value="premium">Premium</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={appliances.cooktop.action} onValueChange={(v) => onUpdate({ cooktop: { ...appliances.cooktop, action: nv(v) } })}>
+                    <SelectTrigger className="w-[110px] h-8 text-sm border-border/60 bg-secondary/50">
+                      <SelectValue placeholder="Action" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                      <SelectItem value="replace">Replace</SelectItem>
+                      <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    placeholder="F9 Note"
+                    value={appliances.cooktop.f9Note}
+                    onChange={(e) => onUpdate({ cooktop: { ...appliances.cooktop, f9Note: e.target.value } })}
+                    className="w-[120px] h-8 text-sm border-border/60 bg-secondary/50"
+                  />
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Wall Oven */}
+          <Collapsible>
+            <CollapsibleTrigger className="group flex w-full items-center justify-between rounded border border-border/40 p-2 hover:bg-secondary/30">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={appliances.wallOven.enabled}
+                  onCheckedChange={(checked) => onUpdate({ wallOven: { ...appliances.wallOven, enabled: checked } })}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <Label className="text-sm">Wall Oven</Label>
+              </div>
+              <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-2 pl-4">
+              {appliances.wallOven.enabled && (
+                <div className="flex flex-wrap gap-2">
+                  <Select value={appliances.wallOven.type} onValueChange={(v) => onUpdate({ wallOven: { ...appliances.wallOven, type: nv(v) } })}>
+                    <SelectTrigger className="w-[100px] h-8 text-sm border-border/60 bg-secondary/50">
+                      <SelectValue placeholder="Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                      <SelectItem value="single">Single</SelectItem>
+                      <SelectItem value="double">Double</SelectItem>
+                      <SelectItem value="microwave-combo">Microwave Combo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={appliances.wallOven.grade} onValueChange={(v) => onUpdate({ wallOven: { ...appliances.wallOven, grade: nv(v) } })}>
+                    <SelectTrigger className="w-[100px] h-8 text-sm border-border/60 bg-secondary/50">
+                      <SelectValue placeholder="Grade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                      <SelectItem value="standard">Standard</SelectItem>
+                      <SelectItem value="high">High Grade</SelectItem>
+                      <SelectItem value="premium">Premium</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={appliances.wallOven.action} onValueChange={(v) => onUpdate({ wallOven: { ...appliances.wallOven, action: nv(v) } })}>
+                    <SelectTrigger className="w-[110px] h-8 text-sm border-border/60 bg-secondary/50">
+                      <SelectValue placeholder="Action" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                      <SelectItem value="replace">Replace</SelectItem>
+                      <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    placeholder="F9 Note"
+                    value={appliances.wallOven.f9Note}
+                    onChange={(e) => onUpdate({ wallOven: { ...appliances.wallOven, f9Note: e.target.value } })}
+                    className="w-[120px] h-8 text-sm border-border/60 bg-secondary/50"
+                  />
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Air Handler */}
+          <Collapsible>
+            <CollapsibleTrigger className="group flex w-full items-center justify-between rounded border border-border/40 p-2 hover:bg-secondary/30">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={appliances.airHandler.enabled}
+                  onCheckedChange={(checked) => onUpdate({ airHandler: { ...appliances.airHandler, enabled: checked } })}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <Label className="text-sm">Air Handler</Label>
+              </div>
+              <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-2 pl-4">
+              {appliances.airHandler.enabled && (
+                <div className="flex flex-wrap gap-2">
+                  <Select value={appliances.airHandler.type} onValueChange={(v) => onUpdate({ airHandler: { ...appliances.airHandler, type: nv(v) } })}>
+                    <SelectTrigger className="w-[140px] h-8 text-sm border-border/60 bg-secondary/50">
+                      <SelectValue placeholder="Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                      <SelectItem value="electric">Electric</SelectItem>
+                      <SelectItem value="gas">Gas</SelectItem>
+                      <SelectItem value="heat-pump">Heat Pump</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={appliances.airHandler.options} onValueChange={(v) => onUpdate({ airHandler: { ...appliances.airHandler, options: nv(v) } })}>
+                    <SelectTrigger className="w-[140px] h-8 text-sm border-border/60 bg-secondary/50">
+                      <SelectValue placeholder="Options" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                      <SelectItem value="horizontal">Horizontal</SelectItem>
+                      <SelectItem value="upflow">Upflow</SelectItem>
+                      <SelectItem value="downflow">Downflow</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={appliances.airHandler.action} onValueChange={(v) => onUpdate({ airHandler: { ...appliances.airHandler, action: nv(v) } })}>
+                    <SelectTrigger className="w-[110px] h-8 text-sm border-border/60 bg-secondary/50">
+                      <SelectValue placeholder="Action" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                      <SelectItem value="replace">Replace</SelectItem>
+                      <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                      <SelectItem value="service-call">Service Call</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    placeholder="F9 Note"
+                    value={appliances.airHandler.f9Note}
+                    onChange={(e) => onUpdate({ airHandler: { ...appliances.airHandler, f9Note: e.target.value } })}
+                    className="flex-1 min-w-[150px] h-8 text-sm border-border/60 bg-secondary/50"
+                  />
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Boiler */}
+          <Collapsible>
+            <CollapsibleTrigger className="group flex w-full items-center justify-between rounded border border-border/40 p-2 hover:bg-secondary/30">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={appliances.boiler.enabled}
+                  onCheckedChange={(checked) => onUpdate({ boiler: { ...appliances.boiler, enabled: checked } })}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <Label className="text-sm">Boiler</Label>
+              </div>
+              <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-2 pl-4">
+              {appliances.boiler.enabled && (
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    <Select value={appliances.boiler.type} onValueChange={(v) => onUpdate({ boiler: { ...appliances.boiler, type: nv(v) } })}>
+                      <SelectTrigger className="w-[120px] h-8 text-sm border-border/60 bg-secondary/50">
+                        <SelectValue placeholder="Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                        <SelectItem value="natural-gas">Natural Gas</SelectItem>
+                        <SelectItem value="electric">Electric</SelectItem>
+                        <SelectItem value="oil-fired">Oil fired</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={appliances.boiler.action} onValueChange={(v) => onUpdate({ boiler: { ...appliances.boiler, action: nv(v) } })}>
+                      <SelectTrigger className="w-[140px] h-8 text-sm border-border/60 bg-secondary/50">
+                        <SelectValue placeholder="Action" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                        <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                        <SelectItem value="replace">Replace</SelectItem>
+                        <SelectItem value="service-call">Service Call</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={appliances.boiler.expansionTank}
+                        onCheckedChange={(checked) => onUpdate({ boiler: { ...appliances.boiler, expansionTank: checked } })}
+                      />
+                      <Label className="text-sm whitespace-nowrap">Expansion Tank</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={appliances.boiler.circulatorPump}
+                        onCheckedChange={(checked) => onUpdate({ boiler: { ...appliances.boiler, circulatorPump: checked } })}
+                      />
+                      <Label className="text-sm whitespace-nowrap">Circulator pump</Label>
+                    </div>
+                  </div>
+                  <Input
+                    placeholder="F9 Note"
+                    value={appliances.boiler.f9Note}
+                    onChange={(e) => onUpdate({ boiler: { ...appliances.boiler, f9Note: e.target.value } })}
+                    className="w-full h-8 text-sm border-border/60 bg-secondary/50"
+                  />
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       )}
     </div>

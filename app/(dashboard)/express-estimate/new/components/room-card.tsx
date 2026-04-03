@@ -40,6 +40,7 @@ export function RoomCard({
   onRemove,
   onSave,
 }: RoomCardProps) {
+  console.log("[v0] RoomCard rendered for room:", room.id, room.name, "nfipCleaning.enabled:", room.nfipCleaning.enabled, "flooring.enabled:", room.flooring.enabled)
   const roomTypes = [
     { value: "room", label: "Room" },
     { value: "bathroom", label: "Bathroom" },
@@ -121,13 +122,19 @@ export function RoomCard({
           {/* NFIP Cleaning */}
           <NFIPCleaningSection
             nfipCleaning={room.nfipCleaning}
-            onChange={(updates) => onUpdate({ nfipCleaning: { ...room.nfipCleaning, ...updates } })}
+            onChange={(updates) => {
+              console.log("[v0] NFIPCleaningSection onChange called with:", updates)
+              onUpdate({ nfipCleaning: { ...room.nfipCleaning, ...updates } })
+            }}
           />
 
           {/* Flooring */}
           <FlooringSection
             flooring={room.flooring}
-            onChange={(updates) => onUpdate({ flooring: { ...room.flooring, ...updates } })}
+            onChange={(updates) => {
+              console.log("[v0] FlooringSection onChange called with:", updates)
+              onUpdate({ flooring: { ...room.flooring, ...updates } })
+            }}
           />
 
           {/* Trim */}
