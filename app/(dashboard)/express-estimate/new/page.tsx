@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -17,29 +16,19 @@ import {
   ChevronDown,
   Plus,
   Trash2,
-  Copy,
   Home,
   Droplets,
   Zap,
   Wind,
   HelpCircle,
-  X
 } from "lucide-react"
 
 // Types and Defaults from extracted modules
-import type {
-  Room,
-  FloorLayer,
-  WindowItem,
-  DoorItem,
-} from "./types"
+import type { Room } from "./types"
 import {
   defaultRoom,
   defaultBathroomExtras,
   defaultKitchenExtras,
-  createFloorLayer,
-  createWindow,
-  createDoor,
 } from "./defaults"
 import { RoomCard } from "./components/room-card"
 
@@ -215,20 +204,6 @@ export default function NewExpressEstimatePage() {
   const updateRoom = (roomId: number, updates: Partial<Room>) => {
     setRooms(rooms.map(r => r.id === roomId ? { ...r, ...updates } : r))
     handleSave()
-  }
-
-  const addWindow = (roomId: number) => {
-    const room = rooms.find(r => r.id === roomId)
-    if (room) {
-      updateRoom(roomId, { windows: [...room.windows, createWindow()] })
-    }
-  }
-
-  const addDoor = (roomId: number, category: "interior" | "exterior") => {
-    const room = rooms.find(r => r.id === roomId)
-    if (room) {
-      updateRoom(roomId, { doors: [...room.doors, createDoor(category)] })
-    }
   }
 
   return (
@@ -1997,225 +1972,6 @@ export default function NewExpressEstimatePage() {
                           onCopy={() => copyRoom(room.id)}
                           onRemove={() => removeRoom(room.id)}
                         />
-                      ))}
-
-                      {/* All room rendering now handled by RoomCard components above */}
-                                                  <SelectItem value="service-call">Service Call</SelectItem>
-                                                </SelectContent>
-                                              </Select>
-                                              <Input
-                                                placeholder="F9 Model/Serial..."
-                                                value={room.appliances.airHandler.f9Note}
-                                                onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, airHandler: { ...room.appliances!.airHandler, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50 flex-1 min-w-[150px]"
-                                              />
-                                            </div>
-                                          )}
-                                        </div>
-
-                                        {/* Boiler */}
-                                        <div className="space-y-3 rounded-lg bg-secondary/30 p-3">
-                                          <div className="flex items-center gap-3">
-                                            <Switch
-                                              checked={room.appliances.boiler.enabled}
-                                              onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, enabled: checked } } })}
-                                            />
-                                            <Label className="text-sm font-medium">Boiler</Label>
-                                          </div>
-                                          {room.appliances.boiler.enabled && (
-                                            <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.boiler.type} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, type: value } } }) }}>
-                                                <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
-                                                  <SelectValue placeholder="Type" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="natural-gas">Natural Gas</SelectItem>
-                                                  <SelectItem value="electric">Electric</SelectItem>
-                                                  <SelectItem value="oil-fired">Oil fired</SelectItem>
-                                                </SelectContent>
-                                              </Select>
-                                              <Select value={room.appliances.boiler.action} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, action: value } } }) }}>
-                                                <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
-                                                  <SelectValue placeholder="Action" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                  <SelectItem value="replace">Replace</SelectItem>
-                                                  <SelectItem value="service-call">Service Call</SelectItem>
-                                                </SelectContent>
-                                              </Select>
-                                              <div className="flex items-center gap-2">
-                                                <Switch
-                                                  checked={room.appliances.boiler.expansionTank}
-                                                  onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, expansionTank: checked } } })}
-                                                />
-                                                <Label className="text-sm whitespace-nowrap">Expansion Tank</Label>
-                                              </div>
-                                              <div className="flex items-center gap-2">
-                                                <Switch
-                                                  checked={room.appliances.boiler.circulatorPump}
-                                                  onCheckedChange={(checked) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, circulatorPump: checked } } })}
-                                                />
-                                                <Label className="text-sm whitespace-nowrap">Circulator pump</Label>
-                                              </div>
-                                              <Input
-                                                placeholder="F9 Model/Serial..."
-                                                value={room.appliances.boiler.f9Note}
-                                                onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, boiler: { ...room.appliances!.boiler, f9Note: e.target.value } } })}
-                                                className="border-border/60 bg-secondary/50 flex-1 min-w-[150px]"
-                                              />
-                                            </div>
-                                          )}
-                                        </div>
-                                        
-                                        {/* Complete Button */}
-                                        <div className="flex justify-end pt-3 border-t border-border/40">
-                                          <Button 
-                                            type="button" 
-                                            onClick={() => { handleSave(); }}
-                                            className="gap-2"
-                                          >
-                                            <CheckCircle className="h-4 w-4" />
-                                            Complete
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                </>
-                              )}
-
-                              {/* Doors - Always last */}
-                              <div className="space-y-3 rounded-lg border border-border/40 p-4">
-                                <div className="flex items-center justify-between">
-                                  <Label className="font-medium">Doors ({room.doors.length})</Label>
-                                  <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "interior")}>
-                                      <Plus className="h-3 w-3" />
-                                      Interior
-                                    </Button>
-                                    <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "exterior")}>
-                                      <Plus className="h-3 w-3" />
-                                      Exterior
-                                    </Button>
-                                  </div>
-                                </div>
-                                {room.doors.map((door, idx) => (
-                                  <div key={door.id} className="space-y-3 rounded-lg bg-secondary/30 p-3">
-                                    <div className="flex flex-wrap items-center gap-3">
-                                      <Badge variant="secondary" className="capitalize">{door.category}</Badge>
-                                      <Select value={door.type} onValueChange={(__v) => {
-                                        const value = __v === "__none__" ? "" : __v;
-                                        const newDoors = [...room.doors]
-                                        newDoors[idx] = { ...door, type: value }
-                                        updateRoom(room.id, { doors: newDoors })
-                                      }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[130px]">
-                                          <SelectValue placeholder="Type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                          {door.category === "interior" ? (
-                                            <>
-                                              <SelectItem value="6-panel">6 Panel</SelectItem>
-                                              <SelectItem value="8ft-paneled">8ft Paneled</SelectItem>
-                                              <SelectItem value="french">French</SelectItem>
-                                              <SelectItem value="bifold-single">Bifold Single</SelectItem>
-                                              <SelectItem value="bifold-double">Bifold Double</SelectItem>
-                                              <SelectItem value="pocket-single">Pocket Single</SelectItem>
-                                            </>
-                                          ) : (
-                                            <>
-                                              <SelectItem value="wood-door">Wood Door</SelectItem>
-                                              <SelectItem value="metal-door">Metal Door</SelectItem>
-                                              <SelectItem value="french-wood">French Wood</SelectItem>
-                                              <SelectItem value="french-metal">French Metal</SelectItem>
-                                            </>
-                                          )}
-                                        </SelectContent>
-                                      </Select>
-                                      <Select value={door.grade} onValueChange={(__v) => {
-                                        const value = __v === "__none__" ? "" : __v;
-                                        const newDoors = [...room.doors]
-                                        newDoors[idx] = { ...door, grade: value }
-                                        updateRoom(room.id, { doors: newDoors })
-                                      }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
-                                          <SelectValue placeholder="Grade" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                          <SelectItem value="standard">Standard</SelectItem>
-                                          <SelectItem value="high">High</SelectItem>
-                                          <SelectItem value="premium">Premium</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                      <Select value={door.handleAction} onValueChange={(__v) => {
-                                        const value = __v === "__none__" ? "" : __v;
-                                        const newDoors = [...room.doors]
-                                        newDoors[idx] = { ...door, handleAction: value }
-                                        updateRoom(room.id, { doors: newDoors })
-                                      }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
-                                          <SelectValue placeholder="Handle" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                          <SelectItem value="replace">Replace</SelectItem>
-                                          <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                      <div className="flex-1"></div>
-                                      <div className="flex items-center gap-2">
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          className="h-9 w-9 text-destructive hover:bg-destructive/20"
-                                          onClick={() => {
-                                            const newDoors = room.doors.filter(d => d.id !== door.id)
-                                            updateRoom(room.id, { doors: newDoors })
-                                          }}
-                                        >
-                                          <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                      </div>
-                                    </div>
-                                    {/* Misc options for Exterior doors */}
-                                    {door.category === "exterior" && (
-                                      <div className="flex items-center gap-4 pt-2 border-t border-border/20">
-                                        <Label className="text-sm font-medium">Misc</Label>
-                                        <div className="flex items-center gap-2">
-                                          <Switch
-                                            checked={door.peepHole}
-                                            onCheckedChange={(checked) => {
-                                              const newDoors = [...room.doors]
-                                              newDoors[idx] = { ...door, peepHole: checked }
-                                              updateRoom(room.id, { doors: newDoors })
-                                            }}
-                                          />
-                                          <Label className="text-sm">Peep Hole</Label>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                          <Switch
-                                            checked={door.mailSlot}
-                                            onCheckedChange={(checked) => {
-                                              const newDoors = [...room.doors]
-                                              newDoors[idx] = { ...door, mailSlot: checked }
-                                              updateRoom(room.id, { doors: newDoors })
-                                            }}
-                                          />
-                                          <Label className="text-sm">Mail Slot</Label>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </CollapsibleContent>
-                        </Collapsible>
                       ))}
 
                       {/* Add Room Buttons */}
