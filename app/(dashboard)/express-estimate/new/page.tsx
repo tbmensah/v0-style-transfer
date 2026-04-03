@@ -103,7 +103,10 @@ interface WallCoveringOptions {
   replacementHeight: string
   texture: boolean
   textureType: string
-}
+  panelingStyle: string
+  panelingFinish: string
+  panelingGrade: string
+  }
 
 interface ElectricalOptions {
   enabled: boolean
@@ -235,7 +238,7 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
   nfipCleaning: { enabled: false, wall: { height: "", wallType: "", ceilingAffected: false }, floor: { type: "", areaOnCrawlspace: false } },
   flooring: { enabled: false, multipleLayers: false, layers: [{ id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }], vaporBarrier: false, subfloorReplacement: false, f9Note: "" },
   trim: { enabled: false, baseboardHeight: "", material: "", detail: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
-  wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", texture: false, textureType: "" },
+  wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", texture: false, textureType: "", panelingStyle: "", panelingFinish: "", panelingGrade: "" },
   electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
   windowsEnabled: false,
   windows: [],
@@ -3121,11 +3124,127 @@ export default function NewExpressEstimatePage() {
                                                   <SelectItem value="paneling-high">Paneling High Grade</SelectItem>
                                                   <SelectItem value="paneling-premium">Paneling Premium Grade</SelectItem>
                                                   <SelectItem value="paneling-mobile-home">Paneling - Mobile Home</SelectItem>
+                                                  <SelectItem value="paneling-unfinished">Paneling - Unfinished</SelectItem>
+                                                  <SelectItem value="judges">Judges</SelectItem>
+                                                  <SelectItem value="bead-board">Bead Board</SelectItem>
                                                 </>
                                               )}
                                             </SelectContent>
                                           </Select>
                                         </div>
+                                      )}
+                                      {/* Paneling - Unfinished fields */}
+                                      {room.wallCovering.type === "paneling-unfinished" && (
+                                        <>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Style</Label>
+                                            <Select value={room.wallCovering.panelingStyle} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingStyle: value } }) }}>
+                                              <SelectTrigger className="w-[220px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="tg-bullnose">T&G Paneling - Bullnose</SelectItem>
+                                                <SelectItem value="tg-double-beaded">T&G Paneling - Double Beaded Vee</SelectItem>
+                                                <SelectItem value="tg-cedar">T&G Paneling - Cedar Paneling</SelectItem>
+                                                <SelectItem value="tg-knotty-pine">T&G Paneling - Knotty Pine</SelectItem>
+                                                <SelectItem value="tg-redwood">T&G Paneling - Redwood</SelectItem>
+                                                <SelectItem value="tg-v-joint">T&G Paneling - V Joint</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Finish</Label>
+                                            <Select value={room.wallCovering.panelingFinish} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingFinish: value } }) }}>
+                                              <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="none">None</SelectItem>
+                                                <SelectItem value="paint">Paint</SelectItem>
+                                                <SelectItem value="stain">Stain</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                        </>
+                                      )}
+                                      {/* Judges fields */}
+                                      {room.wallCovering.type === "judges" && (
+                                        <>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Style</Label>
+                                            <Select value={room.wallCovering.panelingStyle} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingStyle: value } }) }}>
+                                              <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="flat-panel">Flat panel w/moldings</SelectItem>
+                                                <SelectItem value="raised-panel">Raised panel</SelectItem>
+                                                <SelectItem value="shaker-style">Shaker style</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Grade</Label>
+                                            <Select value={room.wallCovering.panelingGrade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingGrade: value } }) }}>
+                                              <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="paint-grade">Paint Grade</SelectItem>
+                                                <SelectItem value="hardwood">Hardwood</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                        </>
+                                      )}
+                                      {/* Bead Board fields */}
+                                      {room.wallCovering.type === "bead-board" && (
+                                        <>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Style</Label>
+                                            <Select value={room.wallCovering.panelingStyle} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingStyle: value } }) }}>
+                                              <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="1/4-3/8-hardwood">1/4 to 3/8 Hardwood</SelectItem>
+                                                <SelectItem value="1/2-mdf">1/2 MDF</SelectItem>
+                                                <SelectItem value="1/4-mdf">1/4 MDF</SelectItem>
+                                                <SelectItem value="3/8-softwood-veneer">3/8 Softwood Veneer</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Finish</Label>
+                                            <Select value={room.wallCovering.panelingFinish} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingFinish: value } }) }}>
+                                              <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="none">None</SelectItem>
+                                                <SelectItem value="paint">Paint</SelectItem>
+                                                <SelectItem value="stain">Stain</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Replacement Height (PF)</Label>
+                                            <Input
+                                              type="number"
+                                              min="0"
+                                              placeholder="0"
+                                              value={room.wallCovering.replacementHeight}
+                                              onChange={(e) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: e.target.value } })}
+                                              className="w-[80px] border-border/60 bg-secondary/50"
+                                            />
+                                          </div>
+                                        </>
                                       )}
                                       {room.wallCovering.material && room.wallCovering.material !== "paneling" && (
                                         <div className="space-y-1">
