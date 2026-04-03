@@ -4164,7 +4164,7 @@ const newDoor: DoorItem = {
                                             <>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
-                                                <div className="flex items-center gap-2 pt-1">
+                                                <div className="flex items-center gap-2 h-9">
                                                   <Switch
                                                     checked={room.shower.mortarBedReplace}
                                                     onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedReplace: checked } })}
