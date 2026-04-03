@@ -3260,11 +3260,6 @@ export default function NewExpressEstimatePage() {
                                               className="w-[80px] border-border/60 bg-secondary/50"
                                             />
                                           </div>
-                                        </>
-                                      )}
-                                      {/* Chair Rail for Drywall */}
-                                      {(room.wallCovering.material === "drywall-sf" || room.wallCovering.material === "drywall-lf") && (
-                                        <>
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Chair Rail Action</Label>
                                             <Select value={room.wallCovering.chairRailAction} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, chairRailAction: value } }) }}>
@@ -3294,6 +3289,7 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                         </>
                                       )}
+                                      {/* Replacement Height and Chair Rail for Drywall */}
                                       {room.wallCovering.material && room.wallCovering.material !== "paneling" && room.wallCovering.material !== "bead-board" && (
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Replacement Height</Label>
@@ -3327,29 +3323,39 @@ export default function NewExpressEstimatePage() {
                                           </Select>
                                         </div>
                                       )}
-                                      <div className="flex items-center gap-2 pb-1">
-                                        <Switch
-                                          checked={room.wallCovering.texture}
-                                          onCheckedChange={(checked) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, texture: checked } })}
-                                        />
-                                        <Label className="text-sm">Texture</Label>
-                                      </div>
-                                      {room.wallCovering.texture && (
-                                        <div className="space-y-1">
-                                          <Select value={room.wallCovering.textureType} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, textureType: value } }) }}>
-                                            <SelectTrigger className="w-[160px] border-border/60 bg-secondary/50">
-                                              <SelectValue placeholder="Select" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                              <SelectItem value="smooth">Smooth</SelectItem>
-                                              <SelectItem value="hand-texture">Hand texture</SelectItem>
-                                              <SelectItem value="machine-texture">Machine texture</SelectItem>
-                                              <SelectItem value="heavy-texture">Heavy texture</SelectItem>
-                                            </SelectContent>
-                                          </Select>
-                                        </div>
+                                      {/* Chair Rail for Drywall */}
+                                      {(room.wallCovering.material === "drywall-sf" || room.wallCovering.material === "drywall-lf") && (
+                                        <>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Chair Rail Action</Label>
+                                            <Select value={room.wallCovering.chairRailAction} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, chairRailAction: value } }) }}>
+                                              <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="replace">Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach & reset</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Chair Rail Finish</Label>
+                                            <Select value={room.wallCovering.chairRailFinish} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, chairRailFinish: value } }) }}>
+                                              <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="none">None</SelectItem>
+                                                <SelectItem value="paint">Paint</SelectItem>
+                                                <SelectItem value="stain">Stain</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                        </>
                                       )}
+
                                     </div>
                                     <p className="text-xs text-amber-500">Note: Some carriers require drywall calculated in SF instead of LF, please check with current guidelines of carriers</p>
                                   </div>
