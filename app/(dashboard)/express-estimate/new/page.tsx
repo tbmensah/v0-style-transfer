@@ -50,7 +50,9 @@ interface Room {
   trim: TrimOptions
   wallCovering: WallCoveringOptions
   electrical: ElectricalOptions
+  windowsEnabled: boolean
   windows: WindowItem[]
+  doorsEnabled: boolean
   doors: DoorItem[]
   // Bathroom specific
   vanity?: VanityOptions
@@ -271,7 +273,9 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
   trim: { enabled: false, baseboardHeight: "", material: "", woodType: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
   wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", panelingStyle: "", panelingFinish: "", judgesStyle: "", judgesGrade: "", judgesFinish: "", texture: false, textureType: "" },
   electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
+  windowsEnabled: true,
   windows: [],
+  doorsEnabled: true,
   doors: [],
   appliances: {
     enabled: false,
@@ -2783,13 +2787,21 @@ const newDoor: DoorItem = {
                               {/* Windows */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
                                 <div className="flex items-center justify-between">
-                                  <Label className="font-medium">Windows ({room.windows.length})</Label>
-                                  <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addWindow(room.id)}>
-                                    <Plus className="h-3 w-3" />
-                                    Add Window
-                                  </Button>
+                                  <div className="flex items-center gap-3">
+                                    <Switch
+                                      checked={room.windowsEnabled}
+                                      onCheckedChange={(checked) => updateRoom(room.id, { windowsEnabled: checked })}
+                                    />
+                                    <Label className="font-medium">Windows ({room.windows.length})</Label>
+                                  </div>
+                                  {room.windowsEnabled && (
+                                    <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addWindow(room.id)}>
+                                      <Plus className="h-3 w-3" />
+                                      Add Window
+                                    </Button>
+                                  )}
                                 </div>
-                                {room.windows.map((window, idx) => (
+                                {room.windowsEnabled && room.windows.map((window, idx) => (
                                   <div key={window.id} className="rounded-lg bg-secondary/30 p-3">
                                     <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                       <div className="space-y-1">
@@ -4592,19 +4604,27 @@ const newDoor: DoorItem = {
                               {/* Doors - Always last */}
                               <div className="space-y-3 rounded-lg border border-border/40 p-4">
                                 <div className="flex items-center justify-between">
-                                  <Label className="font-medium">Doors ({room.doors.length})</Label>
-                                  <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "interior")}>
-                                      <Plus className="h-3 w-3" />
-                                      Interior
-                                    </Button>
-                                    <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "exterior")}>
-                                      <Plus className="h-3 w-3" />
-                                      Exterior
-                                    </Button>
+                                  <div className="flex items-center gap-3">
+                                    <Switch
+                                      checked={room.doorsEnabled}
+                                      onCheckedChange={(checked) => updateRoom(room.id, { doorsEnabled: checked })}
+                                    />
+                                    <Label className="font-medium">Doors ({room.doors.length})</Label>
                                   </div>
+                                  {room.doorsEnabled && (
+                                    <div className="flex gap-2">
+                                      <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "interior")}>
+                                        <Plus className="h-3 w-3" />
+                                        Interior
+                                      </Button>
+                                      <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "exterior")}>
+                                        <Plus className="h-3 w-3" />
+                                        Exterior
+                                      </Button>
+                                    </div>
+                                  )}
                                 </div>
-                                {[...room.doors].sort((a, b) => a.category === "interior" && b.category === "exterior" ? -1 : a.category === "exterior" && b.category === "interior" ? 1 : 0).map((door) => {
+                                {room.doorsEnabled && [...room.doors].sort((a, b) => a.category === "interior" && b.category === "exterior" ? -1 : a.category === "exterior" && b.category === "interior" ? 1 : 0).map((door) => {
                                   const idx = room.doors.findIndex(d => d.id === door.id);
                                   return (
                                   <div key={door.id} className="space-y-3 rounded-lg bg-secondary/30 p-3">
