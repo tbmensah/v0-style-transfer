@@ -4159,6 +4159,54 @@ const newDoor: DoorItem = {
                                             </>
                                           )}
 
+                                          {/* Tiled Shower fields - inline with Type */}
+                                          {room.shower.type === "tile-shower" && (
+                                            <>
+                                              <div className="space-y-1">
+                                                <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
+                                                <div className="flex items-center gap-2 pt-1">
+                                                  <Switch
+                                                    checked={room.shower.mortarBedReplace}
+                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedReplace: checked } })}
+                                                  />
+                                                  <Label className="text-sm whitespace-nowrap">Replace</Label>
+                                                </div>
+                                              </div>
+                                              <div className="space-y-1">
+                                                <Label className="text-xs text-muted-foreground">Walls</Label>
+                                                <Select value={room.shower.walls} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, walls: value } }) }}>
+                                                  <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                    <SelectItem value="up-to-60sf">Up to 60 SF</SelectItem>
+                                                    <SelectItem value="up-to-60sf-high">Up to 60 SF - High Grade</SelectItem>
+                                                    <SelectItem value="61-100sf">61-100 SF</SelectItem>
+                                                    <SelectItem value="61-100sf-high">61-100 SF - High Grade</SelectItem>
+                                                    <SelectItem value="101-120sf">101-120 SF</SelectItem>
+                                                    <SelectItem value="101-120sf-high">101-120 SF - High Grade</SelectItem>
+                                                    <SelectItem value="121-150sf">121-150 SF</SelectItem>
+                                                    <SelectItem value="121-150sf-high">121-150 SF - High Grade</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="space-y-1">
+                                                <Label className="text-xs text-muted-foreground">Shower Faucet</Label>
+                                                <Select value={room.shower.showerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: value } }) }}>
+                                                  <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                            </>
+                                          )}
+
                                           {/* Tub With Tiled Surround fields */}
                                           {room.shower.type === "tub-tile-surround" && (
                                             <>
@@ -4315,53 +4363,6 @@ const newDoor: DoorItem = {
                                             </>
                                           )}
 
-                                          {/* Tiled Shower fields */}
-                                          {room.shower.type === "tile-shower" && (
-                                            <>
-                                              <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
-                                                <div className="flex items-center gap-2 pt-1">
-                                                  <Switch
-                                                    checked={room.shower.mortarBedReplace}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedReplace: checked } })}
-                                                  />
-                                                  <Label className="text-sm whitespace-nowrap">Replace</Label>
-                                                </div>
-                                              </div>
-                                              <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">Walls</Label>
-                                                <Select value={room.shower.walls} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, walls: value } }) }}>
-                                                  <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
-                                                    <SelectValue placeholder="Select" />
-                                                  </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="up-to-60sf">Up to 60 SF</SelectItem>
-                                                    <SelectItem value="up-to-60sf-high">Up to 60 SF - High Grade</SelectItem>
-                                                    <SelectItem value="61-100sf">61-100 SF</SelectItem>
-                                                    <SelectItem value="61-100sf-high">61-100 SF - High Grade</SelectItem>
-                                                    <SelectItem value="101-120sf">101-120 SF</SelectItem>
-                                                    <SelectItem value="101-120sf-high">101-120 SF - High Grade</SelectItem>
-                                                    <SelectItem value="121-150sf">121-150 SF</SelectItem>
-                                                    <SelectItem value="121-150sf-high">121-150 SF - High Grade</SelectItem>
-                                                  </SelectContent>
-                                                </Select>
-                                              </div>
-                                              <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">Shower Faucet</Label>
-                                                <Select value={room.shower.showerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, showerFaucet: value } }) }}>
-                                                  <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
-                                                    <SelectValue placeholder="Select" />
-                                                  </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
-                                                  </SelectContent>
-                                                </Select>
-                                              </div>
-                                            </>
-                                          )}
                                         </div>
                                         )}
 
