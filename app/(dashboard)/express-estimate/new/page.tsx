@@ -1992,6 +1992,237 @@ const newDoor: DoorItem = {
                     </CollapsibleContent>
                   </Collapsible>
 
+                  {/* Subgrade Area Coverage Items */}
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
+                      <div className="flex items-center gap-3">
+                        <Square className="h-5 w-5 text-primary" />
+                        <span className="font-medium text-foreground">Subgrade Area Coverage Items</span>
+                        {(foundation.subgradeAreaCoverage.drywall.enabled || foundation.subgradeAreaCoverage.wallInsulation.enabled || foundation.subgradeAreaCoverage.foundationalDoor.enabled || foundation.subgradeAreaCoverage.foundationalWindows.length > 0) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
+                      <div className="space-y-4">
+                        {/* Enable Drywall */}
+                        <div className="space-y-3">
+                          <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={foundation.subgradeAreaCoverage.drywall.enabled}
+                                onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, enabled: checked } } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Enable Drywall</Label>
+                            </div>
+                            {foundation.subgradeAreaCoverage.drywall.enabled && (
+                              <>
+                                <div className="flex items-center gap-2">
+                                  <Label className="text-xs text-muted-foreground">Replacement height</Label>
+                                  <Select value={foundation.subgradeAreaCoverage.drywall.replacementHeight} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, replacementHeight: value } } }); handleSave() }}>
+                                    <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="--" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
+                                      <SelectItem value="1/2">1/2</SelectItem>
+                                      <SelectItem value="1">1</SelectItem>
+                                      <SelectItem value="2">2</SelectItem>
+                                      <SelectItem value="3">3</SelectItem>
+                                      <SelectItem value="4">4</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={foundation.subgradeAreaCoverage.drywall.measureType === "sf"}
+                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, measureType: checked ? "sf" : "lf" } } }); handleSave() }}
+                                  />
+                                  <Label className="text-sm">Square Feet</Label>
+                                </div>
+                                <span className="text-xs text-muted-foreground">or</span>
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={foundation.subgradeAreaCoverage.drywall.measureType === "lf"}
+                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, measureType: checked ? "lf" : "sf" } } }); handleSave() }}
+                                  />
+                                  <Label className="text-sm">Linear Feet</Label>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Enable Wall Insulation */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={foundation.subgradeAreaCoverage.wallInsulation.enabled}
+                              onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, enabled: checked } } }); handleSave() }}
+                            />
+                            <Label className="text-sm">Enable Wall Insulation</Label>
+                          </div>
+                          {foundation.subgradeAreaCoverage.wallInsulation.enabled && (
+                            <div className="pl-6">
+                              <Select value={foundation.subgradeAreaCoverage.wallInsulation.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, type: value } } }); handleSave() }}>
+                                <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                  <SelectItem value="r13-unfaced">{"4' - R-13 Unfaced Batt"}</SelectItem>
+                                  <SelectItem value="r19-unfaced">{"6' - R-19 Unfaced Batt"}</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Enable Foundational Door */}
+                        <div className="space-y-2">
+                          <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={foundation.subgradeAreaCoverage.foundationalDoor.enabled}
+                                onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalDoor: { ...foundation.subgradeAreaCoverage.foundationalDoor, enabled: checked } } }); handleSave() }}
+                              />
+                              <Label className="text-sm">Enable Foundational Door</Label>
+                            </div>
+                            {foundation.subgradeAreaCoverage.foundationalDoor.enabled && (
+                              <Select value={foundation.subgradeAreaCoverage.foundationalDoor.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalDoor: { ...foundation.subgradeAreaCoverage.foundationalDoor, action: value } } }); handleSave() }}>
+                                <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select action" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                  <SelectItem value="detach-reset-handle">Detach &amp; Reset Handle</SelectItem>
+                                  <SelectItem value="replace">Replace</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </div>
+                          {foundation.subgradeAreaCoverage.foundationalDoor.enabled && (
+                            <p className="text-xs text-amber-500 pl-6">Note: Includes painting of exterior slab only</p>
+                          )}
+                        </div>
+
+                        {/* Enable Foundational Window */}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={foundation.subgradeAreaCoverage.foundationalWindows.length > 0}
+                                onCheckedChange={(checked) => {
+                                  if (checked && foundation.subgradeAreaCoverage.foundationalWindows.length === 0) {
+                                    setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: [{ id: Date.now(), type: "", size: "", quantity: "", material: "" }] } })
+                                  } else if (!checked) {
+                                    setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: [] } })
+                                  }
+                                  handleSave()
+                                }}
+                              />
+                              <Label className="text-sm">Enable Foundational Window</Label>
+                            </div>
+                            {foundation.subgradeAreaCoverage.foundationalWindows.length > 0 && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: [...foundation.subgradeAreaCoverage.foundationalWindows, { id: Date.now(), type: "", size: "", quantity: "", material: "" }] } })
+                                  handleSave()
+                                }}
+                                className="text-xs"
+                              >
+                                + Add Window
+                              </Button>
+                            )}
+                          </div>
+                          {foundation.subgradeAreaCoverage.foundationalWindows.length > 0 && (
+                            <div className="space-y-3 pl-6">
+                              {foundation.subgradeAreaCoverage.foundationalWindows.map((window, index) => (
+                                <div key={window.id} className="flex flex-wrap items-center gap-3">
+                                  <div className="flex items-center gap-2">
+                                    <Label className="text-xs text-muted-foreground">Type</Label>
+                                    <Select value={window.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; const updated = [...foundation.subgradeAreaCoverage.foundationalWindows]; updated[index] = { ...window, type: value }; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: updated } }); handleSave() }}>
+                                      <SelectTrigger className="w-28 border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                        <SelectItem value="casement">Casement</SelectItem>
+                                        <SelectItem value="double-hung">Double Hung</SelectItem>
+                                        <SelectItem value="single-hung">Single Hung</SelectItem>
+                                        <SelectItem value="sliding">Sliding</SelectItem>
+                                        <SelectItem value="fixed">Fixed</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Label className="text-xs text-muted-foreground">Size</Label>
+                                    <Select value={window.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; const updated = [...foundation.subgradeAreaCoverage.foundationalWindows]; updated[index] = { ...window, size: value }; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: updated } }); handleSave() }}>
+                                      <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                        <SelectItem value="2-4sf">2-4 sf</SelectItem>
+                                        <SelectItem value="4-8sf">4-8 sf</SelectItem>
+                                        <SelectItem value="8-12sf">8-12 sf</SelectItem>
+                                        <SelectItem value="12+sf">12+ sf</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Label className="text-xs text-muted-foreground">Quantity</Label>
+                                    <Select value={window.quantity} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; const updated = [...foundation.subgradeAreaCoverage.foundationalWindows]; updated[index] = { ...window, quantity: value }; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: updated } }); handleSave() }}>
+                                      <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="--" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                                          <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Label className="text-xs text-muted-foreground">Material</Label>
+                                    <Select value={window.material} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; const updated = [...foundation.subgradeAreaCoverage.foundationalWindows]; updated[index] = { ...window, material: value }; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: updated } }); handleSave() }}>
+                                      <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                        <SelectItem value="vinyl">Vinyl</SelectItem>
+                                        <SelectItem value="wood">Wood</SelectItem>
+                                        <SelectItem value="aluminum">Aluminum</SelectItem>
+                                        <SelectItem value="fiberglass">Fiberglass</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  {foundation.subgradeAreaCoverage.foundationalWindows.length > 1 && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        const updated = foundation.subgradeAreaCoverage.foundationalWindows.filter((w) => w.id !== window.id)
+                                        setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: updated } })
+                                        handleSave()
+                                      }}
+                                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+
                   {/* HVAC */}
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
