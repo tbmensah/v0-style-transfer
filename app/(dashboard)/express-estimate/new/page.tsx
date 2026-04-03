@@ -320,7 +320,7 @@ export default function NewExpressEstimatePage() {
       disconnect30Amp: "",
       breakerPanel: { enabled: false, amps: "", arcFaults: false },
       meterBox: false,
-      circuits: [] as Array<{ id: number; amps: string; note: string }>,
+      circuits: [] as Array<{ id: number; type: string; qty: string }>,
     },
     finishes: [] as Array<{
       id: number;
@@ -1139,60 +1139,58 @@ export default function NewExpressEstimatePage() {
                           </>
                         )}
                         
-                        {/* Circuits Section */}
-                        <div className="w-full border-t border-border/40 pt-4 mt-2">
+                        {/* Breaker Circuit Replacement */}
+                        <div className="w-full pt-4">
                           <div className="flex items-center gap-3 mb-3">
-                            <Label className="font-medium">Circuits ({exterior.electrical.circuits.length})</Label>
+                            <Label className="text-sm">Breaker Circuit Replacement</Label>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="gap-2 border-border/60"
+                              className="gap-1 border-border/60 h-7 text-xs"
                               onClick={() => {
                                 setExterior({
                                   ...exterior,
                                   electrical: {
                                     ...exterior.electrical,
-                                    circuits: [...exterior.electrical.circuits, { id: Date.now(), amps: "", note: "" }]
+                                    circuits: [...exterior.electrical.circuits, { id: Date.now(), type: "", qty: "" }]
                                   }
                                 })
                                 handleSave()
                               }}
                             >
-                              <Plus className="h-3 w-3" />
-                              Add Circuit
+                              Add Circuit +
                             </Button>
                           </div>
                           {exterior.electrical.circuits.map((circuit, idx) => (
-                            <div key={circuit.id} className="flex flex-wrap items-center gap-3 mb-2 p-2 rounded bg-secondary/30">
-                              <Select value={circuit.amps} onValueChange={(v) => {
+                            <div key={circuit.id} className="flex items-center gap-3 mb-2">
+                              <Select value={circuit.type} onValueChange={(v) => {
                                 const value = v === "__none__" ? "" : v
                                 const newCircuits = [...exterior.electrical.circuits]
-                                newCircuits[idx] = { ...circuit, amps: value }
+                                newCircuits[idx] = { ...circuit, type: value }
                                 setExterior({ ...exterior, electrical: { ...exterior.electrical, circuits: newCircuits } })
                                 handleSave()
                               }}>
-                                <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Amps" />
+                                <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select type" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="15">15 Amp</SelectItem>
-                                  <SelectItem value="20">20 Amp</SelectItem>
-                                  <SelectItem value="30">30 Amp</SelectItem>
-                                  <SelectItem value="40">40 Amp</SelectItem>
-                                  <SelectItem value="50">50 Amp</SelectItem>
+                                  <SelectItem value="110v-single">110 V - Single Pole</SelectItem>
+                                  <SelectItem value="220v-double">220 V - Double Pole</SelectItem>
+                                  <SelectItem value="arc-fault-afci">Arc Fault - AFCI</SelectItem>
+                                  <SelectItem value="ground-fault-gfi">Ground Fault - GFI</SelectItem>
                                 </SelectContent>
                               </Select>
                               <Input
-                                placeholder="Note..."
-                                value={circuit.note}
+                                placeholder="QTY"
+                                value={circuit.qty}
                                 onChange={(e) => {
                                   const newCircuits = [...exterior.electrical.circuits]
-                                  newCircuits[idx] = { ...circuit, note: e.target.value }
+                                  newCircuits[idx] = { ...circuit, qty: e.target.value }
                                   setExterior({ ...exterior, electrical: { ...exterior.electrical, circuits: newCircuits } })
                                   handleSave()
                                 }}
-                                className="flex-1 min-w-[150px] border-border/60 bg-secondary/50"
+                                className="w-[80px] border-border/60 bg-secondary/50"
                               />
                               <Button
                                 variant="ghost"
