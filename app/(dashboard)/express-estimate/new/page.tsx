@@ -320,13 +320,16 @@ export default function NewExpressEstimatePage() {
       disconnect30Amp: "",
       breakerPanel: { enabled: false, amps: "", arcFaults: false },
       meterBox: false,
+      circuits: [] as Array<{ id: number; type: string; qty: string }>,
     },
-    finishes: [] as Array<{
-      id: number;
-      type: string;
-      measureType: "pf" | "sf" | "lf";
-      value: string;
-    }>,
+    finishes: {
+      exteriorPaint: { enabled: false },
+      siding: { enabled: false, perimeterFeet: "", squareFeetEnabled: false, squareFeet: "" },
+      sheathing: { enabled: false, type: "", replacementHeight: "" },
+      houseWrap: { enabled: false, replacementHeight: "" },
+      backerBoard: { enabled: false, replacementHeight: "" },
+      wallInsulation: { enabled: false, type: "", replacementHeight: "" },
+    },
   })
 
   // Foundation State
@@ -1137,132 +1140,346 @@ export default function NewExpressEstimatePage() {
                             </div>
                           </>
                         )}
+                        
+                        {/* Breaker Circuit Replacement */}
+                        <div className="w-full pt-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Label className="text-sm">Breaker Circuit Replacement</Label>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 border-border/60 h-7 text-xs"
+                              onClick={() => {
+                                setExterior({
+                                  ...exterior,
+                                  electrical: {
+                                    ...exterior.electrical,
+                                    circuits: [...exterior.electrical.circuits, { id: Date.now(), type: "", qty: "" }]
+                                  }
+                                })
+                                handleSave()
+                              }}
+                            >
+                              Add Circuit +
+                            </Button>
+                          </div>
+                          {exterior.electrical.circuits.map((circuit, idx) => (
+                            <div key={circuit.id} className="flex items-center gap-3 mb-2">
+                              <Select value={circuit.type} onValueChange={(v) => {
+                                const value = v === "__none__" ? "" : v
+                                const newCircuits = [...exterior.electrical.circuits]
+                                newCircuits[idx] = { ...circuit, type: value }
+                                setExterior({ ...exterior, electrical: { ...exterior.electrical, circuits: newCircuits } })
+                                handleSave()
+                              }}>
+                                <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                  <SelectItem value="110v-single">110 V - Single Pole</SelectItem>
+                                  <SelectItem value="220v-double">220 V - Double Pole</SelectItem>
+                                  <SelectItem value="arc-fault-afci">Arc Fault - AFCI</SelectItem>
+                                  <SelectItem value="ground-fault-gfi">Ground Fault - GFI</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Input
+                                placeholder="QTY"
+                                value={circuit.qty}
+                                onChange={(e) => {
+                                  const newCircuits = [...exterior.electrical.circuits]
+                                  newCircuits[idx] = { ...circuit, qty: e.target.value }
+                                  setExterior({ ...exterior, electrical: { ...exterior.electrical, circuits: newCircuits } })
+                                  handleSave()
+                                }}
+                                className="w-[80px] border-border/60 bg-secondary/50"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:bg-destructive/20"
+                                onClick={() => {
+                                  const newCircuits = exterior.electrical.circuits.filter(c => c.id !== circuit.id)
+                                  setExterior({ ...exterior, electrical: { ...exterior.electrical, circuits: newCircuits } })
+                                  handleSave()
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
 
-                  {/* Finishes */}
+                  {/* Finishes and Insulation */}
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50 [&[data-state=open]>svg]:rotate-180">
                       <div className="flex items-center gap-3">
                         <Home className="h-5 w-5 text-primary" />
-                        <span className="font-medium text-foreground">Finishes</span>
-                        {exterior.finishes.length > 0 && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                        <span className="font-medium text-foreground">Finishes and Insulation</span>
+                        {(exterior.finishes.exteriorPaint.enabled || exterior.finishes.siding.enabled || exterior.finishes.sheathing.enabled || exterior.finishes.houseWrap.enabled || exterior.finishes.backerBoard.enabled || exterior.finishes.wallInsulation.enabled) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
-                      <div className="flex flex-wrap items-end gap-4">
-                        <div className="flex items-center gap-2 pb-2">
-                          <Switch
-                            checked={exterior.finishes.some(f => f.type === "exterior-paint")}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-paint", measureType: "pf", value: "" }] })
-                              } else {
-                                setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-paint") })
-                              }
-                              handleSave()
-                            }}
-                          />
-                          <Label className="text-sm">Exterior Paint</Label>
+                      <div className="space-y-4">
+                        {/* Exterior Paint */}
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={exterior.finishes.exteriorPaint.enabled}
+                              onCheckedChange={(checked) => {
+                                setExterior({ ...exterior, finishes: { ...exterior.finishes, exteriorPaint: { ...exterior.finishes.exteriorPaint, enabled: checked } } })
+                                handleSave()
+                              }}
+                            />
+                            <Label className="text-sm">Exterior Paint</Label>
+                          </div>
+                          <p className="text-[10px] text-amber-500 mt-1 ml-10">Note: This option is for full wall of for paint</p>
                         </div>
-                        {exterior.finishes.some(f => f.type === "exterior-paint") && (
-                          <>
-                            <div className="flex items-center gap-2">
-                              {(["pf", "sf"] as const).map((mt) => (
-                                <Button
-                                  key={mt}
-                                  type="button"
-                                  variant={exterior.finishes.find(f => f.type === "exterior-paint")?.measureType === mt ? "default" : "outline"}
-                                  size="sm"
-                                  className="h-7 px-2 text-xs"
-                                  onClick={() => {
-                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-paint" ? { ...f, measureType: mt } : f) })
+
+                        {/* Siding */}
+                        <div className="flex flex-wrap items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={exterior.finishes.siding.enabled}
+                              onCheckedChange={(checked) => {
+                                setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, enabled: checked } } })
+                                handleSave()
+                              }}
+                            />
+                            <Label className="text-sm">Siding</Label>
+                          </div>
+                          {exterior.finishes.siding.enabled && (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={!exterior.finishes.siding.squareFeetEnabled}
+                                  onCheckedChange={(checked) => {
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeetEnabled: !checked } } })
+                                    handleSave()
+                                  }}
+                                />
+                                <Label className="text-xs text-muted-foreground">Perimeter Feet</Label>
+                              </div>
+                              <span className="text-xs text-muted-foreground">Or</span>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={exterior.finishes.siding.squareFeetEnabled}
+                                  onCheckedChange={(checked) => {
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeetEnabled: checked } } })
+                                    handleSave()
+                                  }}
+                                />
+                                <Label className="text-xs text-muted-foreground">Square Feet</Label>
+                              </div>
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="0"
+                                value={exterior.finishes.siding.squareFeetEnabled ? exterior.finishes.siding.squareFeet : exterior.finishes.siding.perimeterFeet}
+                                onChange={(e) => {
+                                  if (exterior.finishes.siding.squareFeetEnabled) {
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeet: e.target.value } } })
+                                  } else {
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, perimeterFeet: e.target.value } } })
+                                  }
+                                  handleSave()
+                                }}
+                                className="w-16 h-8 border-border/60 bg-secondary/50 text-sm"
+                              />
+                            </>
+                          )}
+                        </div>
+
+                        {/* Sheathing */}
+                        <div className="flex flex-wrap items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={exterior.finishes.sheathing.enabled}
+                              onCheckedChange={(checked) => {
+                                setExterior({ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, enabled: checked } } })
+                                handleSave()
+                              }}
+                            />
+                            <Label className="text-sm">Sheathing</Label>
+                          </div>
+                          {exterior.finishes.sheathing.enabled && (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs text-muted-foreground">Type</Label>
+                                <Select
+                                  value={exterior.finishes.sheathing.type}
+                                  onValueChange={(v) => {
+                                    const value = v === "__none__" ? "" : v
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, type: value } } })
                                     handleSave()
                                   }}
                                 >
-                                  {mt.toUpperCase()}
-                                </Button>
-                              ))}
-                            </div>
-                            <div className="space-y-2 min-w-[100px]">
-                              <Select
-                                value={exterior.finishes.find(f => f.type === "exterior-paint")?.value || ""}
-                                onValueChange={(__v) => {
-                                  const value = __v === "__none__" ? "" : __v;
-                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-paint" ? { ...f, value } : f) })
-                                  handleSave()
-                                }}
-                              >
-                                <SelectTrigger className="border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="0.25">0.25</SelectItem>
-                                  <SelectItem value="0.5">0.5</SelectItem>
-                                  <SelectItem value="W">W</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </>
-                        )}
-                        <div className="flex items-center gap-2 pb-2">
-                          <Switch
-                            checked={exterior.finishes.some(f => f.type === "exterior-siding")}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setExterior({ ...exterior, finishes: [...exterior.finishes, { id: Date.now(), type: "exterior-siding", measureType: "sf", value: "" }] })
-                              } else {
-                                setExterior({ ...exterior, finishes: exterior.finishes.filter(f => f.type !== "exterior-siding") })
-                              }
-                              handleSave()
-                            }}
-                          />
-                          <Label className="text-sm">Exterior Siding</Label>
-                        </div>
-                        {exterior.finishes.some(f => f.type === "exterior-siding") && (
-                          <>
-                            <div className="flex items-center gap-2">
-                              {(["pf", "sf"] as const).map((mt) => (
-                                <Button
-                                  key={mt}
-                                  type="button"
-                                  variant={exterior.finishes.find(f => f.type === "exterior-siding")?.measureType === mt ? "default" : "outline"}
-                                  size="sm"
-                                  className="h-7 px-2 text-xs"
-                                  onClick={() => {
-                                    setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-siding" ? { ...f, measureType: mt } : f) })
+                                  <SelectTrigger className="w-[80px] h-8 border-border/60 bg-secondary/50 text-sm">
+                                    <SelectValue placeholder="Type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="1/2">1/2</SelectItem>
+                                    <SelectItem value="3/4">3/4</SelectItem>
+                                    <SelectItem value="3/8">3/8</SelectItem>
+                                    <SelectItem value="5/8">5/8</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs text-muted-foreground">Replacement Height</Label>
+                                <Select
+                                  value={exterior.finishes.sheathing.replacementHeight}
+                                  onValueChange={(v) => {
+                                    const value = v === "__none__" ? "" : v
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, replacementHeight: value } } })
                                     handleSave()
                                   }}
                                 >
-                                  {mt.toUpperCase()}
-                                </Button>
-                              ))}
-                            </div>
-                            <div className="space-y-2 min-w-[100px]">
+                                  <SelectTrigger className="w-[80px] h-8 border-border/60 bg-secondary/50 text-sm">
+                                    <SelectValue placeholder="Height" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="4">4 PF</SelectItem>
+                                    <SelectItem value="8">8 PF</SelectItem>
+                                    <SelectItem value="12">12 PF</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </>
+                          )}
+                        </div>
+
+                        {/* House wrap */}
+                        <div className="flex flex-wrap items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={exterior.finishes.houseWrap.enabled}
+                              onCheckedChange={(checked) => {
+                                setExterior({ ...exterior, finishes: { ...exterior.finishes, houseWrap: { ...exterior.finishes.houseWrap, enabled: checked } } })
+                                handleSave()
+                              }}
+                            />
+                            <Label className="text-sm">House wrap</Label>
+                          </div>
+                          {exterior.finishes.houseWrap.enabled && (
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs text-muted-foreground">Replacement Height</Label>
                               <Select
-                                value={exterior.finishes.find(f => f.type === "exterior-siding")?.value || ""}
-                                onValueChange={(__v) => {
-                                  const value = __v === "__none__" ? "" : __v;
-                                  setExterior({ ...exterior, finishes: exterior.finishes.map(f => f.type === "exterior-siding" ? { ...f, value } : f) })
+                                value={exterior.finishes.houseWrap.replacementHeight}
+                                onValueChange={(v) => {
+                                  const value = v === "__none__" ? "" : v
+                                  setExterior({ ...exterior, finishes: { ...exterior.finishes, houseWrap: { ...exterior.finishes.houseWrap, replacementHeight: value } } })
                                   handleSave()
                                 }}
                               >
-                                <SelectTrigger className="border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select" />
+                                <SelectTrigger className="w-[80px] h-8 border-border/60 bg-secondary/50 text-sm">
+                                  <SelectValue placeholder="Height" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="0.25">0.25</SelectItem>
-                                  <SelectItem value="0.5">0.5</SelectItem>
-                                  <SelectItem value="W">W</SelectItem>
+                                  <SelectItem value="4">4 PF</SelectItem>
+                                  <SelectItem value="8">8 PF</SelectItem>
+                                  <SelectItem value="12">12 PF</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
-                          </>
-                        )}
+                          )}
+                        </div>
+
+                        {/* Backer Board Behind Brick */}
+                        <div className="flex flex-wrap items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={exterior.finishes.backerBoard.enabled}
+                              onCheckedChange={(checked) => {
+                                setExterior({ ...exterior, finishes: { ...exterior.finishes, backerBoard: { ...exterior.finishes.backerBoard, enabled: checked } } })
+                                handleSave()
+                              }}
+                            />
+                            <Label className="text-sm">Backer Board Behind Brick</Label>
+                          </div>
+                          {exterior.finishes.backerBoard.enabled && (
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs text-muted-foreground">Replacement Height</Label>
+                              <Select
+                                value={exterior.finishes.backerBoard.replacementHeight}
+                                onValueChange={(v) => {
+                                  const value = v === "__none__" ? "" : v
+                                  setExterior({ ...exterior, finishes: { ...exterior.finishes, backerBoard: { ...exterior.finishes.backerBoard, replacementHeight: value } } })
+                                  handleSave()
+                                }}
+                              >
+                                <SelectTrigger className="w-[80px] h-8 border-border/60 bg-secondary/50 text-sm">
+                                  <SelectValue placeholder="Height" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                  <SelectItem value="4">4 PF</SelectItem>
+                                  <SelectItem value="8">8 PF</SelectItem>
+                                  <SelectItem value="12">12 PF</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Wall Insulation */}
+                        <div className="flex flex-wrap items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={exterior.finishes.wallInsulation.enabled}
+                              onCheckedChange={(checked) => {
+                                setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, enabled: checked } } })
+                                handleSave()
+                              }}
+                            />
+                            <Label className="text-sm">Wall Insulation</Label>
+                          </div>
+                          {exterior.finishes.wallInsulation.enabled && (
+                            <>
+                              <Select
+                                value={exterior.finishes.wallInsulation.type}
+                                onValueChange={(v) => {
+                                  const value = v === "__none__" ? "" : v
+                                  setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, type: value } } })
+                                  handleSave()
+                                }}
+                              >
+                                <SelectTrigger className="w-[120px] h-8 border-border/60 bg-secondary/50 text-sm">
+                                  <SelectValue placeholder="Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                  <SelectItem value="spray-foam">Spray foam</SelectItem>
+                                  <SelectItem value="batt">Batt</SelectItem>
+                                  <SelectItem value="blown-in">Blown-in</SelectItem>
+                                  <SelectItem value="rigid-foam">Rigid foam</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs text-muted-foreground">Replacement Height</Label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="0"
+                                  value={exterior.finishes.wallInsulation.replacementHeight}
+                                  onChange={(e) => {
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, replacementHeight: e.target.value } } })
+                                    handleSave()
+                                  }}
+                                  className="w-16 h-8 border-border/60 bg-secondary/50 text-sm"
+                                />
+                                <span className="text-xs text-muted-foreground">PF</span>
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
