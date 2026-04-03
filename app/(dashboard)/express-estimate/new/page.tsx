@@ -493,7 +493,7 @@ export default function NewExpressEstimatePage() {
       gfiOutlets: "",
       lightSwitch: "",
       junctionBox: "",
-      breakerPanel: { enabled: false, amps: "", arcFaults: false },
+      breakerPanel: { enabled: false, panelType: "", circuits: [] as Array<{ id: number; type: string; qty: string }> },
       meterBox: false,
     },
   })
@@ -2709,36 +2709,99 @@ const newDoor: DoorItem = {
                         </div>
                         {/* Breaker Panel */}
                         <div className="space-y-3">
-                          <div className="flex items-center gap-3">
-                            <Switch
-                              checked={foundation.electrical.breakerPanel.enabled}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
-                            />
-                            <Label>Enable Breaker Panel</Label>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Switch
+                                checked={foundation.electrical.breakerPanel.enabled}
+                                onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
+                              />
+                              <Label>Enable Breaker Panel</Label>
+                            </div>
+                            {foundation.electrical.breakerPanel.enabled && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="gap-1 border-border/60"
+                                onClick={() => {
+                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: [...foundation.electrical.breakerPanel.circuits, { id: Date.now(), type: "", qty: "" }] } } })
+                                  handleSave()
+                                }}
+                              >
+                                <Plus className="h-3 w-3" /> Add Circuit
+                              </Button>
+                            )}
                           </div>
                           {foundation.electrical.breakerPanel.enabled && (
-                            <div className="ml-8 flex items-center gap-4">
+                            <div className="ml-8 space-y-4">
                               <div className="space-y-2">
-                                <Label className="text-sm">Amperage</Label>
-                                <Select value={foundation.electrical.breakerPanel.amps} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, amps: value } } }); handleSave() }}>
-                                  <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="Select" />
+                                <Label className="text-sm">Breaker Panel Replacement</Label>
+                                <Select value={foundation.electrical.breakerPanel.panelType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, panelType: value } } }); handleSave() }}>
+                                  <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select type" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    {["100", "150", "200", "300"].map(a => (
-                                      <SelectItem key={a} value={a}>{a} Amp</SelectItem>
-                                    ))}
+                                    <SelectItem value="110v-single">110 V - Single Pole</SelectItem>
+                                    <SelectItem value="220v-double">220 V - Double Pole</SelectItem>
+                                    <SelectItem value="arc-fault-afci">Arc Fault - AFCI</SelectItem>
+                                    <SelectItem value="ground-fault-gfi">Ground Fault - GFI</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="flex items-center gap-2 pt-6">
-                                <Switch
-                                  checked={foundation.electrical.breakerPanel.arcFaults}
-                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
-                                />
-                                <Label className="text-sm">With Arc Faults</Label>
-                              </div>
+                              {foundation.electrical.breakerPanel.circuits.map((circuit, index) => (
+                                <div key={circuit.id} className="flex flex-wrap items-end gap-4 rounded-lg border border-border/40 bg-secondary/30 p-3">
+                                  <div className="space-y-2 flex-1 min-w-[180px]">
+                                    <Label className="text-sm">Breaker Circuit Replacement</Label>
+                                    <Select value={circuit.type} onValueChange={(__v) => {
+                                      const value = __v === "__none__" ? "" : __v;
+                                      const updated = [...foundation.electrical.breakerPanel.circuits];
+                                      updated[index] = { ...circuit, type: value };
+                                      setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: updated } } })
+                                      handleSave()
+                                    }}>
+                                      <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="Select type" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                        <SelectItem value="110v-single">110 V - Single Pole</SelectItem>
+                                        <SelectItem value="220v-double">220 V - Double Pole</SelectItem>
+                                        <SelectItem value="arc-fault-afci">Arc Fault - AFCI</SelectItem>
+                                        <SelectItem value="ground-fault-gfi">Ground Fault - GFI</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label className="text-sm">QTY</Label>
+                                    <Input
+                                      type="number"
+                                      min={1}
+                                      value={circuit.qty}
+                                      onChange={(e) => {
+                                        const updated = [...foundation.electrical.breakerPanel.circuits];
+                                        updated[index] = { ...circuit, qty: e.target.value };
+                                        setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: updated } } })
+                                        handleSave()
+                                      }}
+                                      placeholder="--"
+                                      className="w-20 border-border/60 bg-secondary/50"
+                                    />
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                    onClick={() => {
+                                      setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: foundation.electrical.breakerPanel.circuits.filter(c => c.id !== circuit.id) } } })
+                                      handleSave()
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              ))}
                             </div>
                           )}
                         </div>
