@@ -495,6 +495,7 @@ export default function NewExpressEstimatePage() {
       junctionBox: "",
       breakerPanel: { enabled: false, panelType: "", circuits: [] as Array<{ id: number; type: string; qty: string }> },
       meterBox: false,
+      houseRewire: { enabled: false, homeSf: "" },
     },
   })
 
@@ -2820,6 +2821,25 @@ const newDoor: DoorItem = {
                                 <SelectItem value="2">2</SelectItem>
                               </SelectContent>
                             </Select>
+                          )}
+                        </div>
+
+                        {/* House Rewire */}
+                        <div className="flex items-center gap-3">
+                          <Switch
+                            checked={foundation.electrical.houseRewire.enabled}
+                            onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, houseRewire: { ...foundation.electrical.houseRewire, enabled: checked } } }); handleSave() }}
+                          />
+                          <Label>House Rewire</Label>
+                          {foundation.electrical.houseRewire.enabled && (
+                            <Input
+                              type="number"
+                              min={0}
+                              value={foundation.electrical.houseRewire.homeSf}
+                              onChange={(e) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, houseRewire: { ...foundation.electrical.houseRewire, homeSf: e.target.value } } }); handleSave() }}
+                              placeholder="enter home SF"
+                              className="w-36 border-border/60 bg-secondary/50"
+                            />
                           )}
                         </div>
                       </div>
