@@ -2647,73 +2647,128 @@ const newDoor: DoorItem = {
                         <div className="flex flex-wrap items-end gap-4">
                           <div className="space-y-2">
                             <Label>110 outlet</Label>
-                            <Select value={foundation.electrical.outlets110} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: value } }); handleSave() }}>
-                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                <SelectValue placeholder="QTY" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <Input
+                              type="number"
+                              min={0}
+                              max={10}
+                              inputMode="numeric"
+                              placeholder="QTY"
+                              value={foundation.electrical.outlets110}
+                              onChange={(e) => {
+                                const v = e.target.value
+                                if (v === "") {
+                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: "" } })
+                                  handleSave()
+                                  return
+                                }
+                                const n = parseInt(v, 10)
+                                if (Number.isNaN(n)) return
+                                const clamped = Math.min(10, Math.max(0, n))
+                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: String(clamped) } })
+                                handleSave()
+                              }}
+                              className="w-20 border-border/60 bg-secondary/50"
+                            />
                           </div>
                           <div className="space-y-2">
                             <Label>220 outlet</Label>
-                            <Select value={foundation.electrical.outlets220} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: value } }); handleSave() }}>
-                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                <SelectValue placeholder="QTY" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                {[0, 1, 2, 3, 4, 5].map(n => (
-                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <Input
+                              type="number"
+                              min={0}
+                              max={5}
+                              inputMode="numeric"
+                              placeholder="QTY"
+                              value={foundation.electrical.outlets220}
+                              onChange={(e) => {
+                                const v = e.target.value
+                                if (v === "") {
+                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: "" } })
+                                  handleSave()
+                                  return
+                                }
+                                const n = parseInt(v, 10)
+                                if (Number.isNaN(n)) return
+                                const clamped = Math.min(5, Math.max(0, n))
+                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: String(clamped) } })
+                                handleSave()
+                              }}
+                              className="w-20 border-border/60 bg-secondary/50"
+                            />
                           </div>
                           <div className="space-y-2">
                             <Label>GFI outlet</Label>
-                            <Select value={foundation.electrical.gfiOutlets} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: value } }); handleSave() }}>
-                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                <SelectValue placeholder="QTY" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                {[0, 1, 2, 3, 4, 5].map(n => (
-                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <Input
+                              type="number"
+                              min={0}
+                              max={5}
+                              inputMode="numeric"
+                              placeholder="QTY"
+                              value={foundation.electrical.gfiOutlets}
+                              onChange={(e) => {
+                                const v = e.target.value
+                                if (v === "") {
+                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: "" } })
+                                  handleSave()
+                                  return
+                                }
+                                const n = parseInt(v, 10)
+                                if (Number.isNaN(n)) return
+                                const clamped = Math.min(5, Math.max(0, n))
+                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: String(clamped) } })
+                                handleSave()
+                              }}
+                              className="w-20 border-border/60 bg-secondary/50"
+                            />
                           </div>
                           <div className="space-y-2">
                             <Label>Light Switch</Label>
-                            <Select value={foundation.electrical.lightSwitch} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: value } }); handleSave() }}>
-                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                <SelectValue placeholder="QTY" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(n => (
-                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <Input
+                              type="number"
+                              min={0}
+                              max={8}
+                              inputMode="numeric"
+                              placeholder="QTY"
+                              value={foundation.electrical.lightSwitch}
+                              onChange={(e) => {
+                                const v = e.target.value
+                                if (v === "") {
+                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: "" } })
+                                  handleSave()
+                                  return
+                                }
+                                const n = parseInt(v, 10)
+                                if (Number.isNaN(n)) return
+                                const clamped = Math.min(8, Math.max(0, n))
+                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: String(clamped) } })
+                                handleSave()
+                              }}
+                              className="w-20 border-border/60 bg-secondary/50"
+                            />
                           </div>
                           <div className="space-y-2">
                             <Label>Junction Box</Label>
-                            <Select value={foundation.electrical.junctionBox} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: value } }); handleSave() }}>
-                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                <SelectValue placeholder="QTY" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                {[0, 1, 2, 3, 4, 5].map(n => (
-                                  <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <Input
+                              type="number"
+                              min={0}
+                              max={5}
+                              inputMode="numeric"
+                              placeholder="QTY"
+                              value={foundation.electrical.junctionBox}
+                              onChange={(e) => {
+                                const v = e.target.value
+                                if (v === "") {
+                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: "" } })
+                                  handleSave()
+                                  return
+                                }
+                                const n = parseInt(v, 10)
+                                if (Number.isNaN(n)) return
+                                const clamped = Math.min(5, Math.max(0, n))
+                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: String(clamped) } })
+                                handleSave()
+                              }}
+                              className="w-20 border-border/60 bg-secondary/50"
+                            />
                           </div>
                         </div>
                         {/* Breaker Panel */}
