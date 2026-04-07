@@ -97,7 +97,7 @@ interface TrimOptions {
   shoe: boolean
   shoeFinish: string
   subtractCabinetry: boolean
-  }
+}
 
 interface WallCoveringOptions {
   enabled: boolean
@@ -111,7 +111,7 @@ interface WallCoveringOptions {
   panelingGrade: string
   chairRailAction: string
   chairRailFinish: string
-  }
+}
 
 interface ElectricalOptions {
   enabled: boolean
@@ -157,7 +157,7 @@ interface DoorItem {
   panelGrade: string
   stormdoorAssembly: boolean
   retrofitInStucco: boolean
-  }
+}
 
 interface VanityOptions {
   enabled: boolean
@@ -213,7 +213,7 @@ interface ShowerOptions {
   tileFeatureStrip: boolean
   glassDoor: boolean
   glassDoorAction: string
-  }
+}
 
 interface CabinetOptions {
   enabled: boolean
@@ -274,40 +274,40 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
 }
 
 const defaultBathroomExtras = {
-vanity: {
-  enabled: false,
-  size: "",
-  grade: "",
-  detachAndReset: false,
-  countertop: { type: "", grade: "", size: "", pStop: "", sink: "", action: "", faucet: "", faucetAction: "" },
-  backsplashUnattached: false,
-  backsplashAction: ""
+  vanity: {
+    enabled: false,
+    size: "",
+    grade: "",
+    detachAndReset: false,
+    countertop: { type: "", grade: "", size: "", pStop: "", sink: "", action: "", faucet: "", faucetAction: "" },
+    backsplashUnattached: false,
+    backsplashAction: ""
   },
   toilet: { enabled: false, action: "", seatReplacement: false, supplyLine: false },
-shower: {
-  enabled: false,
-  type: "",
-  detachAndReset: false,
-  showerFaucet: "",
-  actionForTub: "",
-  jetted: false,
-  jettedMotorReplace: false,
-  surround: "",
-  tubShowerFaucet: "",
-  mortarBedReplace: false,
-  mortarBedSize: "",
-  walls: "",
-  tileBench: false,
-  tileNiche: false,
-  tileNicheQty: "",
-  towelBar: false,
-  tileSoapDish: false,
-  tileSoapDishQty: "",
-  grabBar: false,
-  grabBarQty: "",
-  tileFeatureStrip: false,
-  glassDoor: false,
-  glassDoorAction: ""
+  shower: {
+    enabled: false,
+    type: "",
+    detachAndReset: false,
+    showerFaucet: "",
+    actionForTub: "",
+    jetted: false,
+    jettedMotorReplace: false,
+    surround: "",
+    tubShowerFaucet: "",
+    mortarBedReplace: false,
+    mortarBedSize: "",
+    walls: "",
+    tileBench: false,
+    tileNiche: false,
+    tileNicheQty: "",
+    towelBar: false,
+    tileSoapDish: false,
+    tileSoapDishQty: "",
+    grabBar: false,
+    grabBarQty: "",
+    tileFeatureStrip: false,
+    glassDoor: false,
+    glassDoorAction: ""
   },
 }
 
@@ -532,15 +532,15 @@ export default function NewExpressEstimatePage() {
           roomName = `Room ${rooms.filter(r => r.type === "room").length + 1}`
       }
     }
-  const newRoom: Room = {
-  id: Date.now(),
-  name: roomName,
-  ...defaultRoom,
-  type,
-  ...defaultAppliancesExtras,
-  ...(type === "bathroom" ? defaultBathroomExtras : {}),
-  ...(type === "kitchen" ? defaultKitchenExtras : {}),
-  }
+    const newRoom: Room = {
+      id: Date.now(),
+      name: roomName,
+      ...defaultRoom,
+      type,
+      ...defaultAppliancesExtras,
+      ...(type === "bathroom" ? defaultBathroomExtras : {}),
+      ...(type === "kitchen" ? defaultKitchenExtras : {}),
+    }
     setRooms([...rooms, newRoom])
     handleSave()
   }
@@ -591,25 +591,25 @@ export default function NewExpressEstimatePage() {
   const addDoor = (roomId: number, category: "interior" | "exterior") => {
     const room = rooms.find(r => r.id === roomId)
     if (room) {
-const newDoor: DoorItem = {
-  id: Date.now(),
-  category,
-  type: "",
-  size: "",
-  grade: "",
-  finish: "",
-  handleAction: "",
-  misc: "",
-  peepHole: false,
-  mailSlot: false,
-  nonCased: false,
-  sidelites: false,
-  sidelitesQty: "",
-  panelSize: "",
-  panelGrade: "",
-  stormdoorAssembly: false,
-  retrofitInStucco: false,
-  }
+      const newDoor: DoorItem = {
+        id: Date.now(),
+        category,
+        type: "",
+        size: "",
+        grade: "",
+        finish: "",
+        handleAction: "",
+        misc: "",
+        peepHole: false,
+        mailSlot: false,
+        nonCased: false,
+        sidelites: false,
+        sidelitesQty: "",
+        panelSize: "",
+        panelGrade: "",
+        stormdoorAssembly: false,
+        retrofitInStucco: false,
+      }
       updateRoom(roomId, { doors: [...room.doors, newDoor] })
     }
   }
@@ -1251,7 +1251,7 @@ const newDoor: DoorItem = {
                             </div>
                           </>
                         )}
-                        
+
                         {/* Breaker Circuit Replacement */}
                         <div className="w-full pt-4">
                           <div className="flex items-center gap-3 mb-3">
@@ -4787,41 +4787,41 @@ const newDoor: DoorItem = {
                                           </div>
                                         )}
                                         {room.shower.type !== "tub-tile-surround" && (
-                                        <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                          <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
 
-                                          {/* Tub With Cultured Marble fields */}
-                                          {room.shower.type === "tub-cultured-marble" && (
-                                            <>
-                                              <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">Action for tub</Label>
-                                                <Select value={room.shower.actionForTub} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, actionForTub: value } }) }}>
-                                                  <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
-                                                    <SelectValue placeholder="Select" />
-                                                  </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="detach-tub">Detach tub</SelectItem>
-                                                    <SelectItem value="replace-tub">Replace tub</SelectItem>
-                                                  </SelectContent>
-                                                </Select>
-                                              </div>
-                                              <div className="space-y-1">
-                                                <Label className="text-xs text-muted-foreground">Tub Shower Faucet</Label>
-                                                <Select value={room.shower.tubShowerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } }) }}>
-                                                  <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
-                                                    <SelectValue placeholder="Select" />
-                                                  </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
-                                                  </SelectContent>
-                                                </Select>
-                                              </div>
-                                            </>
-                                          )}
+                                            {/* Tub With Cultured Marble fields */}
+                                            {room.shower.type === "tub-cultured-marble" && (
+                                              <>
+                                                <div className="space-y-1">
+                                                  <Label className="text-xs text-muted-foreground">Action for tub</Label>
+                                                  <Select value={room.shower.actionForTub} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, actionForTub: value } }) }}>
+                                                    <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
+                                                      <SelectValue placeholder="Select" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                      <SelectItem value="detach-tub">Detach tub</SelectItem>
+                                                      <SelectItem value="replace-tub">Replace tub</SelectItem>
+                                                    </SelectContent>
+                                                  </Select>
+                                                </div>
+                                                <div className="space-y-1">
+                                                  <Label className="text-xs text-muted-foreground">Tub Shower Faucet</Label>
+                                                  <Select value={room.shower.tubShowerFaucet} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { shower: { ...room.shower!, tubShowerFaucet: value } }) }}>
+                                                    <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                                      <SelectValue placeholder="Select" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                      <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                      <SelectItem value="replace">Replace</SelectItem>
+                                                    </SelectContent>
+                                                  </Select>
+                                                </div>
+                                              </>
+                                            )}
 
-                                        </div>
+                                          </div>
                                         )}
 
                                         {/* Notes for different types */}
@@ -5824,11 +5824,11 @@ const newDoor: DoorItem = {
                                             </div>
                                           )}
                                         </div>
-                                        
+
                                         {/* Complete Button */}
                                         <div className="flex justify-end pt-3 border-t border-border/40">
-                                          <Button 
-                                            type="button" 
+                                          <Button
+                                            type="button"
                                             onClick={() => { handleSave(); }}
                                             className="gap-2"
                                           >
@@ -6356,7 +6356,7 @@ const newDoor: DoorItem = {
                                                 <Label className="text-sm whitespace-nowrap">Circulator pump</Label>
                                               </div>
                                             </div>
-                                            
+
                                             {/* Baseboard Heat - inside Boiler enabled block */}
                                             <div className="flex items-center gap-3 pt-2 border-t border-border/30">
                                               <Switch
