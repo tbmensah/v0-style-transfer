@@ -1,0 +1,11 @@
+---
+description: Never commit to main; use dev branch for all commits
+alwaysApply: true
+---
+
+# Git: commit on `dev` only
+
+- **Do not** create commits on `main`. Never run `git commit` while `main` is checked out for project work.
+- **Always** commit on the `dev` branch (or a feature branch created from `dev`).
+- Before committing: ensure the current branch is `dev` (or a child of `dev`), e.g. `git checkout dev` and `git pull` as needed, then commit.
+- If the user asks to commit or push, verify branch first; if on `main`, switch to `dev` (or ask how they want to handle unmerged work) rather than committing to `main`.
