@@ -34,7 +34,7 @@ export default function LoginPage() {
             </Link>
             <CardTitle className="text-2xl font-bold text-foreground">Welcome back</CardTitle>
             <CardDescription className="text-muted-foreground">
-              Enter your credentials to access your account here here
+              Enter your credentials to access your account
             </CardDescription>
           </CardHeader>
           <CardContent>
