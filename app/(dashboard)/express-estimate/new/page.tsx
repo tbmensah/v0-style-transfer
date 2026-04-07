@@ -910,7 +910,7 @@ const newDoor: DoorItem = {
                                   setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
                                   handleSave()
                                 }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[140px] min-w-[140px] shrink-0">
                                     <SelectValue placeholder="Tonnage" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -1023,7 +1023,7 @@ const newDoor: DoorItem = {
                                   setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
                                   handleSave()
                                 }}>
-                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
+                                  <SelectTrigger className="border-border/60 bg-secondary/50 w-[140px] min-w-[140px] shrink-0">
                                     <SelectValue placeholder="Tonnage" />
                                   </SelectTrigger>
                                   <SelectContent>
