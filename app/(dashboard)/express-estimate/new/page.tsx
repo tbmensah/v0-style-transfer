@@ -333,6 +333,26 @@ const defaultKitchenExtras = {
   ...defaultAppliancesExtras,
 }
 
+/** Interior flooring: Vapor Barrier / Subfloor Replacement visibility and exclusivity */
+function flooringShowVaporBarrier(type: string, application: string): boolean {
+  if (!type) return true
+  if (type === "epoxy" || type === "terrazzo") return false
+  if (type === "sheet-vinyl") return false
+  if (type === "carpet" || type === "carpet-glue-down" || type === "tile") return false
+  if (application === "glue-down-concrete") return false
+  return true
+}
+
+function flooringShowSubfloorReplacement(type: string): boolean {
+  if (!type) return true
+  if (type === "epoxy" || type === "terrazzo") return false
+  return true
+}
+
+function flooringVaporBarrierSubfloorIndependent(type: string, application: string): boolean {
+  return type === "laminate" || type === "hardwood" || application === "floating"
+}
+
 export default function NewExpressEstimatePage() {
   const [activeTab, setActiveTab] = useState("exterior")
   const nv = (v: string) => v === "__none__" ? "" : v
@@ -498,11 +518,13 @@ export default function NewExpressEstimatePage() {
       junctionBox: "",
       breakerPanel: { enabled: false, panelType: "", circuits: [] as Array<{ id: number; type: string; qty: string }> },
       meterBox: false,
+      meterBoxQty: "",
       houseRewire: { enabled: false, homeSf: "" },
     },
     stairs: {
       stairsForReplacement: "",
       sizeOfTreads: "",
+      qty: "",
       risers: false,
       stringersLength: "",
       landingReplacement: false,
@@ -2936,17 +2958,29 @@ const newDoor: DoorItem = {
                           />
                           <Label>Enable Meter Box</Label>
                           {foundation.electrical.meterBox && (
-                            <Select defaultValue="qty">
-                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                <SelectValue placeholder="QTY" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                <SelectItem value="qty">QTY</SelectItem>
-                                <SelectItem value="1">1</SelectItem>
-                                <SelectItem value="2">2</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <Input
+                              type="number"
+                              min={0}
+                              max={10}
+                              step={1}
+                              inputMode="numeric"
+                              placeholder="QTY"
+                              value={foundation.electrical.meterBoxQty}
+                              onChange={(e) => {
+                                const v = e.target.value
+                                if (v === "") {
+                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, meterBoxQty: "" } })
+                                  handleSave()
+                                  return
+                                }
+                                const n = parseInt(v, 10)
+                                if (Number.isNaN(n)) return
+                                const clamped = Math.min(10, Math.max(0, n))
+                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, meterBoxQty: String(clamped) } })
+                                handleSave()
+                              }}
+                              className="w-20 border-border/60 bg-secondary/50"
+                            />
                           )}
                         </div>
 
@@ -2978,13 +3012,13 @@ const newDoor: DoorItem = {
                       <div className="flex items-center gap-3">
                         <svg className="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 20h4v-4h4v-4h4v-4h4V4" /></svg>
                         <span className="font-medium text-foreground">Stairs</span>
-                        {(foundation.stairs.stairsForReplacement || foundation.stairs.landingReplacement) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                        {(foundation.stairs.stairsForReplacement || foundation.stairs.qty || foundation.stairs.landingReplacement) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="space-y-4">
-                        {/* Row 1: # of stairs, Size of Treads, Risers */}
+                        {/* Row 1: # of stairs, Size of Treads, Risers, QTY */}
                         <div className="flex flex-wrap items-center gap-4">
                           <div className="flex items-center gap-2">
                             <Label className="text-sm whitespace-nowrap"># of stairs For Replacement</Label>
@@ -3021,6 +3055,29 @@ const newDoor: DoorItem = {
                             />
                             <Label className="text-sm">Risers</Label>
                           </div>
+                          <Input
+                            type="number"
+                            min={0}
+                            max={10}
+                            step={1}
+                            inputMode="numeric"
+                            placeholder="QTY"
+                            value={foundation.stairs.qty}
+                            onChange={(e) => {
+                              const v = e.target.value
+                              if (v === "") {
+                                setFoundation({ ...foundation, stairs: { ...foundation.stairs, qty: "" } })
+                                handleSave()
+                                return
+                              }
+                              const n = parseInt(v, 10)
+                              if (Number.isNaN(n)) return
+                              const clamped = Math.min(10, Math.max(0, n))
+                              setFoundation({ ...foundation, stairs: { ...foundation.stairs, qty: String(clamped) } })
+                              handleSave()
+                            }}
+                            className="w-20 border-border/60 bg-secondary/50"
+                          />
                         </div>
 
                         {/* Row 2: Total length of stringers */}
@@ -3438,11 +3495,13 @@ const newDoor: DoorItem = {
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Application</Label>
                                                 <Select
-                                                  value={layer.application}
+                                                  value={layer.type === "vinyl-plank" && layer.application === "installed-over-subfloor" ? "" : layer.application}
                                                   onValueChange={(__v) => {
                                                     const value = __v === "__none__" ? "" : __v;
                                                     const newLayers = [...(room.flooring.layers || [])]
-                                                    newLayers[layerIndex] = { ...layer, application: value }
+                                                    const next = { ...layer, application: value }
+                                                    if (value === "glue-down-concrete") next.vaporBarrier = false
+                                                    newLayers[layerIndex] = next
                                                     updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                   }}
                                                 >
@@ -3454,7 +3513,6 @@ const newDoor: DoorItem = {
                                                     {layer.type === "vinyl-plank" && (
                                                       <>
                                                         <SelectItem value="glue-down-concrete">Glue Down on Concrete</SelectItem>
-                                                        <SelectItem value="installed-over-subfloor">Installed over Subfloor</SelectItem>
                                                         <SelectItem value="floating">Floating</SelectItem>
                                                       </>
                                                     )}
@@ -3499,28 +3557,38 @@ const newDoor: DoorItem = {
                                               </div>
                                             )}
                                             {/* Toggles after dropdowns */}
-                                            <div className="flex items-center gap-2 pb-1">
-                                              <Switch
-                                                checked={layer.vaporBarrier}
-                                                onCheckedChange={(checked) => {
-                                                  const newLayers = [...(room.flooring.layers || [])]
-                                                  newLayers[layerIndex] = { ...layer, vaporBarrier: checked, subfloorReplacement: checked ? false : layer.subfloorReplacement }
-                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                                }}
-                                              />
-                                              <Label className="text-sm whitespace-nowrap">Vapor Barrier</Label>
-                                            </div>
-                                            <div className="flex items-center gap-2 pb-1">
-                                              <Switch
-                                                checked={layer.subfloorReplacement}
-                                                onCheckedChange={(checked) => {
-                                                  const newLayers = [...(room.flooring.layers || [])]
-                                                  newLayers[layerIndex] = { ...layer, subfloorReplacement: checked, vaporBarrier: checked ? false : layer.vaporBarrier }
-                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                                }}
-                                              />
-                                              <Label className="text-sm whitespace-nowrap">Subfloor Replacement</Label>
-                                            </div>
+                                            {flooringShowVaporBarrier(layer.type, layer.application) && (
+                                              <div className="flex items-center gap-2 pb-1">
+                                                <Switch
+                                                  checked={layer.vaporBarrier}
+                                                  onCheckedChange={(checked) => {
+                                                    const newLayers = [...(room.flooring.layers || [])]
+                                                    const independent = flooringVaporBarrierSubfloorIndependent(layer.type, layer.application)
+                                                    newLayers[layerIndex] = independent
+                                                      ? { ...layer, vaporBarrier: checked }
+                                                      : { ...layer, vaporBarrier: checked, subfloorReplacement: checked ? false : layer.subfloorReplacement }
+                                                    updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                  }}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Vapor Barrier</Label>
+                                              </div>
+                                            )}
+                                            {flooringShowSubfloorReplacement(layer.type) && (
+                                              <div className="flex items-center gap-2 pb-1">
+                                                <Switch
+                                                  checked={layer.subfloorReplacement}
+                                                  onCheckedChange={(checked) => {
+                                                    const newLayers = [...(room.flooring.layers || [])]
+                                                    const independent = flooringVaporBarrierSubfloorIndependent(layer.type, layer.application)
+                                                    newLayers[layerIndex] = independent
+                                                      ? { ...layer, subfloorReplacement: checked }
+                                                      : { ...layer, subfloorReplacement: checked, vaporBarrier: checked ? false : layer.vaporBarrier }
+                                                    updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                  }}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Subfloor Replacement</Label>
+                                              </div>
+                                            )}
                                             {/* Delete button at far right */}
                                             {layerIndex > 0 && (
                                               <>
@@ -3598,7 +3666,7 @@ const newDoor: DoorItem = {
                                           <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           <SelectItem value="mdf">MDF</SelectItem>
                                           <SelectItem value="standard">Standard</SelectItem>
-                                          <SelectItem value="wood">Wood</SelectItem>
+                                          <SelectItem value="wood">Hardwood</SelectItem>
                                         </SelectContent>
                                       </Select>
                                     </div>
