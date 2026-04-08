@@ -422,6 +422,8 @@ export default function NewExpressEstimatePage() {
       wallInsulation: {
         enabled: false,
         type: "",
+        replacementHeight: "",
+        measureType: "sf" as "sf" | "lf",
       },
       foundationalDoor: {
         enabled: false,
@@ -2247,17 +2249,48 @@ const newDoor: DoorItem = {
                             <Label className="text-sm">Enable Wall Insulation</Label>
                           </div>
                           {foundation.subgradeAreaCoverage.wallInsulation.enabled && (
-                            <div className="pl-6">
-                              <Select value={foundation.subgradeAreaCoverage.wallInsulation.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, type: value } } }); handleSave() }}>
-                                <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="r13-unfaced">{"4' - R-13 Unfaced Batt"}</SelectItem>
-                                  <SelectItem value="r19-unfaced">{"6' - R-19 Unfaced Batt"}</SelectItem>
-                                </SelectContent>
-                              </Select>
+                            <div className="pl-6 flex flex-wrap items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs text-muted-foreground">Type</Label>
+                                <Select value={foundation.subgradeAreaCoverage.wallInsulation.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, type: value } } }); handleSave() }}>
+                                  <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="--" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="r13-unfaced">{"4' - R-13 Unfaced Batt"}</SelectItem>
+                                    <SelectItem value="r19-unfaced">{"6' - R-19 Unfaced Batt"}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs text-muted-foreground">Replacement height</Label>
+                                <Select value={foundation.subgradeAreaCoverage.wallInsulation.replacementHeight} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, replacementHeight: value } } }); handleSave() }}>
+                                  <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="--" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="0.5">0.5</SelectItem>
+                                    <SelectItem value="W">W</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={foundation.subgradeAreaCoverage.wallInsulation.measureType === "sf"}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, measureType: checked ? "sf" : "lf" } } }); handleSave() }}
+                                />
+                                <Label className="text-sm">Square Feet</Label>
+                              </div>
+                              <span className="text-xs text-muted-foreground">or</span>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={foundation.subgradeAreaCoverage.wallInsulation.measureType === "lf"}
+                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, measureType: checked ? "lf" : "sf" } } }); handleSave() }}
+                                />
+                                <Label className="text-sm">Linear Feet</Label>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -2274,7 +2307,7 @@ const newDoor: DoorItem = {
                             </div>
                             {foundation.subgradeAreaCoverage.foundationalDoor.enabled && (
                               <Select value={foundation.subgradeAreaCoverage.foundationalDoor.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalDoor: { ...foundation.subgradeAreaCoverage.foundationalDoor, action: value } } }); handleSave() }}>
-                                <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                <SelectTrigger className="w-56 border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select action" />
                                 </SelectTrigger>
                                 <SelectContent>
