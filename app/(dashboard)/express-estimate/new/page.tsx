@@ -3782,10 +3782,10 @@ const newDoor: DoorItem = {
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               {room.wallCovering.material === "drywall-sf" && (
                                                 <>
-                                                  <SelectItem value="1/2-in">1/2 in</SelectItem>
-                                                  <SelectItem value="1/4-in">1/4 in</SelectItem>
-                                                  <SelectItem value="3/8-in">3/8 in</SelectItem>
-                                                  <SelectItem value="5/8-in">5/8 in</SelectItem>
+                                                  <SelectItem value="1/2-in">{"1/2 ''"}</SelectItem>
+                                                  <SelectItem value="1/4-in">{"1/4 ''"}</SelectItem>
+                                                  <SelectItem value="3/8-in">{"3/8 ''"}</SelectItem>
+                                                  <SelectItem value="5/8-in">{"5/8 ''"}</SelectItem>
                                                 </>
                                               )}
                                               {room.wallCovering.material === "drywall-lf" && (
@@ -3957,13 +3957,15 @@ const newDoor: DoorItem = {
                                           </div>
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Chair Rail Finish</Label>
-                                            <Select value={room.wallCovering.chairRailFinish} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, chairRailFinish: value } }) }}>
+                                            <Select
+                                              value={room.wallCovering.chairRailFinish === "paint" || room.wallCovering.chairRailFinish === "stain" ? room.wallCovering.chairRailFinish : undefined}
+                                              onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, chairRailFinish: value } }) }}
+                                            >
                                               <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="none">None</SelectItem>
                                                 <SelectItem value="paint">Paint</SelectItem>
                                                 <SelectItem value="stain">Stain</SelectItem>
                                               </SelectContent>
@@ -3985,12 +3987,18 @@ const newDoor: DoorItem = {
                                                 <>
                                                   <SelectItem value="0.5W">0.5W</SelectItem>
                                                   <SelectItem value="W">W</SelectItem>
+                                                  <SelectItem value="pf-x-4">PF x 4</SelectItem>
+                                                  <SelectItem value="pf-x-8">PF x 8</SelectItem>
+                                                  <SelectItem value="pf-x-12">PF x 12</SelectItem>
                                                 </>
                                               )}
                                               {room.wallCovering.material === "drywall-lf" && (
                                                 <>
                                                   <SelectItem value="PF">PF</SelectItem>
                                                   <SelectItem value="PFx2">PFx2</SelectItem>
+                                                  <SelectItem value="pf-x-4">PF x 4</SelectItem>
+                                                  <SelectItem value="pf-x-8">PF x 8</SelectItem>
+                                                  <SelectItem value="pf-x-12">PF x 12</SelectItem>
                                                 </>
                                               )}
                                               {room.wallCovering.material === "plaster" && (
@@ -3999,6 +4007,9 @@ const newDoor: DoorItem = {
                                                   <SelectItem value="0.5W">0.5W</SelectItem>
                                                   <SelectItem value="0.75W">0.75W</SelectItem>
                                                   <SelectItem value="W">W</SelectItem>
+                                                  <SelectItem value="pf-x-4">PF x 4</SelectItem>
+                                                  <SelectItem value="pf-x-8">PF x 8</SelectItem>
+                                                  <SelectItem value="pf-x-12">PF x 12</SelectItem>
                                                 </>
                                               )}
                                             </SelectContent>
@@ -4023,13 +4034,15 @@ const newDoor: DoorItem = {
                                           </div>
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Chair Rail Finish</Label>
-                                            <Select value={room.wallCovering.chairRailFinish} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, chairRailFinish: value } }) }}>
+                                            <Select
+                                              value={room.wallCovering.chairRailFinish === "paint" || room.wallCovering.chairRailFinish === "stain" ? room.wallCovering.chairRailFinish : undefined}
+                                              onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, chairRailFinish: value } }) }}
+                                            >
                                               <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="none">None</SelectItem>
                                                 <SelectItem value="paint">Paint</SelectItem>
                                                 <SelectItem value="stain">Stain</SelectItem>
                                               </SelectContent>
