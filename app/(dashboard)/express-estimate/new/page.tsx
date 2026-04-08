@@ -1451,7 +1451,7 @@ const newDoor: DoorItem = {
                                     handleSave()
                                   }}
                                 >
-                                  <SelectTrigger className="w-[80px] h-8 border-border/60 bg-secondary/50 text-sm">
+                                  <SelectTrigger className="w-[96px] h-8 border-border/60 bg-secondary/50 text-sm">
                                     <SelectValue placeholder="Height" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -1489,7 +1489,7 @@ const newDoor: DoorItem = {
                                   handleSave()
                                 }}
                               >
-                                <SelectTrigger className="w-[80px] h-8 border-border/60 bg-secondary/50 text-sm">
+                                <SelectTrigger className="w-[96px] h-8 border-border/60 bg-secondary/50 text-sm">
                                   <SelectValue placeholder="Height" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1526,7 +1526,7 @@ const newDoor: DoorItem = {
                                   handleSave()
                                 }}
                               >
-                                <SelectTrigger className="w-[80px] h-8 border-border/60 bg-secondary/50 text-sm">
+                                <SelectTrigger className="w-[96px] h-8 border-border/60 bg-secondary/50 text-sm">
                                   <SelectValue placeholder="Height" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1743,25 +1743,27 @@ const newDoor: DoorItem = {
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
-                                  {[1, 2, 3, 4, 5].map((n) => (
-                                    <SelectItem key={n} value={String(n)}>{n} ft</SelectItem>
+                                  {[3, 4, 5, 6, 7].map((n) => (
+                                    <SelectItem key={n} value={String(n)}>{n}'</SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
                             </div>
                             <div className="flex items-center gap-2">
                               <Label className="text-xs text-muted-foreground">Total Length of Stringers Submerged (ft)</Label>
-                              <Select value={foundation.crawlspace.stringersLength} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, stringersLength: value } }); handleSave() }}>
-                                <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="--" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
-                                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((n) => (
-                                    <SelectItem key={n} value={String(n)}>{n} ft</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                              <Input
+                                type="number"
+                                min="1"
+                                max="20"
+                                step="1"
+                                placeholder="--"
+                                value={foundation.crawlspace.stringersLength}
+                                onChange={(e) => {
+                                  setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, stringersLength: e.target.value } })
+                                  handleSave()
+                                }}
+                                className="border-border/60 bg-secondary/50 w-20"
+                              />
                             </div>
                           </div>
                         )}
