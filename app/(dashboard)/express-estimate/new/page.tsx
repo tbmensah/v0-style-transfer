@@ -415,7 +415,6 @@ export default function NewExpressEstimatePage() {
     subgradeAreaCoverage: {
       drywall: {
         enabled: false,
-        type: "",
         replacementHeight: "",
         measureType: "sf" as "sf" | "lf",
       },
@@ -1452,7 +1451,7 @@ const newDoor: DoorItem = {
                                     handleSave()
                                   }}
                                 >
-                                  <SelectTrigger className="w-[96px] h-8 border-border/60 bg-secondary/50 text-sm">
+                                  <SelectTrigger className="w-[80px] h-8 border-border/60 bg-secondary/50 text-sm">
                                     <SelectValue placeholder="Height" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -1490,7 +1489,7 @@ const newDoor: DoorItem = {
                                   handleSave()
                                 }}
                               >
-                                <SelectTrigger className="w-[96px] h-8 border-border/60 bg-secondary/50 text-sm">
+                                <SelectTrigger className="w-[80px] h-8 border-border/60 bg-secondary/50 text-sm">
                                   <SelectValue placeholder="Height" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1527,7 +1526,7 @@ const newDoor: DoorItem = {
                                   handleSave()
                                 }}
                               >
-                                <SelectTrigger className="w-[96px] h-8 border-border/60 bg-secondary/50 text-sm">
+                                <SelectTrigger className="w-[80px] h-8 border-border/60 bg-secondary/50 text-sm">
                                   <SelectValue placeholder="Height" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1744,27 +1743,25 @@ const newDoor: DoorItem = {
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
-                                  {[3, 4, 5, 6, 7].map((n) => (
-                                    <SelectItem key={n} value={String(n)}>{n}'</SelectItem>
+                                  {[1, 2, 3, 4, 5].map((n) => (
+                                    <SelectItem key={n} value={String(n)}>{n} ft</SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
                             </div>
                             <div className="flex items-center gap-2">
                               <Label className="text-xs text-muted-foreground">Total Length of Stringers Submerged (ft)</Label>
-                              <Input
-                                type="number"
-                                min="1"
-                                max="20"
-                                step="1"
-                                placeholder="--"
-                                value={foundation.crawlspace.stringersLength}
-                                onChange={(e) => {
-                                  setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, stringersLength: e.target.value } })
-                                  handleSave()
-                                }}
-                                className="border-border/60 bg-secondary/50 w-20"
-                              />
+                              <Select value={foundation.crawlspace.stringersLength} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, stringersLength: value } }); handleSave() }}>
+                                <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="--" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
+                                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((n) => (
+                                    <SelectItem key={n} value={String(n)}>{n} ft</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </div>
                           </div>
                         )}
@@ -2184,38 +2181,21 @@ const newDoor: DoorItem = {
                             </div>
                             {foundation.subgradeAreaCoverage.drywall.enabled && (
                               <>
-                                <div className="flex flex-wrap items-center gap-4">
-                                  <div className="flex items-center gap-2">
-                                    <Label className="text-xs text-muted-foreground">Type</Label>
-                                    <Select value={foundation.subgradeAreaCoverage.drywall.type} onValueChange={(__v) => {
-                                      const value = __v === "__none__" ? "" : __v
-                                      setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, type: value } } })
-                                      handleSave()
-                                    }}>
-                                      <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
-                                        <SelectValue placeholder="--" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        {['1/2"', '1/4"', '3/8"', '5/8"'].map((t) => (
-                                          <SelectItem key={t} value={t}>{t}</SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Label className="text-xs text-muted-foreground">Replacement height</Label>
-                                    <Select value={foundation.subgradeAreaCoverage.drywall.replacementHeight} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, replacementHeight: value } } }); handleSave() }}>
-                                      <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                        <SelectValue placeholder="--" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        <SelectItem value="0.5">0.5</SelectItem>
-                                        <SelectItem value="W">W</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
+                                <div className="flex items-center gap-2">
+                                  <Label className="text-xs text-muted-foreground">Replacement height</Label>
+                                  <Select value={foundation.subgradeAreaCoverage.drywall.replacementHeight} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, replacementHeight: value } } }); handleSave() }}>
+                                    <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="--" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
+                                      <SelectItem value="1/2">1/2</SelectItem>
+                                      <SelectItem value="1">1</SelectItem>
+                                      <SelectItem value="2">2</SelectItem>
+                                      <SelectItem value="3">3</SelectItem>
+                                      <SelectItem value="4">4</SelectItem>
+                                    </SelectContent>
+                                  </Select>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <Switch
