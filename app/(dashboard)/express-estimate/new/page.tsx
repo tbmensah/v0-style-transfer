@@ -2826,34 +2826,56 @@ const newDoor: DoorItem = {
                         </div>
                         {/* Breaker Panel */}
                         <div className="space-y-3">
-                          <div className="flex items-center gap-3">
-                            <Switch
-                              checked={foundation.electrical.breakerPanel.enabled}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
-                            />
-                            <Label>Enable Breaker Panel</Label>
+                          <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
+                            <div className="flex items-center gap-3">
+                              <Switch
+                                checked={foundation.electrical.breakerPanel.enabled}
+                                onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
+                              />
+                              <Label>Enable Breaker Panel</Label>
+                            </div>
+                            {foundation.electrical.breakerPanel.enabled && (
+                              <>
+                                <div className="flex flex-wrap items-end gap-2">
+                                  <Label className="text-sm whitespace-nowrap">Breaker Panel Replacement</Label>
+                                  <Select value={foundation.electrical.breakerPanel.panelType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, panelType: value } } }); handleSave() }}>
+                                    <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="110v-single">110 V - Single Pole</SelectItem>
+                                      <SelectItem value="220v-double">220 V - Double Pole</SelectItem>
+                                      <SelectItem value="arc-fault-afci">Arc Fault - AFCI</SelectItem>
+                                      <SelectItem value="ground-fault-gfi">Ground Fault - GFI</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="flex items-end gap-2">
+                                  <span className="text-xs text-muted-foreground pb-2">or</span>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="gap-1 border-border/60"
+                                    onClick={() => {
+                                      setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: [...foundation.electrical.breakerPanel.circuits, { id: Date.now(), type: "", qty: "" }] } } })
+                                      handleSave()
+                                    }}
+                                  >
+                                    <Plus className="h-3 w-3" /> Add Circuit
+                                  </Button>
+                                </div>
+                              </>
+                            )}
                           </div>
                           {foundation.electrical.breakerPanel.enabled && (
-                            <div className="ml-8 space-y-4">
-                              <div className="space-y-2">
-                                <Label className="text-sm">Breaker Panel Replacement</Label>
-                                <Select value={foundation.electrical.breakerPanel.panelType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, panelType: value } } }); handleSave() }}>
-                                  <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="Select type" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="110v-single">110 V - Single Pole</SelectItem>
-                                    <SelectItem value="220v-double">220 V - Double Pole</SelectItem>
-                                    <SelectItem value="arc-fault-afci">Arc Fault - AFCI</SelectItem>
-                                    <SelectItem value="ground-fault-gfi">Ground Fault - GFI</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
+                            <div className="ml-6 space-y-4 border-l border-border/40 pl-4">
+                              <Label className="text-sm font-medium">Breaker Circuit Replacement</Label>
                               {foundation.electrical.breakerPanel.circuits.map((circuit, index) => (
                                 <div key={circuit.id} className="flex items-end gap-3">
                                   <div className="space-y-2">
-                                    <Label className="text-sm">Breaker Circuit Replacement</Label>
+                                    <Label className="text-sm">Type</Label>
                                     <Select value={circuit.type} onValueChange={(__v) => {
                                       const value = __v === "__none__" ? "" : __v;
                                       const updated = [...foundation.electrical.breakerPanel.circuits];
@@ -2903,18 +2925,6 @@ const newDoor: DoorItem = {
                                   </Button>
                                 </div>
                               ))}
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="gap-1 border-border/60"
-                                onClick={() => {
-                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: [...foundation.electrical.breakerPanel.circuits, { id: Date.now(), type: "", qty: "" }] } } })
-                                  handleSave()
-                                }}
-                              >
-                                <Plus className="h-3 w-3" /> Add Circuit
-                              </Button>
                             </div>
                           )}
                         </div>
