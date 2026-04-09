@@ -2860,6 +2860,9 @@ const newDoor: DoorItem = {
                                   />
                                   <Label>Breaker Panel Replacement</Label>
                                 </div>
+                                <span className="shrink-0 text-xs text-muted-foreground sm:px-1" aria-hidden="true">
+                                  or
+                                </span>
                                 <div className="flex items-center gap-3">
                                   <Switch
                                     checked={foundation.electrical.breakerPanel.circuitReplacement ?? false}
