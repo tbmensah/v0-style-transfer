@@ -510,6 +510,7 @@ export default function NewExpressEstimatePage() {
       stairsForReplacement: "",
       sizeOfTreads: "",
       risers: false,
+      risersQty: "",
       stringersLength: "",
       landingReplacement: false,
     },
@@ -3065,12 +3066,24 @@ const newDoor: DoorItem = {
                               </SelectContent>
                             </Select>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <Switch
                               checked={foundation.stairs.risers}
                               onCheckedChange={(checked) => { setFoundation({ ...foundation, stairs: { ...foundation.stairs, risers: checked } }); handleSave() }}
                             />
                             <Label className="text-sm">Risers</Label>
+                            {foundation.stairs.risers && (
+                              <Input
+                                type="number"
+                                min={0}
+                                step={1}
+                                inputMode="numeric"
+                                placeholder="QTY"
+                                value={foundation.stairs.risersQty ?? ""}
+                                onChange={(e) => { setFoundation({ ...foundation, stairs: { ...foundation.stairs, risersQty: e.target.value } }); handleSave() }}
+                                className="w-20 border-border/60 bg-secondary/50"
+                              />
+                            )}
                           </div>
                         </div>
 
