@@ -3713,7 +3713,7 @@ const newDoor: DoorItem = {
                                           <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                           <SelectItem value="mdf">MDF</SelectItem>
                                           <SelectItem value="standard">Standard</SelectItem>
-                                          <SelectItem value="wood">Wood</SelectItem>
+                                          <SelectItem value="wood">Hardwood</SelectItem>
                                         </SelectContent>
                                       </Select>
                                     </div>
