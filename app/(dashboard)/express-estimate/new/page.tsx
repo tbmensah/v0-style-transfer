@@ -574,7 +574,26 @@ export default function NewExpressEstimatePage() {
   }
 
   const updateRoom = (roomId: number, updates: Partial<Room>) => {
-    setRooms(rooms.map(r => r.id === roomId ? { ...r, ...updates } : r))
+    setRooms(
+      rooms.map((r) => {
+        if (r.id !== roomId) return r
+        const merged = { ...r, ...updates }
+        if (merged.flooring?.layers?.length) {
+          return {
+            ...merged,
+            flooring: {
+              ...merged.flooring,
+              layers: merged.flooring.layers.map((l) =>
+                l.type === "vinyl-plank" && l.application === "installed-over-subfloor"
+                  ? { ...l, application: "" }
+                  : l
+              ),
+            },
+          }
+        }
+        return merged
+      })
+    )
     handleSave()
   }
 
@@ -3375,7 +3394,15 @@ const newDoor: DoorItem = {
                                   <>
                                     <p className="text-xs text-amber-500">Note: Please note carpet installed over flooring is a content item</p>
                                     <div className="space-y-4">
-                                      {(room.flooring.layers || []).map((layer, layerIndex) => (
+                                      {(room.flooring.layers || []).map((layer, layerIndex) => {
+                                        const showVaporBarrier =
+                                          layer.type !== "terrazzo" &&
+                                          !["sheet-vinyl", "carpet", "carpet-glue-down", "tile"].includes(layer.type) &&
+                                          layer.application !== "glue-down-concrete" &&
+                                          layer.application !== "gluedown"
+                                        const showSubfloorReplacement = layer.type !== "terrazzo"
+                                        const vaporSubfloorIndependent = ["vinyl-plank", "sheet-vinyl", "laminate", "hardwood"].includes(layer.type)
+                                        return (
                                         <div key={layer.id} className="rounded-lg bg-secondary/30 p-3">
                                           <div className="flex items-center gap-2 mb-2">
                                             <Label className="text-sm font-medium">{layerIndex === 0 ? "1st Layer" : `${layerIndex + 1}${layerIndex === 1 ? "nd" : layerIndex === 2 ? "rd" : "th"} Layer`}</Label>
@@ -3389,7 +3416,15 @@ const newDoor: DoorItem = {
                                                 onValueChange={(__v) => {
                                                   const value = __v === "__none__" ? "" : __v;
                                                   const newLayers = [...(room.flooring.layers || [])]
-                                                  newLayers[layerIndex] = { ...layer, type: value, grade: "", application: "" }
+                                                  const noVaporTypes = ["sheet-vinyl", "carpet", "carpet-glue-down", "tile", "terrazzo"] as const
+                                                  let next = { ...layer, type: value, grade: "", application: "" }
+                                                  if (noVaporTypes.includes(value as (typeof noVaporTypes)[number])) {
+                                                    next = { ...next, vaporBarrier: false }
+                                                  }
+                                                  if (value === "terrazzo") {
+                                                    next = { ...next, subfloorReplacement: false }
+                                                  }
+                                                  newLayers[layerIndex] = next
                                                   updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                 }}
                                               >
@@ -3506,7 +3541,11 @@ const newDoor: DoorItem = {
                                                   onValueChange={(__v) => {
                                                     const value = __v === "__none__" ? "" : __v;
                                                     const newLayers = [...(room.flooring.layers || [])]
-                                                    newLayers[layerIndex] = { ...layer, application: value }
+                                                    let next = { ...layer, application: value }
+                                                    if (value === "glue-down-concrete" || value === "gluedown") {
+                                                      next = { ...next, vaporBarrier: false }
+                                                    }
+                                                    newLayers[layerIndex] = next
                                                     updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
                                                   }}
                                                 >
@@ -3518,7 +3557,6 @@ const newDoor: DoorItem = {
                                                     {layer.type === "vinyl-plank" && (
                                                       <>
                                                         <SelectItem value="glue-down-concrete">Glue Down on Concrete</SelectItem>
-                                                        <SelectItem value="installed-over-subfloor">Installed over Subfloor</SelectItem>
                                                         <SelectItem value="floating">Floating</SelectItem>
                                                       </>
                                                     )}
@@ -3563,28 +3601,40 @@ const newDoor: DoorItem = {
                                               </div>
                                             )}
                                             {/* Toggles after dropdowns */}
-                                            <div className="flex items-center gap-2 pb-1">
-                                              <Switch
-                                                checked={layer.vaporBarrier}
-                                                onCheckedChange={(checked) => {
-                                                  const newLayers = [...(room.flooring.layers || [])]
-                                                  newLayers[layerIndex] = { ...layer, vaporBarrier: checked, subfloorReplacement: checked ? false : layer.subfloorReplacement }
-                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                                }}
-                                              />
-                                              <Label className="text-sm whitespace-nowrap">Vapor Barrier</Label>
-                                            </div>
-                                            <div className="flex items-center gap-2 pb-1">
-                                              <Switch
-                                                checked={layer.subfloorReplacement}
-                                                onCheckedChange={(checked) => {
-                                                  const newLayers = [...(room.flooring.layers || [])]
-                                                  newLayers[layerIndex] = { ...layer, subfloorReplacement: checked, vaporBarrier: checked ? false : layer.vaporBarrier }
-                                                  updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
-                                                }}
-                                              />
-                                              <Label className="text-sm whitespace-nowrap">Subfloor Replacement</Label>
-                                            </div>
+                                            {showVaporBarrier && (
+                                              <div className="flex items-center gap-2 pb-1">
+                                                <Switch
+                                                  checked={layer.vaporBarrier}
+                                                  onCheckedChange={(checked) => {
+                                                    const newLayers = [...(room.flooring.layers || [])]
+                                                    if (vaporSubfloorIndependent || !showSubfloorReplacement) {
+                                                      newLayers[layerIndex] = { ...layer, vaporBarrier: checked }
+                                                    } else {
+                                                      newLayers[layerIndex] = { ...layer, vaporBarrier: checked, subfloorReplacement: checked ? false : layer.subfloorReplacement }
+                                                    }
+                                                    updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                  }}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Vapor Barrier</Label>
+                                              </div>
+                                            )}
+                                            {showSubfloorReplacement && (
+                                              <div className="flex items-center gap-2 pb-1">
+                                                <Switch
+                                                  checked={layer.subfloorReplacement}
+                                                  onCheckedChange={(checked) => {
+                                                    const newLayers = [...(room.flooring.layers || [])]
+                                                    if (vaporSubfloorIndependent || !showVaporBarrier) {
+                                                      newLayers[layerIndex] = { ...layer, subfloorReplacement: checked }
+                                                    } else {
+                                                      newLayers[layerIndex] = { ...layer, subfloorReplacement: checked, vaporBarrier: checked ? false : layer.vaporBarrier }
+                                                    }
+                                                    updateRoom(room.id, { flooring: { ...room.flooring, layers: newLayers } })
+                                                  }}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Subfloor Replacement</Label>
+                                              </div>
+                                            )}
                                             {/* Delete button at far right */}
                                             {layerIndex > 0 && (
                                               <>
@@ -3611,7 +3661,8 @@ const newDoor: DoorItem = {
                                             )}
                                           </div>
                                         </div>
-                                      ))}
+                                        )
+                                      })}
                                       {room.flooring.multipleLayers && (
                                         <div className="space-y-2 pt-2">
                                           <Textarea
