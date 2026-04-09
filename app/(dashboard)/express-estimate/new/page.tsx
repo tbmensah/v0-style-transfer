@@ -4507,96 +4507,116 @@ const newDoor: DoorItem = {
                                   <Label className="font-medium">Electrical</Label>
                                 </div>
                                 {room.electrical.enabled && (
-                                  <div className="flex flex-wrap items-center gap-4">
-                                    <div className="space-y-1 w-[80px]">
+                                  <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
+                                    <div className="flex w-[80px] flex-col gap-1">
                                       <Label className="text-xs text-muted-foreground">110 Outlets</Label>
                                       <Input
                                         type="number"
                                         min="0"
+                                        step={1}
                                         placeholder="QTY"
                                         value={room.electrical.outlets110 || ""}
                                         onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, outlets110: parseInt(e.target.value) || 0 } })}
-                                        className="border-border/60 bg-secondary/50"
+                                        className="h-9 w-full border-border/60 bg-secondary/50"
                                       />
                                     </div>
-                                    <div className="space-y-1 w-[80px]">
+                                    <div className="flex w-[80px] flex-col gap-1">
                                       <Label className="text-xs text-muted-foreground">220 Outlets</Label>
                                       <Input
                                         type="number"
                                         min="0"
+                                        step={1}
                                         placeholder="QTY"
                                         value={room.electrical.outlets220 || ""}
                                         onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, outlets220: parseInt(e.target.value) || 0 } })}
-                                        className="border-border/60 bg-secondary/50"
+                                        className="h-9 w-full border-border/60 bg-secondary/50"
                                       />
                                     </div>
-                                    <div className="space-y-1 w-[80px]">
+                                    <div className="flex w-[80px] flex-col gap-1">
                                       <Label className="text-xs text-muted-foreground">GFI Outlets</Label>
                                       <Input
                                         type="number"
                                         min="0"
+                                        step={1}
                                         placeholder="QTY"
                                         value={room.electrical.gfiOutlets || ""}
                                         onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, gfiOutlets: parseInt(e.target.value) || 0 } })}
-                                        className="border-border/60 bg-secondary/50"
+                                        className="h-9 w-full border-border/60 bg-secondary/50"
                                       />
                                     </div>
-                                    <div className="space-y-1 w-[80px]">
+                                    <div className="flex w-[80px] flex-col gap-1">
                                       <Label className="text-xs text-muted-foreground">Light Switches</Label>
                                       <Input
                                         type="number"
                                         min="0"
+                                        step={1}
                                         placeholder="QTY"
                                         value={room.electrical.lightSwitches || ""}
                                         onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, lightSwitches: parseInt(e.target.value) || 0 } })}
-                                        className="border-border/60 bg-secondary/50"
+                                        className="h-9 w-full border-border/60 bg-secondary/50"
                                       />
                                     </div>
-                                    <div className="space-y-1 w-[80px]">
+                                    <div className="flex w-[80px] flex-col gap-1">
                                       <Label className="text-xs text-muted-foreground">Ceiling Lights</Label>
                                       <Input
                                         type="number"
                                         min="0"
+                                        step={1}
                                         placeholder="QTY"
                                         value={room.electrical.ceilingLights || ""}
                                         onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, ceilingLights: parseInt(e.target.value) || 0 } })}
-                                        className="border-border/60 bg-secondary/50"
+                                        className="h-9 w-full border-border/60 bg-secondary/50"
                                       />
                                     </div>
-                                    <div className="space-y-1 w-[80px]">
+                                    <div className="flex w-[80px] flex-col gap-1">
                                       <Label className="text-xs text-muted-foreground">Ceiling Fans</Label>
                                       <Input
                                         type="number"
                                         min="0"
+                                        step={1}
                                         placeholder="QTY"
                                         value={room.electrical.ceilingFans || ""}
                                         onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, ceilingFans: parseInt(e.target.value) || 0 } })}
-                                        className="border-border/60 bg-secondary/50"
+                                        className="h-9 w-full border-border/60 bg-secondary/50"
                                       />
                                     </div>
-                                    <div className="space-y-1 min-w-[130px]">
-                                      <Label className="text-xs text-muted-foreground">Bathroom Light Bar</Label>
-                                      <Select value={room.electrical.bathroomLightBar} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { electrical: { ...room.electrical, bathroomLightBar: value } }) }}>
-                                        <SelectTrigger className="border-border/60 bg-secondary/50">
-                                          <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                          <SelectItem value="1">1 light</SelectItem>
-                                          <SelectItem value="2">2 light</SelectItem>
-                                          <SelectItem value="3">3 light</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                    <div className="space-y-1 w-[80px]">
-                                      <Input
-                                        type="number"
-                                        min="0"
-                                        placeholder="QTY"
-                                        value={room.electrical.bathroomLightBarQty || ""}
-                                        onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, bathroomLightBarQty: parseInt(e.target.value) || 0 } })}
-                                        className="border-border/60 bg-secondary/50"
-                                      />
+                                    <div className="flex flex-wrap items-end gap-1">
+                                      <div className="flex min-w-[140px] flex-col gap-1">
+                                        <Label className="text-xs text-muted-foreground">Bathroom Light Bar</Label>
+                                        <Select value={room.electrical.bathroomLightBar} onValueChange={(__v) => {
+                                          const value = nv(__v);
+                                          updateRoom(room.id, {
+                                            electrical: {
+                                              ...room.electrical,
+                                              bathroomLightBar: value,
+                                              bathroomLightBarQty: value ? room.electrical.bathroomLightBarQty : 0,
+                                            },
+                                          })
+                                        }}
+                                        >
+                                          <SelectTrigger className="h-9 border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="1">1 light</SelectItem>
+                                            <SelectItem value="2">2 light</SelectItem>
+                                            <SelectItem value="3">3 light</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                      {room.electrical.bathroomLightBar ? (
+                                        <Input
+                                          type="number"
+                                          min="0"
+                                          step={1}
+                                          placeholder="QTY"
+                                          value={room.electrical.bathroomLightBarQty || ""}
+                                          onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, bathroomLightBarQty: parseInt(e.target.value) || 0 } })}
+                                          className="h-9 w-[80px] shrink-0 border-border/60 bg-secondary/50"
+                                          aria-label="Bathroom light bar quantity"
+                                        />
+                                      ) : null}
                                     </div>
                                   </div>
                                 )}
