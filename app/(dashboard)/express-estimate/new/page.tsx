@@ -2848,7 +2848,6 @@ const newDoor: DoorItem = {
                                   </Select>
                                 </div>
                                 <div className="flex items-end gap-2">
-                                  <span className="text-xs text-muted-foreground pb-2 bg-white">xor</span>
                                   <Button
                                     type="button"
                                     variant="outline"
