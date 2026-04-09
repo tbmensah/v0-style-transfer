@@ -1850,7 +1850,6 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
-                                  placeholder="Length"
                                   value={foundation.enclosureRemoval.sandRemoval.length}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, length: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
