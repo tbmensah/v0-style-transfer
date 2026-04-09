@@ -1850,7 +1850,6 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
-                                  placeholder="Length"
                                   value={foundation.enclosureRemoval.sandRemoval.length}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, length: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
@@ -1861,7 +1860,6 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
-                                  placeholder="Width"
                                   value={foundation.enclosureRemoval.sandRemoval.width}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, width: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
@@ -1872,7 +1870,6 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
-                                  placeholder="Depth"
                                   value={foundation.enclosureRemoval.sandRemoval.depth}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, depth: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
@@ -2382,10 +2379,9 @@ const newDoor: DoorItem = {
                                       </SelectTrigger>
                                       <SelectContent>
                                         <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        <SelectItem value="2-4sf">2-4 sf</SelectItem>
-                                        <SelectItem value="4-8sf">4-8 sf</SelectItem>
-                                        <SelectItem value="8-12sf">8-12 sf</SelectItem>
-                                        <SelectItem value="12+sf">12+ sf</SelectItem>
+                                        <SelectItem value="4-8-sf">4- 8 SF</SelectItem>
+                                        <SelectItem value="9-12-sf">9 - 12 SF</SelectItem>
+                                        <SelectItem value="13-19-sf">13 - 19 SF</SelectItem>
                                       </SelectContent>
                                     </Select>
                                   </div>
@@ -2852,7 +2848,6 @@ const newDoor: DoorItem = {
                                   </Select>
                                 </div>
                                 <div className="flex items-end gap-2">
-                                  <span className="text-xs text-muted-foreground pb-2 bg-white">xor</span>
                                   <Button
                                     type="button"
                                     variant="outline"
