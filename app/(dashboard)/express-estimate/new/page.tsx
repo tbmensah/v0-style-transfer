@@ -3829,24 +3829,24 @@ const newDoor: DoorItem = {
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               {room.wallCovering.material === "drywall-sf" && (
                                                 <>
-                                                  <SelectItem value="1/2-in">1/2 in</SelectItem>
-                                                  <SelectItem value="1/4-in">1/4 in</SelectItem>
-                                                  <SelectItem value="3/8-in">3/8 in</SelectItem>
-                                                  <SelectItem value="5/8-in">5/8 in</SelectItem>
+                                                  <SelectItem value="1/2-in">1/2″</SelectItem>
+                                                  <SelectItem value="1/4-in">1/4″</SelectItem>
+                                                  <SelectItem value="3/8-in">3/8″</SelectItem>
+                                                  <SelectItem value="5/8-in">5/8″</SelectItem>
                                                 </>
                                               )}
                                               {room.wallCovering.material === "drywall-lf" && (
                                                 <>
-                                                  <SelectItem value="1/2-lf-4ft">1/2 - Drywall Per LF - up to 4&apos; tall</SelectItem>
-                                                  <SelectItem value="5/8-lf-4ft">5/8 Drywall Per LF - up to 4&apos; tall</SelectItem>
+                                                  <SelectItem value="1/2-lf-4ft">1/2″ - Drywall Per LF - up to 4&apos; tall</SelectItem>
+                                                  <SelectItem value="5/8-lf-4ft">5/8″ Drywall Per LF - up to 4&apos; tall</SelectItem>
                                                 </>
                                               )}
                                               {room.wallCovering.material === "plaster" && (
                                                 <>
                                                   <SelectItem value="two-coat-no-lath">Two Coat Plaster (No Lath)</SelectItem>
-                                                  <SelectItem value="acoustic-1/2-blueboard">Acoustic Plaster Over 1/2 Gypsum Core Blueboard</SelectItem>
-                                                  <SelectItem value="acoustic-5/8-blueboard">Acoustic Plaster Over 5/8 Gypsum Core Blueboard</SelectItem>
-                                                  <SelectItem value="acoustic-1/2-metal-lath">Acoustic Plaster Over 1/2 Metal Lath</SelectItem>
+                                                  <SelectItem value="acoustic-1/2-blueboard">Acoustic Plaster Over 1/2″ Gypsum Core Blueboard</SelectItem>
+                                                  <SelectItem value="acoustic-5/8-blueboard">Acoustic Plaster Over 5/8″ Gypsum Core Blueboard</SelectItem>
+                                                  <SelectItem value="acoustic-1/2-metal-lath">Acoustic Plaster Over 1/2″ Metal Lath</SelectItem>
                                                 </>
                                               )}
                                               {room.wallCovering.material === "paneling" && (
@@ -3957,10 +3957,10 @@ const newDoor: DoorItem = {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="1/4-3/8-hardwood">1/4 to 3/8 Hardwood</SelectItem>
-                                                <SelectItem value="1/2-mdf">1/2 MDF</SelectItem>
-                                                <SelectItem value="1/4-mdf">1/4 MDF</SelectItem>
-                                                <SelectItem value="3/8-softwood-veneer">3/8 Softwood Veneer</SelectItem>
+                                                <SelectItem value="1/4-3/8-hardwood">1/4″ to 3/8″ Hardwood</SelectItem>
+                                                <SelectItem value="1/2-mdf">1/2″ MDF</SelectItem>
+                                                <SelectItem value="1/4-mdf">1/4″ MDF</SelectItem>
+                                                <SelectItem value="3/8-softwood-veneer">3/8″ Softwood Veneer</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           </div>
