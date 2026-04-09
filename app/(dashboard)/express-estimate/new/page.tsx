@@ -1860,7 +1860,6 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
-                                  placeholder="Width"
                                   value={foundation.enclosureRemoval.sandRemoval.width}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, width: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
@@ -1871,7 +1870,6 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
-                                  placeholder="Depth"
                                   value={foundation.enclosureRemoval.sandRemoval.depth}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, depth: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
