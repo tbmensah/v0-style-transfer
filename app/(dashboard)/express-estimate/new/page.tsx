@@ -4125,7 +4125,7 @@ const newDoor: DoorItem = {
                                 </div>
                                 {room.windowsEnabled && room.windows.map((window, idx) => (
                                   <div key={window.id} className="rounded-lg bg-secondary/30 p-3 space-y-2">
-                                    {/* First row: Type, Material, Size, Grade, QTY */}
+                                    {/* First row: Type, Material, Size, Grade, Finish (wood), QTY */}
                                     <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">Type</Label>
@@ -4153,7 +4153,7 @@ const newDoor: DoorItem = {
                                         <Select value={window.material} onValueChange={(__v) => {
                                           const value = __v === "__none__" ? "" : __v;
                                           const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, material: value, size: "", grade: "" }
+                                          newWindows[idx] = { ...window, material: value, size: "", grade: "", finish: value === "wood" ? window.finish : "" }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
                                           <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
@@ -4360,24 +4360,43 @@ const newDoor: DoorItem = {
                                           </Select>
                                         </div>
                                       )}
+                                      {window.material === "wood" && (
+                                        <div className="space-y-1">
+                                          <Label className="text-xs text-muted-foreground">Finish</Label>
+                                          <Select value={window.finish} onValueChange={(__v) => {
+                                            const value = __v === "__none__" ? "" : __v;
+                                            const newWindows = [...room.windows]
+                                            newWindows[idx] = { ...window, finish: value }
+                                            updateRoom(room.id, { windows: newWindows })
+                                          }}>
+                                            <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                              <SelectValue placeholder="Select" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                              <SelectItem value="stain">Stain</SelectItem>
+                                              <SelectItem value="paint">Paint</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                      )}
                                       <div className="space-y-1">
                                         <Label className="text-xs text-muted-foreground">QTY</Label>
-                                        <Select value={window.quantity} onValueChange={(__v) => {
-                                          const value = __v === "__none__" ? "" : __v;
-                                          const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, quantity: value }
-                                          updateRoom(room.id, { windows: newWindows })
-                                        }}>
-                                          <SelectTrigger className="w-[70px] border-border/60 bg-secondary/50">
-                                            <SelectValue placeholder="Select" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                            {Array.from({ length: 30 }, (_, i) => i + 1).map((num) => (
-                                              <SelectItem key={num} value={String(num)}>{num}</SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
+                                        <Input
+                                          type="number"
+                                          min={1}
+                                          max={99}
+                                          step={1}
+                                          inputMode="numeric"
+                                          value={window.quantity}
+                                          onChange={(e) => {
+                                            const v = e.target.value
+                                            const newWindows = [...room.windows]
+                                            newWindows[idx] = { ...window, quantity: v }
+                                            updateRoom(room.id, { windows: newWindows })
+                                          }}
+                                          className="w-[70px] border-border/60 bg-secondary/50"
+                                        />
                                       </div>
                                       {/* Copy and Delete buttons */}
                                       <div className="flex-1" />
