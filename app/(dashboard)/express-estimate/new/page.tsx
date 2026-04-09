@@ -2379,10 +2379,9 @@ const newDoor: DoorItem = {
                                       </SelectTrigger>
                                       <SelectContent>
                                         <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        <SelectItem value="2-4sf">2-4 sf</SelectItem>
-                                        <SelectItem value="4-8sf">4-8 sf</SelectItem>
-                                        <SelectItem value="8-12sf">8-12 sf</SelectItem>
-                                        <SelectItem value="12+sf">12+ sf</SelectItem>
+                                        <SelectItem value="4-8-sf">4- 8 SF</SelectItem>
+                                        <SelectItem value="9-12-sf">9 - 12 SF</SelectItem>
+                                        <SelectItem value="13-19-sf">13 - 19 SF</SelectItem>
                                       </SelectContent>
                                     </Select>
                                   </div>

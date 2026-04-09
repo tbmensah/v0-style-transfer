@@ -9,3 +9,4 @@ alwaysApply: true
 - **Always** commit on the `dev` branch (or a feature branch created from `dev`).
 - Before committing: ensure the current branch is `dev` (or a child of `dev`), e.g. `git checkout dev` and `git pull` as needed, then commit.
 - If the user asks to commit or push, verify branch first; if on `main`, switch to `dev` (or ask how they want to handle unmerged work) rather than committing to `main`.
+- When the user asks to push to `dev`, **always** run `git push origin dev`. That updates the remote branch **`origin/dev`** with the current local **`dev`** (commits are already on local `dev` before you push; this publishes them to the remote so local and `origin/dev` stay aligned).
