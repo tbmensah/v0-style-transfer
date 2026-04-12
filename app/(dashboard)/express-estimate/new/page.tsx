@@ -971,7 +971,7 @@ const newDoor: DoorItem = {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    {["2", "2.5", "3", "4", "5"].map(t => (
+                                    {["2", "2.5", "3", "3.5", "4", "5"].map(t => (
                                       <SelectItem key={t} value={t}>{t} Ton</SelectItem>
                                     ))}
                                   </SelectContent>
@@ -1084,7 +1084,7 @@ const newDoor: DoorItem = {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    {["2", "2.5", "3", "4", "5"].map(t => (
+                                    {["2", "2.5", "3", "3.5", "4", "5"].map(t => (
                                       <SelectItem key={t} value={t}>{t} Ton</SelectItem>
                                     ))}
                                   </SelectContent>
@@ -1575,25 +1575,20 @@ const newDoor: DoorItem = {
                                 </Select>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Label className="text-xs text-muted-foreground">Replacement Height</Label>
-                                <Select
+                                <Label className="text-xs text-muted-foreground">Replacement Height (PF)</Label>
+                                <Input
+                                  type="number"
+                                  min={0}
+                                  step="any"
+                                  inputMode="decimal"
+                                  placeholder="PF"
                                   value={exterior.finishes.sheathing.replacementHeight}
-                                  onValueChange={(v) => {
-                                    const value = v === "__none__" ? "" : v
-                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, replacementHeight: value } } })
+                                  onChange={(e) => {
+                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, replacementHeight: e.target.value } } })
                                     handleSave()
                                   }}
-                                >
-                                  <SelectTrigger className="h-8 w-fit min-w-[3.5rem] border-border/60 bg-secondary/50 text-sm">
-                                    <SelectValue placeholder="Height" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="4">4 PF</SelectItem>
-                                    <SelectItem value="8">8 PF</SelectItem>
-                                    <SelectItem value="12">12 PF</SelectItem>
-                                  </SelectContent>
-                                </Select>
+                                  className="h-8 w-[96px] border-border/60 bg-secondary/50 text-sm"
+                                />
                               </div>
                             </>
                           )}
@@ -1613,25 +1608,20 @@ const newDoor: DoorItem = {
                           </div>
                           {exterior.finishes.houseWrap.enabled && (
                             <div className="flex items-center gap-2">
-                              <Label className="text-xs text-muted-foreground">Replacement Height</Label>
-                              <Select
+                              <Label className="text-xs text-muted-foreground">Replacement Height (PF)</Label>
+                              <Input
+                                type="number"
+                                min={0}
+                                step="any"
+                                inputMode="decimal"
+                                placeholder="PF"
                                 value={exterior.finishes.houseWrap.replacementHeight}
-                                onValueChange={(v) => {
-                                  const value = v === "__none__" ? "" : v
-                                  setExterior({ ...exterior, finishes: { ...exterior.finishes, houseWrap: { ...exterior.finishes.houseWrap, replacementHeight: value } } })
+                                onChange={(e) => {
+                                  setExterior({ ...exterior, finishes: { ...exterior.finishes, houseWrap: { ...exterior.finishes.houseWrap, replacementHeight: e.target.value } } })
                                   handleSave()
                                 }}
-                              >
-                                <SelectTrigger className="h-8 w-fit min-w-[3.5rem] border-border/60 bg-secondary/50 text-sm">
-                                  <SelectValue placeholder="Height" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="4">4 PF</SelectItem>
-                                  <SelectItem value="8">8 PF</SelectItem>
-                                  <SelectItem value="12">12 PF</SelectItem>
-                                </SelectContent>
-                              </Select>
+                                className="h-8 w-[96px] border-border/60 bg-secondary/50 text-sm"
+                              />
                             </div>
                           )}
                         </div>
@@ -1650,25 +1640,20 @@ const newDoor: DoorItem = {
                           </div>
                           {exterior.finishes.backerBoard.enabled && (
                             <div className="flex items-center gap-2">
-                              <Label className="text-xs text-muted-foreground">Replacement Height</Label>
-                              <Select
+                              <Label className="text-xs text-muted-foreground">Replacement Height (PF)</Label>
+                              <Input
+                                type="number"
+                                min={0}
+                                step="any"
+                                inputMode="decimal"
+                                placeholder="PF"
                                 value={exterior.finishes.backerBoard.replacementHeight}
-                                onValueChange={(v) => {
-                                  const value = v === "__none__" ? "" : v
-                                  setExterior({ ...exterior, finishes: { ...exterior.finishes, backerBoard: { ...exterior.finishes.backerBoard, replacementHeight: value } } })
+                                onChange={(e) => {
+                                  setExterior({ ...exterior, finishes: { ...exterior.finishes, backerBoard: { ...exterior.finishes.backerBoard, replacementHeight: e.target.value } } })
                                   handleSave()
                                 }}
-                              >
-                                <SelectTrigger className="w-[96px] h-8 border-border/60 bg-secondary/50 text-sm">
-                                  <SelectValue placeholder="Height" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="4">4 PF</SelectItem>
-                                  <SelectItem value="8">8 PF</SelectItem>
-                                  <SelectItem value="12">12 PF</SelectItem>
-                                </SelectContent>
-                              </Select>
+                                className="h-8 w-[96px] border-border/60 bg-secondary/50 text-sm"
+                              />
                             </div>
                           )}
                         </div>
@@ -1704,22 +1689,24 @@ const newDoor: DoorItem = {
                                   <SelectItem value="batt">Batt</SelectItem>
                                   <SelectItem value="blown-in">Blown-in</SelectItem>
                                   <SelectItem value="rigid-foam">Rigid foam</SelectItem>
+                                  <SelectItem value="foil-vapor-barrier-aluminum-single-sided">Foil Vapor Barrier - Aluminum - Single Sided</SelectItem>
                                 </SelectContent>
                               </Select>
                               <div className="flex items-center gap-2">
-                                <Label className="text-xs text-muted-foreground">Replacement Height</Label>
+                                <Label className="text-xs text-muted-foreground">Replacement Height (PF)</Label>
                                 <Input
                                   type="number"
-                                  min="0"
-                                  placeholder="0"
+                                  min={0}
+                                  step="any"
+                                  inputMode="decimal"
+                                  placeholder="PF"
                                   value={exterior.finishes.wallInsulation.replacementHeight}
                                   onChange={(e) => {
                                     setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, replacementHeight: e.target.value } } })
                                     handleSave()
                                   }}
-                                  className="w-16 h-8 border-border/60 bg-secondary/50 text-sm"
+                                  className="h-8 w-[96px] border-border/60 bg-secondary/50 text-sm"
                                 />
-                                <span className="text-xs text-muted-foreground">PF</span>
                               </div>
                             </>
                           )}
