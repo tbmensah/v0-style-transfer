@@ -3140,32 +3140,21 @@ const newDoor: DoorItem = {
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Size</Label>
-                                {foundation.hvac.baseboardHeat.type === "electric" ? (
-                                  <Select value={foundation.hvac.baseboardHeat.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, size: value } } }); handleSave() }}>
-                                    <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="--" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
-                                      <SelectItem value="2">2&apos;</SelectItem>
-                                      <SelectItem value="3">3&apos;</SelectItem>
-                                      <SelectItem value="4">4&apos;</SelectItem>
-                                      <SelectItem value="5">5&apos;</SelectItem>
-                                      <SelectItem value="6">6&apos;</SelectItem>
-                                      <SelectItem value="8">8&apos;</SelectItem>
-                                      <SelectItem value="10">10&apos;</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                ) : (
-                                  <Input
-                                    type="number"
-                                    min={1}
-                                    value={foundation.hvac.baseboardHeat.size}
-                                    onChange={(e) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, size: e.target.value } } }); handleSave() }}
-                                    placeholder="LF"
-                                    className="border-border/60 bg-secondary/50 w-20"
-                                  />
-                                )}
+                                <Select value={foundation.hvac.baseboardHeat.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, size: value } } }); handleSave() }}>
+                                  <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                    <SelectItem value="2">2&apos;</SelectItem>
+                                    <SelectItem value="3">3&apos;</SelectItem>
+                                    <SelectItem value="4">4&apos;</SelectItem>
+                                    <SelectItem value="5">5&apos;</SelectItem>
+                                    <SelectItem value="6">6&apos;</SelectItem>
+                                    <SelectItem value="8">8&apos;</SelectItem>
+                                    <SelectItem value="10">10&apos;</SelectItem>
+                                  </SelectContent>
+                                </Select>
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Action</Label>
@@ -4512,18 +4501,25 @@ const newDoor: DoorItem = {
                                       {/* Replacement Height and Chair Rail for Drywall */}
                                       {room.wallCovering.material && room.wallCovering.material !== "paneling" && room.wallCovering.material !== "bead-board" && (
                                         <div className="space-y-1">
-                                          <Label className="text-xs text-muted-foreground">Replacement Height</Label>
+                                          <Label className="text-xs text-muted-foreground">
+                                            {(room.wallCovering.material === "tile-cement-board" || room.wallCovering.material === "tile-wire-lath")
+                                              ? "Replacement Height (ft)"
+                                              : "Replacement Height"}
+                                          </Label>
                                           {(room.wallCovering.material === "tile-cement-board" || room.wallCovering.material === "tile-wire-lath") ? (
-                                            <Input
-                                              type="number"
-                                              min={0}
-                                              step={1}
-                                              inputMode="decimal"
-                                              placeholder="0"
-                                              value={room.wallCovering.replacementHeight}
-                                              onChange={(e) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: e.target.value } })}
-                                              className="w-[100px] border-border/60 bg-secondary/50"
-                                            />
+                                            <div className="relative w-[100px]">
+                                              <Input
+                                                type="number"
+                                                min={0}
+                                                step={1}
+                                                inputMode="decimal"
+                                                placeholder="0"
+                                                value={room.wallCovering.replacementHeight}
+                                                onChange={(e) => updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: e.target.value } })}
+                                                className="w-full border-border/60 bg-secondary/50 pr-7"
+                                              />
+                                              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">ft</span>
+                                            </div>
                                           ) : (
                                             <Select value={room.wallCovering.replacementHeight} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, replacementHeight: value } }) }}>
                                               <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
@@ -5066,8 +5062,8 @@ const newDoor: DoorItem = {
                                         className="h-9 w-full border-border/60 bg-secondary/50"
                                       />
                                     </div>
-                                    <div className="flex flex-wrap items-end gap-1">
-                                      <div className="flex min-w-[140px] flex-col gap-1">
+                                    <div className="flex flex-nowrap items-end gap-0">
+                                      <div className="flex w-fit flex-col gap-1">
                                         <Label className="text-xs text-muted-foreground">Bathroom Light Bar</Label>
                                         <Select value={room.electrical.bathroomLightBar} onValueChange={(__v) => {
                                           const value = nv(__v);
@@ -5080,7 +5076,7 @@ const newDoor: DoorItem = {
                                           })
                                         }}
                                         >
-                                          <SelectTrigger className="h-9 border-border/60 bg-secondary/50">
+                                          <SelectTrigger className="h-9 w-fit min-w-0 border-border/60 bg-secondary/50">
                                             <SelectValue placeholder="Select" />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -6562,31 +6558,21 @@ const newDoor: DoorItem = {
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Size</Label>
-                                                {room.appliances.baseboardHeat.type === "electric" ? (
-                                                  <Select value={room.appliances.baseboardHeat.size} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, baseboardHeat: { ...room.appliances!.baseboardHeat, size: value } } }) }}>
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm min-w-[8rem] w-[120px]">
-                                                      <SelectValue placeholder="Height" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      <SelectItem value="2">2&apos;</SelectItem>
-                                                      <SelectItem value="3">3&apos;</SelectItem>
-                                                      <SelectItem value="4">4&apos;</SelectItem>
-                                                      <SelectItem value="5">5&apos;</SelectItem>
-                                                      <SelectItem value="8">8&apos;</SelectItem>
-                                                      <SelectItem value="10">10&apos;</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                ) : (
-                                                  <Input
-                                                    type="number"
-                                                    min={1}
-                                                    value={room.appliances.baseboardHeat.size}
-                                                    onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, baseboardHeat: { ...room.appliances!.baseboardHeat, size: e.target.value } } })}
-                                                    placeholder="Height"
-                                                    className="border-border/60 bg-secondary/50 min-w-[8rem] w-[120px]"
-                                                  />
-                                                )}
+                                                <Select value={room.appliances.baseboardHeat.size} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, baseboardHeat: { ...room.appliances!.baseboardHeat, size: value } } }) }}>
+                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm min-w-[8rem] w-[120px]">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                    <SelectItem value="2">2&apos;</SelectItem>
+                                                    <SelectItem value="3">3&apos;</SelectItem>
+                                                    <SelectItem value="4">4&apos;</SelectItem>
+                                                    <SelectItem value="5">5&apos;</SelectItem>
+                                                    <SelectItem value="6">6&apos;</SelectItem>
+                                                    <SelectItem value="8">8&apos;</SelectItem>
+                                                    <SelectItem value="10">10&apos;</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Action</Label>
@@ -7170,31 +7156,21 @@ const newDoor: DoorItem = {
                                             </div>
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Size</Label>
-                                              {room.appliances.baseboardHeat.type === "electric" ? (
-                                                <Select value={room.appliances.baseboardHeat.size} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, baseboardHeat: { ...room.appliances!.baseboardHeat, size: value } } }) }}>
-                                                  <SelectTrigger className="border-border/60 bg-secondary/50 text-sm min-w-[8rem] w-[120px]">
-                                                    <SelectValue placeholder="Height" />
-                                                  </SelectTrigger>
-                                                  <SelectContent>
-                                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="2">2&apos;</SelectItem>
-                                                    <SelectItem value="3">3&apos;</SelectItem>
-                                                    <SelectItem value="4">4&apos;</SelectItem>
-                                                    <SelectItem value="5">5&apos;</SelectItem>
-                                                    <SelectItem value="8">8&apos;</SelectItem>
-                                                    <SelectItem value="10">10&apos;</SelectItem>
-                                                  </SelectContent>
-                                                </Select>
-                                              ) : (
-                                                <Input
-                                                  type="number"
-                                                  min={1}
-                                                  value={room.appliances.baseboardHeat.size}
-                                                  onChange={(e) => updateRoom(room.id, { appliances: { ...room.appliances!, baseboardHeat: { ...room.appliances!.baseboardHeat, size: e.target.value } } })}
-                                                  placeholder="Height"
-                                                  className="border-border/60 bg-secondary/50 min-w-[8rem] w-[120px]"
-                                                />
-                                              )}
+                                              <Select value={room.appliances.baseboardHeat.size} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, baseboardHeat: { ...room.appliances!.baseboardHeat, size: value } } }) }}>
+                                                <SelectTrigger className="border-border/60 bg-secondary/50 text-sm min-w-[8rem] w-[120px]">
+                                                  <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                  <SelectItem value="2">2&apos;</SelectItem>
+                                                  <SelectItem value="3">3&apos;</SelectItem>
+                                                  <SelectItem value="4">4&apos;</SelectItem>
+                                                  <SelectItem value="5">5&apos;</SelectItem>
+                                                  <SelectItem value="6">6&apos;</SelectItem>
+                                                  <SelectItem value="8">8&apos;</SelectItem>
+                                                  <SelectItem value="10">10&apos;</SelectItem>
+                                                </SelectContent>
+                                              </Select>
                                             </div>
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Action</Label>
