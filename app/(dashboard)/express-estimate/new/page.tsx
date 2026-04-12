@@ -362,9 +362,16 @@ export default function NewExpressEstimatePage() {
     electrical: {
       exteriorOutlets: "",
       disconnect30Amp: "",
-      breakerPanel: { enabled: false, amps: "", arcFaults: false },
+      breakerPanel: {
+        enabled: false,
+        amps: "",
+        arcFaults: false,
+        panelReplacement: false,
+        circuitReplacement: false,
+        panelType: "",
+        circuits: [] as Array<{ id: number; type: string; qty: string }>,
+      },
       meterBox: false,
-      circuits: [] as Array<{ id: number; type: string; qty: string }>,
     },
     finishes: {
       exteriorPaint: { enabled: false },
@@ -429,13 +436,8 @@ export default function NewExpressEstimatePage() {
         enabled: false,
         action: "",
       },
-      foundationalWindows: [] as Array<{
-        id: number;
-        type: string;
-        size: string;
-        quantity: string;
-        material: string;
-      }>,
+      foundationalWindowsEnabled: false,
+      foundationalWindows: [] as WindowItem[],
     },
     sumpPump: { enabled: false, action: "", hp: "", f9Note: "" },
     waterHeater: { enabled: false, type: "", size: "", rating: "", action: "", f9Note: "" },
@@ -504,6 +506,7 @@ export default function NewExpressEstimatePage() {
         circuits: [] as Array<{ id: number; type: string; qty: string }>,
       },
       meterBox: false,
+      meterBoxQty: "",
       houseRewire: { enabled: false, homeSf: "" },
     },
     stairs: {
@@ -615,6 +618,30 @@ export default function NewExpressEstimatePage() {
       }
       updateRoom(roomId, { windows: [...room.windows, newWindow] })
     }
+  }
+
+  const addFoundationalWindow = () => {
+    const newWindow: WindowItem = {
+      id: Date.now(),
+      type: "",
+      material: "",
+      size: "",
+      grade: "",
+      quantity: "",
+      finish: "",
+      blinds: "",
+      casingTrim: "",
+      marbleSillReplace: false,
+      marbleSillDetach: false,
+    }
+    setFoundation({
+      ...foundation,
+      subgradeAreaCoverage: {
+        ...foundation.subgradeAreaCoverage,
+        foundationalWindows: [...foundation.subgradeAreaCoverage.foundationalWindows, newWindow],
+      },
+    })
+    handleSave()
   }
 
   const addDoor = (roomId: number, category: "interior" | "exterior") => {
@@ -1214,140 +1241,217 @@ const newDoor: DoorItem = {
                       <div className="flex items-center gap-3">
                         <Zap className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Electrical</span>
-                        {(exterior.electrical.exteriorOutlets > 0 || exterior.electrical.breakerPanel.enabled) &&
+                        {(Number(exterior.electrical.exteriorOutlets) > 0 || Number(exterior.electrical.disconnect30Amp) > 0 || exterior.electrical.breakerPanel.enabled) &&
                           <Badge variant="secondary" className="text-xs">Saved</Badge>
                         }
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
-                      <div className="flex flex-wrap items-end gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-xs text-muted-foreground">Exterior Outlets</Label>
-                          <Input
-                            type="number"
-                            min="0"
-                            value={exterior.electrical.exteriorOutlets}
-                            onChange={(e) => {
-                              const val = e.target.value.replace(/^0+/, '') || ""
-                              setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: val } }); handleSave()
-                            }}
-                            className="border-border/60 bg-secondary/50 w-24"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-xs text-muted-foreground">30 Amp Disconnect</Label>
-                          <Input
-                            type="number"
-                            min="0"
-                            value={exterior.electrical.disconnect30Amp}
-                            onChange={(e) => {
-                              const val = e.target.value.replace(/^0+/, '') || ""
-                              setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: val } }); handleSave()
-                            }}
-                            className="border-border/60 bg-secondary/50 w-24"
-                          />
-                        </div>
-                        <div className="flex items-center gap-2 pb-2">
-                          <Switch
-                            checked={exterior.electrical.breakerPanel.enabled}
-                            onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
-                          />
-                          <Label className="text-sm">Breaker Panel</Label>
-                        </div>
-                        {exterior.electrical.breakerPanel.enabled && (
-                          <>
-                            <div className="space-y-2 min-w-[120px]">
-                              <Label className="text-xs text-muted-foreground">Amperage</Label>
-                              <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
-                                <SelectTrigger className="border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  {["70", "100", "125", "150", "200", "300"].map(a => (
-                                    <SelectItem key={a} value={a}>{a} Amp</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div className="flex items-center gap-2 pb-2">
-                              <Switch
-                                checked={exterior.electrical.breakerPanel.arcFaults}
-                                onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
-                              />
-                              <Label className="text-sm">With Arc Faults</Label>
-                            </div>
-                          </>
-                        )}
-                        
-                        {/* Breaker Circuit Replacement */}
-                        <div className="w-full pt-4">
-                          <div className="flex items-center gap-3 mb-3">
-                            <Label className="text-sm">Breaker Circuit Replacement</Label>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="gap-1 border-border/60 h-7 text-xs"
-                              onClick={() => {
-                                setExterior({
-                                  ...exterior,
-                                  electrical: {
-                                    ...exterior.electrical,
-                                    circuits: [...exterior.electrical.circuits, { id: Date.now(), type: "", qty: "" }]
-                                  }
-                                })
-                                handleSave()
+                      <div className="space-y-6">
+                        <div className="flex flex-wrap items-end gap-4">
+                          <div className="space-y-2">
+                            <Label className="text-xs text-muted-foreground">Exterior Outlets</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              value={exterior.electrical.exteriorOutlets}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/^0+/, '') || ""
+                                setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: val } }); handleSave()
                               }}
-                            >
-                              Add Circuit +
-                            </Button>
+                              className="border-border/60 bg-secondary/50 w-24"
+                            />
                           </div>
-                          {exterior.electrical.circuits.map((circuit, idx) => (
-                            <div key={circuit.id} className="flex items-center gap-3 mb-2">
-                              <Select value={circuit.type} onValueChange={(v) => {
-                                const value = v === "__none__" ? "" : v
-                                const newCircuits = [...exterior.electrical.circuits]
-                                newCircuits[idx] = { ...circuit, type: value }
-                                setExterior({ ...exterior, electrical: { ...exterior.electrical, circuits: newCircuits } })
-                                handleSave()
-                              }}>
-                                <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="110v-single">110 V - Single Pole</SelectItem>
-                                  <SelectItem value="220v-double">220 V - Double Pole</SelectItem>
-                                  <SelectItem value="arc-fault-afci">Arc Fault - AFCI</SelectItem>
-                                  <SelectItem value="ground-fault-gfi">Ground Fault - GFI</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <Input
-                                placeholder="QTY"
-                                value={circuit.qty}
-                                onChange={(e) => {
-                                  const newCircuits = [...exterior.electrical.circuits]
-                                  newCircuits[idx] = { ...circuit, qty: e.target.value }
-                                  setExterior({ ...exterior, electrical: { ...exterior.electrical, circuits: newCircuits } })
-                                  handleSave()
-                                }}
-                                className="w-[80px] border-border/60 bg-secondary/50"
+                          <div className="space-y-2">
+                            <Label className="text-xs text-muted-foreground">30 Amp Disconnect</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              value={exterior.electrical.disconnect30Amp}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/^0+/, '') || ""
+                                setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: val } }); handleSave()
+                              }}
+                              className="border-border/60 bg-secondary/50 w-24"
+                            />
+                          </div>
+                        </div>
+                        {/* Breaker Panel — matches Foundation Electrical */}
+                        <div className="space-y-3">
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+                            <div className="flex items-center gap-3">
+                              <Switch
+                                checked={exterior.electrical.breakerPanel.enabled}
+                                onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
                               />
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-destructive hover:bg-destructive/20"
-                                onClick={() => {
-                                  const newCircuits = exterior.electrical.circuits.filter(c => c.id !== circuit.id)
-                                  setExterior({ ...exterior, electrical: { ...exterior.electrical, circuits: newCircuits } })
-                                  handleSave()
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                              <Label>Enable Breaker Panel</Label>
                             </div>
-                          ))}
+                          </div>
+                          {exterior.electrical.breakerPanel.enabled && (
+                            <div className="space-y-4">
+                              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:gap-x-8 sm:gap-y-2">
+                                <div className="space-y-2 min-w-[120px]">
+                                  <Label className="text-xs text-muted-foreground">Amperage</Label>
+                                  <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      {["70", "100", "125", "150", "200", "300"].map(a => (
+                                        <SelectItem key={a} value={a}>{a} Amp</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="flex items-center gap-3 pb-0.5">
+                                  <Switch
+                                    checked={exterior.electrical.breakerPanel.arcFaults}
+                                    onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
+                                  />
+                                  <Label>With Arc Fault</Label>
+                                </div>
+                              </div>
+                              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-2">
+                                <div className="flex items-center gap-3">
+                                  <Switch
+                                    checked={exterior.electrical.breakerPanel.panelReplacement ?? false}
+                                    onCheckedChange={(checked) => {
+                                      setExterior({
+                                        ...exterior,
+                                        electrical: {
+                                          ...exterior.electrical,
+                                          breakerPanel: {
+                                            ...exterior.electrical.breakerPanel,
+                                            panelReplacement: checked,
+                                            circuitReplacement: checked ? false : exterior.electrical.breakerPanel.circuitReplacement,
+                                          },
+                                        },
+                                      })
+                                      handleSave()
+                                    }}
+                                  />
+                                  <Label>Breaker Panel Replacement</Label>
+                                </div>
+                                <span className="shrink-0 text-xs text-muted-foreground sm:px-1" aria-hidden="true">
+                                  or
+                                </span>
+                                <div className="flex items-center gap-3">
+                                  <Switch
+                                    checked={exterior.electrical.breakerPanel.circuitReplacement ?? false}
+                                    onCheckedChange={(checked) => {
+                                      setExterior({
+                                        ...exterior,
+                                        electrical: {
+                                          ...exterior.electrical,
+                                          breakerPanel: {
+                                            ...exterior.electrical.breakerPanel,
+                                            circuitReplacement: checked,
+                                            panelReplacement: checked ? false : exterior.electrical.breakerPanel.panelReplacement,
+                                          },
+                                        },
+                                      })
+                                      handleSave()
+                                    }}
+                                  />
+                                  <Label>Breaker Circuit Replacement</Label>
+                                </div>
+                              </div>
+                              {(exterior.electrical.breakerPanel.panelReplacement ?? false) && (
+                                <div className="flex flex-wrap items-end gap-2">
+                                  <Label className="text-sm whitespace-nowrap">Replacement type</Label>
+                                  <Select value={exterior.electrical.breakerPanel.panelType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, panelType: value } } }); handleSave() }}>
+                                    <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="110v-single">110 V - Single Pole</SelectItem>
+                                      <SelectItem value="220v-double">220 V - Double Pole</SelectItem>
+                                      <SelectItem value="arc-fault-afci">Arc Fault - AFCI</SelectItem>
+                                      <SelectItem value="ground-fault-gfi">Ground Fault - GFI</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              )}
+                              {(exterior.electrical.breakerPanel.circuitReplacement ?? false) && (
+                                <div className="space-y-3">
+                                  <div className="flex items-end gap-2">
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      className="gap-1 border-border/60"
+                                      onClick={() => {
+                                        setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: [...exterior.electrical.breakerPanel.circuits, { id: Date.now(), type: "", qty: "" }] } } })
+                                        handleSave()
+                                      }}
+                                    >
+                                      <Plus className="h-3 w-3" /> Add Circuit
+                                    </Button>
+                                  </div>
+                                  {exterior.electrical.breakerPanel.circuits.length > 0 && (
+                                    <div className="ml-6 space-y-4 border-l border-border/40 pl-4">
+                                      {exterior.electrical.breakerPanel.circuits.map((circuit, index) => (
+                                        <div key={circuit.id} className="flex items-end gap-3">
+                                          <div className="space-y-2">
+                                            <Label className="text-sm">Type</Label>
+                                            <Select value={circuit.type} onValueChange={(__v) => {
+                                              const value = __v === "__none__" ? "" : __v;
+                                              const updated = [...exterior.electrical.breakerPanel.circuits];
+                                              updated[index] = { ...circuit, type: value };
+                                              setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: updated } } })
+                                              handleSave()
+                                            }}>
+                                              <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select type" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="110v-single">110 V - Single Pole</SelectItem>
+                                                <SelectItem value="220v-double">220 V - Double Pole</SelectItem>
+                                                <SelectItem value="arc-fault-afci">Arc Fault - AFCI</SelectItem>
+                                                <SelectItem value="ground-fault-gfi">Ground Fault - GFI</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="space-y-2">
+                                            <Label className="text-sm">QTY</Label>
+                                            <Input
+                                              type="number"
+                                              min={1}
+                                              value={circuit.qty}
+                                              onChange={(e) => {
+                                                const updated = [...exterior.electrical.breakerPanel.circuits];
+                                                updated[index] = { ...circuit, qty: e.target.value };
+                                                setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: updated } } })
+                                                handleSave()
+                                              }}
+                                              placeholder="--"
+                                              className="w-20 border-border/60 bg-secondary/50"
+                                            />
+                                          </div>
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-9 w-9 p-0 text-destructive hover:text-destructive"
+                                            onClick={() => {
+                                              setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: exterior.electrical.breakerPanel.circuits.filter(c => c.id !== circuit.id) } } })
+                                              handleSave()
+                                            }}
+                                          >
+                                            <Trash2 className="h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </CollapsibleContent>
@@ -1765,16 +1869,19 @@ const newDoor: DoorItem = {
                               />
                             </div>
                             <div className="flex items-center gap-2">
-                              <Label className="text-xs text-muted-foreground">Width of Treads (ft)</Label>
+                              <Label className="text-sm whitespace-nowrap">Width of Treads</Label>
                               <Select value={foundation.crawlspace.treadWidth} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, treadWidth: value } }); handleSave() }}>
-                                <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="--" />
+                                <SelectTrigger className="w-56 border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select size" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
-                                  {[3, 4, 5, 6, 7].map((n) => (
-                                    <SelectItem key={n} value={String(n)}>{n}'</SelectItem>
-                                  ))}
+                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                  <SelectItem value="up-to-4ft">Up to 4ft</SelectItem>
+                                  <SelectItem value="up-to-4ft-stain-grade">Up to 4ft Stain Grade</SelectItem>
+                                  <SelectItem value="greater-4-up-to-8">{"Greater than 4' up to 8'"}</SelectItem>
+                                  <SelectItem value="hardwood-up-to-4ft">Hardwood - up to 4ft</SelectItem>
+                                  <SelectItem value="hardwood-up-to-4ft-high-grade">Hardwood - up to 4ft High Grade</SelectItem>
+                                  <SelectItem value="hardwood-greater-4-up-to-8">{"Hardwood - Greater than 4' up to 8'"}</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -1876,6 +1983,7 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
+                                  placeholder="--"
                                   value={foundation.enclosureRemoval.sandRemoval.length}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, length: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
@@ -1886,6 +1994,7 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
+                                  placeholder="--"
                                   value={foundation.enclosureRemoval.sandRemoval.width}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, width: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
@@ -1896,6 +2005,7 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
+                                  placeholder="--"
                                   value={foundation.enclosureRemoval.sandRemoval.depth}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, depth: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
@@ -1922,6 +2032,7 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
+                                  placeholder="--"
                                   value={foundation.enclosureRemoval.backfill.length}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, length: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
@@ -1932,6 +2043,7 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
+                                  placeholder="--"
                                   value={foundation.enclosureRemoval.backfill.width}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, width: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
@@ -1942,6 +2054,7 @@ const newDoor: DoorItem = {
                                 <Input
                                   type="number"
                                   min="0"
+                                  placeholder="--"
                                   value={foundation.enclosureRemoval.backfill.depth}
                                   onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, depth: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
@@ -2191,7 +2304,7 @@ const newDoor: DoorItem = {
                       <div className="flex items-center gap-3">
                         <Square className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Subgrade Area Coverage Items</span>
-                        {(foundation.subgradeAreaCoverage.drywall.enabled || foundation.subgradeAreaCoverage.wallInsulation.enabled || foundation.subgradeAreaCoverage.foundationalDoor.enabled || foundation.subgradeAreaCoverage.foundationalWindows.length > 0) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                        {(foundation.subgradeAreaCoverage.drywall.enabled || foundation.subgradeAreaCoverage.wallInsulation.enabled || foundation.subgradeAreaCoverage.foundationalDoor.enabled || foundation.subgradeAreaCoverage.foundationalWindowsEnabled || foundation.subgradeAreaCoverage.foundationalWindows.length > 0) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
@@ -2342,122 +2455,490 @@ const newDoor: DoorItem = {
                             )}
                           </div>
                           {foundation.subgradeAreaCoverage.foundationalDoor.enabled && (
-                            <p className="text-xs text-amber-500 pl-6">Note: Includes painting of exterior slab only</p>
+                            <p className="text-xs text-amber-500 pl-6">Note: Enabling the foundation door is putting it in for replacement along with the painting of the exterior slab</p>
                           )}
                         </div>
 
-                        {/* Enable Foundational Window */}
+                        {/* Enable Foundation Window */}
                         <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <Switch
-                                checked={foundation.subgradeAreaCoverage.foundationalWindows.length > 0}
-                                onCheckedChange={(checked) => {
-                                  if (checked && foundation.subgradeAreaCoverage.foundationalWindows.length === 0) {
-                                    setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: [{ id: Date.now(), type: "", size: "", quantity: "", material: "" }] } })
-                                  } else if (!checked) {
-                                    setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: [] } })
-                                  }
-                                  handleSave()
-                                }}
-                              />
-                              <Label className="text-sm">Enable Foundational Window</Label>
-                            </div>
-                            {foundation.subgradeAreaCoverage.foundationalWindows.length > 0 && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: [...foundation.subgradeAreaCoverage.foundationalWindows, { id: Date.now(), type: "", size: "", quantity: "", material: "" }] } })
-                                  handleSave()
-                                }}
-                                className="text-xs"
-                              >
-                                + Add Window
+                          <div className="flex items-center gap-3">
+                            <Switch
+                              checked={foundation.subgradeAreaCoverage.foundationalWindowsEnabled}
+                              onCheckedChange={(checked) => {
+                                    setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindowsEnabled: checked,
+                                      },
+                                    })
+                                    handleSave()
+                                  }}
+                            />
+                            <Label className="text-sm">Enable Foundation Window</Label>
+                            {foundation.subgradeAreaCoverage.foundationalWindowsEnabled && (
+                              <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={addFoundationalWindow}>
+                                <Plus className="h-3 w-3" />
+                                Add Window
                               </Button>
                             )}
                           </div>
-                          {foundation.subgradeAreaCoverage.foundationalWindows.length > 0 && (
-                            <div className="space-y-3 pl-6">
-                              {foundation.subgradeAreaCoverage.foundationalWindows.map((window, index) => (
-                                <div key={window.id} className="flex flex-wrap items-center gap-3">
-                                  <div className="flex items-center gap-2">
-                                    <Label className="text-xs text-muted-foreground">Type</Label>
-                                    <Select value={window.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; const updated = [...foundation.subgradeAreaCoverage.foundationalWindows]; updated[index] = { ...window, type: value }; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: updated } }); handleSave() }}>
-                                      <SelectTrigger className="w-28 border-border/60 bg-secondary/50">
-                                        <SelectValue placeholder="Select" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        <SelectItem value="casement">Casement</SelectItem>
-                                        <SelectItem value="double-hung">Double Hung</SelectItem>
-                                        <SelectItem value="single-hung">Single Hung</SelectItem>
-                                        <SelectItem value="sliding">Sliding</SelectItem>
-                                        <SelectItem value="fixed">Fixed</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Label className="text-xs text-muted-foreground">Size</Label>
-                                    <Select value={window.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; const updated = [...foundation.subgradeAreaCoverage.foundationalWindows]; updated[index] = { ...window, size: value }; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: updated } }); handleSave() }}>
-                                      <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
-                                        <SelectValue placeholder="Select" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        <SelectItem value="4-8-sf">4- 8 SF</SelectItem>
-                                        <SelectItem value="9-12-sf">9 - 12 SF</SelectItem>
-                                        <SelectItem value="13-19-sf">13 - 19 SF</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Label className="text-xs text-muted-foreground">Quantity</Label>
-                                    <Select value={window.quantity} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; const updated = [...foundation.subgradeAreaCoverage.foundationalWindows]; updated[index] = { ...window, quantity: value }; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: updated } }); handleSave() }}>
-                                      <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                        <SelectValue placeholder="--" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
-                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                                          <SelectItem key={n} value={String(n)}>{n}</SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Label className="text-xs text-muted-foreground">Material</Label>
-                                    <Select value={window.material} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; const updated = [...foundation.subgradeAreaCoverage.foundationalWindows]; updated[index] = { ...window, material: value }; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: updated } }); handleSave() }}>
-                                      <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
-                                        <SelectValue placeholder="Select" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        <SelectItem value="vinyl">Vinyl</SelectItem>
-                                        <SelectItem value="wood">Wood</SelectItem>
-                                        <SelectItem value="aluminum">Aluminum</SelectItem>
-                                        <SelectItem value="fiberglass">Fiberglass</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  {foundation.subgradeAreaCoverage.foundationalWindows.length > 1 && (
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => {
-                                        const updated = foundation.subgradeAreaCoverage.foundationalWindows.filter((w) => w.id !== window.id)
-                                        setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalWindows: updated } })
-                                        handleSave()
-                                      }}
-                                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  )}
+                          {foundation.subgradeAreaCoverage.foundationalWindowsEnabled && foundation.subgradeAreaCoverage.foundationalWindows.map((window, idx) => (
+                            <div key={window.id} className="rounded-lg bg-secondary/30 p-3 space-y-2">
+                              {/* First row: Type, Material, Size, Grade, Finish (wood), QTY */}
+                              <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">Type</Label>
+                                  <Select value={window.type} onValueChange={(__v) => {
+                                    const value = __v === "__none__" ? "" : __v;
+                                    const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
+                                    newWindows[idx] = { ...window, type: value, size: "", grade: "" }
+                                    setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: newWindows,
+                                      },
+                                    })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="single-hung">Single Hung</SelectItem>
+                                      <SelectItem value="double-hung">Double Hung</SelectItem>
+                                      <SelectItem value="casement">Casement</SelectItem>
+                                      <SelectItem value="fixed">Fixed</SelectItem>
+                                      <SelectItem value="horizontal-slider">Horizontal Slider</SelectItem>
+                                    </SelectContent>
+                                  </Select>
                                 </div>
-                              ))}
+                                <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">Material</Label>
+                                  <Select value={window.material} onValueChange={(__v) => {
+                                    const value = __v === "__none__" ? "" : __v;
+                                    const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
+                                    newWindows[idx] = { ...window, material: value, size: "", grade: "", finish: value === "wood" ? window.finish : "" }
+                                    setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: newWindows,
+                                      },
+                                    })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="vinyl">Vinyl</SelectItem>
+                                      <SelectItem value="aluminum">Aluminum</SelectItem>
+                                      <SelectItem value="wood">Wood</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                {window.type && window.material && (
+                                  <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground">Size</Label>
+                                    <Select value={window.size} onValueChange={(__v) => {
+                                      const value = __v === "__none__" ? "" : __v;
+                                      const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
+                                      newWindows[idx] = { ...window, size: value }
+                                      setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: newWindows,
+                                      },
+                                    })
+                                    handleSave()
+                                    }}>
+                                      <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                        {/* Vinyl - Single Hung */}
+                                        {window.material === "vinyl" && window.type === "single-hung" && (
+                                          <>
+                                            <SelectItem value="4-8">4-8 SF</SelectItem>
+                                            <SelectItem value="9-12">9-12 SF</SelectItem>
+                                            <SelectItem value="13-19">13-19 SF</SelectItem>
+                                            <SelectItem value="20-28">20-28 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Vinyl - Double Hung */}
+                                        {window.material === "vinyl" && window.type === "double-hung" && (
+                                          <>
+                                            <SelectItem value="9-12">9-12 SF</SelectItem>
+                                            <SelectItem value="4-8">4-8 SF</SelectItem>
+                                            <SelectItem value="13-19">13-19 SF</SelectItem>
+                                            <SelectItem value="20-28">20-28 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Vinyl - Casement */}
+                                        {window.material === "vinyl" && window.type === "casement" && (
+                                          <>
+                                            <SelectItem value="3-5">3-5 SF</SelectItem>
+                                            <SelectItem value="6-8">6-8 SF</SelectItem>
+                                            <SelectItem value="9-13">9-13 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Aluminum - Horizontal Slider */}
+                                        {window.material === "aluminum" && window.type === "horizontal-slider" && (
+                                          <>
+                                            <SelectItem value="3-11">3-11 SF</SelectItem>
+                                            <SelectItem value="12-23">12-23 SF</SelectItem>
+                                            <SelectItem value="24-32">24-32 SF</SelectItem>
+                                            <SelectItem value="33-40">33-40 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Aluminum - Casement */}
+                                        {window.material === "aluminum" && window.type === "casement" && (
+                                          <>
+                                            <SelectItem value="3-5">3-5 SF</SelectItem>
+                                            <SelectItem value="6-8">6-8 SF</SelectItem>
+                                            <SelectItem value="9-13">9-13 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Aluminum - Fixed */}
+                                        {window.material === "aluminum" && window.type === "fixed" && (
+                                          <>
+                                            <SelectItem value="3-11">3-11 SF</SelectItem>
+                                            <SelectItem value="12-23">12-23 SF</SelectItem>
+                                            <SelectItem value="24-32">24-32 SF</SelectItem>
+                                            <SelectItem value="33-40">33-40 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Aluminum - Single Hung */}
+                                        {window.material === "aluminum" && window.type === "single-hung" && (
+                                          <>
+                                            <SelectItem value="4-8">4-8 SF</SelectItem>
+                                            <SelectItem value="9-12">9-12 SF</SelectItem>
+                                            <SelectItem value="13-19">13-19 SF</SelectItem>
+                                            <SelectItem value="20-28">20-28 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Aluminum - Double Hung */}
+                                        {window.material === "aluminum" && window.type === "double-hung" && (
+                                          <>
+                                            <SelectItem value="4-8">4-8 SF</SelectItem>
+                                            <SelectItem value="9-12">9-12 SF</SelectItem>
+                                            <SelectItem value="13-19">13-19 SF</SelectItem>
+                                            <SelectItem value="20-28">20-28 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Wood - Casement */}
+                                        {window.material === "wood" && window.type === "casement" && (
+                                          <>
+                                            <SelectItem value="3-11">3-11 SF</SelectItem>
+                                            <SelectItem value="12-23">12-23 SF</SelectItem>
+                                            <SelectItem value="24-32">24-32 SF</SelectItem>
+                                            <SelectItem value="33-40">33-40 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Wood - Double Hung */}
+                                        {window.material === "wood" && window.type === "double-hung" && (
+                                          <>
+                                            <SelectItem value="4-8">4-8 SF</SelectItem>
+                                            <SelectItem value="9-12">9-12 SF</SelectItem>
+                                            <SelectItem value="13-19">13-19 SF</SelectItem>
+                                            <SelectItem value="20-28">20-28 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Wood - Horizontal Slider */}
+                                        {window.material === "wood" && window.type === "horizontal-slider" && (
+                                          <>
+                                            <SelectItem value="3-11">3-11 SF</SelectItem>
+                                            <SelectItem value="12-23">12-23 SF</SelectItem>
+                                            <SelectItem value="24-32">24-32 SF</SelectItem>
+                                            <SelectItem value="33-40">33-40 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Wood - Fixed */}
+                                        {window.material === "wood" && window.type === "fixed" && (
+                                          <>
+                                            <SelectItem value="3-11">3-11 SF</SelectItem>
+                                            <SelectItem value="12-23">12-23 SF</SelectItem>
+                                            <SelectItem value="24-32">24-32 SF</SelectItem>
+                                            <SelectItem value="33-44">33-44 SF</SelectItem>
+                                            <SelectItem value="44-55">44-55 SF</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Wood - Single Hung */}
+                                        {window.material === "wood" && window.type === "single-hung" && (
+                                          <>
+                                            <SelectItem value="4-8">4-8 SF</SelectItem>
+                                            <SelectItem value="9-12">9-12 SF</SelectItem>
+                                            <SelectItem value="13-19">13-19 SF</SelectItem>
+                                            <SelectItem value="20-28">20-28 SF</SelectItem>
+                                          </>
+                                        )}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                )}
+                                {window.type && window.material && (
+                                  <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground">Grade</Label>
+                                    <Select value={window.grade} onValueChange={(__v) => {
+                                      const value = __v === "__none__" ? "" : __v;
+                                      const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
+                                      newWindows[idx] = { ...window, grade: value }
+                                      setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: newWindows,
+                                      },
+                                    })
+                                    handleSave()
+                                    }}>
+                                      <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                        {/* Vinyl - all types */}
+                                        {window.material === "vinyl" && (
+                                          <>
+                                            <SelectItem value="base">Base</SelectItem>
+                                            <SelectItem value="high">High Grade</SelectItem>
+                                            <SelectItem value="premium">Premium Grade</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Aluminum - Horizontal Slider, Fixed, Single Hung, Double Hung */}
+                                        {window.material === "aluminum" && (window.type === "horizontal-slider" || window.type === "fixed") && (
+                                          <>
+                                            <SelectItem value="base">Base</SelectItem>
+                                            <SelectItem value="2-pane">2 Pane</SelectItem>
+                                            <SelectItem value="2-pane-thermal">2 Pane w/Thermal</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Aluminum - Casement, Single Hung, Double Hung */}
+                                        {window.material === "aluminum" && (window.type === "casement" || window.type === "single-hung" || window.type === "double-hung") && (
+                                          <>
+                                            <SelectItem value="base">Base</SelectItem>
+                                            <SelectItem value="high">High Grade</SelectItem>
+                                            <SelectItem value="premium">Premium Grade</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Wood - Casement */}
+                                        {window.material === "wood" && window.type === "casement" && (
+                                          <>
+                                            <SelectItem value="base">Base</SelectItem>
+                                            <SelectItem value="high">High Grade</SelectItem>
+                                            <SelectItem value="premium">Premium Grade</SelectItem>
+                                          </>
+                                        )}
+                                        {/* Wood - Double Hung, Horizontal Slider, Fixed, Single Hung */}
+                                        {window.material === "wood" && (window.type === "double-hung" || window.type === "horizontal-slider" || window.type === "fixed" || window.type === "single-hung") && (
+                                          <>
+                                            <SelectItem value="base">Base</SelectItem>
+                                            <SelectItem value="standard">Standard Grade</SelectItem>
+                                            <SelectItem value="high">High Grade</SelectItem>
+                                            <SelectItem value="premium">Premium Grade</SelectItem>
+                                          </>
+                                        )}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                )}
+                                {window.material === "wood" && (
+                                  <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground">Finish</Label>
+                                    <Select value={window.finish} onValueChange={(__v) => {
+                                      const value = __v === "__none__" ? "" : __v;
+                                      const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
+                                      newWindows[idx] = { ...window, finish: value }
+                                      setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: newWindows,
+                                      },
+                                    })
+                                    handleSave()
+                                    }}>
+                                      <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                        <SelectItem value="stain">Stain</SelectItem>
+                                        <SelectItem value="paint">Paint</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                )}
+                                <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">QTY</Label>
+                                  <Input
+                                    type="number"
+                                    min={1}
+                                    max={99}
+                                    step={1}
+                                    inputMode="numeric"
+                                    value={window.quantity}
+                                    onChange={(e) => {
+                                      const v = e.target.value
+                                      const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
+                                      newWindows[idx] = { ...window, quantity: v }
+                                      setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: newWindows,
+                                      },
+                                    })
+                                    handleSave()
+                                    }}
+                                    className="w-[70px] border-border/60 bg-secondary/50"
+                                  />
+                                </div>
+                                {/* Copy and Delete buttons */}
+                                <div className="flex-1" />
+                                <div className="flex items-center gap-1">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
+                                    onClick={() => {
+                                      const newWindow = { ...window, id: Date.now() }
+                                      setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: [...foundation.subgradeAreaCoverage.foundationalWindows, newWindow],
+                                      },
+                                    })
+                                    handleSave()
+                                    }}
+                                  >
+                                    <Copy className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                    onClick={() => {
+                                      const newWindows = foundation.subgradeAreaCoverage.foundationalWindows.filter(w => w.id !== window.id)
+                                      setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: newWindows,
+                                      },
+                                    })
+                                    handleSave()
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                              {/* Second row: Blinds, Casing/Trim, Marble Sill Replace, Marble Sill Detach */}
+                              <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">Blinds</Label>
+                                  <Select value={window.blinds} onValueChange={(__v) => {
+                                    const value = __v === "__none__" ? "" : __v;
+                                    const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
+                                    newWindows[idx] = { ...window, blinds: value }
+                                    setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: newWindows,
+                                      },
+                                    })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="pvc">PVC</SelectItem>
+                                      <SelectItem value="wood">Wood</SelectItem>
+                                      <SelectItem value="metal">Metal</SelectItem>
+                                      <SelectItem value="shutters">Shutters</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">Casing/Trim</Label>
+                                  <Select value={window.casingTrim} onValueChange={(__v) => {
+                                    const value = __v === "__none__" ? "" : __v;
+                                    const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
+                                    newWindows[idx] = { ...window, casingTrim: value }
+                                    setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: newWindows,
+                                      },
+                                    })
+                                    handleSave()
+                                  }}>
+                                    <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="untrimmed">Untrimmed Window</SelectItem>
+                                      <SelectItem value="casing-stain">Casing - Stain</SelectItem>
+                                      <SelectItem value="casing-apron-stain">Casing With Apron - Stain</SelectItem>
+                                      <SelectItem value="casing-paint">Casing - Paint</SelectItem>
+                                      <SelectItem value="casing-apron-paint">Casing With Apron - Paint</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="flex items-center gap-2 pb-1">
+                                  <Switch
+                                    checked={window.marbleSillReplace}
+                                    onCheckedChange={(checked) => {
+                                      const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
+                                      newWindows[idx] = { ...window, marbleSillReplace: checked }
+                                      setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: newWindows,
+                                      },
+                                    })
+                                    handleSave()
+                                    }}
+                                  />
+                                  <Label className="text-sm whitespace-nowrap">Marble Sill Replace</Label>
+                                </div>
+                                <div className="flex items-center gap-2 pb-1">
+                                  <Switch
+                                    checked={window.marbleSillDetach}
+                                    onCheckedChange={(checked) => {
+                                      const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
+                                      newWindows[idx] = { ...window, marbleSillDetach: checked }
+                                      setFoundation({
+                                      ...foundation,
+                                      subgradeAreaCoverage: {
+                                        ...foundation.subgradeAreaCoverage,
+                                        foundationalWindows: newWindows,
+                                      },
+                                    })
+                                    handleSave()
+                                    }}
+                                  />
+                                  <Label className="text-sm whitespace-nowrap">Marble Sill Detach</Label>
+                                </div>
+                              </div>
                             </div>
-                          )}
+                          ))}
                         </div>
                       </div>
                     </CollapsibleContent>
@@ -2713,7 +3194,7 @@ const newDoor: DoorItem = {
                       <div className="flex items-center gap-3">
                         <Zap className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Electrical</span>
-                        {(foundation.electrical.outlets110 > 0 || foundation.electrical.breakerPanel.enabled || foundation.electrical.meterBox) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                        {(Number(foundation.electrical.outlets110) > 0 || foundation.electrical.breakerPanel.enabled || foundation.electrical.meterBox) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
@@ -3007,17 +3488,21 @@ const newDoor: DoorItem = {
                           />
                           <Label>Enable Meter Box</Label>
                           {foundation.electrical.meterBox && (
-                            <Select defaultValue="qty">
-                              <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
-                                <SelectValue placeholder="QTY" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                <SelectItem value="qty">QTY</SelectItem>
-                                <SelectItem value="1">1</SelectItem>
-                                <SelectItem value="2">2</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <Input
+                              type="number"
+                              min={0}
+                              inputMode="numeric"
+                              placeholder="QTY"
+                              value={foundation.electrical.meterBoxQty}
+                              onChange={(e) => {
+                                setFoundation({
+                                  ...foundation,
+                                  electrical: { ...foundation.electrical, meterBoxQty: e.target.value.replace(/^0+/, "") || "" },
+                                })
+                                handleSave()
+                              }}
+                              className="w-20 border-border/60 bg-secondary/50"
+                            />
                           )}
                         </div>
 
