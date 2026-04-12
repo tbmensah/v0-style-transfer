@@ -372,6 +372,7 @@ export default function NewExpressEstimatePage() {
         circuits: [] as Array<{ id: number; type: string; qty: string }>,
       },
       meterBox: false,
+      meterBoxQty: "",
     },
     finishes: {
       exteriorPaint: { enabled: false },
@@ -418,6 +419,7 @@ export default function NewExpressEstimatePage() {
       bellyPaper: false,
       floorInsulation: false,
       floorInsulationType: "",
+      confinedSpace: false,
     },
     subgradeAreaCoverage: {
       drywall: {
@@ -440,7 +442,7 @@ export default function NewExpressEstimatePage() {
       foundationalWindows: [] as WindowItem[],
     },
     sumpPump: { enabled: false, action: "", hp: "", f9Note: "" },
-    waterHeater: { enabled: false, type: "", size: "", rating: "", action: "", f9Note: "" },
+    waterHeater: { enabled: false, tankless: false, type: "", size: "", rating: "", action: "", f9Note: "" },
     waterSoftener: { enabled: false, type: "", size: "", action: "", f9Note: "" },
     hvac: {
       airHandlers: [] as Array<{
@@ -458,6 +460,8 @@ export default function NewExpressEstimatePage() {
         f9Note: "",
         expansionTank: false,
         circulatorPump: false,
+        oilTankReplacement: false,
+        oilReplacement: false,
       },
       baseboardHeat: {
         enabled: false,
@@ -1241,7 +1245,7 @@ const newDoor: DoorItem = {
                       <div className="flex items-center gap-3">
                         <Zap className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Electrical</span>
-                        {(Number(exterior.electrical.exteriorOutlets) > 0 || Number(exterior.electrical.disconnect30Amp) > 0 || exterior.electrical.breakerPanel.enabled) &&
+                        {(Number(exterior.electrical.exteriorOutlets) > 0 || Number(exterior.electrical.disconnect30Amp) > 0 || exterior.electrical.breakerPanel.enabled || exterior.electrical.meterBox) &&
                           <Badge variant="secondary" className="text-xs">Saved</Badge>
                         }
                       </div>
@@ -1451,6 +1455,31 @@ const newDoor: DoorItem = {
                                 </div>
                               )}
                             </div>
+                          )}
+                        </div>
+                        {/* Meter Box — matches Foundation Electrical */}
+                        <div className="flex items-center gap-3">
+                          <Switch
+                            checked={exterior.electrical.meterBox}
+                            onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, meterBox: checked } }); handleSave() }}
+                          />
+                          <Label>Enable Meter Box</Label>
+                          {exterior.electrical.meterBox && (
+                            <Input
+                              type="number"
+                              min={0}
+                              inputMode="numeric"
+                              placeholder="QTY"
+                              value={exterior.electrical.meterBoxQty}
+                              onChange={(e) => {
+                                setExterior({
+                                  ...exterior,
+                                  electrical: { ...exterior.electrical, meterBoxQty: e.target.value.replace(/^0+/, "") || "" },
+                                })
+                                handleSave()
+                              }}
+                              className="w-20 border-border/60 bg-secondary/50"
+                            />
                           )}
                         </div>
                       </div>
@@ -1902,7 +1931,7 @@ const newDoor: DoorItem = {
                       <div className="flex items-center gap-3">
                         <Layers className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">Insulation</span>
-                        {(foundation.insulation.bellyPaper || foundation.insulation.floorInsulation) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
+                        {(foundation.insulation.bellyPaper || foundation.insulation.floorInsulation || foundation.insulation.confinedSpace) && <Badge variant="secondary" className="text-xs">Saved</Badge>}
                       </div>
                       <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                     </CollapsibleTrigger>
@@ -1933,9 +1962,17 @@ const newDoor: DoorItem = {
                                 <SelectItem value="spray-foam">Spray Foam</SelectItem>
                                 <SelectItem value="r13">R-13</SelectItem>
                                 <SelectItem value="r19">R-19</SelectItem>
+                                <SelectItem value="6in-r21-paper-foil-faced">{"6\" R21 - Paper/Foil Faced"}</SelectItem>
                               </SelectContent>
                             </Select>
                           )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={foundation.insulation.confinedSpace}
+                            onCheckedChange={(checked) => { setFoundation({ ...foundation, insulation: { ...foundation.insulation, confinedSpace: checked } }); handleSave() }}
+                          />
+                          <Label className="text-sm">Confined Space</Label>
                         </div>
                       </div>
                     </CollapsibleContent>
@@ -2153,9 +2190,30 @@ const newDoor: DoorItem = {
                           </div>
                           {foundation.waterHeater.enabled && (
                             <div className="flex flex-wrap items-end gap-4 pl-6">
+                              <div className="flex items-center gap-2 pb-0.5">
+                                <Switch
+                                  checked={foundation.waterHeater.tankless}
+                                  onCheckedChange={(checked) => {
+                                    setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, tankless: checked, size: "" } })
+                                    handleSave()
+                                  }}
+                                />
+                                <Label className="text-sm whitespace-nowrap">Tankless</Label>
+                              </div>
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Type</Label>
-                                <Select value={foundation.waterHeater.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, type: value } }); handleSave() }}>
+                                <Select value={foundation.waterHeater.type} onValueChange={(__v) => {
+                                  const value = __v === "__none__" ? "" : __v
+                                  setFoundation({
+                                    ...foundation,
+                                    waterHeater: {
+                                      ...foundation.waterHeater,
+                                      type: value,
+                                      ...(foundation.waterHeater.tankless ? { size: "" } : {}),
+                                    },
+                                  })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
@@ -2167,18 +2225,38 @@ const newDoor: DoorItem = {
                                 </Select>
                               </div>
                               <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground">Size</Label>
+                                <Label className="text-xs text-muted-foreground">
+                                  {foundation.waterHeater.tankless && foundation.waterHeater.type === "electric" ? "Capacity" : "Size"}
+                                </Label>
                                 <Select value={foundation.waterHeater.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, size: value } }); handleSave() }}>
-                                  <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
+                                  <SelectTrigger className={`border-border/60 bg-secondary/50 ${foundation.waterHeater.tankless && (foundation.waterHeater.type === "gas" || foundation.waterHeater.type === "electric") ? "min-w-[200px] w-[min(100%,240px)]" : "w-24"}`}>
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="20gal">20 gal</SelectItem>
-                                    <SelectItem value="30gal">30 gal</SelectItem>
-                                    <SelectItem value="40gal">40 gal</SelectItem>
-                                    <SelectItem value="50gal">50 gal</SelectItem>
-                                    <SelectItem value="75gal">75 gal</SelectItem>
+                                    {!foundation.waterHeater.tankless && (
+                                      <>
+                                        <SelectItem value="20gal">20 gal</SelectItem>
+                                        <SelectItem value="30gal">30 gal</SelectItem>
+                                        <SelectItem value="40gal">40 gal</SelectItem>
+                                        <SelectItem value="50gal">50 gal</SelectItem>
+                                        <SelectItem value="75gal">75 gal</SelectItem>
+                                      </>
+                                    )}
+                                    {foundation.waterHeater.tankless && foundation.waterHeater.type === "gas" && (
+                                      <>
+                                        <SelectItem value="tankless-gas-3-3-9-gal">3 - 3.9 gallon</SelectItem>
+                                        <SelectItem value="tankless-gas-4-4-9-gal">4 - 4.9 gallon</SelectItem>
+                                        <SelectItem value="tankless-gas-5-5-9-gal">5 - 5.9 Gallon</SelectItem>
+                                      </>
+                                    )}
+                                    {foundation.waterHeater.tankless && foundation.waterHeater.type === "electric" && (
+                                      <>
+                                        <SelectItem value="tankless-electric-up-to-14-9-kw">Up to 14.9KW</SelectItem>
+                                        <SelectItem value="tankless-electric-15-20-kw">15 to 20KW</SelectItem>
+                                        <SelectItem value="tankless-electric-20-1-36-kw">20.1KW to 36KW</SelectItem>
+                                      </>
+                                    )}
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -2297,7 +2375,7 @@ const newDoor: DoorItem = {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="space-y-4">
-                        {/* Enable Drywall */}
+                        {/* Enable Basement Drywall */}
                         <div className="space-y-3">
                           <div className="flex flex-wrap items-center gap-4">
                             <div className="flex items-center gap-2">
@@ -2305,7 +2383,7 @@ const newDoor: DoorItem = {
                                 checked={foundation.subgradeAreaCoverage.drywall.enabled}
                                 onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, enabled: checked } } }); handleSave() }}
                               />
-                              <Label className="text-sm">Enable Drywall</Label>
+                              <Label className="text-sm">Enable Basement Drywall</Label>
                             </div>
                             {foundation.subgradeAreaCoverage.drywall.enabled && (
                               <>
@@ -2763,17 +2841,17 @@ const newDoor: DoorItem = {
                                   </div>
                                 )}
                                 <div className="space-y-1">
-                                  <Label className="text-xs text-muted-foreground">QTY</Label>
-                                  <Input
-                                    type="number"
-                                    min={1}
-                                    max={99}
-                                    step={1}
-                                    inputMode="numeric"
-                                    value={window.quantity}
-                                    onChange={(e) => {
-                                      const v = e.target.value
-                                      const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
+                                        <Label className="text-xs text-muted-foreground">QTY</Label>
+                                        <Input
+                                          type="number"
+                                          min={1}
+                                          max={99}
+                                          step={1}
+                                          inputMode="numeric"
+                                          value={window.quantity}
+                                          onChange={(e) => {
+                                            const v = e.target.value
+                                            const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
                                       newWindows[idx] = { ...window, quantity: v }
                                       setFoundation({
                                       ...foundation,
@@ -2855,6 +2933,7 @@ const newDoor: DoorItem = {
                                       <SelectItem value="pvc">PVC</SelectItem>
                                       <SelectItem value="wood">Wood</SelectItem>
                                       <SelectItem value="metal">Metal</SelectItem>
+                                      <SelectItem value="cloth">Cloth</SelectItem>
                                       <SelectItem value="shutters">Shutters</SelectItem>
                                     </SelectContent>
                                   </Select>
@@ -3047,7 +3126,21 @@ const newDoor: DoorItem = {
                               <div className="flex flex-wrap items-end gap-4">
                                 <div className="space-y-1">
                                   <Label className="text-xs text-muted-foreground">Type</Label>
-                                  <Select value={foundation.hvac.boiler.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, type: value } } }); handleSave() }}>
+                                  <Select value={foundation.hvac.boiler.type} onValueChange={(__v) => {
+                                    const value = __v === "__none__" ? "" : __v
+                                    setFoundation({
+                                      ...foundation,
+                                      hvac: {
+                                        ...foundation.hvac,
+                                        boiler: {
+                                          ...foundation.hvac.boiler,
+                                          type: value,
+                                          ...(value !== "oil" ? { oilTankReplacement: false, oilReplacement: false } : {}),
+                                        },
+                                      },
+                                    })
+                                    handleSave()
+                                  }}>
                                     <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
@@ -3097,6 +3190,50 @@ const newDoor: DoorItem = {
                                   <Label className="text-sm">Circulator pump</Label>
                                 </div>
                               </div>
+                              {foundation.hvac.boiler.type === "oil" && (
+                                <div className="flex flex-wrap items-center gap-6">
+                                  <div className="flex items-center gap-2">
+                                    <Switch
+                                      checked={foundation.hvac.boiler.oilTankReplacement}
+                                      onCheckedChange={(checked) => {
+                                        setFoundation({
+                                          ...foundation,
+                                          hvac: {
+                                            ...foundation.hvac,
+                                            boiler: {
+                                              ...foundation.hvac.boiler,
+                                              oilTankReplacement: checked,
+                                              oilReplacement: checked ? false : foundation.hvac.boiler.oilReplacement,
+                                            },
+                                          },
+                                        })
+                                        handleSave()
+                                      }}
+                                    />
+                                    <Label className="text-sm">Oil Tank Replacement</Label>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Switch
+                                      checked={foundation.hvac.boiler.oilReplacement}
+                                      onCheckedChange={(checked) => {
+                                        setFoundation({
+                                          ...foundation,
+                                          hvac: {
+                                            ...foundation.hvac,
+                                            boiler: {
+                                              ...foundation.hvac.boiler,
+                                              oilReplacement: checked,
+                                              oilTankReplacement: checked ? false : foundation.hvac.boiler.oilTankReplacement,
+                                            },
+                                          },
+                                        })
+                                        handleSave()
+                                      }}
+                                    />
+                                    <Label className="text-sm">Oil Replacement</Label>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
@@ -4914,6 +5051,7 @@ const newDoor: DoorItem = {
                                             <SelectItem value="pvc">PVC</SelectItem>
                                             <SelectItem value="wood">Wood</SelectItem>
                                             <SelectItem value="metal">Metal</SelectItem>
+                                            <SelectItem value="cloth">Cloth</SelectItem>
                                             <SelectItem value="shutters">Shutters</SelectItem>
                                           </SelectContent>
                                         </Select>
@@ -6126,7 +6264,6 @@ const newDoor: DoorItem = {
                                                         <SelectItem value="18-22">18-22 cf</SelectItem>
                                                         <SelectItem value="22-25">22-25 cf</SelectItem>
                                                         <SelectItem value="25-30">25-30 cf</SelectItem>
-                                                        <SelectItem value="25-26">25-26 cf</SelectItem>
                                                       </>
                                                     )}
                                                     {room.appliances.refrigerator.type === "built-in" && (
@@ -6724,7 +6861,6 @@ const newDoor: DoorItem = {
                                                       <SelectItem value="18-22">18-22 cf</SelectItem>
                                                       <SelectItem value="22-25">22-25 cf</SelectItem>
                                                       <SelectItem value="25-30">25-30 cf</SelectItem>
-                                                      <SelectItem value="25-26">25-26 cf</SelectItem>
                                                     </>
                                                   )}
                                                   {room.appliances.refrigerator.type === "built-in" && (
