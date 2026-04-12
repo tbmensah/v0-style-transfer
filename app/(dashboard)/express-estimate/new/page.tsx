@@ -3882,10 +3882,11 @@ const newDoor: DoorItem = {
                                       {(room.flooring.layers || []).map((layer, layerIndex) => {
                                         const showVaporBarrier =
                                           layer.type !== "terrazzo" &&
+                                          layer.type !== "epoxy" &&
                                           !["sheet-vinyl", "carpet", "carpet-glue-down", "tile"].includes(layer.type) &&
                                           layer.application !== "glue-down-concrete" &&
                                           layer.application !== "gluedown"
-                                        const showSubfloorReplacement = layer.type !== "terrazzo"
+                                        const showSubfloorReplacement = layer.type !== "terrazzo" && layer.type !== "epoxy"
                                         const vaporSubfloorIndependent = ["vinyl-plank", "sheet-vinyl", "laminate", "hardwood"].includes(layer.type)
                                         return (
                                         <div key={layer.id} className="rounded-lg bg-secondary/30 p-3">
@@ -3901,12 +3902,12 @@ const newDoor: DoorItem = {
                                                 onValueChange={(__v) => {
                                                   const value = __v === "__none__" ? "" : __v;
                                                   const newLayers = [...(room.flooring.layers || [])]
-                                                  const noVaporTypes = ["sheet-vinyl", "carpet", "carpet-glue-down", "tile", "terrazzo"] as const
+                                                  const noVaporTypes = ["sheet-vinyl", "carpet", "carpet-glue-down", "tile", "terrazzo", "epoxy"] as const
                                                   let next = { ...layer, type: value, grade: "", application: "" }
                                                   if (noVaporTypes.includes(value as (typeof noVaporTypes)[number])) {
                                                     next = { ...next, vaporBarrier: false }
                                                   }
-                                                  if (value === "terrazzo") {
+                                                  if (value === "terrazzo" || value === "epoxy") {
                                                     next = { ...next, subfloorReplacement: false }
                                                   }
                                                   newLayers[layerIndex] = next
