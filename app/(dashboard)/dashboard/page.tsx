@@ -1,4 +1,8 @@
+"use client"
+
 import Link from "next/link"
+import { displayFirstName } from "@/lib/utilities/user-display"
+import { useAuthStore } from "@/lib/stores/auth-store"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -36,11 +40,16 @@ function getStatusBadge(status: string) {
 }
 
 export default function DashboardPage() {
+  const user = useAuthStore((s) => s.user)
+  const firstName = displayFirstName(user)
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Welcome back, Sarah</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Welcome back, {firstName}
+        </h1>
         <p className="mt-1 text-muted-foreground">{"Here's an overview of your claims estimating activity"}</p>
       </div>
 

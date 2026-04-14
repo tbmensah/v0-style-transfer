@@ -1,35 +1,86 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { getSupabaseRedirectUrl } from "@/lib/auth/supabase-redirect"
+import {
+  signupDefaultValues,
+  signupResolver,
+  type SignupFormValues,
+} from "@/lib/forms/signup"
+import { getSupabaseBrowserClient } from "@/lib/supabase/browser-client"
 import { Zap } from "lucide-react"
 
 export default function SignupPage() {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    company: "",
-    password: "",
-    confirmPassword: "",
-    acceptTerms: false,
+  const router = useRouter()
+
+  const form = useForm<SignupFormValues>({
+    resolver: signupResolver,
+    defaultValues: signupDefaultValues,
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle signup - redirect to dashboard for demo
-    window.location.href = "/dashboard"
+  async function onSubmit(values: SignupFormValues) {
+    const supabase = getSupabaseBrowserClient()
+    if (!supabase) {
+      form.setError("root", {
+        message: "Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+      })
+      return
+    }
+
+    const metadata: Record<string, string> = {
+      full_name: values.fullName,
+    }
+    const company = values.company.trim()
+    if (company) {
+      metadata.company = company
+    }
+
+    const emailRedirectTo = getSupabaseRedirectUrl()
+
+    const { data, error } = await supabase.auth.signUp({
+      email: values.email,
+      password: values.password,
+      options: {
+        data: metadata,
+        ...(emailRedirectTo ? { emailRedirectTo } : {}),
+      },
+    })
+
+    if (error) {
+      form.setError("root", { message: error.message })
+      return
+    }
+
+    form.clearErrors()
+    form.reset(signupDefaultValues)
+
+    if (data.session) {
+      router.push("/login?signedUp=1")
+    } else {
+      router.push("/login?confirm=email")
+    }
+    router.refresh()
   }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* Subtle gradient background */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
-      
+
       <div className="relative flex flex-1 items-center justify-center px-4 py-12">
         <Card className="w-full max-w-md border-border/60 bg-card/90 shadow-2xl backdrop-blur-sm">
           <CardHeader className="space-y-1 text-center">
@@ -45,88 +96,145 @@ export default function SignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="John Doe"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  required
-                  className="border-border/60 bg-secondary/50"
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                {form.formState.errors.root ? (
+                  <p className="text-destructive text-sm" role="alert">
+                    {form.formState.errors.root.message}
+                  </p>
+                ) : null}
+                <FormField
+                  control={form.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground">Full Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="John Doe"
+                          autoComplete="name"
+                          className="border-border/60 bg-secondary/50"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="name@email.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  className="border-border/60 bg-secondary/50"
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="name@email.com"
+                          autoComplete="email"
+                          className="border-border/60 bg-secondary/50"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="company" className="text-foreground">
-                  Company <span className="text-muted-foreground">(Optional)</span>
-                </Label>
-                <Input
-                  id="company"
-                  type="text"
-                  placeholder="Your company name"
-                  value={formData.company}
-                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  className="border-border/60 bg-secondary/50"
+                <FormField
+                  control={form.control}
+                  name="company"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground">
+                        Company <span className="text-muted-foreground">(Optional)</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Your company name"
+                          autoComplete="organization"
+                          className="border-border/60 bg-secondary/50"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                  className="border-border/60 bg-secondary/50"
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground">Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          autoComplete="new-password"
+                          className="border-border/60 bg-secondary/50"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  required
-                  className="border-border/60 bg-secondary/50"
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground">Confirm Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          autoComplete="new-password"
+                          className="border-border/60 bg-secondary/50"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="flex items-start gap-2">
-                <Checkbox
-                  id="terms"
-                  checked={formData.acceptTerms}
-                  onCheckedChange={(checked) => setFormData({ ...formData, acceptTerms: checked as boolean })}
-                  className="mt-1"
+                <FormField
+                  control={form.control}
+                  name="acceptTerms"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start gap-2 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={(c) => field.onChange(c === true)}
+                          className="mt-1"
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="text-sm font-normal leading-relaxed text-muted-foreground">
+                          By signing up, you agree to our{" "}
+                          <Link href="/terms" className="text-primary hover:underline">
+                            Terms
+                          </Link>{" "}
+                          and{" "}
+                          <Link href="/privacy" className="text-primary hover:underline">
+                            Privacy Policy
+                          </Link>
+                        </FormLabel>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
                 />
-                <Label htmlFor="terms" className="text-sm leading-relaxed text-muted-foreground">
-                  By signing up, you agree to our{" "}
-                  <Link href="/terms" className="text-primary hover:underline">
-                    Terms
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy" className="text-primary hover:underline">
-                    Privacy Policy
-                  </Link>
-                </Label>
-              </div>
-              <Button type="submit" className="w-full shadow-md shadow-primary/20">
-                Create account
-              </Button>
-            </form>
+                <Button
+                  type="submit"
+                  className="w-full shadow-md shadow-primary/20"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting ? "Creating account…" : "Create account"}
+                </Button>
+              </form>
+            </Form>
             <p className="mt-6 text-center text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link href="/login" className="font-medium text-primary hover:underline">

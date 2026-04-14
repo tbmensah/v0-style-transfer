@@ -1,10 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { signOut } from "@/lib/auth/sign-out"
+import { userInitials } from "@/lib/utilities/user-display"
+import { useAuthStore } from "@/lib/stores/auth-store"
 import { cn } from "@/lib/utils"
 import { LayoutDashboard, Upload, ClipboardList, Coins, Settings, HelpCircle, LogOut, History, Zap, ChevronLeft, ChevronRight } from "lucide-react"
-import { createContext, useContext, useState, ReactNode } from "react"
+import { createContext, useContext, useState, type ReactNode } from "react"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -43,7 +46,22 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
 
 export function DashboardSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const user = useAuthStore((s) => s.user)
+  const [loggingOut, setLoggingOut] = useState(false)
   const { isCollapsed, setIsCollapsed } = useSidebar()
+
+  const displayName = user?.fullName?.trim() || user?.email || "Account"
+  const email = user?.email ?? ""
+  const initials = userInitials(user)
+
+  async function handleLogout() {
+    setLoggingOut(true)
+    await signOut()
+    router.push("/login")
+    router.refresh()
+    setLoggingOut(false)
+  }
 
   return (
     <aside 
@@ -127,17 +145,19 @@ export function DashboardSidebar() {
               </Link>
             )
           })}
-          <Link
-            href="/"
+          <button
+            type="button"
             title={isCollapsed ? "Log Out" : undefined}
+            disabled={loggingOut}
+            onClick={() => void handleLogout()}
             className={cn(
-              "flex items-center rounded-lg text-sm font-medium text-sidebar-foreground/70 transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
-              isCollapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5"
+              "flex w-full items-center rounded-lg text-sm font-medium text-sidebar-foreground/70 transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground disabled:opacity-50",
+              isCollapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
             )}
           >
             <LogOut className="h-5 w-5 shrink-0" />
-            {!isCollapsed && "Log Out"}
-          </Link>
+            {!isCollapsed && (loggingOut ? "Signing out…" : "Log Out")}
+          </button>
         </div>
       </nav>
 
@@ -150,16 +170,18 @@ export function DashboardSidebar() {
           "flex items-center",
           isCollapsed ? "justify-center" : "gap-3"
         )}>
-          <div 
+          <div
             className="flex h-10 w-10 items-center justify-center rounded-full bg-sidebar-primary/20 text-sm font-medium text-sidebar-primary ring-1 ring-sidebar-primary/20"
-            title={isCollapsed ? "Sarah Mitchell" : undefined}
+            title={isCollapsed ? displayName : undefined}
           >
-            SM
+            {initials}
           </div>
           {!isCollapsed && (
             <div className="flex-1 overflow-hidden">
-              <p className="truncate text-sm font-medium text-sidebar-foreground">Sarah Mitchell</p>
-              <p className="truncate text-xs text-sidebar-foreground/60">sarah@insuranceco.com</p>
+              <p className="truncate text-sm font-medium text-sidebar-foreground">
+                {user?.fullName?.trim() || email || "Signed in"}
+              </p>
+              <p className="truncate text-xs text-sidebar-foreground/60">{email || "—"}</p>
             </div>
           )}
         </div>

@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { formatMemberSince, userInitials } from "@/lib/utilities/user-display"
+import { useAuthStore } from "@/lib/stores/auth-store"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,11 +11,22 @@ import { Badge } from "@/components/ui/badge"
 import { AlertTriangle } from "lucide-react"
 
 export default function AccountPage() {
+  const user = useAuthStore((s) => s.user)
+
   const [profileData, setProfileData] = useState({
-    fullName: "Sarah Mitchell",
-    email: "sarah.mitchell@insuranceco.com",
-    company: "Mitchell Insurance Services",
+    fullName: "",
+    email: "",
+    company: "",
   })
+
+  useEffect(() => {
+    if (!user) return
+    setProfileData({
+      fullName: user.fullName ?? "",
+      email: user.email,
+      company: user.company ?? "",
+    })
+  }, [user])
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -149,7 +162,7 @@ export default function AccountPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 text-xl font-bold text-primary ring-2 ring-primary/20">
-                  SM
+                  {userInitials(user)}
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">{profileData.fullName}</p>
@@ -167,7 +180,7 @@ export default function AccountPage() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Member since</span>
-                  <span className="text-foreground">Jan 15, 2024</span>
+                  <span className="text-foreground">{formatMemberSince(user?.createdAt)}</span>
                 </div>
               </div>
             </CardContent>
