@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, ClipboardList, Coins, CheckCircle, Clock, AlertCircle, XCircle, Download, Eye } from "lucide-react"
+import { useMe } from "@/lib/api/hooks/use-me"
 
 const recentJobs = [
   { id: "2024-0892", name: "Johnson Residence", type: "FF", date: "Mar 10, 2024", status: "Completed" },
@@ -42,7 +43,8 @@ function getStatusBadge(status: string) {
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user)
   const firstName = displayFirstName(user)
-
+  const { data: me } = useMe();
+  console.log(me);
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -158,9 +160,8 @@ export default function DashboardPage() {
                   {recentJobs.map((job) => (
                     <div key={job.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
                       <div className="flex items-center gap-4">
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-lg text-xs font-bold ring-1 ${
-                          job.type === "FF" ? "bg-primary/20 text-primary ring-primary/20" : "bg-secondary text-foreground ring-border/60"
-                        }`}>
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-lg text-xs font-bold ring-1 ${job.type === "FF" ? "bg-primary/20 text-primary ring-primary/20" : "bg-secondary text-foreground ring-border/60"
+                          }`}>
                           {job.type}
                         </div>
                         <div>

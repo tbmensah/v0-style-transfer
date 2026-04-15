@@ -1,7 +1,16 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useMutation } from "@tanstack/react-query"
+import { Suspense, useEffect, useState } from "react"
 import Link from "next/link"
+import { toast } from "sonner"
+import { getApiErrorMessage } from "@/lib/api/parse-api-error"
+import { DEFAULT_FF_PDF_TYPE } from "@/lib/constants/ff-pdf-type-default"
+import { initFastFillUpload, submitFastFillJobDetails } from "@/lib/api/requests/fast-fill"
+import { uploadFileToSignedUrl } from "@/lib/api/upload-signed-url"
+import { useFastFillUploadInit } from "@/lib/api/hooks/use-fast-fill-upload-init"
+import type { FastFillUploadInitData } from "@/lib/types/fast-fill"
+import { parallelWithRetry } from "@/lib/utilities/parallel-retry"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -27,19 +36,56 @@ interface FilePair {
   pdf: File | null
   esx: File | null
   selected: boolean
+  /** Presigned upload slot from API — one per row. */
+  uploadSession?: FastFillUploadInitData | null
   status?: "pending" | "processing" | "completed" | "failed"
   progress?: number
 }
 
 type WorkflowStep = "upload" | "confirm" | "processing" | "complete"
 
-export default function NewFastFillPage() {
+function NewFastFillPageContent() {
+  const {
+    data: firstUploadInit,
+    isLoading: initLoading,
+    error: initError,
+    isError: initFailed,
+    resetDraft,
+  } = useFastFillUploadInit()
+
+  const addPairInit = useMutation({
+    mutationFn: initFastFillUpload,
+  })
+
   const [step, setStep] = useState<WorkflowStep>("upload")
-  const [filePairs, setFilePairs] = useState<FilePair[]>([{ id: 1, pdf: null, esx: null, selected: true }])
+  const [filePairs, setFilePairs] = useState<FilePair[]>([
+    { id: 1, pdf: null, esx: null, selected: true, uploadSession: null },
+  ])
   const [processingProgress, setProcessingProgress] = useState(0)
+  const [submittingDetails, setSubmittingDetails] = useState(false)
+
+  useEffect(() => {
+    if (!firstUploadInit) return
+    setFilePairs((prev) =>
+      prev.map((p, i) => (i === 0 ? { ...p, uploadSession: firstUploadInit } : p)),
+    )
+  }, [firstUploadInit])
+
+  useEffect(() => {
+    if (!initFailed || !initError) return
+    toast.error(getApiErrorMessage(initError), { id: "fast-fill-upload-init" })
+  }, [initFailed, initError])
 
   const addFilePair = () => {
-    setFilePairs([...filePairs, { id: Date.now(), pdf: null, esx: null, selected: true }])
+    const id = Date.now()
+    setFilePairs((prev) => [...prev, { id, pdf: null, esx: null, selected: true, uploadSession: null }])
+    addPairInit.mutate(undefined, {
+      onSuccess: (session) => {
+        setFilePairs((prev) =>
+          prev.map((p) => (p.id === id ? { ...p, uploadSession: session } : p)),
+        )
+      },
+    })
   }
 
   const removeFilePair = (id: number) => {
@@ -61,49 +107,85 @@ export default function NewFastFillPage() {
   const tokenCost = selectedPairs.length
 
   const handleProceedToConfirm = () => {
-    if (validPairs.length > 0) {
-      setStep("confirm")
+    if (validPairs.length === 0) return
+    for (const pair of filePairs) {
+      if (!pair.pdf) continue
+      if (!pair.uploadSession) {
+        toast.error("Upload slot not ready for one or more rows. Wait for init or try again.", {
+          id: "fast-fill-continue",
+        })
+        return
+      }
     }
+    setStep("confirm")
   }
 
-  const handleStartProcessing = useCallback(() => {
-    setStep("processing")
-    setProcessingProgress(0)
-    
-    // Update all selected pairs to processing status
-    setFilePairs(prev => prev.map(pair => 
-      pair.selected && pair.pdf 
-        ? { ...pair, status: "processing", progress: 0 } 
-        : pair
-    ))
-
-    // Simulate processing with progress
-    let progress = 0
-    const interval = setInterval(() => {
-      progress += Math.random() * 15
-      if (progress >= 100) {
-        progress = 100
-        clearInterval(interval)
-        
-        // Mark all as completed
-        setFilePairs(prev => prev.map(pair => 
-          pair.status === "processing" 
-            ? { ...pair, status: "completed", progress: 100 } 
-            : pair
-        ))
-        
-        setTimeout(() => setStep("complete"), 500)
+  const handleStartProcessing = async () => {
+    const toProcess = filePairs.filter((p) => p.pdf && p.selected)
+    setSubmittingDetails(true)
+    try {
+      const uploadAndDetails = async (pair: FilePair) => {
+        if (!pair.pdf || !pair.uploadSession) {
+          throw new Error("Missing PDF or upload session for a job row.")
+        }
+        await uploadFileToSignedUrl(pair.pdf, pair.uploadSession.upload_url)
+        await submitFastFillJobDetails(pair.uploadSession.job_id, {
+          ff_pdf_type: DEFAULT_FF_PDF_TYPE,
+          pdf_file_key: pair.uploadSession.storage_path,
+          esx_file_key: pair.esx?.name ?? "",
+        })
       }
-      setProcessingProgress(Math.min(progress, 100))
-      
-      // Update individual progress
-      setFilePairs(prev => prev.map(pair => 
-        pair.status === "processing" 
-          ? { ...pair, progress: Math.min((pair.progress || 0) + Math.random() * 20, progress) } 
-          : pair
-      ))
-    }, 500)
-  }, [])
+
+      await parallelWithRetry(toProcess, uploadAndDetails, {
+        maxAttempts: 3,
+        delayMs: 500,
+      })
+
+      setStep("processing")
+      setProcessingProgress(0)
+
+      setFilePairs((prev) =>
+        prev.map((pair) =>
+          pair.selected && pair.pdf ? { ...pair, status: "processing", progress: 0 } : pair,
+        ),
+      )
+
+      let progress = 0
+      const interval = setInterval(() => {
+        progress += Math.random() * 15
+        if (progress >= 100) {
+          progress = 100
+          clearInterval(interval)
+
+          setFilePairs((prev) =>
+            prev.map((pair) =>
+              pair.status === "processing"
+                ? { ...pair, status: "completed", progress: 100 }
+                : pair,
+            ),
+          )
+
+          setTimeout(() => setStep("complete"), 500)
+        }
+        setProcessingProgress(Math.min(progress, 100))
+
+        setFilePairs((prev) =>
+          prev.map((pair) =>
+            pair.status === "processing"
+              ? {
+                  ...pair,
+                  progress: Math.min((pair.progress || 0) + Math.random() * 20, progress),
+                }
+              : pair,
+          ),
+        )
+      }, 500)
+    } catch (e) {
+      toast.error(getApiErrorMessage(e), { id: "fast-fill-process" })
+    } finally {
+      setSubmittingDetails(false)
+    }
+  }
 
   const handleDownloadAll = () => {
     // Simulate download
@@ -111,8 +193,9 @@ export default function NewFastFillPage() {
   }
 
   const handleStartNew = () => {
+    resetDraft()
     setStep("upload")
-    setFilePairs([{ id: 1, pdf: null, esx: null, selected: true }])
+    setFilePairs([{ id: 1, pdf: null, esx: null, selected: true, uploadSession: null }])
     setProcessingProgress(0)
   }
 
@@ -254,9 +337,14 @@ export default function NewFastFillPage() {
                     )}
                   </div>
                 ))}
-                <Button variant="outline" onClick={addFilePair} className="w-full gap-2 border-border/60">
+                <Button
+                  variant="outline"
+                  onClick={addFilePair}
+                  disabled={addPairInit.isPending || initLoading}
+                  className="w-full gap-2 border-border/60"
+                >
                   <Plus className="h-4 w-4" />
-                  Add Another File Pair
+                  {addPairInit.isPending ? "Reserving upload slot…" : "Add Another File Pair"}
                 </Button>
               </CardContent>
             </Card>
@@ -289,12 +377,16 @@ export default function NewFastFillPage() {
                     </div>
                   </div>
                 </div>
-                <Button 
-                  className="w-full gap-2 shadow-md shadow-primary/20" 
-                  disabled={validPairs.length === 0}
+                <Button
+                  className="w-full gap-2 shadow-md shadow-primary/20"
+                  disabled={
+                    validPairs.length === 0 ||
+                    initLoading ||
+                    filePairs.some((p) => p.pdf && !p.uploadSession)
+                  }
                   onClick={handleProceedToConfirm}
                 >
-                  Continue
+                  {initLoading ? "Preparing upload…" : "Continue"}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
                 <Link href="/fast-fill">
@@ -398,12 +490,12 @@ export default function NewFastFillPage() {
                     <ArrowLeft className="h-4 w-4" />
                     Back
                   </Button>
-                  <Button 
-                    className="flex-1 gap-2 shadow-md shadow-primary/20" 
-                    disabled={selectedPairs.length === 0}
-                    onClick={handleStartProcessing}
+                  <Button
+                    className="flex-1 gap-2 shadow-md shadow-primary/20"
+                    disabled={selectedPairs.length === 0 || submittingDetails}
+                    onClick={() => void handleStartProcessing()}
                   >
-                    Process
+                    {submittingDetails ? "Submitting…" : "Process"}
                   </Button>
                 </div>
               </CardContent>
@@ -511,5 +603,20 @@ export default function NewFastFillPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function NewFastFillPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[40vh] items-center justify-center gap-2 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+          <span>Loading…</span>
+        </div>
+      }
+    >
+      <NewFastFillPageContent />
+    </Suspense>
   )
 }

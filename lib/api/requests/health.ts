@@ -1,4 +1,7 @@
+import { unwrapSuccess } from "@/lib/api/unwrap-envelope"
+import { API_ENDPOINTS } from "@/lib/constants/api-endpoints"
 import { apiClient } from "@/lib/http/api-client"
+import type { SuccessEnvelope } from "@/lib/types/api-envelope"
 import type { HealthResponse } from "@/lib/types/health"
 
 /**
@@ -6,6 +9,6 @@ import type { HealthResponse } from "@/lib/types/health"
  * Requires `NEXT_PUBLIC_API_BASE_URL` in `.env.local`.
  */
 export async function fetchHealth(): Promise<HealthResponse> {
-  const { data } = await apiClient.get<HealthResponse>("/health")
-  return data
+  const { data } = await apiClient.get<SuccessEnvelope<HealthResponse>>(API_ENDPOINTS.health)
+  return unwrapSuccess(data, "No health payload")
 }
