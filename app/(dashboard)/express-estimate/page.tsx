@@ -1,33 +1,32 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
+import { getApiErrorMessage } from "@/lib/api/parse-api-error"
+import { useJobsList } from "@/lib/api/hooks/use-jobs-list"
+import { ListPagination } from "@/components/list-pagination"
+import { JobsDataTable } from "@/components/jobs/jobs-data-table"
+import { expressJobColumns } from "@/components/jobs/job-table-columns"
+import { hasApiBase } from "@/lib/environment/public-env"
+import { LIST_PAGE_SIZE } from "@/lib/constants/pagination"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, ClipboardList, CheckCircle, Clock, Download, Eye } from "lucide-react"
-
-const expressEstimateJobs = [
-  { id: "2024-0891", name: "Williams Property", date: "Mar 10, 2024", status: "Processing", tokens: 1 },
-  { id: "2024-0889", name: "Garcia Residence", date: "Mar 9, 2024", status: "Completed", tokens: 1 },
-  { id: "2024-0886", name: "Davis Home", date: "Mar 6, 2024", status: "Completed", tokens: 1 },
-]
-
-function getStatusBadge(status: string) {
-  const config: Record<string, { variant: "default" | "secondary" | "destructive" | "outline", icon: React.ElementType }> = {
-    "Completed": { variant: "default", icon: CheckCircle },
-    "Processing": { variant: "secondary", icon: Clock },
-  }
-  const { variant, icon: Icon } = config[status] || { variant: "secondary" as const, icon: Clock }
-  return (
-    <Badge variant={variant} className="gap-1">
-      <Icon className="h-3 w-3" />
-      {status}
-    </Badge>
-  )
-}
+import { Plus } from "lucide-react"
 
 export default function ExpressEstimatePage() {
+  const [page, setPage] = useState(1)
+  const { data, isLoading, isError, error, refetch } = useJobsList({
+    job_type: "ee",
+    page,
+    page_size: LIST_PAGE_SIZE,
+  })
+
+  const items = data?.items ?? []
+  const total = data?.total ?? 0
+
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Express Estimate</h1>
@@ -41,71 +40,57 @@ export default function ExpressEstimatePage() {
         </Link>
       </div>
 
-      {/* Token Balance */}
       <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Available Tokens</CardTitle>
-          <CardDescription>Each Express Estimate uses 1 token</CardDescription>
+          <CardDescription>Each Express Estimate uses tokens per your account balance</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold text-foreground">12</span>
-            <Badge variant="secondary" className="text-xs">EE tokens</Badge>
+            <span className="text-3xl font-bold text-foreground">—</span>
+            <Badge variant="secondary" className="text-xs">
+              EE tokens
+            </Badge>
           </div>
         </CardContent>
       </Card>
 
-      {/* Jobs Table */}
       <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
           <CardTitle className="text-foreground">Express Estimate Jobs</CardTitle>
           <CardDescription>All your Express Estimate submissions</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border/60">
-                  <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Job Name</th>
-                  <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Date</th>
-                  <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Tokens</th>
-                  <th className="pb-3 text-right text-sm font-medium text-muted-foreground">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/60">
-                {expressEstimateJobs.map((job) => (
-                  <tr key={job.id} className="group transition-colors hover:bg-secondary/30">
-                    <td className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20">
-                          <ClipboardList className="h-4 w-4 text-primary" />
-                        </div>
-                        <span className="font-medium text-foreground">Claim #{job.id} - {job.name}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 text-sm text-muted-foreground">{job.date}</td>
-                    <td className="py-4">{getStatusBadge(job.status)}</td>
-                    <td className="py-4 text-sm text-muted-foreground">{job.tokens}</td>
-                    <td className="py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        {job.status === "Completed" && (
-                          <Button variant="ghost" size="icon" title="Download">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {job.status === "Processing" && (
-                          <Button variant="ghost" size="icon" title="View">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {!hasApiBase ? (
+            <p className="text-sm text-muted-foreground">
+              Set <code className="rounded bg-muted px-1.5 py-0.5 text-xs">NEXT_PUBLIC_API_BASE_URL</code> to load
+              jobs from the API.
+            </p>
+          ) : isError ? (
+            <div className="space-y-3 rounded-lg border border-destructive/40 bg-destructive/5 p-4">
+              <p className="text-sm text-destructive">{getApiErrorMessage(error)}</p>
+              <Button type="button" variant="outline" size="sm" onClick={() => void refetch()}>
+                Retry
+              </Button>
+            </div>
+          ) : (
+            <>
+              <JobsDataTable
+                columns={expressJobColumns}
+                data={items}
+                isLoading={isLoading}
+                emptyMessage="No Express Estimate jobs yet."
+                getRowId={(row) => row.id}
+              />
+              <ListPagination
+                className="mt-6"
+                page={page}
+                totalItems={total}
+                pageSize={LIST_PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

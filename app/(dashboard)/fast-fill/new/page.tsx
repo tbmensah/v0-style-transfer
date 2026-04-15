@@ -565,19 +565,21 @@ function NewFastFillPageContent() {
             <CardContent className="space-y-6">
               <div className="space-y-3">
                 {selectedPairs.map((pair, index) => (
-                  <div key={pair.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20">
+                  <div key={pair.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50">
+                    <div className="flex min-w-0 flex-1 items-center gap-4">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20">
                         <CheckCircle className="h-5 w-5 text-primary" />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-sm font-medium text-foreground">Job {index + 1}: {pair.pdf?.name?.replace(".pdf", "_prelim.esx")}</p>
                         <p className="text-xs text-muted-foreground">Ready for download</p>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/20">
-                      <Download className="h-4 w-4" />
-                    </Button>
+                    <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
+                      <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/20" title="Download">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>

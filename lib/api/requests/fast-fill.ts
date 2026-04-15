@@ -22,7 +22,7 @@ export async function initFastFillUpload(): Promise<FastFillUploadInitData> {
 
 /**
  * Existing job (e.g. `?job_id=` but no local draft): fetch fresh upload URL + paths.
- * `GET /api/v1/jobs/ff/{job_id}/upload-url`
+ * `GET /jobs/ff/{job_id}/upload-url`
  */
 export async function fetchFastFillJobUploadUrl(
   jobId: string,
@@ -35,7 +35,7 @@ export async function fetchFastFillJobUploadUrl(
 
 /**
  * After PDF upload to `storage_path`, register keys + FF type for the job.
- * `POST /api/v1/jobs/ff/{job_id}/details`
+ * `POST /jobs/ff/{job_id}/details`
  */
 export async function submitFastFillJobDetails(
   jobId: string,

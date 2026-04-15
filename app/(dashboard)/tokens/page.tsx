@@ -161,7 +161,7 @@ export default function TokensPage() {
                 <tr className="border-b border-border/60">
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Date</th>
                   <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Type</th>
-                  <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Quantity</th>
+                  <th className="pb-3 text-center text-sm font-medium text-muted-foreground">Quantity</th>
                   <th className="pb-3 text-right text-sm font-medium text-muted-foreground">Amount</th>
                 </tr>
               </thead>
@@ -175,7 +175,7 @@ export default function TokensPage() {
                         {purchase.type}
                       </Badge>
                     </td>
-                    <td className="py-4 text-sm text-foreground">{purchase.quantity} tokens</td>
+                    <td className="py-4 text-center text-sm text-foreground">{purchase.quantity} tokens</td>
                     <td className="py-4 text-right text-sm font-medium text-foreground">${purchase.amount}</td>
                   </tr>
                 ))}

@@ -1,11 +1,11 @@
-/** Presigned upload slot — from `POST /fast-fill/upload-init` or `GET /api/v1/jobs/ff/{job_id}/upload-url`. */
+/** Presigned upload slot — from draft/upload-init or `GET /jobs/ff/{job_id}/upload-url`. */
 export type FastFillUploadInitData = {
   job_id: string
   upload_url: string
   storage_path: string
 }
 
-/** `POST /api/v1/jobs/ff/{job_id}/details` */
+/** `POST /jobs/ff/{job_id}/details` */
 export type FastFillJobDetailsPayload = {
   ff_pdf_type: string
   pdf_file_key: string

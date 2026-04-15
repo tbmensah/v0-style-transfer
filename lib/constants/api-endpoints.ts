@@ -9,6 +9,7 @@ export const FAST_FILL_JOB_ID_QUERY = "job_id" as const
 export const API_ENDPOINTS = {
   health: "/health",
   me: "/me",
+  jobsList: "/jobs",
   fastFillUploadInit: "/jobs/ff/draft-upload",
 } as const
 

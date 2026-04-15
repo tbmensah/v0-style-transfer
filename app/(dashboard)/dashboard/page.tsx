@@ -158,30 +158,34 @@ export default function DashboardPage() {
               <TabsContent value="all">
                 <div className="space-y-4">
                   {recentJobs.map((job) => (
-                    <div key={job.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
-                      <div className="flex items-center gap-4">
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-lg text-xs font-bold ring-1 ${job.type === "FF" ? "bg-primary/20 text-primary ring-primary/20" : "bg-secondary text-foreground ring-border/60"
+                    <div key={job.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
+                      <div className="flex min-w-0 flex-1 items-center gap-4">
+                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold ring-1 ${job.type === "FF" ? "bg-primary/20 text-primary ring-primary/20" : "bg-secondary text-foreground ring-border/60"
                           }`}>
                           {job.type}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <p className="font-medium text-foreground">Claim #{job.id} - {job.name}</p>
-                          <p className="text-sm text-muted-foreground">{job.date}</p>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                            <p className="text-sm text-muted-foreground">{job.date}</p>
+                            {getStatusBadge(job.status)}
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {getStatusBadge(job.status)}
-                        {job.status === "Completed" && (
-                          <Button variant="ghost" size="icon">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {job.status === "Needs Review" && (
-                          <Button variant="ghost" size="icon">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
+                      {(job.status === "Completed" || job.status === "Needs Review") && (
+                        <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
+                          {job.status === "Completed" && (
+                            <Button variant="ghost" size="icon" title="Download">
+                              <Download className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {job.status === "Needs Review" && (
+                            <Button variant="ghost" size="icon" title="View">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -189,29 +193,33 @@ export default function DashboardPage() {
               <TabsContent value="fast-fill">
                 <div className="space-y-4">
                   {recentJobs.filter(job => job.type === "FF").map((job) => (
-                    <div key={job.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg text-xs font-bold ring-1 bg-primary/20 text-primary ring-primary/20">
+                    <div key={job.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
+                      <div className="flex min-w-0 flex-1 items-center gap-4">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold ring-1 bg-primary/20 text-primary ring-primary/20">
                           {job.type}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <p className="font-medium text-foreground">Claim #{job.id} - {job.name}</p>
-                          <p className="text-sm text-muted-foreground">{job.date}</p>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                            <p className="text-sm text-muted-foreground">{job.date}</p>
+                            {getStatusBadge(job.status)}
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {getStatusBadge(job.status)}
-                        {job.status === "Completed" && (
-                          <Button variant="ghost" size="icon">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {job.status === "Needs Review" && (
-                          <Button variant="ghost" size="icon">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
+                      {(job.status === "Completed" || job.status === "Needs Review") && (
+                        <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
+                          {job.status === "Completed" && (
+                            <Button variant="ghost" size="icon" title="Download">
+                              <Download className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {job.status === "Needs Review" && (
+                            <Button variant="ghost" size="icon" title="View">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -219,29 +227,33 @@ export default function DashboardPage() {
               <TabsContent value="express-estimate">
                 <div className="space-y-4">
                   {recentJobs.filter(job => job.type === "EE").map((job) => (
-                    <div key={job.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg text-xs font-bold ring-1 bg-secondary text-foreground ring-border/60">
+                    <div key={job.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
+                      <div className="flex min-w-0 flex-1 items-center gap-4">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold ring-1 bg-secondary text-foreground ring-border/60">
                           {job.type}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <p className="font-medium text-foreground">Claim #{job.id} - {job.name}</p>
-                          <p className="text-sm text-muted-foreground">{job.date}</p>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                            <p className="text-sm text-muted-foreground">{job.date}</p>
+                            {getStatusBadge(job.status)}
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {getStatusBadge(job.status)}
-                        {job.status === "Completed" && (
-                          <Button variant="ghost" size="icon">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {job.status === "Needs Review" && (
-                          <Button variant="ghost" size="icon">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
+                      {(job.status === "Completed" || job.status === "Needs Review") && (
+                        <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
+                          {job.status === "Completed" && (
+                            <Button variant="ghost" size="icon" title="Download">
+                              <Download className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {job.status === "Needs Review" && (
+                            <Button variant="ghost" size="icon" title="View">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -259,14 +271,16 @@ export default function DashboardPage() {
           <CardContent>
             <div className="space-y-4">
               {completedDownloads.map((item) => (
-                <div key={item.id} className="flex items-center justify-between rounded-lg border border-border/40 bg-secondary/30 p-3 transition-colors hover:bg-secondary/50">
-                  <div>
+                <div key={item.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/40 bg-secondary/30 p-3 transition-colors hover:bg-secondary/50">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-foreground">Claim #{item.id} - {item.name}</p>
                     <p className="text-xs text-muted-foreground">{item.date}</p>
                   </div>
-                  <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/20">
-                    <Download className="h-4 w-4" />
-                  </Button>
+                  <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
+                    <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/20" title="Download">
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
