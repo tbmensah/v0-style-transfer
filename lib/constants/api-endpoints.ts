@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
   health: "/health",
   me: "/me",
   jobsList: "/jobs",
+  jobsSearch: "/jobs/search",
   fastFillUploadInit: "/jobs/ff/draft-upload",
 } as const
 

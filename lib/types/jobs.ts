@@ -35,8 +35,29 @@ export type JobsListData = {
 
 export type JobsListParams = {
   job_type?: JobType | null
+  /** Repeat `status` query param per value. */
+  status?: JobStatus[] | null
   created_from?: string | null
   created_to?: string | null
   page?: number
   page_size?: number
 }
+
+/** `GET /jobs/search` — `q` required (1–64 chars). No date filters on this route. */
+export type JobsSearchParams = {
+  q: string
+  job_type?: JobType | null
+  status?: JobStatus[] | null
+  page?: number
+  page_size?: number
+}
+
+export const JOB_STATUS_VALUES: readonly JobStatus[] = [
+  "draft",
+  "confirmed",
+  "queued",
+  "processing",
+  "completed",
+  "failed",
+  "refunded",
+] as const
