@@ -1,53 +1,187 @@
 "use client"
 
+import { Suspense, useMemo } from "react"
 import Link from "next/link"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { displayFirstName } from "@/lib/utilities/user-display"
 import { useAuthStore } from "@/lib/stores/auth-store"
+import { useDashboardMetrics } from "@/lib/api/hooks/use-dashboard-metrics"
+import { useJobStatusSummary } from "@/lib/api/hooks/use-job-status-summary"
+import { useJobsList } from "@/lib/api/hooks/use-jobs-list"
+import { getApiErrorMessage } from "@/lib/api/parse-api-error"
+import { hasApiBase } from "@/lib/environment/public-env"
+import { LIST_PAGE_SIZE } from "@/lib/constants/pagination"
+import {
+  historyBrowseHref,
+  stringifyHistoryUrl,
+} from "@/lib/utilities/history-url-state"
+import { jobDisplayTitle } from "@/lib/utilities/job-display-title"
+import { formatJobTableDate } from "@/lib/utilities/format-job-table-date"
+import { openJobDownloadUrl } from "@/lib/utilities/job-download"
+import {
+  jobDownloadInteractionDisabled,
+  jobIsCompleted,
+  jobMatchesStatus,
+} from "@/lib/utilities/job-status"
+import type { ApiJob } from "@/lib/types/jobs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Upload, ClipboardList, Coins, CheckCircle, Clock, AlertCircle, XCircle, Download, Eye } from "lucide-react"
-import { useMe } from "@/lib/api/hooks/use-me"
+import { JobStatusBadge } from "@/components/jobs/job-status-badge"
+import { Upload, ClipboardList, Coins, Clock, AlertCircle, Download, Eye } from "lucide-react"
 
-const recentJobs = [
-  { id: "2024-0892", name: "Johnson Residence", type: "FF", date: "Mar 10, 2024", status: "Completed" },
-  { id: "2024-0891", name: "Williams Property", type: "EE", date: "Mar 10, 2024", status: "Processing" },
-  { id: "2024-0890", name: "Thompson House", type: "FF", date: "Mar 9, 2024", status: "Failed" },
-  { id: "2024-0889", name: "Garcia Residence", type: "EE", date: "Mar 9, 2024", status: "Completed" },
-  { id: "2024-0888", name: "Anderson Property", type: "FF", date: "Mar 8, 2024", status: "Needs Review" },
-]
+type DashboardJobsTab = "all" | "fast-fill" | "express-estimate"
 
-const completedDownloads = [
-  { id: "2024-0892", name: "Johnson Residence", date: "Mar 10, 2024" },
-  { id: "2024-0889", name: "Garcia Residence", date: "Mar 9, 2024" },
-  { id: "2024-0886", name: "Davis Home", date: "Mar 6, 2024" },
-]
+function parseDashboardJobsTab(raw: string | null): DashboardJobsTab {
+  if (raw === "fast-fill" || raw === "express-estimate") return raw
+  return "all"
+}
 
-function getStatusBadge(status: string) {
-  const config: Record<string, { variant: "default" | "secondary" | "destructive" | "outline", icon: React.ElementType }> = {
-    "Completed": { variant: "default", icon: CheckCircle },
-    "Processing": { variant: "secondary", icon: Clock },
-    "Failed": { variant: "destructive", icon: XCircle },
-    "Needs Review": { variant: "outline", icon: AlertCircle },
-  }
-  const { variant, icon: Icon } = config[status] || { variant: "secondary" as const, icon: Clock }
+function jobTypeLabel(job: ApiJob): "FF" | "EE" {
+  return job.job_type === "ff" ? "FF" : "EE"
+}
+
+function filterJobsByTab(jobs: ApiJob[], tab: DashboardJobsTab): ApiJob[] {
+  if (tab === "fast-fill") return jobs.filter((j) => j.job_type === "ff")
+  if (tab === "express-estimate") return jobs.filter((j) => j.job_type === "ee")
+  return jobs
+}
+
+function RecentJobRow({ job }: { job: ApiJob }) {
+  const typeLabel = jobTypeLabel(job)
+  const isFf = job.job_type === "ff"
+  const title = jobDisplayTitle(job)
+  const dateStr = formatJobTableDate(job.created_at)
+  const completed = jobIsCompleted(job)
+  const needsReview = jobMatchesStatus(job, "needs_review")
+
   return (
-    <Badge variant={variant} className="gap-1">
-      <Icon className="h-3 w-3" />
-      {status}
-    </Badge>
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
+      <div className="flex min-w-0 flex-1 items-center gap-4">
+        <div
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold ring-1 ${
+            isFf ? "bg-primary/20 text-primary ring-primary/20" : "bg-secondary text-foreground ring-border/60"
+          }`}
+        >
+          {typeLabel}
+        </div>
+        <div className="min-w-0">
+          <p className="truncate font-medium text-foreground">{title}</p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <p className="text-sm text-muted-foreground">{dateStr}</p>
+            <JobStatusBadge status={job.status} />
+          </div>
+        </div>
+      </div>
+      {(completed || needsReview) && (
+        <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
+          {completed && (
+            <Button
+              variant="ghost"
+              size="icon"
+              title={jobDownloadInteractionDisabled(job) ? "Download available when completed" : "Download"}
+              disabled={jobDownloadInteractionDisabled(job)}
+              onClick={() => {
+                const u = job.download_url?.trim()
+                if (u) openJobDownloadUrl(u)
+              }}
+            >
+              <Download className="h-4 w-4" />
+            </Button>
+          )}
+          {needsReview && (
+            <Button variant="ghost" size="icon" asChild>
+              <Link href={`/history?q=${encodeURIComponent(job.id)}`} title="View in history">
+                <Eye className="h-4 w-4" />
+              </Link>
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 
-export default function DashboardPage() {
+function DashboardPageContent() {
   const user = useAuthStore((s) => s.user)
   const firstName = displayFirstName(user)
-  const { data: me } = useMe();
-  console.log(me);
+  const router = useRouter()
+  const pathname = usePathname()
+  const urlSearchParams = useSearchParams()
+
+  const jobsTab = parseDashboardJobsTab(urlSearchParams.get("tab"))
+
+  const {
+    data: metrics,
+    isLoading: metricsLoading,
+    isError: metricsError,
+  } = useDashboardMetrics()
+
+  const {
+    data: statusSummary,
+    isLoading: statusSummaryLoading,
+    isError: statusSummaryError,
+    error: statusSummaryErr,
+  } = useJobStatusSummary()
+
+  const { data, isLoading, isError, error, refetch } = useJobsList({
+    page: 1,
+    page_size: 5,
+  })
+
+  const items = data?.items ?? []
+
+  const metricValue = (n: number | undefined) => {
+    if (!hasApiBase || metricsError) return "—"
+    if (metricsLoading) return "—"
+    if (n === undefined) return "—"
+    return String(n)
+  }
+
+  const statusCountValue = (n: number | undefined) => {
+    if (!hasApiBase || statusSummaryError) return "—"
+    if (statusSummaryLoading) return "—"
+    if (n === undefined) return "—"
+    return String(n)
+  }
+
+  const viewAllHref = historyBrowseHref(
+    jobsTab === "fast-fill" ? "ff" : jobsTab === "express-estimate" ? "ee" : null,
+  )
+
+  const completedHistoryHref = (() => {
+    const qs = stringifyHistoryUrl({
+      q: "",
+      page: 1,
+      page_size: LIST_PAGE_SIZE,
+      job_type: null,
+      status: ["completed"],
+      created_from: null,
+      created_to: null,
+    })
+    return qs ? `/history?${qs}` : "/history"
+  })()
+
+  const readyForDownload = useMemo(() => {
+    return items
+      .filter((j) => jobIsCompleted(j) && j.download_url?.trim())
+      .slice(0, 5)
+  }, [items])
+
+  const setJobsTab = (value: string) => {
+    const nextTab = parseDashboardJobsTab(value)
+    const next = new URLSearchParams(urlSearchParams.toString())
+    if (nextTab === "all") {
+      next.delete("tab")
+    } else {
+      next.set("tab", nextTab)
+    }
+    const qs = next.toString()
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+  }
+
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Welcome back, {firstName}
@@ -55,7 +189,6 @@ export default function DashboardPage() {
         <p className="mt-1 text-muted-foreground">{"Here's an overview of your claims estimating activity"}</p>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="border-border/60 bg-card/80 shadow-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -65,7 +198,9 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">24</div>
+            <div className="text-3xl font-bold tabular-nums text-foreground">
+              {metricValue(metrics?.fast_fill_tokens)}
+            </div>
             <p className="text-xs text-muted-foreground">Available for use</p>
           </CardContent>
         </Card>
@@ -77,7 +212,9 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">12</div>
+            <div className="text-3xl font-bold tabular-nums text-foreground">
+              {metricValue(metrics?.express_estimate_tokens)}
+            </div>
             <p className="text-xs text-muted-foreground">Available for use</p>
           </CardContent>
         </Card>
@@ -89,7 +226,9 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">1</div>
+            <div className="text-3xl font-bold tabular-nums text-foreground">
+              {metricValue(metrics?.processing)}
+            </div>
             <p className="text-xs text-muted-foreground">Jobs in progress</p>
           </CardContent>
         </Card>
@@ -101,13 +240,14 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">1</div>
+            <div className="text-3xl font-bold tabular-nums text-foreground">
+              {metricValue(metrics?.needs_review)}
+            </div>
             <p className="text-xs text-muted-foreground">Require attention</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick Actions */}
       <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
           <CardTitle className="text-foreground">Quick Actions</CardTitle>
@@ -135,156 +275,109 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Recent Jobs & Downloads */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Recent Jobs */}
         <Card className="border-border/60 bg-card/80 shadow-md lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-foreground">Recent Jobs</CardTitle>
               <CardDescription>Your latest claim estimating jobs</CardDescription>
             </div>
-            <Link href="/history">
-              <Button variant="ghost" size="sm">View all</Button>
+            <Link href={viewAllHref}>
+              <Button variant="ghost" size="sm">
+                View all
+              </Button>
             </Link>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="all">
-              <TabsList className="mb-4">
-                <TabsTrigger value="all">All Jobs</TabsTrigger>
-                <TabsTrigger value="fast-fill">Fast Fill</TabsTrigger>
-                <TabsTrigger value="express-estimate">Express Estimate</TabsTrigger>
-              </TabsList>
-              <TabsContent value="all">
-                <div className="space-y-4">
-                  {recentJobs.map((job) => (
-                    <div key={job.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
-                      <div className="flex min-w-0 flex-1 items-center gap-4">
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold ring-1 ${job.type === "FF" ? "bg-primary/20 text-primary ring-primary/20" : "bg-secondary text-foreground ring-border/60"
-                          }`}>
-                          {job.type}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-foreground">Claim #{job.id} - {job.name}</p>
-                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                            <p className="text-sm text-muted-foreground">{job.date}</p>
-                            {getStatusBadge(job.status)}
-                          </div>
-                        </div>
-                      </div>
-                      {(job.status === "Completed" || job.status === "Needs Review") && (
-                        <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
-                          {job.status === "Completed" && (
-                            <Button variant="ghost" size="icon" title="Download">
-                              <Download className="h-4 w-4" />
-                            </Button>
-                          )}
-                          {job.status === "Needs Review" && (
-                            <Button variant="ghost" size="icon" title="View">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-              <TabsContent value="fast-fill">
-                <div className="space-y-4">
-                  {recentJobs.filter(job => job.type === "FF").map((job) => (
-                    <div key={job.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
-                      <div className="flex min-w-0 flex-1 items-center gap-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold ring-1 bg-primary/20 text-primary ring-primary/20">
-                          {job.type}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-foreground">Claim #{job.id} - {job.name}</p>
-                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                            <p className="text-sm text-muted-foreground">{job.date}</p>
-                            {getStatusBadge(job.status)}
-                          </div>
-                        </div>
-                      </div>
-                      {(job.status === "Completed" || job.status === "Needs Review") && (
-                        <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
-                          {job.status === "Completed" && (
-                            <Button variant="ghost" size="icon" title="Download">
-                              <Download className="h-4 w-4" />
-                            </Button>
-                          )}
-                          {job.status === "Needs Review" && (
-                            <Button variant="ghost" size="icon" title="View">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-              <TabsContent value="express-estimate">
-                <div className="space-y-4">
-                  {recentJobs.filter(job => job.type === "EE").map((job) => (
-                    <div key={job.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-secondary/50 p-4 transition-colors hover:bg-secondary/70">
-                      <div className="flex min-w-0 flex-1 items-center gap-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold ring-1 bg-secondary text-foreground ring-border/60">
-                          {job.type}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-foreground">Claim #{job.id} - {job.name}</p>
-                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                            <p className="text-sm text-muted-foreground">{job.date}</p>
-                            {getStatusBadge(job.status)}
-                          </div>
-                        </div>
-                      </div>
-                      {(job.status === "Completed" || job.status === "Needs Review") && (
-                        <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
-                          {job.status === "Completed" && (
-                            <Button variant="ghost" size="icon" title="Download">
-                              <Download className="h-4 w-4" />
-                            </Button>
-                          )}
-                          {job.status === "Needs Review" && (
-                            <Button variant="ghost" size="icon" title="View">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-            </Tabs>
+            {!hasApiBase ? (
+              <p className="text-sm text-muted-foreground">
+                Set <code className="rounded bg-muted px-1.5 py-0.5 text-xs">NEXT_PUBLIC_API_BASE_URL</code> to load
+                jobs from the API.
+              </p>
+            ) : isError ? (
+              <div className="space-y-3 rounded-lg border border-destructive/40 bg-destructive/5 p-4">
+                <p className="text-sm text-destructive">{getApiErrorMessage(error)}</p>
+                <Button type="button" variant="outline" size="sm" onClick={() => void refetch()}>
+                  Retry
+                </Button>
+              </div>
+            ) : (
+              <Tabs value={jobsTab} onValueChange={setJobsTab}>
+                <TabsList className="mb-4">
+                  <TabsTrigger value="all">All Jobs</TabsTrigger>
+                  <TabsTrigger value="fast-fill">Fast Fill</TabsTrigger>
+                  <TabsTrigger value="express-estimate">Express Estimate</TabsTrigger>
+                </TabsList>
+                <TabsContent value="all" className="mt-0">
+                  <RecentJobsList
+                    jobs={filterJobsByTab(items, "all")}
+                    isLoading={isLoading}
+                    emptyMessage="No jobs yet."
+                  />
+                </TabsContent>
+                <TabsContent value="fast-fill" className="mt-0">
+                  <RecentJobsList
+                    jobs={filterJobsByTab(items, "fast-fill")}
+                    isLoading={isLoading}
+                    emptyMessage="No Fast Fill jobs yet."
+                  />
+                </TabsContent>
+                <TabsContent value="express-estimate" className="mt-0">
+                  <RecentJobsList
+                    jobs={filterJobsByTab(items, "express-estimate")}
+                    isLoading={isLoading}
+                    emptyMessage="No Express Estimate jobs yet."
+                  />
+                </TabsContent>
+              </Tabs>
+            )}
           </CardContent>
         </Card>
 
-        {/* Ready for Download */}
         <Card className="border-border/60 bg-card/80 shadow-md">
           <CardHeader>
             <CardTitle className="text-foreground">Ready for Download</CardTitle>
             <CardDescription>Completed outputs available for 14 days</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {completedDownloads.map((item) => (
-                <div key={item.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/40 bg-secondary/30 p-3 transition-colors hover:bg-secondary/50">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-foreground">Claim #{item.id} - {item.name}</p>
-                    <p className="text-xs text-muted-foreground">{item.date}</p>
+            {!hasApiBase ? (
+              <p className="text-sm text-muted-foreground">
+                Set <code className="rounded bg-muted px-1.5 py-0.5 text-xs">NEXT_PUBLIC_API_BASE_URL</code> to see
+                downloads.
+              </p>
+            ) : isError ? null : readyForDownload.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No completed downloads yet.</p>
+            ) : (
+              <div className="space-y-4">
+                {readyForDownload.map((job) => (
+                  <div
+                    key={job.id}
+                    className="flex items-center justify-between gap-4 rounded-lg border border-border/40 bg-secondary/30 p-3 transition-colors hover:bg-secondary/50"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">{jobDisplayTitle(job)}</p>
+                      <p className="text-xs text-muted-foreground">{formatJobTableDate(job.created_at)}</p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-primary hover:bg-primary/20"
+                        title="Download"
+                        disabled={jobDownloadInteractionDisabled(job)}
+                        onClick={() => {
+                          const u = job.download_url?.trim()
+                          if (u) openJobDownloadUrl(u)
+                        }}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
-                    <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/20" title="Download">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Link href="/history?status=completed" className="mt-4 block">
+                ))}
+              </div>
+            )}
+            <Link href={completedHistoryHref} className="mt-4 block">
               <Button variant="link" className="h-auto p-0 text-primary">
                 View all completed
               </Button>
@@ -293,30 +386,85 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Job Status Summary */}
       <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
           <CardTitle className="text-foreground">Job Status Summary</CardTitle>
           <CardDescription>Overview of all your jobs by status</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {[
-              { label: "Draft", count: 1, color: "bg-secondary/60" },
-              { label: "Submitted", count: 1, color: "bg-blue-950/50" },
-              { label: "Processing", count: 1, color: "bg-yellow-950/50" },
-              { label: "Completed", count: 3, color: "bg-primary/20" },
-              { label: "Failed", count: 1, color: "bg-red-950/50" },
-              { label: "Needs Review", count: 1, color: "bg-orange-950/50" },
-            ].map((status) => (
-              <div key={status.label} className={`rounded-lg ${status.color} border border-border/40 p-4 text-center transition-colors hover:border-border/60`}>
-                <div className="text-2xl font-bold text-foreground">{status.count}</div>
-                <div className="text-sm text-muted-foreground">{status.label}</div>
-              </div>
-            ))}
-          </div>
+          {!hasApiBase ? (
+            <p className="text-sm text-muted-foreground">
+              Set <code className="rounded bg-muted px-1.5 py-0.5 text-xs">NEXT_PUBLIC_API_BASE_URL</code> to load
+              status counts.
+            </p>
+          ) : statusSummaryError ? (
+            <p className="text-sm text-destructive">{getApiErrorMessage(statusSummaryErr)}</p>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
+              {(
+                [
+                  { label: "Draft", key: "draft" as const, color: "bg-secondary/60" },
+                  { label: "Submitted", key: "submitted" as const, color: "bg-blue-950/50" },
+                  { label: "Processing", key: "processing" as const, color: "bg-yellow-950/50" },
+                  { label: "Completed", key: "completed" as const, color: "bg-primary/20" },
+                  { label: "Failed", key: "failed" as const, color: "bg-red-950/50" },
+                  { label: "Needs Review", key: "needs_review" as const, color: "bg-orange-950/50" },
+                ] as const
+              ).map((status) => (
+                <div
+                  key={status.key}
+                  className={`rounded-lg ${status.color} border border-border/40 p-4 text-center transition-colors hover:border-border/60`}
+                >
+                  <div className="text-2xl font-bold tabular-nums text-foreground">
+                    {statusCountValue(statusSummary?.[status.key])}
+                  </div>
+                  <div className="text-sm text-muted-foreground">{status.label}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+function RecentJobsList({
+  jobs,
+  isLoading,
+  emptyMessage,
+}: {
+  jobs: ApiJob[]
+  isLoading: boolean
+  emptyMessage: string
+}) {
+  if (isLoading) {
+    return (
+      <div className="space-y-3 text-sm text-muted-foreground" aria-busy="true">
+        Loading…
+      </div>
+    )
+  }
+  if (jobs.length === 0) {
+    return <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+  }
+  return (
+    <div className="space-y-4">
+      {jobs.map((job) => (
+        <RecentJobRow key={job.id} job={job} />
+      ))}
+    </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[40vh] items-center justify-center text-muted-foreground">Loading…</div>
+      }
+    >
+      <DashboardPageContent />
+    </Suspense>
   )
 }

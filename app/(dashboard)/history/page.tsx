@@ -23,8 +23,9 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Search, Filter } from "lucide-react"
-import type { JobStatus } from "@/lib/types/jobs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Filter, Search, X } from "lucide-react"
+import type { JobStatus, JobType } from "@/lib/types/jobs"
 
 function formatStatusLabel(s: JobStatus) {
   return s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
@@ -61,6 +62,7 @@ function HistoryPageContent() {
   const [qInput, setQInput] = useState(() => parseHistoryUrl(urlSearchParams).q)
   const [qApplied, setQApplied] = useState(() => parseHistoryUrl(urlSearchParams).q)
   const [page, setPage] = useState(() => parseHistoryUrl(urlSearchParams).page)
+  const [pageSize, setPageSize] = useState(() => parseHistoryUrl(urlSearchParams).page_size)
   const [filters, setFilters] = useState<HistoryFilterValues>(() =>
     urlStateToFilters(parseHistoryUrl(urlSearchParams)),
   )
@@ -71,6 +73,7 @@ function HistoryPageContent() {
     setQInput(next.q)
     setQApplied(next.q)
     setPage(next.page)
+    setPageSize(next.page_size)
     setFilters(urlStateToFilters(next))
   }, [searchKey])
 
@@ -82,29 +85,41 @@ function HistoryPageContent() {
     [pathname, router],
   )
 
+  function buildUrlState(over: Partial<HistoryUrlState>): HistoryUrlState {
+    return {
+      q: over.q !== undefined ? over.q : qApplied,
+      page: over.page !== undefined ? over.page : page,
+      page_size: over.page_size !== undefined ? over.page_size : pageSize,
+      job_type: over.job_type !== undefined ? over.job_type : filters.job_type,
+      status: over.status !== undefined ? over.status : filters.status,
+      created_from: over.created_from !== undefined ? over.created_from : filters.created_from,
+      created_to: over.created_to !== undefined ? over.created_to : filters.created_to,
+    }
+  }
+
   const searchActive = qApplied.trim().length >= 1
 
   const listParams = useMemo(
     () => ({
       page,
-      page_size: LIST_PAGE_SIZE,
+      page_size: pageSize,
       ...(filters.job_type ? { job_type: filters.job_type } : {}),
       ...(filters.status.length > 0 ? { status: filters.status } : {}),
       ...(filters.created_from ? { created_from: filters.created_from } : {}),
       ...(filters.created_to ? { created_to: filters.created_to } : {}),
     }),
-    [page, filters],
+    [page, pageSize, filters],
   )
 
   const jobsSearchApiParams = useMemo(
     () => ({
       q: qApplied,
       page,
-      page_size: LIST_PAGE_SIZE,
+      page_size: pageSize,
       ...(filters.job_type ? { job_type: filters.job_type } : {}),
       ...(filters.status.length > 0 ? { status: filters.status } : {}),
     }),
-    [page, qApplied, filters.job_type, filters.status],
+    [page, pageSize, qApplied, filters.job_type, filters.status],
   )
 
   const browseQuery = useJobsList(listParams, { enabled: !searchActive })
@@ -116,39 +131,75 @@ function HistoryPageContent() {
   const items = data?.items ?? []
   const total = data?.total ?? 0
 
-  const activeFilterChips = useMemo(() => {
-    const chips: string[] = []
-    if (page > 1) {
-      chips.push(`Page: ${page}`)
-    }
-    if (filters.job_type === "ff") {
-      chips.push("Type: Fast Fill")
-    } else if (filters.job_type === "ee") {
-      chips.push("Type: Express Estimate")
-    }
-    if (filters.status.length > 0) {
-      const labels = [...filters.status].sort().map((s) => formatStatusLabel(s))
-      chips.push(`Status: ${labels.join(", ")}`)
-    }
-    if (filters.created_from) {
-      chips.push(`Created from: ${formatFilterDateTime(filters.created_from)}`)
-    }
-    if (filters.created_to) {
-      chips.push(`Created to: ${formatFilterDateTime(filters.created_to)}`)
-    }
-    return chips
-  }, [qApplied, page, filters])
+  const jobTypeTab =
+    filters.job_type === "ff" ? "fast-fill" : filters.job_type === "ee" ? "express-estimate" : "all"
 
-  function buildUrlState(over: Partial<HistoryUrlState>): HistoryUrlState {
-    return {
-      q: over.q !== undefined ? over.q : qApplied,
-      page: over.page !== undefined ? over.page : page,
-      job_type: over.job_type !== undefined ? over.job_type : filters.job_type,
-      status: over.status !== undefined ? over.status : filters.status,
-      created_from: over.created_from !== undefined ? over.created_from : filters.created_from,
-      created_to: over.created_to !== undefined ? over.created_to : filters.created_to,
-    }
+  const searchPlaceholder =
+    jobTypeTab === "fast-fill"
+      ? "Enter file name or job id…"
+      : jobTypeTab === "express-estimate"
+        ? "Enter project name or job id…"
+        : "Enter job id, project name, or file name…"
+
+  const searchAriaLabel =
+    jobTypeTab === "fast-fill"
+      ? "Search by file name or job id"
+      : jobTypeTab === "express-estimate"
+        ? "Search by project name or job id"
+        : "Search by job id, project name, or file name"
+
+  function setJobTypeFromTab(value: string) {
+    const job_type: JobType | null =
+      value === "fast-fill" ? "ff" : value === "express-estimate" ? "ee" : null
+    setFilters((f) => ({ ...f, job_type }))
+    setPage(1)
+    replaceUrl(buildUrlState({ page: 1, job_type }))
   }
+
+  type FilterChip = { id: string; label: string; onRemove: () => void }
+
+  const filterChips: FilterChip[] = []
+  if (filters.status.length > 0) {
+    const labels = [...filters.status].sort().map((s) => formatStatusLabel(s))
+    filterChips.push({
+      id: "status",
+      label: `Status: ${labels.join(", ")}`,
+      onRemove: () => {
+        setFilters((f) => ({ ...f, status: [] }))
+        setPage(1)
+        replaceUrl(buildUrlState({ page: 1, status: [] }))
+      },
+    })
+  }
+  if (filters.created_from) {
+    filterChips.push({
+      id: "created_from",
+      label: `Created from: ${formatFilterDateTime(filters.created_from)}`,
+      onRemove: () => {
+        setFilters((f) => ({ ...f, created_from: null }))
+        setPage(1)
+        replaceUrl(buildUrlState({ page: 1, created_from: null }))
+      },
+    })
+  }
+  if (filters.created_to) {
+    filterChips.push({
+      id: "created_to",
+      label: `Created to: ${formatFilterDateTime(filters.created_to)}`,
+      onRemove: () => {
+        setFilters((f) => ({ ...f, created_to: null }))
+        setPage(1)
+        replaceUrl(buildUrlState({ page: 1, created_to: null }))
+      },
+    })
+  }
+
+  const listTitle =
+    filters.job_type === "ff"
+      ? "Fast Fill jobs"
+      : filters.job_type === "ee"
+        ? "Express Estimate jobs"
+        : "All jobs"
 
   function handleSearch() {
     const t = qInput.trim()
@@ -171,6 +222,7 @@ function HistoryPageContent() {
     const empty: HistoryUrlState = {
       q: "",
       page: 1,
+      page_size: LIST_PAGE_SIZE,
       job_type: null,
       status: [],
       created_from: null,
@@ -179,6 +231,7 @@ function HistoryPageContent() {
     setQInput("")
     setQApplied("")
     setPage(1)
+    setPageSize(LIST_PAGE_SIZE)
     setFilters(defaultFilters())
     replaceUrl(empty)
   }
@@ -202,11 +255,11 @@ function HistoryPageContent() {
             <div className="relative min-w-[200px] flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Job id fragment (UUID substring)…"
+                placeholder={searchPlaceholder}
                 className="border-border/60 bg-secondary/50 pl-9"
                 value={qInput}
                 onChange={(e) => setQInput(e.target.value)}
-                aria-label="Search by job id fragment"
+                aria-label={searchAriaLabel}
               />
             </div>
             <Button type="submit" className="gap-2 shadow-md shadow-primary/20">
@@ -228,28 +281,51 @@ function HistoryPageContent() {
               onClick={() => setSheetOpen(true)}
             >
               <Filter className="h-4 w-4" />
-              Filters
+              {"Status & dates"}
             </Button>
           </form>
+          <Tabs value={jobTypeTab} onValueChange={setJobTypeFromTab} className="mt-4 w-full">
+            <TabsList className="mb-1 w-fit">
+              <TabsTrigger value="all">All Jobs</TabsTrigger>
+              <TabsTrigger value="fast-fill">Fast Fill</TabsTrigger>
+              <TabsTrigger value="express-estimate">Express Estimate</TabsTrigger>
+            </TabsList>
+            <TabsContent value="all" className="m-0 hidden" aria-hidden />
+            <TabsContent value="fast-fill" className="m-0 hidden" aria-hidden />
+            <TabsContent value="express-estimate" className="m-0 hidden" aria-hidden />
+          </Tabs>
           {searchActive ? (
             <p className="mt-2 text-xs text-muted-foreground">
-              Showing search results for id containing <code className="text-[0.7rem]">{qApplied}</code>. Date
-              filters apply when you clear search and browse all jobs.
+              Showing results matching <code className="text-[0.7rem]">{qApplied}</code>. Clear search to browse with
+              filters and pagination.
             </p>
           ) : (
             <p className="mt-2 text-xs text-muted-foreground">
-              Paginated list with optional filters. Use Search after entering part of a job UUID. Filters and page
-              stay in the URL when you refresh.
+              {jobTypeTab === "fast-fill"
+                ? "Paginated list with optional filters. Search matches PDF file names or job ids."
+                : jobTypeTab === "express-estimate"
+                  ? "Paginated list with optional filters. Search matches project names or job ids."
+                  : "Paginated list with optional filters. Search matches job ids, project names, or file names."}{" "}
+              Filters and page stay in the URL when you refresh.
             </p>
           )}
-          {activeFilterChips.length > 0 ? (
+          {filterChips.length > 0 ? (
             <ul className="mt-3 flex list-none flex-wrap gap-2 p-0" aria-label="Active filters">
-              {activeFilterChips.map((label) => (
-                <li
-                  key={label}
-                  className="rounded-md border border-border/60 bg-secondary/30 px-2.5 py-1 text-xs text-foreground"
-                >
-                  {label}
+              {filterChips.map((chip) => (
+                <li key={chip.id}>
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-secondary/30 py-1 pl-2.5 pr-1 text-xs text-foreground">
+                    <span>{chip.label}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
+                      aria-label={`Remove filter: ${chip.label}`}
+                      onClick={chip.onRemove}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </span>
                 </li>
               ))}
             </ul>
@@ -264,12 +340,11 @@ function HistoryPageContent() {
         onApply={(next) => {
           const nextUrl = buildUrlState({
             page: 1,
-            job_type: next.job_type,
             status: next.status,
             created_from: next.created_from,
             created_to: next.created_to,
           })
-          setFilters(next)
+          setFilters((f) => ({ ...f, ...next }))
           setPage(1)
           replaceUrl(nextUrl)
         }}
@@ -278,7 +353,7 @@ function HistoryPageContent() {
 
       <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
-          <CardTitle className="text-foreground">All Jobs</CardTitle>
+          <CardTitle className="text-foreground capitalize">{listTitle}</CardTitle>
           <CardDescription>Fast Fill and Express Estimate jobs from your account</CardDescription>
         </CardHeader>
         <CardContent>
@@ -307,7 +382,12 @@ function HistoryPageContent() {
                 className="mt-6"
                 page={page}
                 totalItems={total}
-                pageSize={LIST_PAGE_SIZE}
+                pageSize={pageSize}
+                onPageSizeChange={(sz) => {
+                  setPage(1)
+                  setPageSize(sz)
+                  replaceUrl(buildUrlState({ page: 1, page_size: sz }))
+                }}
                 onPageChange={(p) => {
                   setPage(p)
                   replaceUrl(buildUrlState({ page: p }))

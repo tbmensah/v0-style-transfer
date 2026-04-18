@@ -24,24 +24,24 @@ export type HistoryFilterValues = {
 }
 
 type Draft = {
-  job_type: JobType | null
   status: JobStatus[]
   createdFromLocal: string
   createdToLocal: string
 }
 
+/** Status + date filters only; job type is controlled on the history page (tabs). */
+export type HistorySheetFilterResult = Pick<HistoryFilterValues, "status" | "created_from" | "created_to">
+
 function toDraft(f: HistoryFilterValues): Draft {
   return {
-    job_type: f.job_type,
     status: [...f.status],
     createdFromLocal: isoToDatetimeLocal(f.created_from),
     createdToLocal: isoToDatetimeLocal(f.created_to),
   }
 }
 
-function toApplied(d: Draft): HistoryFilterValues {
+function toApplied(d: Draft): HistorySheetFilterResult {
   return {
-    job_type: d.job_type,
     status: d.status,
     created_from: datetimeLocalToIso(d.createdFromLocal) ?? null,
     created_to: datetimeLocalToIso(d.createdToLocal) ?? null,
@@ -56,7 +56,7 @@ type Props = {
   open: boolean
   onOpenChange: (open: boolean) => void
   applied: HistoryFilterValues
-  onApply: (next: HistoryFilterValues) => void
+  onApply: (next: HistorySheetFilterResult) => void
   searchActive: boolean
 }
 
@@ -80,15 +80,14 @@ export function HistoryJobFiltersSheet({
     }))
   }
 
-  const setJobType = (t: JobType | null) => setDraft((d) => ({ ...d, job_type: t }))
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="flex w-full flex-col sm:max-w-md">
         <SheetHeader>
           <SheetTitle>Filters</SheetTitle>
           <SheetDescription>
-            Apply job type, status, and created date range.{" "}
+            Apply status and created date range. Use the job type tabs on the page for Fast Fill vs Express
+            Estimate.{" "}
             {searchActive ? (
               <span className="text-amber-600 dark:text-amber-500">
                 Date range applies to browse (all jobs) only, not ID search.
@@ -98,39 +97,6 @@ export function HistoryJobFiltersSheet({
         </SheetHeader>
 
         <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pb-4">
-          <div className="space-y-2">
-            <Label className="text-foreground">Job type</Label>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant={draft.job_type === null ? "default" : "outline"}
-                className="border-border/60"
-                onClick={() => setJobType(null)}
-              >
-                All
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant={draft.job_type === "ff" ? "default" : "outline"}
-                className="border-border/60"
-                onClick={() => setJobType("ff")}
-              >
-                Fast Fill
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant={draft.job_type === "ee" ? "default" : "outline"}
-                className="border-border/60"
-                onClick={() => setJobType("ee")}
-              >
-                Express
-              </Button>
-            </div>
-          </div>
-
           <div className="space-y-3">
             <Label className="text-foreground">Status</Label>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">

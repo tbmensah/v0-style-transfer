@@ -9,6 +9,8 @@ export type FastFillUploadInitData = {
 export type FastFillJobDetailsPayload = {
   ff_pdf_type: string
   pdf_file_key: string
+  /** Original PDF file name as selected by the user (e.g. `File.name`). */
+  original_filename: string
   /** ESX object key in storage when upload exists; until then client sends filename only (see API). */
   esx_file_key: string
 }

@@ -132,6 +132,7 @@ function NewFastFillPageContent() {
         await submitFastFillJobDetails(pair.uploadSession.job_id, {
           ff_pdf_type: DEFAULT_FF_PDF_TYPE,
           pdf_file_key: pair.uploadSession.storage_path,
+          original_filename: pair.pdf.name,
           esx_file_key: pair.esx?.name ?? "",
         })
       }

@@ -9,6 +9,9 @@ function statusKey(status?: JobStatus[] | null) {
 export const queryKeys = {
   health: ["api", "health"] as const,
   me: ["api", "me"] as const,
+  metrics: ["api", "metrics"] as const,
+  /** Invalidated with `metrics` via shared `["api", "metrics"]` prefix. */
+  metricsJobStatusSummary: ["api", "metrics", "job-status-summary"] as const,
   fastFillUploadInit: ["api", "fast-fill", "upload-init"] as const,
   jobs: (params: JobsListParams) =>
     [

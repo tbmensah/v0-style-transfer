@@ -1,5 +1,6 @@
 import { unwrapSuccess } from "@/lib/api/unwrap-envelope"
 import { API_ENDPOINTS } from "@/lib/constants/api-endpoints"
+import { clampListPageSize } from "@/lib/constants/pagination"
 import { apiClient } from "@/lib/http/api-client"
 import type { SuccessEnvelope } from "@/lib/types/api-envelope"
 import type { JobStatus, JobsListData, JobsListParams, JobsSearchParams } from "@/lib/types/jobs"
@@ -19,7 +20,9 @@ function buildJobsQuery(params: JobsListParams): string {
   if (params.created_from) search.set("created_from", params.created_from)
   if (params.created_to) search.set("created_to", params.created_to)
   if (params.page != null) search.set("page", String(params.page))
-  if (params.page_size != null) search.set("page_size", String(params.page_size))
+  if (params.page_size != null) {
+    search.set("page_size", String(clampListPageSize(params.page_size)))
+  }
   const qs = search.toString()
   return qs ? `?${qs}` : ""
 }
@@ -31,8 +34,7 @@ function buildJobsSearchQuery(params: JobsSearchParams): string {
   appendStatusParams(search, params.status)
   if (params.page != null) search.set("page", String(params.page))
   if (params.page_size != null) {
-    const size = Math.min(100, Math.max(1, params.page_size))
-    search.set("page_size", String(size))
+    search.set("page_size", String(clampListPageSize(params.page_size)))
   }
   return `?${search.toString()}`
 }

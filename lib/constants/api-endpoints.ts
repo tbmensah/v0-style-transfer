@@ -9,8 +9,14 @@ export const FAST_FILL_JOB_ID_QUERY = "job_id" as const
 export const API_ENDPOINTS = {
   health: "/health",
   me: "/me",
+  /** `GET` — dashboard token balances + job bucket counts (relative to same base as `/jobs`). */
+  metrics: "/metrics",
+  /** `GET` — per-user job counts by UI bucket (draft, submitted, processing, completed, failed, needs_review). */
+  metricsJobStatusSummary: "/metrics/job-status-summary",
   jobsList: "/jobs",
   jobsSearch: "/jobs/search",
+  /** `POST` — create Express Estimate job (wizard JSON → JSONB). Use with base URL that matches `GET /jobs` (often `…/api/v1` is included in `NEXT_PUBLIC_API_BASE_URL`). */
+  jobsExpressEstimate: "/jobs/ee",
   fastFillUploadInit: "/jobs/ff/draft-upload",
 } as const
 
