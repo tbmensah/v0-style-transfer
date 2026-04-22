@@ -39,15 +39,19 @@ export type JobsListParams = {
   status?: JobStatus[] | null
   created_from?: string | null
   created_to?: string | null
+  /** Filter rows with a non-empty output file key. */
+  has_output?: boolean | null
   page?: number
   page_size?: number
 }
 
-/** `GET /jobs/search` — `q` required (1–64 chars). No date filters on this route. */
+/** `GET /jobs/search` — `q` required (1–64 chars). */
 export type JobsSearchParams = {
   q: string
   job_type?: JobType | null
   status?: JobStatus[] | null
+  created_from?: string | null
+  created_to?: string | null
   page?: number
   page_size?: number
 }

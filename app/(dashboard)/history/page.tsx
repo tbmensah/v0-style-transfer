@@ -118,8 +118,10 @@ function HistoryPageContent() {
       page_size: pageSize,
       ...(filters.job_type ? { job_type: filters.job_type } : {}),
       ...(filters.status.length > 0 ? { status: filters.status } : {}),
+      ...(filters.created_from ? { created_from: filters.created_from } : {}),
+      ...(filters.created_to ? { created_to: filters.created_to } : {}),
     }),
-    [page, pageSize, qApplied, filters.job_type, filters.status],
+    [page, pageSize, qApplied, filters],
   )
 
   const browseQuery = useJobsList(listParams, { enabled: !searchActive })

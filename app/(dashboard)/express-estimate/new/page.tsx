@@ -10,6 +10,8 @@ import {
   type ExpressEstimatePageValues,
 } from "@/lib/schemas/express-estimate-form"
 import { queryKeys } from "@/lib/api/query-keys"
+import { useMetricsContext } from "@/components/metrics-context"
+import { formatMetricCount } from "@/lib/utilities/metrics-display"
 import { createExpressEstimateJob } from "@/lib/api/requests/express-estimate"
 import { getApiErrorMessage } from "@/lib/api/parse-api-error"
 import { hasApiBase } from "@/lib/environment/public-env"
@@ -548,6 +550,19 @@ export default function NewExpressEstimatePage() {
   const nv = (v: string) => v === "__none__" ? "" : v
   const router = useRouter()
   const queryClient = useQueryClient()
+  const { dashboard: dashboardMetrics } = useMetricsContext()
+  const eeBalance = dashboardMetrics.data?.express_estimate_tokens
+  const eeCost = 1
+  const eeBalanceDisplay = formatMetricCount(eeBalance, {
+    isError: dashboardMetrics.isError,
+    isLoading: dashboardMetrics.isLoading,
+  })
+  const insufficientEe =
+    hasApiBase &&
+    !dashboardMetrics.isLoading &&
+    !dashboardMetrics.isError &&
+    eeBalance !== undefined &&
+    eeCost > eeBalance
 
   const form = useForm<ExpressEstimatePageValues>({
     resolver: zodResolver(expressEstimatePageSchema),
@@ -582,7 +597,9 @@ export default function NewExpressEstimatePage() {
       onSuccess: () => {
         toast.success("Express Estimate created.", { id: "ee-submit" })
         void queryClient.invalidateQueries({ queryKey: ["api", "jobs"] })
+        void queryClient.invalidateQueries({ queryKey: ["api", "ops"] })
         void queryClient.invalidateQueries({ queryKey: queryKeys.metrics })
+        void queryClient.invalidateQueries({ queryKey: queryKeys.tokensLifetime })
         router.push("/express-estimate")
       },
       onError: (e) => {
@@ -8111,14 +8128,19 @@ const newDoor: DoorItem = {
                 <div className="rounded-lg bg-secondary/50 p-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Your balance</span>
-                    <Badge variant="secondary">12 EE</Badge>
+                    <Badge variant="secondary">
+                      {eeBalanceDisplay === "—" ? "—" : `${eeBalanceDisplay} EE`}
+                    </Badge>
                   </div>
                 </div>
               </div>
+              {insufficientEe ? (
+                <p className="text-xs text-destructive">Not enough Express Estimate tokens.</p>
+              ) : null}
               <Button
                 type="button"
                 className="w-full shadow-md shadow-primary/20"
-                disabled={createJob.isPending}
+                disabled={createJob.isPending || insufficientEe}
                 onClick={() => void handleSubmit(onSubmitExpressEstimate, onInvalidExpressEstimate)()}
               >
                 {createJob.isPending ? (

@@ -5,10 +5,11 @@ import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { displayFirstName } from "@/lib/utilities/user-display"
 import { useAuthStore } from "@/lib/stores/auth-store"
-import { useDashboardMetrics } from "@/lib/api/hooks/use-dashboard-metrics"
-import { useJobStatusSummary } from "@/lib/api/hooks/use-job-status-summary"
+import { useMetricsContext } from "@/components/metrics-context"
+import { formatMetricCount } from "@/lib/utilities/metrics-display"
 import { useJobsList } from "@/lib/api/hooks/use-jobs-list"
 import { getApiErrorMessage } from "@/lib/api/parse-api-error"
+import { toast } from "sonner"
 import { hasApiBase } from "@/lib/environment/public-env"
 import { LIST_PAGE_SIZE } from "@/lib/constants/pagination"
 import {
@@ -17,7 +18,7 @@ import {
 } from "@/lib/utilities/history-url-state"
 import { jobDisplayTitle } from "@/lib/utilities/job-display-title"
 import { formatJobTableDate } from "@/lib/utilities/format-job-table-date"
-import { openJobDownloadUrl } from "@/lib/utilities/job-download"
+import { downloadFromApiJob } from "@/lib/utilities/job-download"
 import {
   jobDownloadInteractionDisabled,
   jobIsCompleted,
@@ -82,8 +83,13 @@ function RecentJobRow({ job }: { job: ApiJob }) {
               title={jobDownloadInteractionDisabled(job) ? "Download available when completed" : "Download"}
               disabled={jobDownloadInteractionDisabled(job)}
               onClick={() => {
-                const u = job.download_url?.trim()
-                if (u) openJobDownloadUrl(u)
+                void (async () => {
+                  try {
+                    await downloadFromApiJob(job)
+                  } catch (e) {
+                    toast.error(getApiErrorMessage(e))
+                  }
+                })()
               }}
             >
               <Download className="h-4 w-4" />
@@ -111,18 +117,14 @@ function DashboardPageContent() {
 
   const jobsTab = parseDashboardJobsTab(urlSearchParams.get("tab"))
 
-  const {
-    data: metrics,
-    isLoading: metricsLoading,
-    isError: metricsError,
-  } = useDashboardMetrics()
-
-  const {
-    data: statusSummary,
-    isLoading: statusSummaryLoading,
-    isError: statusSummaryError,
-    error: statusSummaryErr,
-  } = useJobStatusSummary()
+  const { dashboard: dashboardQuery, jobStatusSummary: summaryQuery } = useMetricsContext()
+  const metrics = dashboardQuery.data
+  const metricsLoading = dashboardQuery.isLoading
+  const metricsError = dashboardQuery.isError
+  const statusSummary = summaryQuery.data
+  const statusSummaryLoading = summaryQuery.isLoading
+  const statusSummaryError = summaryQuery.isError
+  const statusSummaryErr = summaryQuery.error
 
   const { data, isLoading, isError, error, refetch } = useJobsList({
     page: 1,
@@ -131,19 +133,11 @@ function DashboardPageContent() {
 
   const items = data?.items ?? []
 
-  const metricValue = (n: number | undefined) => {
-    if (!hasApiBase || metricsError) return "—"
-    if (metricsLoading) return "—"
-    if (n === undefined) return "—"
-    return String(n)
-  }
+  const metricValue = (n: number | undefined) =>
+    formatMetricCount(n, { isError: metricsError, isLoading: metricsLoading })
 
-  const statusCountValue = (n: number | undefined) => {
-    if (!hasApiBase || statusSummaryError) return "—"
-    if (statusSummaryLoading) return "—"
-    if (n === undefined) return "—"
-    return String(n)
-  }
+  const statusCountValue = (n: number | undefined) =>
+    formatMetricCount(n, { isError: statusSummaryError, isLoading: statusSummaryLoading })
 
   const viewAllHref = historyBrowseHref(
     jobsTab === "fast-fill" ? "ff" : jobsTab === "express-estimate" ? "ee" : null,
@@ -366,8 +360,13 @@ function DashboardPageContent() {
                         title="Download"
                         disabled={jobDownloadInteractionDisabled(job)}
                         onClick={() => {
-                          const u = job.download_url?.trim()
-                          if (u) openJobDownloadUrl(u)
+                          void (async () => {
+                            try {
+                              await downloadFromApiJob(job)
+                            } catch (e) {
+                              toast.error(getApiErrorMessage(e))
+                            }
+                          })()
                         }}
                       >
                         <Download className="h-4 w-4" />
@@ -400,10 +399,9 @@ function DashboardPageContent() {
           ) : statusSummaryError ? (
             <p className="text-sm text-destructive">{getApiErrorMessage(statusSummaryErr)}</p>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
               {(
                 [
-                  { label: "Draft", key: "draft" as const, color: "bg-secondary/60" },
                   { label: "Submitted", key: "submitted" as const, color: "bg-blue-950/50" },
                   { label: "Processing", key: "processing" as const, color: "bg-yellow-950/50" },
                   { label: "Completed", key: "completed" as const, color: "bg-primary/20" },

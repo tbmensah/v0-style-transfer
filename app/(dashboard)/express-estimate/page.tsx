@@ -7,7 +7,9 @@ import { useJobsList } from "@/lib/api/hooks/use-jobs-list"
 import { ListPagination } from "@/components/list-pagination"
 import { JobsDataTable } from "@/components/jobs/jobs-data-table"
 import { expressJobColumns } from "@/components/jobs/job-table-columns"
+import { useMetricsContext } from "@/components/metrics-context"
 import { hasApiBase } from "@/lib/environment/public-env"
+import { formatMetricCount } from "@/lib/utilities/metrics-display"
 import { LIST_PAGE_SIZE } from "@/lib/constants/pagination"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +18,11 @@ import { Plus } from "lucide-react"
 
 export default function ExpressEstimatePage() {
   const [page, setPage] = useState(1)
+  const { dashboard: dashboardMetrics } = useMetricsContext()
+  const eeDisplay = formatMetricCount(dashboardMetrics.data?.express_estimate_tokens, {
+    isError: dashboardMetrics.isError,
+    isLoading: dashboardMetrics.isLoading,
+  })
   const { data, isLoading, isError, error, refetch } = useJobsList({
     job_type: "ee",
     page,
@@ -31,6 +38,12 @@ export default function ExpressEstimatePage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Express Estimate</h1>
           <p className="mt-1 text-muted-foreground">Create structured estimates from on-site inspection data</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Operator queue:{" "}
+            <Link href="/back-office" className="font-medium text-foreground underline-offset-4 hover:underline">
+              /back-office
+            </Link>
+          </p>
         </div>
         <Link href="/express-estimate/new">
           <Button className="gap-2 shadow-md shadow-primary/20">
@@ -47,7 +60,7 @@ export default function ExpressEstimatePage() {
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold text-foreground">—</span>
+            <span className="text-3xl font-bold tabular-nums text-foreground">{eeDisplay}</span>
             <Badge variant="secondary" className="text-xs">
               EE tokens
             </Badge>

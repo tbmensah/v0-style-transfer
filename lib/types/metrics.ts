@@ -8,7 +8,6 @@ export type DashboardMetricsData = {
 
 /** `GET /metrics/job-status-summary` — `data` payload. */
 export type JobStatusSummaryData = {
-  draft: number
   submitted: number
   processing: number
   completed: number

@@ -7,7 +7,9 @@ import { useJobsList } from "@/lib/api/hooks/use-jobs-list"
 import { ListPagination } from "@/components/list-pagination"
 import { JobsDataTable } from "@/components/jobs/jobs-data-table"
 import { fastFillJobColumns } from "@/components/jobs/job-table-columns"
+import { useMetricsContext } from "@/components/metrics-context"
 import { hasApiBase } from "@/lib/environment/public-env"
+import { formatMetricCount } from "@/lib/utilities/metrics-display"
 import { LIST_PAGE_SIZE } from "@/lib/constants/pagination"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +18,11 @@ import { Plus } from "lucide-react"
 
 export default function FastFillPage() {
   const [page, setPage] = useState(1)
+  const { dashboard: dashboardMetrics } = useMetricsContext()
+  const ffDisplay = formatMetricCount(dashboardMetrics.data?.fast_fill_tokens, {
+    isError: dashboardMetrics.isError,
+    isLoading: dashboardMetrics.isLoading,
+  })
   const { data, isLoading, isError, error, refetch } = useJobsList({
     job_type: "ff",
     page,
@@ -47,7 +54,7 @@ export default function FastFillPage() {
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold text-foreground">—</span>
+            <span className="text-3xl font-bold tabular-nums text-foreground">{ffDisplay}</span>
             <Badge variant="secondary" className="text-xs">
               FF tokens
             </Badge>

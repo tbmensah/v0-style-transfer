@@ -45,7 +45,7 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
 }
 
 export function DashboardSidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ""
   const router = useRouter()
   const user = useAuthStore((s) => s.user)
   const [loggingOut, setLoggingOut] = useState(false)

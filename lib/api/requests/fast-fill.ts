@@ -6,7 +6,11 @@ import {
 } from "@/lib/constants/api-endpoints"
 import { apiClient } from "@/lib/http/api-client"
 import type { SuccessEnvelope } from "@/lib/types/api-envelope"
-import type { FastFillJobDetailsPayload, FastFillUploadInitData } from "@/lib/types/fast-fill"
+import type {
+  FastFillJobDetailsPayload,
+  FastFillSampleUploadData,
+  FastFillUploadInitData,
+} from "@/lib/types/fast-fill"
 
 /**
  * Reserves storage + returns presigned URL. Call once per file pair / job row.
@@ -18,6 +22,14 @@ export async function initFastFillUpload(): Promise<FastFillUploadInitData> {
     {},
   )
   return unwrapSuccess(data, "No upload init data")
+}
+
+/** Presigned URL for sample/reference PDF. `GET /jobs/ff/sample-upload` */
+export async function fetchFastFillSampleUpload(): Promise<FastFillSampleUploadData> {
+  const { data } = await apiClient.get<SuccessEnvelope<FastFillSampleUploadData>>(
+    API_ENDPOINTS.fastFillSampleUpload,
+  )
+  return unwrapSuccess(data, "No sample upload data")
 }
 
 /**

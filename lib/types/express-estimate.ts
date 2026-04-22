@@ -7,4 +7,6 @@ export type ExpressEstimateJobPayload = ExpressEstimateFormValues
 export type ExpressEstimateJobCreateData = {
   job_id: string
   status: string
+  /** When false, server markdown upload failed; use input-render retry or poll until has_input_render. */
+  input_render_ready?: boolean
 }

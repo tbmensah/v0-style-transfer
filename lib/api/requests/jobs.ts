@@ -19,6 +19,8 @@ function buildJobsQuery(params: JobsListParams): string {
   appendStatusParams(search, params.status)
   if (params.created_from) search.set("created_from", params.created_from)
   if (params.created_to) search.set("created_to", params.created_to)
+  if (params.has_output === true) search.set("has_output", "true")
+  if (params.has_output === false) search.set("has_output", "false")
   if (params.page != null) search.set("page", String(params.page))
   if (params.page_size != null) {
     search.set("page_size", String(clampListPageSize(params.page_size)))
@@ -32,6 +34,8 @@ function buildJobsSearchQuery(params: JobsSearchParams): string {
   search.set("q", params.q.trim())
   if (params.job_type) search.set("job_type", params.job_type)
   appendStatusParams(search, params.status)
+  if (params.created_from) search.set("created_from", params.created_from)
+  if (params.created_to) search.set("created_to", params.created_to)
   if (params.page != null) search.set("page", String(params.page))
   if (params.page_size != null) {
     search.set("page_size", String(clampListPageSize(params.page_size)))
@@ -51,6 +55,22 @@ export async function fetchJobsList(params: JobsListParams): Promise<JobsListDat
 export async function fetchJobsSearch(params: JobsSearchParams): Promise<JobsListData> {
   const { data } = await apiClient.get<SuccessEnvelope<JobsListData>>(
     `${API_ENDPOINTS.jobsSearch}${buildJobsSearchQuery(params)}`,
+  )
+  return unwrapSuccess(data, "No jobs data")
+}
+
+/** `GET /ops/jobs` — back office; same filters as `fetchJobsList` but all customers (server enforces `require_back_office`). */
+export async function fetchOpsJobsList(params: JobsListParams): Promise<JobsListData> {
+  const { data } = await apiClient.get<SuccessEnvelope<JobsListData>>(
+    `${API_ENDPOINTS.opsJobsList}${buildJobsQuery(params)}`,
+  )
+  return unwrapSuccess(data, "No jobs data")
+}
+
+/** `GET /ops/jobs/search` — back office search across all customers. */
+export async function fetchOpsJobsSearch(params: JobsSearchParams): Promise<JobsListData> {
+  const { data } = await apiClient.get<SuccessEnvelope<JobsListData>>(
+    `${API_ENDPOINTS.opsJobsSearch}${buildJobsSearchQuery(params)}`,
   )
   return unwrapSuccess(data, "No jobs data")
 }

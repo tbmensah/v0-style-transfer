@@ -1,24 +1,23 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { fetchJobsList } from "@/lib/api/requests/jobs"
+import { fetchOpsJobsList } from "@/lib/api/requests/jobs"
 import { queryKeys } from "@/lib/api/query-keys"
 import { hasApiBase } from "@/lib/environment/public-env"
 import type { JobsListParams } from "@/lib/types/jobs"
 
 const JOBS_REFETCH_MS = 3600 * 1000
 
-export type UseJobsListOptions = {
-  /** When false, query does not run (e.g. History page in search mode). */
+export type UseOpsJobsListOptions = {
   enabled?: boolean
-  /** Default: 1h. Shorter for operator queues (e.g. back office). */
   refetchInterval?: number | false
 }
 
-export function useJobsList(params: JobsListParams, options?: UseJobsListOptions) {
+/** `GET /ops/jobs` — all customers, back office only (server: `require_back_office`). */
+export function useOpsJobsList(params: JobsListParams, options?: UseOpsJobsListOptions) {
   return useQuery({
-    queryKey: queryKeys.jobs(params),
-    queryFn: () => fetchJobsList(params),
+    queryKey: queryKeys.opsJobs(params),
+    queryFn: () => fetchOpsJobsList(params),
     enabled: hasApiBase && (options?.enabled ?? true),
     refetchInterval: options?.refetchInterval !== undefined ? options.refetchInterval : JOBS_REFETCH_MS,
   })

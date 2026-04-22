@@ -4,7 +4,6 @@ import {
   Clock,
   AlertCircle,
   XCircle,
-  Edit,
   Loader2,
   ListOrdered,
   RotateCcw,
@@ -15,6 +14,7 @@ const STATUS_CONFIG: Record<
   string,
   { variant: "default" | "secondary" | "destructive" | "outline"; icon: ElementType }
 > = {
+  draft: { variant: "outline", icon: Clock },
   completed: { variant: "default", icon: CheckCircle },
   confirmed: { variant: "secondary", icon: CheckCircle },
   queued: { variant: "secondary", icon: ListOrdered },
@@ -25,7 +25,6 @@ const STATUS_CONFIG: Record<
   failed: { variant: "destructive", icon: XCircle },
   error: { variant: "destructive", icon: XCircle },
   needs_review: { variant: "outline", icon: AlertCircle },
-  draft: { variant: "outline", icon: Edit },
   refunded: { variant: "outline", icon: RotateCcw },
   cancelled: { variant: "outline", icon: XCircle },
 }

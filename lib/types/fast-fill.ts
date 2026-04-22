@@ -1,3 +1,9 @@
+/** `GET /jobs/ff/sample-upload` — sample PDF slot (no job_id). */
+export type FastFillSampleUploadData = {
+  upload_url: string
+  storage_path: string
+}
+
 /** Presigned upload slot — from draft/upload-init or `GET /jobs/ff/{job_id}/upload-url`. */
 export type FastFillUploadInitData = {
   job_id: string

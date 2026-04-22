@@ -1,6 +1,8 @@
 "use client"
 
 import { DashboardSidebar, SidebarProvider, useSidebar } from "@/components/dashboard-sidebar"
+import { MetricsProvider } from "@/components/metrics-context"
+import { MetricsPrefetch } from "@/components/metrics-prefetch"
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebar()
@@ -24,7 +26,10 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <DashboardContent>{children}</DashboardContent>
+      <MetricsProvider>
+        <MetricsPrefetch />
+        <DashboardContent>{children}</DashboardContent>
+      </MetricsProvider>
     </SidebarProvider>
   )
 }
