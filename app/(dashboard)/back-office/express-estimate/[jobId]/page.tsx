@@ -17,6 +17,7 @@ import {
 import { hasApiBase } from "@/lib/environment/public-env"
 import {
   downloadFileFromUrl,
+  suggestedEeInputExcelFilename,
   suggestedEeInputReadableFilename,
   suggestedEeOutputFilename,
 } from "@/lib/utilities/job-download"
@@ -25,7 +26,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { JobStatusBadge } from "@/components/jobs/job-status-badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Loader2, ArrowLeft, FileDown, Upload, CheckCircle, RotateCcw, RefreshCw, ClipboardList } from "lucide-react"
+import {
+  Loader2,
+  ArrowLeft,
+  FileDown,
+  Upload,
+  CheckCircle,
+  RotateCcw,
+  RefreshCw,
+  ClipboardList,
+  FileSpreadsheet,
+} from "lucide-react"
 
 const ACCEPT_EE_OUTPUT = ".md,.pdf,.txt,.docx,.xlsx"
 
@@ -47,11 +58,22 @@ export default function BackOfficeExpressEstimateJobPage() {
   const dlInput = useExpressEstimateInputDownload()
   const dlOutput = useExpressEstimateOutputDownload()
 
-  async function onDownloadReadable() {
+  async function onDownloadInputMarkdown() {
     if (data == null) return
     try {
-      const { url } = await dlInput.mutateAsync(jobId)
+      const { url } = await dlInput.mutateAsync({ jobId })
       const name = suggestedEeInputReadableFilename(data.original_filename)
+      await downloadFileFromUrl(url, name)
+    } catch (e) {
+      toast.error(getApiErrorMessage(e))
+    }
+  }
+
+  async function onDownloadInputExcel() {
+    if (data == null) return
+    try {
+      const { url } = await dlInput.mutateAsync({ jobId, format: "excel" })
+      const name = suggestedEeInputExcelFilename(data.original_filename)
       await downloadFileFromUrl(url, name)
     } catch (e) {
       toast.error(getApiErrorMessage(e))
@@ -215,19 +237,29 @@ export default function BackOfficeExpressEstimateJobPage() {
         <CardHeader>
           <CardTitle>Readable input (for operator)</CardTitle>
           <CardDescription>
-            Server-rendered markdown from the wizard. Not the same as the final deliverable file.
+            Markdown or Excel from the wizard (not the same as the final deliverable file).
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-wrap gap-2">
           <Button
             type="button"
             variant="outline"
             className="gap-2"
             disabled={!data.has_input_render || dlInput.isPending}
-            onClick={() => void onDownloadReadable()}
+            onClick={() => void onDownloadInputMarkdown()}
           >
             {dlInput.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
-            Download readable
+            Download markdown
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="gap-2"
+            disabled={!data.has_input_render || dlInput.isPending}
+            onClick={() => void onDownloadInputExcel()}
+          >
+            {dlInput.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSpreadsheet className="h-4 w-4" />}
+            Download Excel
           </Button>
         </CardContent>
       </Card>

@@ -12,6 +12,9 @@ export type ExpressEstimateJobDetail = {
   updated_at?: string | null
 }
 
+/** `GET /jobs/ee/{id}/input-download?format=…` — omit query or use markdown for markdown; `excel` for spreadsheet. */
+export type EeInputDownloadFormat = "markdown" | "excel"
+
 /** `GET /jobs/ee/{id}/input-download` */
 export type EeInputDownloadData = {
   url: string

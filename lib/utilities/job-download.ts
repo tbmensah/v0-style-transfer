@@ -111,6 +111,15 @@ export function suggestedEeInputReadableFilename(originalFilename: string | null
   return `${stem || "estimate"}.md`
 }
 
+/** EE readable Excel export: stem from `original_filename` + `.xlsx`. */
+export function suggestedEeInputExcelFilename(originalFilename: string | null | undefined): string {
+  if (!originalFilename?.trim()) return "payload.xlsx"
+  const base = sanitizeDownloadFilename(originalFilename.trim())
+  if (base.toLowerCase().endsWith(".xlsx")) return base
+  const stem = base.replace(/\.[^.]+$/i, "")
+  return `${stem || "estimate"}.xlsx`
+}
+
 /** EE final artifact: prefer `original_filename`; add extension from URL/headers when missing. */
 export function suggestedEeOutputFilename(
   originalFilename: string | null | undefined,

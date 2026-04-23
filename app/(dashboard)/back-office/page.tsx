@@ -58,7 +58,8 @@ export default function BackOfficePage() {
             <div className="space-y-0">
               <div className="overflow-x-auto rounded-xl border border-border/60 bg-gradient-to-b from-card to-muted/10">
                 <JobsDataTable
-                  tableClassName="w-full"
+                  tableClassName="w-full min-w-[36rem]"
+                  gridColsClassName="grid-cols-[minmax(0,1fr)_10rem_11.5rem_7.5rem]"
                   columns={backOfficeEeJobColumns}
                   data={items}
                   isLoading={isLoading}

@@ -13,6 +13,7 @@ import { apiClient } from "@/lib/http/api-client"
 import type { SuccessEnvelope } from "@/lib/types/api-envelope"
 import type {
   EeInputDownloadData,
+  EeInputDownloadFormat,
   EeOutputConfirmBody,
   EeOutputDownloadData,
   EeOutputUploadUrlBody,
@@ -35,9 +36,12 @@ export async function postExpressEstimateInputRender(jobId: string): Promise<Exp
   return unwrapSuccess(data, "No job data")
 }
 
-export async function fetchExpressEstimateInputDownload(jobId: string): Promise<EeInputDownloadData> {
+export async function fetchExpressEstimateInputDownload(
+  jobId: string,
+  format?: EeInputDownloadFormat,
+): Promise<EeInputDownloadData> {
   const { data } = await apiClient.get<SuccessEnvelope<EeInputDownloadData>>(
-    apiPathExpressEstimateInputDownload(jobId),
+    apiPathExpressEstimateInputDownload(jobId, format),
   )
   return unwrapSuccess(data, "No input download data")
 }

@@ -119,7 +119,7 @@ const expressEeFieldActionCell = (job: ApiJob) => (
 )
 
 const backOfficeEeActionCell = (job: ApiJob) => (
-  <div className="flex justify-end pr-0.5">
+  <div className="flex w-full justify-start pr-0.5">
     <Button
       asChild
       size="sm"
@@ -184,7 +184,7 @@ export const backOfficeEeJobColumns: ColumnDef<ApiJob, unknown>[] = [
     id: "job",
     header: "Job",
     cell: ({ row }) => (
-      <div className="flex min-w-0 max-w-md items-center gap-3 pl-0.5">
+      <div className="flex min-w-0 items-center gap-3 pl-0.5">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-border/50">
           <ClipboardList className="h-4 w-4 text-primary" />
         </div>
@@ -193,6 +193,7 @@ export const backOfficeEeJobColumns: ColumnDef<ApiJob, unknown>[] = [
         </span>
       </div>
     ),
+    meta: meta({ headerClassName: "min-w-0", cellClassName: "min-w-0" }),
   },
   {
     accessorKey: "created_at",
@@ -202,20 +203,24 @@ export const backOfficeEeJobColumns: ColumnDef<ApiJob, unknown>[] = [
         {formatJobTableDate(row.original.created_at)}
       </time>
     ),
-    meta: meta({ cellClassName: "w-[1%] text-muted-foreground" }),
+    meta: meta({
+      headerClassName: "whitespace-nowrap",
+      cellClassName: "whitespace-nowrap tabular-nums text-muted-foreground",
+    }),
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => <JobStatusBadge status={row.original.status} />,
+    meta: meta({ headerClassName: "min-w-0", cellClassName: "flex min-w-0 items-center" }),
   },
   {
     id: "actions",
-    header: () => <span className="sr-only">Open job</span>,
+    header: () => <div className="flex w-full text-left">Actions</div>,
     cell: ({ row }) => {
       return backOfficeEeActionCell(row.original)
     },
-    meta: meta({ headerClassName: "w-[1%] text-right", cellClassName: "text-right" }),
+    meta: meta({ headerClassName: "text-left", cellClassName: "text-right" }),
   },
 ]
 

@@ -14,7 +14,11 @@ import {
   postExpressEstimateReopen,
 } from "@/lib/api/requests/express-estimate-job"
 import { hasApiBase } from "@/lib/environment/public-env"
-import type { EeOutputConfirmBody, EeOutputUploadUrlBody } from "@/lib/types/express-estimate-job"
+import type {
+  EeInputDownloadFormat,
+  EeOutputConfirmBody,
+  EeOutputUploadUrlBody,
+} from "@/lib/types/express-estimate-job"
 
 const POLL_MS = 5_000
 
@@ -95,10 +99,16 @@ export function usePostExpressEstimateReopen(jobId: string) {
   })
 }
 
-/** Fetches a fresh signed input URL; open in new tab. */
+export type ExpressEstimateInputDownloadVars = {
+  jobId: string
+  format?: EeInputDownloadFormat
+}
+
+/** Fetches a fresh signed input URL for markdown (default) or Excel. */
 export function useExpressEstimateInputDownload() {
   return useMutation({
-    mutationFn: (id: string) => fetchExpressEstimateInputDownload(id),
+    mutationFn: ({ jobId, format }: ExpressEstimateInputDownloadVars) =>
+      fetchExpressEstimateInputDownload(jobId, format),
   })
 }
 

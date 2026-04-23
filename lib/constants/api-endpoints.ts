@@ -1,3 +1,5 @@
+import type { EeInputDownloadFormat } from "@/lib/types/express-estimate-job"
+
 /**
  * Backend API paths, relative to `NEXT_PUBLIC_API_BASE_URL`.
  * Leading slash, no trailing slash.
@@ -56,9 +58,13 @@ export function apiPathExpressEstimateInputRender(jobId: string): string {
   return `/jobs/ee/${eeJob(jobId)}/input-render`
 }
 
-/** `GET` — signed URL for operator-readable payload.md. */
-export function apiPathExpressEstimateInputDownload(jobId: string): string {
-  return `/jobs/ee/${eeJob(jobId)}/input-download`
+/** `GET` — signed URL for operator-readable input (`format=excel` or omit / markdown for markdown). */
+export function apiPathExpressEstimateInputDownload(jobId: string, format?: EeInputDownloadFormat): string {
+  const path = `/jobs/ee/${eeJob(jobId)}/input-download`
+  if (format === "excel") {
+    return `${path}?format=excel`
+  }
+  return path
 }
 
 /** `POST` — presigned output upload URL. */
