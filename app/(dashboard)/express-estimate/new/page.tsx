@@ -1,7 +1,7 @@
 "use client"
 
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
+import { useEffect, useRef } from "react"
 import { useForm, useWatch, type FieldError, type SubmitErrorHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
@@ -9,13 +9,13 @@ import {
   expressEstimatePageSchema,
   type ExpressEstimatePageValues,
 } from "@/lib/schemas/express-estimate-form"
-import { queryKeys } from "@/lib/api/query-keys"
 import { useMetricsContext } from "@/components/metrics-context"
 import { formatMetricCount } from "@/lib/utilities/metrics-display"
-import { createExpressEstimateJob } from "@/lib/api/requests/express-estimate"
-import { getApiErrorMessage } from "@/lib/api/parse-api-error"
 import { hasApiBase } from "@/lib/environment/public-env"
-import { toExpressEstimateJobPayload } from "@/lib/utilities/express-estimate-payload"
+import {
+  readExpressEstimatePreviewDraft,
+  writeExpressEstimatePreviewDraft,
+} from "@/lib/constants/express-estimate-preview-draft"
 import { Form } from "@/components/ui/form"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -549,7 +549,6 @@ type ProjectDetailsFieldErrors = Partial<Record<"projectName" | "claimNumber", F
 export default function NewExpressEstimatePage() {
   const nv = (v: string) => v === "__none__" ? "" : v
   const router = useRouter()
-  const queryClient = useQueryClient()
   const { dashboard: dashboardMetrics } = useMetricsContext()
   const eeBalance = dashboardMetrics.data?.express_estimate_tokens
   const eeCost = 1
@@ -568,12 +567,24 @@ export default function NewExpressEstimatePage() {
     resolver: zodResolver(expressEstimatePageSchema),
     defaultValues: defaultExpressEstimatePageValues,
   })
-  const { control, setValue, handleSubmit, formState: { errors } } = form
+  const { control, setValue, handleSubmit, formState: { errors, isSubmitting } } = form
   const projectDetailsErrors = errors.projectDetails as ProjectDetailsFieldErrors | undefined
 
-  const createJob = useMutation({
-    mutationFn: createExpressEstimateJob,
-  })
+  const rehydratedRef = useRef(false)
+  useEffect(() => {
+    if (rehydratedRef.current) return
+    rehydratedRef.current = true
+    const raw = readExpressEstimatePreviewDraft()
+    if (!raw) return
+    try {
+      const parsed = expressEstimatePageSchema.safeParse(JSON.parse(raw))
+      if (parsed.success) {
+        form.reset(parsed.data)
+      }
+    } catch {
+      // ignore corrupt storage
+    }
+  }, [form])
 
   const onInvalidExpressEstimate: SubmitErrorHandler<ExpressEstimatePageValues> = (errs) => {
     const pd = errs.projectDetails as ProjectDetailsFieldErrors | undefined
@@ -584,7 +595,7 @@ export default function NewExpressEstimatePage() {
     toast.error(message, { id: "ee-validation" })
   }
 
-  const onSubmitExpressEstimate = (values: ExpressEstimatePageValues) => {
+  const onContinueToPreview = (values: ExpressEstimatePageValues) => {
     if (!hasApiBase) {
       toast.error(
         "Set NEXT_PUBLIC_API_BASE_URL in .env.local to submit to the API.",
@@ -592,20 +603,20 @@ export default function NewExpressEstimatePage() {
       )
       return
     }
-    const payload = toExpressEstimateJobPayload(values)
-    createJob.mutate(payload, {
-      onSuccess: () => {
-        toast.success("Express Estimate created.", { id: "ee-submit" })
-        void queryClient.invalidateQueries({ queryKey: ["api", "jobs"] })
-        void queryClient.invalidateQueries({ queryKey: ["api", "ops"] })
-        void queryClient.invalidateQueries({ queryKey: queryKeys.metrics })
-        void queryClient.invalidateQueries({ queryKey: queryKeys.tokensLifetime })
-        router.push("/express-estimate")
-      },
-      onError: (e) => {
-        toast.error(getApiErrorMessage(e), { id: "ee-submit" })
-      },
-    })
+    try {
+      writeExpressEstimatePreviewDraft(JSON.stringify(values))
+      router.push("/express-estimate/new/preview")
+    } catch (e) {
+      const err = e as { name?: string; code?: number }
+      if (err?.name === "QuotaExceededError" || err?.code === 22) {
+        toast.error(
+          "Draft is too large to save in the browser. Try removing some rooms or details.",
+          { id: "ee-preview-storage" },
+        )
+        return
+      }
+      toast.error("Could not save draft for preview.", { id: "ee-preview-storage" })
+    }
   }
 
   const activeTab = useWatch({ control, name: "activeTab", defaultValue: "exterior" })
@@ -8140,16 +8151,16 @@ const newDoor: DoorItem = {
               <Button
                 type="button"
                 className="w-full shadow-md shadow-primary/20"
-                disabled={createJob.isPending || insufficientEe}
-                onClick={() => void handleSubmit(onSubmitExpressEstimate, onInvalidExpressEstimate)()}
+                disabled={isSubmitting || insufficientEe}
+                onClick={() => void handleSubmit(onContinueToPreview, onInvalidExpressEstimate)()}
               >
-                {createJob.isPending ? (
+                {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting…
+                    Checking…
                   </>
                 ) : (
-                  "Review & Generate ESX"
+                  "Continue to preview"
                 )}
               </Button>
               <Link href="/express-estimate">
