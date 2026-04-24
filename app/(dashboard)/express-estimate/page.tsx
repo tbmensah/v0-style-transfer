@@ -38,12 +38,6 @@ export default function ExpressEstimatePage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Express Estimate</h1>
           <p className="mt-1 text-muted-foreground">Create structured estimates from on-site inspection data</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Operator queue:{" "}
-            <Link href="/back-office" className="font-medium text-foreground underline-offset-4 hover:underline">
-              /back-office
-            </Link>
-          </p>
         </div>
         <Link href="/express-estimate/new">
           <Button className="gap-2 shadow-md shadow-primary/20">

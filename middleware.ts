@@ -47,7 +47,9 @@ export async function middleware(request: NextRequest) {
   if (isPublicPath(pathname)) {
     if (
       user &&
-      (pathname.startsWith("/login") || pathname.startsWith("/signup"))
+      (pathname.startsWith("/login") ||
+        pathname.startsWith("/signup") ||
+        pathname.startsWith("/forgot-password"))
     ) {
       return copyCookies(
         response,

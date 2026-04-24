@@ -12,6 +12,8 @@ export function isPublicPath(pathname: string): boolean {
     "/login",
     "/signup",
     "/forgot-password",
+    "/auth/confirm",
+    "/auth/auth-code-error",
     "/terms",
     "/privacy",
   ]
