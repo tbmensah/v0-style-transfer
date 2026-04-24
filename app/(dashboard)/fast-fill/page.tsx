@@ -1,39 +1,39 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
+import { getApiErrorMessage } from "@/lib/api/parse-api-error"
+import { useJobsList } from "@/lib/api/hooks/use-jobs-list"
+import { ListPagination } from "@/components/list-pagination"
+import { JobsDataTable } from "@/components/jobs/jobs-data-table"
+import { fastFillJobColumns } from "@/components/jobs/job-table-columns"
+import { useMetricsContext } from "@/components/metrics-context"
+import { hasApiBase } from "@/lib/environment/public-env"
+import { formatMetricCount } from "@/lib/utilities/metrics-display"
+import { LIST_PAGE_SIZE } from "@/lib/constants/pagination"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Upload, CheckCircle, Clock, AlertCircle, XCircle, Download, Eye, Edit, Trash2 } from "lucide-react"
-
-const fastFillJobs = [
-  { id: "2024-0892", name: "Johnson Residence", date: "Mar 10, 2024", status: "Completed", tokens: 1 },
-  { id: "2024-0890", name: "Thompson House", date: "Mar 9, 2024", status: "Failed", tokens: 1 },
-  { id: "2024-0888", name: "Anderson Property", date: "Mar 8, 2024", status: "Needs Review", tokens: 1 },
-  { id: "2024-0887", name: "Miller Dwelling", date: "Mar 7, 2024", status: "Draft", tokens: 0 },
-  { id: "2024-0885", name: "Wilson Property", date: "Mar 5, 2024", status: "Submitted", tokens: 1 },
-]
-
-function getStatusBadge(status: string) {
-  const config: Record<string, { variant: "default" | "secondary" | "destructive" | "outline", icon: React.ElementType }> = {
-    "Completed": { variant: "default", icon: CheckCircle },
-    "Processing": { variant: "secondary", icon: Clock },
-    "Submitted": { variant: "secondary", icon: Clock },
-    "Failed": { variant: "destructive", icon: XCircle },
-    "Needs Review": { variant: "outline", icon: AlertCircle },
-    "Draft": { variant: "outline", icon: Edit },
-  }
-  const { variant, icon: Icon } = config[status] || { variant: "secondary" as const, icon: Clock }
-  return (
-    <Badge variant={variant} className="gap-1">
-      <Icon className="h-3 w-3" />
-      {status}
-    </Badge>
-  )
-}
+import { Plus } from "lucide-react"
 
 export default function FastFillPage() {
+  const [page, setPage] = useState(1)
+  const { dashboard: dashboardMetrics } = useMetricsContext()
+  const ffDisplay = formatMetricCount(dashboardMetrics.data?.fast_fill_tokens, {
+    isError: dashboardMetrics.isError,
+    isLoading: dashboardMetrics.isLoading,
+  })
+  const { data, isLoading, isError, error, refetch } = useJobsList({
+    job_type: "ff",
+    page,
+    page_size: LIST_PAGE_SIZE,
+  })
+
+  const items = data?.items ?? []
+  const total = data?.total ?? 0
+
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Fast Fill</h1>
@@ -47,86 +47,57 @@ export default function FastFillPage() {
         </Link>
       </div>
 
-      {/* Token Balance */}
       <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Available Tokens</CardTitle>
-          <CardDescription>Each Fast Fill job uses 1 token</CardDescription>
+          <CardDescription>Each Fast Fill job uses tokens per your account balance</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold text-foreground">24</span>
-            <Badge variant="secondary" className="text-xs">FF tokens</Badge>
+            <span className="text-3xl font-bold tabular-nums text-foreground">{ffDisplay}</span>
+            <Badge variant="secondary" className="text-xs">
+              FF tokens
+            </Badge>
           </div>
         </CardContent>
       </Card>
 
-      {/* Jobs Table */}
       <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
           <CardTitle className="text-foreground">Fast Fill Jobs</CardTitle>
           <CardDescription>All your Fast Fill submissions</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border/60">
-                  <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Job Name</th>
-                  <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Date</th>
-                  <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Tokens</th>
-                  <th className="pb-3 text-right text-sm font-medium text-muted-foreground">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/60">
-                {fastFillJobs.map((job) => (
-                  <tr key={job.id} className="group transition-colors hover:bg-secondary/30">
-                    <td className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20">
-                          <Upload className="h-4 w-4 text-primary" />
-                        </div>
-                        <span className="font-medium text-foreground">Claim #{job.id} - {job.name}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 text-sm text-muted-foreground">{job.date}</td>
-                    <td className="py-4">{getStatusBadge(job.status)}</td>
-                    <td className="py-4 text-sm text-muted-foreground">{job.tokens}</td>
-                    <td className="py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        {job.status === "Completed" && (
-                          <Button variant="ghost" size="icon" title="Download">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {job.status === "Needs Review" && (
-                          <Button variant="ghost" size="icon" title="Review">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {job.status === "Draft" && (
-                          <>
-                            <Button variant="ghost" size="icon" title="Edit">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" title="Delete" className="text-destructive hover:text-destructive">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
-                        {job.status === "Failed" && (
-                          <Button variant="ghost" size="sm">
-                            Retry
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {!hasApiBase ? (
+            <p className="text-sm text-muted-foreground">
+              Set <code className="rounded bg-muted px-1.5 py-0.5 text-xs">NEXT_PUBLIC_API_BASE_URL</code> to load
+              jobs from the API.
+            </p>
+          ) : isError ? (
+            <div className="space-y-3 rounded-lg border border-destructive/40 bg-destructive/5 p-4">
+              <p className="text-sm text-destructive">{getApiErrorMessage(error)}</p>
+              <Button type="button" variant="outline" size="sm" onClick={() => void refetch()}>
+                Retry
+              </Button>
+            </div>
+          ) : (
+            <>
+              <JobsDataTable
+                columns={fastFillJobColumns}
+                data={items}
+                isLoading={isLoading}
+                emptyMessage="No Fast Fill jobs yet. Create one to get started."
+                getRowId={(row) => row.id}
+              />
+              <ListPagination
+                className="mt-6"
+                page={page}
+                totalItems={total}
+                pageSize={LIST_PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

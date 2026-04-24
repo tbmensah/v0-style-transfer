@@ -1,6 +1,22 @@
 "use client"
 
-import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useEffect, useRef } from "react"
+import { useForm, useWatch, type FieldError, type SubmitErrorHandler } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
+import {
+  expressEstimatePageSchema,
+  type ExpressEstimatePageValues,
+} from "@/lib/schemas/express-estimate-form"
+import { useMetricsContext } from "@/components/metrics-context"
+import { formatMetricCount } from "@/lib/utilities/metrics-display"
+import { hasApiBase } from "@/lib/environment/public-env"
+import {
+  readExpressEstimatePreviewDraft,
+  writeExpressEstimatePreviewDraft,
+} from "@/lib/constants/express-estimate-preview-draft"
+import { Form } from "@/components/ui/form"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,6 +39,7 @@ import {
   Zap,
   Wind,
   HelpCircle,
+  Loader2,
   X,
   Layers,
   Square
@@ -337,204 +354,295 @@ const defaultKitchenExtras = {
   ...defaultAppliancesExtras,
 }
 
-export default function NewExpressEstimatePage() {
-  const [activeTab, setActiveTab] = useState("exterior")
-  const nv = (v: string) => v === "__none__" ? "" : v
-  const [isSaved, setIsSaved] = useState(true)
+const defaultProjectDetails = {
+  projectName: "",
+  claimNumber: "",
+  inspectionDate: "",
+  propertyAddress: "",
+  propertyType: "",
+  preFirm: false,
+  adjusterName: "",
+  notes: "",
+}
 
-  // Project Details
-  const [projectDetails, setProjectDetails] = useState({
-    projectName: "",
-    claimNumber: "",
-    inspectionDate: "",
-    propertyAddress: "",
-    propertyType: "",
+const defaultExterior = {
+  pressureWash: { enabled: false, perimeterFeet: "", regularPwash: false, cleanWithSteam: false },
+  dumpster: { enabled: false, count: "", size: "" },
+  hvac: {
+    condenserUnits: [] as Array<{ id: number; tonnage: string; seer: string; replace: boolean; serviceCall: boolean; f9Note: string }>,
+    packageUnits: [] as Array<{ id: number; unitType: string; tonnage: string; seer: string; replace: boolean; serviceCall: boolean; f9Note: string }>,
+    miniSplits: [] as Array<{ id: number; zones: string; highEfficiency: boolean; replace: boolean; serviceCall: boolean; f9Note: string }>,
+  },
+  electrical: {
+    exteriorOutlets: "",
+    disconnect30Amp: "",
+    breakerPanel: {
+      enabled: false,
+      amps: "",
+      arcFaults: false,
+      panelReplacement: false,
+      circuitReplacement: false,
+      panelType: "",
+      circuits: [] as Array<{ id: number; type: string; qty: string }>,
+    },
+    meterBox: false,
+    meterBoxQty: "",
+  },
+  finishes: {
+    exteriorPaint: { enabled: false },
+    siding: { enabled: false, perimeterFeet: "", squareFeetEnabled: false, squareFeet: "" },
+    sheathing: { enabled: false, type: "", replacementHeight: "" },
+    houseWrap: { enabled: false, replacementHeight: "" },
+    backerBoard: { enabled: false, replacementHeight: "" },
+    wallInsulation: { enabled: false, type: "", replacementHeight: "" },
+  },
+}
+
+const defaultFoundation = {
+  crawlspace: {
+    enabled: false,
     preFirm: false,
-    adjusterName: "",
-    notes: "",
-  })
-
-  // Exterior State
-  const [exterior, setExterior] = useState({
-    pressureWash: { enabled: false, perimeterFeet: "", regularPwash: false, cleanWithSteam: false },
-    dumpster: { enabled: false, count: "", size: "" },
-    hvac: {
-      condenserUnits: [] as Array<{ id: number; tonnage: string; seer: string; replace: boolean; serviceCall: boolean; f9Note: string }>,
-      packageUnits: [] as Array<{ id: number; unitType: string; tonnage: string; seer: string; replace: boolean; serviceCall: boolean; f9Note: string }>,
-      miniSplits: [] as Array<{ id: number; zones: string; highEfficiency: boolean; replace: boolean; serviceCall: boolean; f9Note: string }>,
-    },
-    electrical: {
-      exteriorOutlets: "",
-      disconnect30Amp: "",
-      breakerPanel: {
-        enabled: false,
-        amps: "",
-        arcFaults: false,
-        panelReplacement: false,
-        circuitReplacement: false,
-        panelType: "",
-        circuits: [] as Array<{ id: number; type: string; qty: string }>,
-      },
-      meterBox: false,
-      meterBoxQty: "",
-    },
-    finishes: {
-      exteriorPaint: { enabled: false },
-      siding: { enabled: false, perimeterFeet: "", squareFeetEnabled: false, squareFeet: "" },
-      sheathing: { enabled: false, type: "", replacementHeight: "" },
-      houseWrap: { enabled: false, replacementHeight: "" },
-      backerBoard: { enabled: false, replacementHeight: "" },
-      wallInsulation: { enabled: false, type: "", replacementHeight: "" },
-    },
-  })
-
-  // Foundation State
-  const [foundation, setFoundation] = useState({
-    crawlspace: {
+    acControlledSpace: false,
+    heavyCleanArea: false,
+    perimeterFeet: "",
+    piersType: "" as "" | "short" | "tall",
+    piersCount: "",
+    cleanJoist: false,
+    bellyPaper: false,
+    floorInsulation: false,
+    floorInsulationType: "",
+    muck: false,
+    muckHeavy: false,
+    standingWater: false,
+    houseRewire: "",
+    stairCleaning: false,
+    stairsSubmerged: "",
+    treadWidth: "",
+    stringersLength: "",
+  },
+  enclosureRemoval: {
+    sandRemoval: { enabled: false, cubicFeet: "", length: "", width: "", depth: "" },
+    backfill: { enabled: false, cubicFeet: "", length: "", width: "", depth: "" },
+    confinedSpace: false,
+  },
+  insulation: {
+    bellyPaper: false,
+    floorInsulation: false,
+    floorInsulationType: "",
+    confinedSpace: false,
+  },
+  subgradeAreaCoverage: {
+    drywall: {
       enabled: false,
-      preFirm: false,
-      acControlledSpace: false,
-      heavyCleanArea: false,
-      perimeterFeet: "",
-      piersType: "" as "" | "short" | "tall",
-      piersCount: "",
-      cleanJoist: false,
-      // Pre-FIRM options
-      bellyPaper: false,
-      floorInsulation: false,
-      floorInsulationType: "",
-      // Muck options
-      muck: false,
-      muckHeavy: false,
-      standingWater: false,
-      houseRewire: "",
-      // Stair Cleaning
-      stairCleaning: false,
-      stairsSubmerged: "",
-      treadWidth: "",
-      stringersLength: "",
+      type: "",
+      replacementHeight: "",
+      measureType: "sf" as "sf" | "lf",
     },
-    enclosureRemoval: {
-      sandRemoval: { enabled: false, cubicFeet: "", length: "", width: "", depth: "" },
-      backfill: { enabled: false, cubicFeet: "", length: "", width: "", depth: "" },
-      confinedSpace: false,
-    },
-    insulation: {
-      bellyPaper: false,
-      floorInsulation: false,
-      floorInsulationType: "",
-      confinedSpace: false,
-    },
-    subgradeAreaCoverage: {
-      drywall: {
-        enabled: false,
-        type: "",
-        replacementHeight: "",
-        measureType: "sf" as "sf" | "lf",
-      },
-      wallInsulation: {
-        enabled: false,
-        type: "",
-        replacementHeight: "",
-        measureType: "sf" as "sf" | "lf",
-      },
-      foundationalDoor: {
-        enabled: false,
-        action: "",
-      },
-      foundationalWindowsEnabled: false,
-      foundationalWindows: [] as WindowItem[],
-    },
-    sumpPump: { enabled: false, action: "", hp: "", f9Note: "" },
-    waterHeater: { enabled: false, tankless: false, type: "", size: "", rating: "", action: "", f9Note: "" },
-    waterSoftener: { enabled: false, type: "", size: "", action: "", f9Note: "" },
-    hvac: {
-      airHandlers: [] as Array<{
-        id: number;
-        type: string;
-        tonnage: string;
-        heatElementCount: string;
-        action: string;
-        f9Note: string;
-      }>,
-      boiler: {
-        enabled: false,
-        type: "",
-        action: "",
-        f9Note: "",
-        expansionTank: false,
-        circulatorPump: false,
-        oilTankReplacement: false,
-        oilReplacement: false,
-      },
-      baseboardHeat: {
-        enabled: false,
-        type: "",
-        size: "",
-        action: "",
-      },
-    },
-    basement: {
+    wallInsulation: {
       enabled: false,
-      wallCleanPf: "",
-      muck: false,
-      muckHeavy: false,
-      // Drywall
-      drywallEnabled: false,
-      drywallMeasureType: "sf" as "sf" | "lf",
-      drywallValue: "",
-      // Stair Cleaning
-      stairCleaning: false,
-      stairCount: "",
-      treadWidth: "",
-      stringersLength: "",
-      // Foundation Door
-      foundationDoor: false,
-      foundationDoorAction: "",
-      // Foundation Windows
-      foundationWindows: [] as Array<{
-        id: number;
-        type: string;
-        size: string;
-        quantity: string;
-        material: string;
-      }>,
+      type: "",
+      replacementHeight: "",
+      measureType: "sf" as "sf" | "lf",
     },
-    electrical: {
-      outlets110: "",
-      outlets220: "",
-      gfiOutlets: "",
-      lightSwitch: "",
-      junctionBox: "",
-      breakerPanel: {
-        enabled: false,
-        panelReplacement: false,
-        circuitReplacement: false,
-        panelType: "",
-        circuits: [] as Array<{ id: number; type: string; qty: string }>,
-      },
-      meterBox: false,
-      meterBoxQty: "",
-      houseRewire: { enabled: false, homeSf: "" },
+    foundationalDoor: {
+      enabled: false,
+      action: "",
     },
-    stairs: {
-      stairsForReplacement: "",
-      sizeOfTreads: "",
-      risers: false,
-      risersQty: "",
-      stringersLength: "",
-      landingReplacement: false,
+    foundationalWindowsEnabled: false,
+    foundationalWindows: [] as WindowItem[],
+  },
+  sumpPump: { enabled: false, action: "", hp: "", f9Note: "" },
+  waterHeater: { enabled: false, tankless: false, type: "", size: "", rating: "", action: "", f9Note: "" },
+  waterSoftener: { enabled: false, type: "", size: "", action: "", f9Note: "" },
+  hvac: {
+    airHandlers: [] as Array<{
+      id: number
+      type: string
+      tonnage: string
+      heatElementCount: string
+      action: string
+      f9Note: string
+    }>,
+    boiler: {
+      enabled: false,
+      type: "",
+      action: "",
+      f9Note: "",
+      expansionTank: false,
+      circulatorPump: false,
+      oilTankReplacement: false,
+      oilReplacement: false,
     },
-    elevator: false,
-  })
+    baseboardHeat: {
+      enabled: false,
+      type: "",
+      size: "",
+      action: "",
+    },
+  },
+  basement: {
+    enabled: false,
+    wallCleanPf: "",
+    muck: false,
+    muckHeavy: false,
+    drywallEnabled: false,
+    drywallMeasureType: "sf" as "sf" | "lf",
+    drywallValue: "",
+    stairCleaning: false,
+    stairCount: "",
+    treadWidth: "",
+    stringersLength: "",
+    foundationDoor: false,
+    foundationDoorAction: "",
+    foundationWindows: [] as Array<{
+      id: number
+      type: string
+      size: string
+      quantity: string
+      material: string
+    }>,
+  },
+  electrical: {
+    outlets110: "",
+    outlets220: "",
+    gfiOutlets: "",
+    lightSwitch: "",
+    junctionBox: "",
+    breakerPanel: {
+      enabled: false,
+      panelReplacement: false,
+      circuitReplacement: false,
+      panelType: "",
+      circuits: [] as Array<{ id: number; type: string; qty: string }>,
+    },
+    meterBox: false,
+    meterBoxQty: "",
+    houseRewire: { enabled: false, homeSf: "" },
+  },
+  stairs: {
+    stairsForReplacement: "",
+    sizeOfTreads: "",
+    risers: false,
+    risersQty: "",
+    stringersLength: "",
+    landingReplacement: false,
+  },
+  elevator: false,
+}
 
-  // Interior Rooms
-  const [rooms, setRooms] = useState<Room[]>([])
+const defaultExpressEstimatePageValues: ExpressEstimatePageValues = {
+  activeTab: "exterior",
+  isSaved: true,
+  projectDetails: defaultProjectDetails,
+  exterior: defaultExterior,
+  foundation: defaultFoundation,
+  rooms: [],
+}
+
+type ExpressProjectDetailsState = typeof defaultProjectDetails
+type ExpressExteriorState = typeof defaultExterior
+type ExpressFoundationState = typeof defaultFoundation
+
+/** RHF + zod `intersection` on `projectDetails` widens `FieldErrors` — narrow for UI. */
+type ProjectDetailsFieldErrors = Partial<Record<"projectName" | "claimNumber", FieldError>>
+
+export default function NewExpressEstimatePage() {
+  const nv = (v: string) => v === "__none__" ? "" : v
+  const router = useRouter()
+  const { dashboard: dashboardMetrics } = useMetricsContext()
+  const eeBalance = dashboardMetrics.data?.express_estimate_tokens
+  const eeCost = 1
+  const eeBalanceDisplay = formatMetricCount(eeBalance, {
+    isError: dashboardMetrics.isError,
+    isLoading: dashboardMetrics.isLoading,
+  })
+  const insufficientEe =
+    hasApiBase &&
+    !dashboardMetrics.isLoading &&
+    !dashboardMetrics.isError &&
+    eeBalance !== undefined &&
+    eeCost > eeBalance
+
+  const form = useForm<ExpressEstimatePageValues>({
+    resolver: zodResolver(expressEstimatePageSchema),
+    defaultValues: defaultExpressEstimatePageValues,
+  })
+  const { control, setValue, handleSubmit, formState: { errors, isSubmitting } } = form
+  const projectDetailsErrors = errors.projectDetails as ProjectDetailsFieldErrors | undefined
+
+  const rehydratedRef = useRef(false)
+  useEffect(() => {
+    if (rehydratedRef.current) return
+    rehydratedRef.current = true
+    const raw = readExpressEstimatePreviewDraft()
+    if (!raw) return
+    try {
+      const parsed = expressEstimatePageSchema.safeParse(JSON.parse(raw))
+      if (parsed.success) {
+        form.reset(parsed.data)
+      }
+    } catch {
+      // ignore corrupt storage
+    }
+  }, [form])
+
+  const onInvalidExpressEstimate: SubmitErrorHandler<ExpressEstimatePageValues> = (errs) => {
+    const pd = errs.projectDetails as ProjectDetailsFieldErrors | undefined
+    const message =
+      pd?.projectName?.message?.trim() ||
+      pd?.claimNumber?.message?.trim() ||
+      "Please fix the errors before submitting."
+    toast.error(message, { id: "ee-validation" })
+  }
+
+  const onContinueToPreview = (values: ExpressEstimatePageValues) => {
+    if (!hasApiBase) {
+      toast.error(
+        "Set NEXT_PUBLIC_API_BASE_URL in .env.local to submit to the API.",
+        { id: "ee-submit" },
+      )
+      return
+    }
+    try {
+      writeExpressEstimatePreviewDraft(JSON.stringify(values))
+      router.push("/express-estimate/new/preview")
+    } catch (e) {
+      const err = e as { name?: string; code?: number }
+      if (err?.name === "QuotaExceededError" || err?.code === 22) {
+        toast.error(
+          "Draft is too large to save in the browser. Try removing some rooms or details.",
+          { id: "ee-preview-storage" },
+        )
+        return
+      }
+      toast.error("Could not save draft for preview.", { id: "ee-preview-storage" })
+    }
+  }
+
+  const activeTab = useWatch({ control, name: "activeTab", defaultValue: "exterior" })
+  const isSaved = useWatch({ control, name: "isSaved", defaultValue: true })
+  const projectDetails = useWatch({
+    control,
+    name: "projectDetails",
+    defaultValue: defaultProjectDetails,
+  }) as ExpressProjectDetailsState
+  const exterior = useWatch({
+    control,
+    name: "exterior",
+    defaultValue: defaultExterior,
+  }) as ExpressExteriorState
+  const foundation = useWatch({
+    control,
+    name: "foundation",
+    defaultValue: defaultFoundation,
+  }) as ExpressFoundationState
+  const rooms = (useWatch({ control, name: "rooms", defaultValue: [] as Room[] }) ??
+    []) as Room[]
 
   // Handlers
   const handleSave = () => {
-    setIsSaved(false)
-    setTimeout(() => setIsSaved(true), 1000)
+    setValue("isSaved", false)
+    setTimeout(() => setValue("isSaved", true), 1000)
   }
 
   const addRoom = (type: string = "room", name: string = "") => {
@@ -562,7 +670,7 @@ export default function NewExpressEstimatePage() {
   ...(type === "bathroom" ? defaultBathroomExtras : {}),
   ...(type === "kitchen" ? defaultKitchenExtras : {}),
   }
-    setRooms([...rooms, newRoom])
+    setValue("rooms", [...rooms, newRoom])
     handleSave()
   }
 
@@ -574,18 +682,19 @@ export default function NewExpressEstimatePage() {
         id: Date.now(),
         name: `${roomToCopy.name} (Copy)`,
       }
-      setRooms([...rooms, newRoom])
+      setValue("rooms", [...rooms, newRoom])
       handleSave()
     }
   }
 
   const removeRoom = (roomId: number) => {
-    setRooms(rooms.filter(r => r.id !== roomId))
+    setValue("rooms", rooms.filter(r => r.id !== roomId))
     handleSave()
   }
 
   const updateRoom = (roomId: number, updates: Partial<Room>) => {
-    setRooms(
+    setValue(
+      "rooms",
       rooms.map((r) => {
         if (r.id !== roomId) return r
         const merged = { ...r, ...updates }
@@ -642,7 +751,7 @@ export default function NewExpressEstimatePage() {
       marbleSillReplace: false,
       marbleSillDetach: false,
     }
-    setFoundation({
+    setValue("foundation",{
       ...foundation,
       subgradeAreaCoverage: {
         ...foundation.subgradeAreaCoverage,
@@ -683,6 +792,7 @@ const newDoor: DoorItem = {
   }
 
   return (
+    <Form {...form}>
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -725,8 +835,9 @@ const newDoor: DoorItem = {
                     id="projectName"
                     placeholder="e.g., Johnson Residence"
                     value={projectDetails.projectName}
-                    onChange={(e) => { setProjectDetails({ ...projectDetails, projectName: e.target.value }); handleSave() }}
-                    className="border-border/60 bg-secondary/50"
+                    onChange={(e) => { setValue("projectDetails",{ ...projectDetails, projectName: e.target.value }); handleSave() }}
+                    className={`border-border/60 bg-secondary/50${projectDetailsErrors?.projectName ? " border-destructive" : ""}`}
+                    aria-invalid={Boolean(projectDetailsErrors?.projectName)}
                   />
                 </div>
                 <div className="space-y-2">
@@ -737,8 +848,9 @@ const newDoor: DoorItem = {
                     id="claimNumber"
                     placeholder="e.g., CLM-2024-0892"
                     value={projectDetails.claimNumber}
-                    onChange={(e) => { setProjectDetails({ ...projectDetails, claimNumber: e.target.value }); handleSave() }}
-                    className="border-border/60 bg-secondary/50"
+                    onChange={(e) => { setValue("projectDetails",{ ...projectDetails, claimNumber: e.target.value }); handleSave() }}
+                    className={`border-border/60 bg-secondary/50${projectDetailsErrors?.claimNumber ? " border-destructive" : ""}`}
+                    aria-invalid={Boolean(projectDetailsErrors?.claimNumber)}
                   />
                 </div>
               </div>
@@ -750,13 +862,13 @@ const newDoor: DoorItem = {
                     type="date"
                     max={new Date().toISOString().split('T')[0]}
                     value={projectDetails.inspectionDate}
-                    onChange={(e) => { setProjectDetails({ ...projectDetails, inspectionDate: e.target.value }); handleSave() }}
+                    onChange={(e) => { setValue("projectDetails",{ ...projectDetails, inspectionDate: e.target.value }); handleSave() }}
                     className="border-border/60 bg-secondary/50"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="propertyType" className="text-foreground">Property Type</Label>
-                  <Select value={projectDetails.propertyType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setProjectDetails({ ...projectDetails, propertyType: value }); handleSave() }}>
+                  <Select value={projectDetails.propertyType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("projectDetails",{ ...projectDetails, propertyType: value }); handleSave() }}>
                     <SelectTrigger className="border-border/60 bg-secondary/50">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
@@ -775,14 +887,14 @@ const newDoor: DoorItem = {
                   id="propertyAddress"
                   placeholder="123 Main St, City, State ZIP"
                   value={projectDetails.propertyAddress}
-                  onChange={(e) => { setProjectDetails({ ...projectDetails, propertyAddress: e.target.value }); handleSave() }}
+                  onChange={(e) => { setValue("projectDetails",{ ...projectDetails, propertyAddress: e.target.value }); handleSave() }}
                   className="border-border/60 bg-secondary/50"
                 />
               </div>
               <div className="flex items-center gap-3 rounded-lg border border-border/60 bg-secondary/30 p-4">
                 <Switch
                   checked={projectDetails.preFirm}
-                  onCheckedChange={(checked) => { setProjectDetails({ ...projectDetails, preFirm: checked }); handleSave() }}
+                  onCheckedChange={(checked) => { setValue("projectDetails",{ ...projectDetails, preFirm: checked }); handleSave() }}
                 />
                 <div>
                   <Label className="text-foreground">Pre-FIRM Property</Label>
@@ -795,7 +907,7 @@ const newDoor: DoorItem = {
           {/* Damage Details Tabs */}
           <Card className="border-border/60 bg-card/80 shadow-md">
             <CardContent className="pt-6">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <Tabs value={activeTab} onValueChange={(v) => setValue("activeTab", v)}>
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="exterior" className="gap-2">
                     <Home className="h-4 w-4" />
@@ -828,7 +940,7 @@ const newDoor: DoorItem = {
                         <div className="flex items-center gap-3">
                           <Switch
                             checked={exterior.pressureWash.enabled}
-                            onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, enabled: checked } }); handleSave() }}
+                            onCheckedChange={(checked) => { setValue("exterior",{ ...exterior, pressureWash: { ...exterior.pressureWash, enabled: checked } }); handleSave() }}
                           />
                           <Label>Enable Pressure Wash</Label>
                         </div>
@@ -843,7 +955,7 @@ const newDoor: DoorItem = {
                                 value={exterior.pressureWash.perimeterFeet}
                                 onChange={(e) => {
                                   const val = e.target.value.replace(/^0+/, '') || ""
-                                  setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, perimeterFeet: val } }); handleSave()
+                                  setValue("exterior",{ ...exterior, pressureWash: { ...exterior.pressureWash, perimeterFeet: val } }); handleSave()
                                 }}
                                 className="border-border/60 bg-secondary/50 w-32"
                               />
@@ -851,14 +963,14 @@ const newDoor: DoorItem = {
                             <div className="flex items-center gap-2 pb-2">
                               <Switch
                                 checked={exterior.pressureWash.regularPwash}
-                                onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, regularPwash: checked, cleanWithSteam: checked ? false : exterior.pressureWash.cleanWithSteam } }); handleSave() }}
+                                onCheckedChange={(checked) => { setValue("exterior",{ ...exterior, pressureWash: { ...exterior.pressureWash, regularPwash: checked, cleanWithSteam: checked ? false : exterior.pressureWash.cleanWithSteam } }); handleSave() }}
                               />
                               <Label className="text-sm">Regular PWash</Label>
                             </div>
                             <div className="flex items-center gap-2 pb-2">
                               <Switch
                                 checked={exterior.pressureWash.cleanWithSteam}
-                                onCheckedChange={(checked) => { setExterior({ ...exterior, pressureWash: { ...exterior.pressureWash, cleanWithSteam: checked, regularPwash: checked ? false : exterior.pressureWash.regularPwash } }); handleSave() }}
+                                onCheckedChange={(checked) => { setValue("exterior",{ ...exterior, pressureWash: { ...exterior.pressureWash, cleanWithSteam: checked, regularPwash: checked ? false : exterior.pressureWash.regularPwash } }); handleSave() }}
                               />
                               <Label className="text-sm">Clean with Steam</Label>
                             </div>
@@ -883,7 +995,7 @@ const newDoor: DoorItem = {
                         <div className="flex items-center gap-3">
                           <Switch
                             checked={exterior.dumpster.enabled}
-                            onCheckedChange={(checked) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, enabled: checked } }); handleSave() }}
+                            onCheckedChange={(checked) => { setValue("exterior",{ ...exterior, dumpster: { ...exterior.dumpster, enabled: checked } }); handleSave() }}
                           />
                           <Label>Add Dumpster</Label>
                         </div>
@@ -896,13 +1008,13 @@ const newDoor: DoorItem = {
                                 min="1"
                                 max="20"
                                 value={exterior.dumpster.count}
-                                onChange={(e) => { setExterior({ ...exterior, dumpster: { ...exterior.dumpster, count: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
+                                onChange={(e) => { setValue("exterior",{ ...exterior, dumpster: { ...exterior.dumpster, count: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
                                 className="border-border/60 bg-secondary/50"
                               />
                             </div>
                             <div className="space-y-2 w-[180px]">
                               <Label>Dumpster Size</Label>
-                              <Select value={exterior.dumpster.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setExterior({ ...exterior, dumpster: { ...exterior.dumpster, size: value } }); handleSave() }}>
+                              <Select value={exterior.dumpster.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("exterior",{ ...exterior, dumpster: { ...exterior.dumpster, size: value } }); handleSave() }}>
                                 <SelectTrigger className="border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select" />
                                 </SelectTrigger>
@@ -948,7 +1060,7 @@ const newDoor: DoorItem = {
                               className="gap-1 border-border/60"
                               onClick={() => {
                                 const newUnit = { id: Date.now(), tonnage: "", seer: "", replace: false, serviceCall: false, f9Note: "" }
-                                setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: [...exterior.hvac.condenserUnits, newUnit] } })
+                                setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, condenserUnits: [...exterior.hvac.condenserUnits, newUnit] } })
                                 handleSave()
                               }}
                             >
@@ -965,7 +1077,7 @@ const newDoor: DoorItem = {
                                   size="sm"
                                   className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                                   onClick={() => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.filter(u => u.id !== unit.id) } })
+                                    setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.filter(u => u.id !== unit.id) } })
                                     handleSave()
                                   }}
                                 >
@@ -975,7 +1087,7 @@ const newDoor: DoorItem = {
                               <div className="flex flex-wrap items-center gap-3">
                                 <Select value={unit.tonnage} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
+                                  setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[140px] min-w-[140px] shrink-0">
@@ -990,7 +1102,7 @@ const newDoor: DoorItem = {
                                 </Select>
                                 <Select value={unit.seer} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
+                                  setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
@@ -1006,7 +1118,7 @@ const newDoor: DoorItem = {
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
+                                      setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -1016,7 +1128,7 @@ const newDoor: DoorItem = {
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
+                                      setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -1026,7 +1138,7 @@ const newDoor: DoorItem = {
                                   placeholder="Enter Model and Serial Number"
                                   value={unit.f9Note}
                                   onChange={(e) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
+                                    setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, condenserUnits: exterior.hvac.condenserUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
                                   className="border-border/60 bg-secondary/50 flex-1 min-w-[180px]"
@@ -1047,7 +1159,7 @@ const newDoor: DoorItem = {
                               className="gap-1 border-border/60"
                               onClick={() => {
                                 const newUnit = { id: Date.now(), unitType: "", tonnage: "", seer: "", replace: false, serviceCall: false, f9Note: "" }
-                                setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: [...exterior.hvac.packageUnits, newUnit] } })
+                                setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, packageUnits: [...exterior.hvac.packageUnits, newUnit] } })
                                 handleSave()
                               }}
                             >
@@ -1064,7 +1176,7 @@ const newDoor: DoorItem = {
                                   size="sm"
                                   className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                                   onClick={() => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.filter(u => u.id !== unit.id) } })
+                                    setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.filter(u => u.id !== unit.id) } })
                                     handleSave()
                                   }}
                                 >
@@ -1074,7 +1186,7 @@ const newDoor: DoorItem = {
                               <div className="flex flex-wrap items-center gap-3">
                                 <Select value={unit.unitType} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
+                                  setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, unitType: value } : u) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[160px]">
@@ -1088,7 +1200,7 @@ const newDoor: DoorItem = {
                                 </Select>
                                 <Select value={unit.tonnage} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
+                                  setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, tonnage: value } : u) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[140px] min-w-[140px] shrink-0">
@@ -1103,7 +1215,7 @@ const newDoor: DoorItem = {
                                 </Select>
                                 <Select value={unit.seer} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
+                                  setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, seer: value } : u) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
@@ -1119,7 +1231,7 @@ const newDoor: DoorItem = {
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
+                                      setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -1129,7 +1241,7 @@ const newDoor: DoorItem = {
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
+                                      setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -1139,7 +1251,7 @@ const newDoor: DoorItem = {
                                   placeholder="Enter Model and Serial Number"
                                   value={unit.f9Note}
                                   onChange={(e) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
+                                    setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, packageUnits: exterior.hvac.packageUnits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
                                   className="border-border/60 bg-secondary/50 flex-1 min-w-[180px]"
@@ -1160,7 +1272,7 @@ const newDoor: DoorItem = {
                               className="gap-1 border-border/60"
                               onClick={() => {
                                 const newUnit = { id: Date.now(), zones: "", highEfficiency: false, replace: false, serviceCall: false, f9Note: "" }
-                                setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: [...exterior.hvac.miniSplits, newUnit] } })
+                                setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, miniSplits: [...exterior.hvac.miniSplits, newUnit] } })
                                 handleSave()
                               }}
                             >
@@ -1177,7 +1289,7 @@ const newDoor: DoorItem = {
                                   size="sm"
                                   className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                                   onClick={() => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.filter(u => u.id !== unit.id) } })
+                                    setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.filter(u => u.id !== unit.id) } })
                                     handleSave()
                                   }}
                                 >
@@ -1187,7 +1299,7 @@ const newDoor: DoorItem = {
                               <div className="flex flex-wrap items-center gap-3">
                                 <Select value={unit.zones} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
+                                  setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, zones: value } : u) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="border-border/60 bg-secondary/50 w-[100px]">
@@ -1204,7 +1316,7 @@ const newDoor: DoorItem = {
                                   <Switch
                                     checked={unit.highEfficiency}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, highEfficiency: checked } : u) } })
+                                      setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, highEfficiency: checked } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -1214,7 +1326,7 @@ const newDoor: DoorItem = {
                                   <Switch
                                     checked={unit.replace}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
+                                      setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, replace: checked, serviceCall: checked ? false : u.serviceCall } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -1224,7 +1336,7 @@ const newDoor: DoorItem = {
                                   <Switch
                                     checked={unit.serviceCall}
                                     onCheckedChange={(checked) => {
-                                      setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
+                                      setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, serviceCall: checked, replace: checked ? false : u.replace } : u) } })
                                       handleSave()
                                     }}
                                   />
@@ -1234,7 +1346,7 @@ const newDoor: DoorItem = {
                                   placeholder="Enter Model and Serial Number"
                                   value={unit.f9Note}
                                   onChange={(e) => {
-                                    setExterior({ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
+                                    setValue("exterior",{ ...exterior, hvac: { ...exterior.hvac, miniSplits: exterior.hvac.miniSplits.map(u => u.id === unit.id ? { ...u, f9Note: e.target.value } : u) } })
                                     handleSave()
                                   }}
                                   className="border-border/60 bg-secondary/50 flex-1 min-w-[180px]"
@@ -1270,7 +1382,7 @@ const newDoor: DoorItem = {
                               value={exterior.electrical.exteriorOutlets}
                               onChange={(e) => {
                                 const val = e.target.value.replace(/^0+/, '') || ""
-                                setExterior({ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: val } }); handleSave()
+                                setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, exteriorOutlets: val } }); handleSave()
                               }}
                               className="border-border/60 bg-secondary/50 w-24"
                             />
@@ -1283,7 +1395,7 @@ const newDoor: DoorItem = {
                               value={exterior.electrical.disconnect30Amp}
                               onChange={(e) => {
                                 const val = e.target.value.replace(/^0+/, '') || ""
-                                setExterior({ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: val } }); handleSave()
+                                setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, disconnect30Amp: val } }); handleSave()
                               }}
                               className="border-border/60 bg-secondary/50 w-24"
                             />
@@ -1295,7 +1407,7 @@ const newDoor: DoorItem = {
                             <div className="flex items-center gap-3">
                               <Switch
                                 checked={exterior.electrical.breakerPanel.enabled}
-                                onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
+                                onCheckedChange={(checked) => { setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
                               />
                               <Label>Enable Breaker Panel</Label>
                             </div>
@@ -1305,7 +1417,7 @@ const newDoor: DoorItem = {
                               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:gap-x-8 sm:gap-y-2">
                                 <div className="space-y-2 min-w-[120px]">
                                   <Label className="text-xs text-muted-foreground">Amperage</Label>
-                                  <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
+                                  <Select value={exterior.electrical.breakerPanel.amps} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, amps: value } } }); handleSave() }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
@@ -1320,7 +1432,7 @@ const newDoor: DoorItem = {
                                 <div className="flex items-center gap-3 pb-0.5">
                                   <Switch
                                     checked={exterior.electrical.breakerPanel.arcFaults}
-                                    onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
+                                    onCheckedChange={(checked) => { setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
                                   />
                                   <Label>With Arc Fault</Label>
                                 </div>
@@ -1330,7 +1442,7 @@ const newDoor: DoorItem = {
                                   <Switch
                                     checked={exterior.electrical.breakerPanel.panelReplacement ?? false}
                                     onCheckedChange={(checked) => {
-                                      setExterior({
+                                      setValue("exterior",{
                                         ...exterior,
                                         electrical: {
                                           ...exterior.electrical,
@@ -1353,7 +1465,7 @@ const newDoor: DoorItem = {
                                   <Switch
                                     checked={exterior.electrical.breakerPanel.circuitReplacement ?? false}
                                     onCheckedChange={(checked) => {
-                                      setExterior({
+                                      setValue("exterior",{
                                         ...exterior,
                                         electrical: {
                                           ...exterior.electrical,
@@ -1373,7 +1485,7 @@ const newDoor: DoorItem = {
                               {(exterior.electrical.breakerPanel.panelReplacement ?? false) && (
                                 <div className="flex flex-wrap items-end gap-2">
                                   <Label className="text-sm whitespace-nowrap">Replacement type</Label>
-                                  <Select value={exterior.electrical.breakerPanel.panelType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, panelType: value } } }); handleSave() }}>
+                                  <Select value={exterior.electrical.breakerPanel.panelType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, panelType: value } } }); handleSave() }}>
                                     <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
@@ -1396,7 +1508,7 @@ const newDoor: DoorItem = {
                                       size="sm"
                                       className="gap-1 border-border/60"
                                       onClick={() => {
-                                        setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: [...exterior.electrical.breakerPanel.circuits, { id: Date.now(), type: "", qty: "" }] } } })
+                                        setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: [...exterior.electrical.breakerPanel.circuits, { id: Date.now(), type: "", qty: "" }] } } })
                                         handleSave()
                                       }}
                                     >
@@ -1413,7 +1525,7 @@ const newDoor: DoorItem = {
                                               const value = __v === "__none__" ? "" : __v;
                                               const updated = [...exterior.electrical.breakerPanel.circuits];
                                               updated[index] = { ...circuit, type: value };
-                                              setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: updated } } })
+                                              setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: updated } } })
                                               handleSave()
                                             }}>
                                               <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
@@ -1437,7 +1549,7 @@ const newDoor: DoorItem = {
                                               onChange={(e) => {
                                                 const updated = [...exterior.electrical.breakerPanel.circuits];
                                                 updated[index] = { ...circuit, qty: e.target.value };
-                                                setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: updated } } })
+                                                setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: updated } } })
                                                 handleSave()
                                               }}
                                               placeholder="--"
@@ -1450,7 +1562,7 @@ const newDoor: DoorItem = {
                                             size="sm"
                                             className="h-9 w-9 p-0 text-destructive hover:text-destructive"
                                             onClick={() => {
-                                              setExterior({ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: exterior.electrical.breakerPanel.circuits.filter(c => c.id !== circuit.id) } } })
+                                              setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, breakerPanel: { ...exterior.electrical.breakerPanel, circuits: exterior.electrical.breakerPanel.circuits.filter(c => c.id !== circuit.id) } } })
                                               handleSave()
                                             }}
                                           >
@@ -1469,7 +1581,7 @@ const newDoor: DoorItem = {
                         <div className="flex items-center gap-3">
                           <Switch
                             checked={exterior.electrical.meterBox}
-                            onCheckedChange={(checked) => { setExterior({ ...exterior, electrical: { ...exterior.electrical, meterBox: checked } }); handleSave() }}
+                            onCheckedChange={(checked) => { setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, meterBox: checked } }); handleSave() }}
                           />
                           <Label>Enable Meter Box</Label>
                           {exterior.electrical.meterBox && (
@@ -1480,7 +1592,7 @@ const newDoor: DoorItem = {
                               placeholder="QTY"
                               value={exterior.electrical.meterBoxQty}
                               onChange={(e) => {
-                                setExterior({
+                                setValue("exterior",{
                                   ...exterior,
                                   electrical: { ...exterior.electrical, meterBoxQty: e.target.value.replace(/^0+/, "") || "" },
                                 })
@@ -1512,7 +1624,7 @@ const newDoor: DoorItem = {
                             <Switch
                               checked={exterior.finishes.exteriorPaint.enabled}
                               onCheckedChange={(checked) => {
-                                setExterior({ ...exterior, finishes: { ...exterior.finishes, exteriorPaint: { ...exterior.finishes.exteriorPaint, enabled: checked } } })
+                                setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, exteriorPaint: { ...exterior.finishes.exteriorPaint, enabled: checked } } })
                                 handleSave()
                               }}
                             />
@@ -1527,7 +1639,7 @@ const newDoor: DoorItem = {
                             <Switch
                               checked={exterior.finishes.siding.enabled}
                               onCheckedChange={(checked) => {
-                                setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, enabled: checked } } })
+                                setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, enabled: checked } } })
                                 handleSave()
                               }}
                             />
@@ -1539,7 +1651,7 @@ const newDoor: DoorItem = {
                                 <Switch
                                   checked={!exterior.finishes.siding.squareFeetEnabled}
                                   onCheckedChange={(checked) => {
-                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeetEnabled: !checked } } })
+                                    setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeetEnabled: !checked } } })
                                     handleSave()
                                   }}
                                 />
@@ -1550,7 +1662,7 @@ const newDoor: DoorItem = {
                                 <Switch
                                   checked={exterior.finishes.siding.squareFeetEnabled}
                                   onCheckedChange={(checked) => {
-                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeetEnabled: checked } } })
+                                    setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeetEnabled: checked } } })
                                     handleSave()
                                   }}
                                 />
@@ -1563,9 +1675,9 @@ const newDoor: DoorItem = {
                                 value={exterior.finishes.siding.squareFeetEnabled ? exterior.finishes.siding.squareFeet : exterior.finishes.siding.perimeterFeet}
                                 onChange={(e) => {
                                   if (exterior.finishes.siding.squareFeetEnabled) {
-                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeet: e.target.value } } })
+                                    setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, squareFeet: e.target.value } } })
                                   } else {
-                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, perimeterFeet: e.target.value } } })
+                                    setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, siding: { ...exterior.finishes.siding, perimeterFeet: e.target.value } } })
                                   }
                                   handleSave()
                                 }}
@@ -1581,7 +1693,7 @@ const newDoor: DoorItem = {
                             <Switch
                               checked={exterior.finishes.sheathing.enabled}
                               onCheckedChange={(checked) => {
-                                setExterior({ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, enabled: checked } } })
+                                setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, enabled: checked } } })
                                 handleSave()
                               }}
                             />
@@ -1595,7 +1707,7 @@ const newDoor: DoorItem = {
                                   value={exterior.finishes.sheathing.type}
                                   onValueChange={(v) => {
                                     const value = v === "__none__" ? "" : v
-                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, type: value } } })
+                                    setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, type: value } } })
                                     handleSave()
                                   }}
                                 >
@@ -1621,7 +1733,7 @@ const newDoor: DoorItem = {
                                   placeholder="PF"
                                   value={exterior.finishes.sheathing.replacementHeight}
                                   onChange={(e) => {
-                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, replacementHeight: e.target.value } } })
+                                    setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, replacementHeight: e.target.value } } })
                                     handleSave()
                                   }}
                                   className="h-8 w-[96px] border-border/60 bg-secondary/50 text-sm"
@@ -1637,7 +1749,7 @@ const newDoor: DoorItem = {
                             <Switch
                               checked={exterior.finishes.houseWrap.enabled}
                               onCheckedChange={(checked) => {
-                                setExterior({ ...exterior, finishes: { ...exterior.finishes, houseWrap: { ...exterior.finishes.houseWrap, enabled: checked } } })
+                                setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, houseWrap: { ...exterior.finishes.houseWrap, enabled: checked } } })
                                 handleSave()
                               }}
                             />
@@ -1654,7 +1766,7 @@ const newDoor: DoorItem = {
                                 placeholder="PF"
                                 value={exterior.finishes.houseWrap.replacementHeight}
                                 onChange={(e) => {
-                                  setExterior({ ...exterior, finishes: { ...exterior.finishes, houseWrap: { ...exterior.finishes.houseWrap, replacementHeight: e.target.value } } })
+                                  setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, houseWrap: { ...exterior.finishes.houseWrap, replacementHeight: e.target.value } } })
                                   handleSave()
                                 }}
                                 className="h-8 w-[96px] border-border/60 bg-secondary/50 text-sm"
@@ -1669,7 +1781,7 @@ const newDoor: DoorItem = {
                             <Switch
                               checked={exterior.finishes.backerBoard.enabled}
                               onCheckedChange={(checked) => {
-                                setExterior({ ...exterior, finishes: { ...exterior.finishes, backerBoard: { ...exterior.finishes.backerBoard, enabled: checked } } })
+                                setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, backerBoard: { ...exterior.finishes.backerBoard, enabled: checked } } })
                                 handleSave()
                               }}
                             />
@@ -1686,7 +1798,7 @@ const newDoor: DoorItem = {
                                 placeholder="PF"
                                 value={exterior.finishes.backerBoard.replacementHeight}
                                 onChange={(e) => {
-                                  setExterior({ ...exterior, finishes: { ...exterior.finishes, backerBoard: { ...exterior.finishes.backerBoard, replacementHeight: e.target.value } } })
+                                  setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, backerBoard: { ...exterior.finishes.backerBoard, replacementHeight: e.target.value } } })
                                   handleSave()
                                 }}
                                 className="h-8 w-[96px] border-border/60 bg-secondary/50 text-sm"
@@ -1701,7 +1813,7 @@ const newDoor: DoorItem = {
                             <Switch
                               checked={exterior.finishes.wallInsulation.enabled}
                               onCheckedChange={(checked) => {
-                                setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, enabled: checked } } })
+                                setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, enabled: checked } } })
                                 handleSave()
                               }}
                             />
@@ -1713,7 +1825,7 @@ const newDoor: DoorItem = {
                                 value={exterior.finishes.wallInsulation.type}
                                 onValueChange={(v) => {
                                   const value = v === "__none__" ? "" : v
-                                  setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, type: value } } })
+                                  setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, type: value } } })
                                   handleSave()
                                 }}
                               >
@@ -1739,7 +1851,7 @@ const newDoor: DoorItem = {
                                   placeholder="PF"
                                   value={exterior.finishes.wallInsulation.replacementHeight}
                                   onChange={(e) => {
-                                    setExterior({ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, replacementHeight: e.target.value } } })
+                                    setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, wallInsulation: { ...exterior.finishes.wallInsulation, replacementHeight: e.target.value } } })
                                     handleSave()
                                   }}
                                   className="h-8 w-[96px] border-border/60 bg-secondary/50 text-sm"
@@ -1772,14 +1884,14 @@ const newDoor: DoorItem = {
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.crawlspace.heavyCleanArea}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, heavyCleanArea: checked } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, heavyCleanArea: checked } }); handleSave() }}
                             />
                             <Label className="text-sm">Heavy Clean Area</Label>
                           </div>
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.crawlspace.acControlledSpace}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, acControlledSpace: checked } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, acControlledSpace: checked } }); handleSave() }}
                             />
                             <Label className="text-sm">AC Controlled Space</Label>
                           </div>
@@ -1799,7 +1911,7 @@ const newDoor: DoorItem = {
                               min="0"
                               placeholder="enter PF"
                               value={foundation.crawlspace.perimeterFeet}
-                              onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, perimeterFeet: e.target.value } }); handleSave() }}
+                              onChange={(e) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, perimeterFeet: e.target.value } }); handleSave() }}
                               className="border-border/60 bg-secondary/50 w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:appearance-auto"
                             />
                           </div>
@@ -1809,7 +1921,7 @@ const newDoor: DoorItem = {
                               type="number"
                               min="0"
                               value={foundation.crawlspace.piersCount}
-                              onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
+                              onChange={(e) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, piersCount: e.target.value.replace(/^0+/, '') || "" } }); handleSave() }}
                               className="border-border/60 bg-secondary/50 w-16"
                             />
                           </div>
@@ -1820,7 +1932,7 @@ const newDoor: DoorItem = {
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.crawlspace.piersType === "short"}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersType: checked ? "short" : "" } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, piersType: checked ? "short" : "" } }); handleSave() }}
                             />
                             <Label className="text-sm">Short Piers</Label>
                           </div>
@@ -1828,14 +1940,14 @@ const newDoor: DoorItem = {
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.crawlspace.piersType === "tall"}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, piersType: checked ? "tall" : "" } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, piersType: checked ? "tall" : "" } }); handleSave() }}
                             />
                             <Label className="text-sm">Tall Piers</Label>
                           </div>
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.crawlspace.cleanJoist}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, cleanJoist: checked } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, cleanJoist: checked } }); handleSave() }}
                             />
                             <Label className="text-sm">Clean Joist</Label>
                           </div>
@@ -1846,7 +1958,7 @@ const newDoor: DoorItem = {
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.crawlspace.muck}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, muck: checked, muckHeavy: checked ? false : foundation.crawlspace.muckHeavy } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, muck: checked, muckHeavy: checked ? false : foundation.crawlspace.muckHeavy } }); handleSave() }}
                             />
                             <Label className="text-sm">Water Muck</Label>
                           </div>
@@ -1854,14 +1966,14 @@ const newDoor: DoorItem = {
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.crawlspace.muckHeavy}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, muckHeavy: checked, muck: checked ? false : foundation.crawlspace.muck } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, muckHeavy: checked, muck: checked ? false : foundation.crawlspace.muck } }); handleSave() }}
                             />
                             <Label className="text-sm">Water Muck Heavy</Label>
                           </div>
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.crawlspace.standingWater}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, standingWater: checked } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, standingWater: checked } }); handleSave() }}
                             />
                             <Label className="text-sm">Standing Water to be pumped out</Label>
                           </div>
@@ -1876,7 +1988,7 @@ const newDoor: DoorItem = {
                         <div className="flex items-center gap-2">
                           <Switch
                             checked={foundation.crawlspace.stairCleaning}
-                            onCheckedChange={(checked) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, stairCleaning: checked } }); handleSave() }}
+                            onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, stairCleaning: checked } }); handleSave() }}
                           />
                           <Label className="text-sm">Enable Stair Cleaning</Label>
                         </div>
@@ -1888,13 +2000,13 @@ const newDoor: DoorItem = {
                                 type="number"
                                 min="1"
                                 value={foundation.crawlspace.stairsSubmerged}
-                                onChange={(e) => { setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, stairsSubmerged: e.target.value } }); handleSave() }}
+                                onChange={(e) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, stairsSubmerged: e.target.value } }); handleSave() }}
                                 className="border-border/60 bg-secondary/50 w-16"
                               />
                             </div>
                             <div className="flex items-center gap-2">
                               <Label className="text-sm whitespace-nowrap">Width of Treads</Label>
-                              <Select value={foundation.crawlspace.treadWidth} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, treadWidth: value } }); handleSave() }}>
+                              <Select value={foundation.crawlspace.treadWidth} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, treadWidth: value } }); handleSave() }}>
                                 <SelectTrigger className="w-56 border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select size" />
                                 </SelectTrigger>
@@ -1919,7 +2031,7 @@ const newDoor: DoorItem = {
                                 placeholder="--"
                                 value={foundation.crawlspace.stringersLength}
                                 onChange={(e) => {
-                                  setFoundation({ ...foundation, crawlspace: { ...foundation.crawlspace, stringersLength: e.target.value } })
+                                  setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, stringersLength: e.target.value } })
                                   handleSave()
                                 }}
                                 className="border-border/60 bg-secondary/50 w-20"
@@ -1948,7 +2060,7 @@ const newDoor: DoorItem = {
                         <div className="flex items-center gap-2">
                           <Switch
                             checked={foundation.insulation.bellyPaper}
-                            onCheckedChange={(checked) => { setFoundation({ ...foundation, insulation: { ...foundation.insulation, bellyPaper: checked } }); handleSave() }}
+                            onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, insulation: { ...foundation.insulation, bellyPaper: checked } }); handleSave() }}
                           />
                           <Label className="text-sm">Belly Paper</Label>
                         </div>
@@ -1956,12 +2068,12 @@ const newDoor: DoorItem = {
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.insulation.floorInsulation}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, insulation: { ...foundation.insulation, floorInsulation: checked } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, insulation: { ...foundation.insulation, floorInsulation: checked } }); handleSave() }}
                             />
                             <Label className="text-sm">Floor Insulation</Label>
                           </div>
                           {foundation.insulation.floorInsulation && (
-                            <Select value={foundation.insulation.floorInsulationType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, insulation: { ...foundation.insulation, floorInsulationType: value } }); handleSave() }}>
+                            <Select value={foundation.insulation.floorInsulationType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, insulation: { ...foundation.insulation, floorInsulationType: value } }); handleSave() }}>
                               <SelectTrigger className="w-40 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="Select type" />
                               </SelectTrigger>
@@ -1978,7 +2090,7 @@ const newDoor: DoorItem = {
                         <div className="flex items-center gap-2">
                           <Switch
                             checked={foundation.insulation.confinedSpace}
-                            onCheckedChange={(checked) => { setFoundation({ ...foundation, insulation: { ...foundation.insulation, confinedSpace: checked } }); handleSave() }}
+                            onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, insulation: { ...foundation.insulation, confinedSpace: checked } }); handleSave() }}
                           />
                           <Label className="text-sm">Confined Space</Label>
                         </div>
@@ -2003,7 +2115,7 @@ const newDoor: DoorItem = {
                           <div className="flex items-center gap-3">
                             <Switch
                               checked={foundation.enclosureRemoval.sandRemoval.enabled}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, enabled: checked } } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, enabled: checked } } }); handleSave() }}
                             />
                             <Label>Sand/Mud Removal</Label>
                             <span className="text-xs text-muted-foreground">(cubic feet)</span>
@@ -2017,7 +2129,7 @@ const newDoor: DoorItem = {
                                   min="0"
                                   placeholder="--"
                                   value={foundation.enclosureRemoval.sandRemoval.length}
-                                  onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, length: e.target.value } } }); handleSave() }}
+                                  onChange={(e) => { setValue("foundation",{ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, length: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
@@ -2028,7 +2140,7 @@ const newDoor: DoorItem = {
                                   min="0"
                                   placeholder="--"
                                   value={foundation.enclosureRemoval.sandRemoval.width}
-                                  onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, width: e.target.value } } }); handleSave() }}
+                                  onChange={(e) => { setValue("foundation",{ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, width: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
@@ -2039,7 +2151,7 @@ const newDoor: DoorItem = {
                                   min="0"
                                   placeholder="--"
                                   value={foundation.enclosureRemoval.sandRemoval.depth}
-                                  onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, depth: e.target.value } } }); handleSave() }}
+                                  onChange={(e) => { setValue("foundation",{ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, sandRemoval: { ...foundation.enclosureRemoval.sandRemoval, depth: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
@@ -2052,7 +2164,7 @@ const newDoor: DoorItem = {
                           <div className="flex items-center gap-3">
                             <Switch
                               checked={foundation.enclosureRemoval.backfill.enabled}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, enabled: checked } } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, enabled: checked } } }); handleSave() }}
                             />
                             <Label>Backfill Around/In Foundation</Label>
                             <span className="text-xs text-muted-foreground">(cubic feet)</span>
@@ -2066,7 +2178,7 @@ const newDoor: DoorItem = {
                                   min="0"
                                   placeholder="--"
                                   value={foundation.enclosureRemoval.backfill.length}
-                                  onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, length: e.target.value } } }); handleSave() }}
+                                  onChange={(e) => { setValue("foundation",{ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, length: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
@@ -2077,7 +2189,7 @@ const newDoor: DoorItem = {
                                   min="0"
                                   placeholder="--"
                                   value={foundation.enclosureRemoval.backfill.width}
-                                  onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, width: e.target.value } } }); handleSave() }}
+                                  onChange={(e) => { setValue("foundation",{ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, width: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
@@ -2088,7 +2200,7 @@ const newDoor: DoorItem = {
                                   min="0"
                                   placeholder="--"
                                   value={foundation.enclosureRemoval.backfill.depth}
-                                  onChange={(e) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, depth: e.target.value } } }); handleSave() }}
+                                  onChange={(e) => { setValue("foundation",{ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, backfill: { ...foundation.enclosureRemoval.backfill, depth: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-24"
                                 />
                               </div>
@@ -2099,7 +2211,7 @@ const newDoor: DoorItem = {
                         <div className="flex items-center gap-3">
                           <Switch
                             checked={foundation.enclosureRemoval.confinedSpace}
-                            onCheckedChange={(checked) => { setFoundation({ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, confinedSpace: checked } }); handleSave() }}
+                            onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, enclosureRemoval: { ...foundation.enclosureRemoval, confinedSpace: checked } }); handleSave() }}
                           />
                           <Label>Confined Space</Label>
                         </div>
@@ -2128,7 +2240,7 @@ const newDoor: DoorItem = {
                             <div className="flex items-center gap-2">
                               <Switch
                                 checked={foundation.sumpPump.enabled}
-                                onCheckedChange={(checked) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, enabled: checked } }); handleSave() }}
+                                onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, sumpPump: { ...foundation.sumpPump, enabled: checked } }); handleSave() }}
                               />
                               <Label className="text-sm">Sump Pump</Label>
                             </div>
@@ -2137,7 +2249,7 @@ const newDoor: DoorItem = {
                                 type="text"
                                 placeholder="F9 Model/serial..."
                                 value={foundation.sumpPump.f9Note}
-                                onChange={(e) => { setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, f9Note: e.target.value } }); handleSave() }}
+                                onChange={(e) => { setValue("foundation",{ ...foundation, sumpPump: { ...foundation.sumpPump, f9Note: e.target.value } }); handleSave() }}
                                 className="border-border/60 bg-secondary/50 w-48"
                               />
                             )}
@@ -2146,7 +2258,7 @@ const newDoor: DoorItem = {
                             <div className="flex flex-wrap items-end gap-4 pl-6">
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Horsepower</Label>
-                                <Select value={foundation.sumpPump.hp} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, hp: value } }); handleSave() }}>
+                                <Select value={foundation.sumpPump.hp} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, sumpPump: { ...foundation.sumpPump, hp: value } }); handleSave() }}>
                                   <SelectTrigger className="w-56 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select horsepower" />
                                   </SelectTrigger>
@@ -2160,7 +2272,7 @@ const newDoor: DoorItem = {
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Action</Label>
-                                <Select value={foundation.sumpPump.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, sumpPump: { ...foundation.sumpPump, action: value } }); handleSave() }}>
+                                <Select value={foundation.sumpPump.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, sumpPump: { ...foundation.sumpPump, action: value } }); handleSave() }}>
                                   <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
@@ -2182,7 +2294,7 @@ const newDoor: DoorItem = {
                             <div className="flex items-center gap-2">
                               <Switch
                                 checked={foundation.waterHeater.enabled}
-                                onCheckedChange={(checked) => { setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, enabled: checked } }); handleSave() }}
+                                onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, enabled: checked } }); handleSave() }}
                               />
                               <Label className="text-sm">Water Heater</Label>
                             </div>
@@ -2191,7 +2303,7 @@ const newDoor: DoorItem = {
                                 type="text"
                                 placeholder="F9 Model/serial..."
                                 value={foundation.waterHeater.f9Note}
-                                onChange={(e) => { setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, f9Note: e.target.value } }); handleSave() }}
+                                onChange={(e) => { setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, f9Note: e.target.value } }); handleSave() }}
                                 className="border-border/60 bg-secondary/50 w-48"
                               />
                             )}
@@ -2202,7 +2314,7 @@ const newDoor: DoorItem = {
                                 <Switch
                                   checked={foundation.waterHeater.tankless}
                                   onCheckedChange={(checked) => {
-                                    setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, tankless: checked, size: "" } })
+                                    setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, tankless: checked, size: "" } })
                                     handleSave()
                                   }}
                                 />
@@ -2212,7 +2324,7 @@ const newDoor: DoorItem = {
                                 <Label className="text-xs text-muted-foreground">Type</Label>
                                 <Select value={foundation.waterHeater.type} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v
-                                  setFoundation({
+                                  setValue("foundation",{
                                     ...foundation,
                                     waterHeater: {
                                       ...foundation.waterHeater,
@@ -2236,7 +2348,7 @@ const newDoor: DoorItem = {
                                 <Label className="text-xs text-muted-foreground">
                                   {foundation.waterHeater.tankless && foundation.waterHeater.type === "electric" ? "Capacity" : "Size"}
                                 </Label>
-                                <Select value={foundation.waterHeater.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, size: value } }); handleSave() }}>
+                                <Select value={foundation.waterHeater.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, size: value } }); handleSave() }}>
                                   <SelectTrigger className={`border-border/60 bg-secondary/50 ${foundation.waterHeater.tankless && (foundation.waterHeater.type === "gas" || foundation.waterHeater.type === "electric") ? "min-w-[200px] w-[min(100%,240px)]" : "w-24"}`}>
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
@@ -2270,7 +2382,7 @@ const newDoor: DoorItem = {
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Rating</Label>
-                                <Select value={foundation.waterHeater.rating} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, rating: value } }); handleSave() }}>
+                                <Select value={foundation.waterHeater.rating} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, rating: value } }); handleSave() }}>
                                   <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="--" />
                                   </SelectTrigger>
@@ -2284,7 +2396,7 @@ const newDoor: DoorItem = {
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Action</Label>
-                                <Select value={foundation.waterHeater.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterHeater: { ...foundation.waterHeater, action: value } }); handleSave() }}>
+                                <Select value={foundation.waterHeater.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, action: value } }); handleSave() }}>
                                   <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
@@ -2306,7 +2418,7 @@ const newDoor: DoorItem = {
                             <div className="flex items-center gap-2">
                               <Switch
                                 checked={foundation.waterSoftener.enabled}
-                                onCheckedChange={(checked) => { setFoundation({ ...foundation, waterSoftener: { ...foundation.waterSoftener, enabled: checked } }); handleSave() }}
+                                onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, waterSoftener: { ...foundation.waterSoftener, enabled: checked } }); handleSave() }}
                               />
                               <Label className="text-sm">Water Softener</Label>
                             </div>
@@ -2315,7 +2427,7 @@ const newDoor: DoorItem = {
                                 type="text"
                                 placeholder="F9 Model/serial..."
                                 value={foundation.waterSoftener.f9Note}
-                                onChange={(e) => { setFoundation({ ...foundation, waterSoftener: { ...foundation.waterSoftener, f9Note: e.target.value } }); handleSave() }}
+                                onChange={(e) => { setValue("foundation",{ ...foundation, waterSoftener: { ...foundation.waterSoftener, f9Note: e.target.value } }); handleSave() }}
                                 className="border-border/60 bg-secondary/50 w-48"
                               />
                             )}
@@ -2324,7 +2436,7 @@ const newDoor: DoorItem = {
                             <div className="flex flex-wrap items-end gap-4 pl-6">
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Type</Label>
-                                <Select value={foundation.waterSoftener.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterSoftener: { ...foundation.waterSoftener, type: value } }); handleSave() }}>
+                                <Select value={foundation.waterSoftener.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterSoftener: { ...foundation.waterSoftener, type: value } }); handleSave() }}>
                                   <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select type" />
                                   </SelectTrigger>
@@ -2337,7 +2449,7 @@ const newDoor: DoorItem = {
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Size</Label>
-                                <Select value={foundation.waterSoftener.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterSoftener: { ...foundation.waterSoftener, size: value } }); handleSave() }}>
+                                <Select value={foundation.waterSoftener.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterSoftener: { ...foundation.waterSoftener, size: value } }); handleSave() }}>
                                   <SelectTrigger className="w-28 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
@@ -2352,7 +2464,7 @@ const newDoor: DoorItem = {
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Action</Label>
-                                <Select value={foundation.waterSoftener.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, waterSoftener: { ...foundation.waterSoftener, action: value } }); handleSave() }}>
+                                <Select value={foundation.waterSoftener.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterSoftener: { ...foundation.waterSoftener, action: value } }); handleSave() }}>
                                   <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
@@ -2389,7 +2501,7 @@ const newDoor: DoorItem = {
                             <div className="flex items-center gap-2">
                               <Switch
                                 checked={foundation.subgradeAreaCoverage.drywall.enabled}
-                                onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, enabled: checked } } }); handleSave() }}
+                                onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, enabled: checked } } }); handleSave() }}
                               />
                               <Label className="text-sm">Enable Basement Drywall</Label>
                             </div>
@@ -2400,7 +2512,7 @@ const newDoor: DoorItem = {
                                     <Label className="text-xs text-muted-foreground">Type</Label>
                                     <Select value={foundation.subgradeAreaCoverage.drywall.type} onValueChange={(__v) => {
                                       const value = __v === "__none__" ? "" : __v
-                                      setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, type: value } } })
+                                      setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, type: value } } })
                                       handleSave()
                                     }}>
                                       <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
@@ -2416,7 +2528,7 @@ const newDoor: DoorItem = {
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <Label className="text-xs text-muted-foreground">Replacement height</Label>
-                                    <Select value={foundation.subgradeAreaCoverage.drywall.replacementHeight} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, replacementHeight: value } } }); handleSave() }}>
+                                    <Select value={foundation.subgradeAreaCoverage.drywall.replacementHeight} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, replacementHeight: value } } }); handleSave() }}>
                                       <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                         <SelectValue placeholder="--" />
                                       </SelectTrigger>
@@ -2431,7 +2543,7 @@ const newDoor: DoorItem = {
                                 <div className="flex items-center gap-2">
                                   <Switch
                                     checked={foundation.subgradeAreaCoverage.drywall.measureType === "sf"}
-                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, measureType: checked ? "sf" : "lf" } } }); handleSave() }}
+                                    onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, measureType: checked ? "sf" : "lf" } } }); handleSave() }}
                                   />
                                   <Label className="text-sm">Square Feet</Label>
                                 </div>
@@ -2439,7 +2551,7 @@ const newDoor: DoorItem = {
                                 <div className="flex items-center gap-2">
                                   <Switch
                                     checked={foundation.subgradeAreaCoverage.drywall.measureType === "lf"}
-                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, measureType: checked ? "lf" : "sf" } } }); handleSave() }}
+                                    onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, measureType: checked ? "lf" : "sf" } } }); handleSave() }}
                                   />
                                   <Label className="text-sm">Linear Feet</Label>
                                 </div>
@@ -2453,7 +2565,7 @@ const newDoor: DoorItem = {
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.subgradeAreaCoverage.wallInsulation.enabled}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, enabled: checked } } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, enabled: checked } } }); handleSave() }}
                             />
                             <Label className="text-sm">Enable Wall Insulation</Label>
                           </div>
@@ -2461,7 +2573,7 @@ const newDoor: DoorItem = {
                             <div className="pl-6 flex flex-wrap items-center gap-4">
                               <div className="flex items-center gap-2">
                                 <Label className="text-xs text-muted-foreground">Type</Label>
-                                <Select value={foundation.subgradeAreaCoverage.wallInsulation.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, type: value } } }); handleSave() }}>
+                                <Select value={foundation.subgradeAreaCoverage.wallInsulation.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, type: value } } }); handleSave() }}>
                                   <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="--" />
                                   </SelectTrigger>
@@ -2474,7 +2586,7 @@ const newDoor: DoorItem = {
                               </div>
                               <div className="flex items-center gap-2">
                                 <Label className="text-xs text-muted-foreground">Replacement height</Label>
-                                <Select value={foundation.subgradeAreaCoverage.wallInsulation.replacementHeight} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, replacementHeight: value } } }); handleSave() }}>
+                                <Select value={foundation.subgradeAreaCoverage.wallInsulation.replacementHeight} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, replacementHeight: value } } }); handleSave() }}>
                                   <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="--" />
                                   </SelectTrigger>
@@ -2488,7 +2600,7 @@ const newDoor: DoorItem = {
                               <div className="flex items-center gap-2">
                                 <Switch
                                   checked={foundation.subgradeAreaCoverage.wallInsulation.measureType === "sf"}
-                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, measureType: checked ? "sf" : "lf" } } }); handleSave() }}
+                                  onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, measureType: checked ? "sf" : "lf" } } }); handleSave() }}
                                 />
                                 <Label className="text-sm">Square Feet</Label>
                               </div>
@@ -2496,7 +2608,7 @@ const newDoor: DoorItem = {
                               <div className="flex items-center gap-2">
                                 <Switch
                                   checked={foundation.subgradeAreaCoverage.wallInsulation.measureType === "lf"}
-                                  onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, measureType: checked ? "lf" : "sf" } } }); handleSave() }}
+                                  onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, wallInsulation: { ...foundation.subgradeAreaCoverage.wallInsulation, measureType: checked ? "lf" : "sf" } } }); handleSave() }}
                                 />
                                 <Label className="text-sm">Linear Feet</Label>
                               </div>
@@ -2510,12 +2622,12 @@ const newDoor: DoorItem = {
                             <div className="flex items-center gap-2">
                               <Switch
                                 checked={foundation.subgradeAreaCoverage.foundationalDoor.enabled}
-                                onCheckedChange={(checked) => { setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalDoor: { ...foundation.subgradeAreaCoverage.foundationalDoor, enabled: checked } } }); handleSave() }}
+                                onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalDoor: { ...foundation.subgradeAreaCoverage.foundationalDoor, enabled: checked } } }); handleSave() }}
                               />
                               <Label className="text-sm">Enable Foundational Door</Label>
                             </div>
                             {foundation.subgradeAreaCoverage.foundationalDoor.enabled && (
-                              <Select value={foundation.subgradeAreaCoverage.foundationalDoor.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalDoor: { ...foundation.subgradeAreaCoverage.foundationalDoor, action: value } } }); handleSave() }}>
+                              <Select value={foundation.subgradeAreaCoverage.foundationalDoor.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalDoor: { ...foundation.subgradeAreaCoverage.foundationalDoor, action: value } } }); handleSave() }}>
                                 <SelectTrigger className="w-56 border-border/60 bg-secondary/50">
                                   <SelectValue placeholder="Select action" />
                                 </SelectTrigger>
@@ -2538,7 +2650,7 @@ const newDoor: DoorItem = {
                             <Switch
                               checked={foundation.subgradeAreaCoverage.foundationalWindowsEnabled}
                               onCheckedChange={(checked) => {
-                                    setFoundation({
+                                    setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2566,7 +2678,7 @@ const newDoor: DoorItem = {
                                     const value = __v === "__none__" ? "" : __v;
                                     const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
                                     newWindows[idx] = { ...window, type: value, size: "", grade: "" }
-                                    setFoundation({
+                                    setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2594,7 +2706,7 @@ const newDoor: DoorItem = {
                                     const value = __v === "__none__" ? "" : __v;
                                     const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
                                     newWindows[idx] = { ...window, material: value, size: "", grade: "", finish: value === "wood" ? window.finish : "" }
-                                    setFoundation({
+                                    setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2621,7 +2733,7 @@ const newDoor: DoorItem = {
                                       const value = __v === "__none__" ? "" : __v;
                                       const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
                                       newWindows[idx] = { ...window, size: value }
-                                      setFoundation({
+                                      setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2762,7 +2874,7 @@ const newDoor: DoorItem = {
                                       const value = __v === "__none__" ? "" : __v;
                                       const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
                                       newWindows[idx] = { ...window, grade: value }
-                                      setFoundation({
+                                      setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2828,7 +2940,7 @@ const newDoor: DoorItem = {
                                       const value = __v === "__none__" ? "" : __v;
                                       const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
                                       newWindows[idx] = { ...window, finish: value }
-                                      setFoundation({
+                                      setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2861,7 +2973,7 @@ const newDoor: DoorItem = {
                                             const v = e.target.value
                                             const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
                                       newWindows[idx] = { ...window, quantity: v }
-                                      setFoundation({
+                                      setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2883,7 +2995,7 @@ const newDoor: DoorItem = {
                                     className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
                                     onClick={() => {
                                       const newWindow = { ...window, id: Date.now() }
-                                      setFoundation({
+                                      setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2902,7 +3014,7 @@ const newDoor: DoorItem = {
                                     className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                                     onClick={() => {
                                       const newWindows = foundation.subgradeAreaCoverage.foundationalWindows.filter(w => w.id !== window.id)
-                                      setFoundation({
+                                      setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2924,7 +3036,7 @@ const newDoor: DoorItem = {
                                     const value = __v === "__none__" ? "" : __v;
                                     const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
                                     newWindows[idx] = { ...window, blinds: value }
-                                    setFoundation({
+                                    setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2952,7 +3064,7 @@ const newDoor: DoorItem = {
                                     const value = __v === "__none__" ? "" : __v;
                                     const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
                                     newWindows[idx] = { ...window, casingTrim: value }
-                                    setFoundation({
+                                    setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2980,7 +3092,7 @@ const newDoor: DoorItem = {
                                     onCheckedChange={(checked) => {
                                       const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
                                       newWindows[idx] = { ...window, marbleSillReplace: checked }
-                                      setFoundation({
+                                      setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -2998,7 +3110,7 @@ const newDoor: DoorItem = {
                                     onCheckedChange={(checked) => {
                                       const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
                                       newWindows[idx] = { ...window, marbleSillDetach: checked }
-                                      setFoundation({
+                                      setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
                                         ...foundation.subgradeAreaCoverage,
@@ -3038,9 +3150,9 @@ const newDoor: DoorItem = {
                                 checked={foundation.hvac.airHandlers.length > 0}
                                 onCheckedChange={(checked) => {
                                   if (checked && foundation.hvac.airHandlers.length === 0) {
-                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [{ id: Date.now(), type: "", tonnage: "", heatElementCount: "", action: "", f9Note: "" }] } })
+                                    setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, airHandlers: [{ id: Date.now(), type: "", tonnage: "", heatElementCount: "", action: "", f9Note: "" }] } })
                                   } else if (!checked) {
-                                    setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: [] } })
+                                    setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, airHandlers: [] } })
                                   }
                                   handleSave()
                                 }}
@@ -3053,7 +3165,7 @@ const newDoor: DoorItem = {
                                 placeholder="F9 Model/serial..."
                                 value={foundation.hvac.airHandlers[0]?.f9Note || ""}
                                 onChange={(e) => {
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, f9Note: e.target.value } : h) } })
+                                  setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, f9Note: e.target.value } : h) } })
                                   handleSave()
                                 }}
                                 className="border-border/60 bg-secondary/50 w-48"
@@ -3066,7 +3178,7 @@ const newDoor: DoorItem = {
                                 <Label className="text-xs text-muted-foreground">Type</Label>
                                 <Select value={foundation.hvac.airHandlers[0]?.type || ""} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, type: value } : h) } })
+                                  setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, type: value } : h) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="w-40 border-border/60 bg-secondary/50">
@@ -3084,7 +3196,7 @@ const newDoor: DoorItem = {
                                 <Label className="text-xs text-muted-foreground">Tonnage</Label>
                                 <Select value={foundation.hvac.airHandlers[0]?.tonnage || ""} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, tonnage: value } : h) } })
+                                  setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, tonnage: value } : h) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
@@ -3102,7 +3214,7 @@ const newDoor: DoorItem = {
                                 <Label className="text-xs text-muted-foreground">Action</Label>
                                 <Select value={foundation.hvac.airHandlers[0]?.action || ""} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v;
-                                  setFoundation({ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, action: value } : h) } })
+                                  setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, action: value } : h) } })
                                   handleSave()
                                 }}>
                                   <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
@@ -3125,7 +3237,7 @@ const newDoor: DoorItem = {
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.hvac.boiler.enabled}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, enabled: checked } } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, enabled: checked } } }); handleSave() }}
                             />
                             <Label className="text-sm">Boiler</Label>
                           </div>
@@ -3136,7 +3248,7 @@ const newDoor: DoorItem = {
                                   <Label className="text-xs text-muted-foreground">Type</Label>
                                   <Select value={foundation.hvac.boiler.type} onValueChange={(__v) => {
                                     const value = __v === "__none__" ? "" : __v
-                                    setFoundation({
+                                    setValue("foundation",{
                                       ...foundation,
                                       hvac: {
                                         ...foundation.hvac,
@@ -3162,7 +3274,7 @@ const newDoor: DoorItem = {
                                 </div>
                                 <div className="space-y-1">
                                   <Label className="text-xs text-muted-foreground">Action</Label>
-                                  <Select value={foundation.hvac.boiler.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, action: value } } }); handleSave() }}>
+                                  <Select value={foundation.hvac.boiler.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, action: value } } }); handleSave() }}>
                                     <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select action" />
                                     </SelectTrigger>
@@ -3178,7 +3290,7 @@ const newDoor: DoorItem = {
                                   type="text"
                                   placeholder="F9 Model/serial..."
                                   value={foundation.hvac.boiler.f9Note}
-                                  onChange={(e) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, f9Note: e.target.value } } }); handleSave() }}
+                                  onChange={(e) => { setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, f9Note: e.target.value } } }); handleSave() }}
                                   className="border-border/60 bg-secondary/50 w-48"
                                 />
                               </div>
@@ -3186,14 +3298,14 @@ const newDoor: DoorItem = {
                                 <div className="flex items-center gap-2">
                                   <Switch
                                     checked={foundation.hvac.boiler.expansionTank}
-                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, expansionTank: checked } } }); handleSave() }}
+                                    onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, expansionTank: checked } } }); handleSave() }}
                                   />
                                   <Label className="text-sm">Expansion Tank</Label>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <Switch
                                     checked={foundation.hvac.boiler.circulatorPump}
-                                    onCheckedChange={(checked) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, circulatorPump: checked } } }); handleSave() }}
+                                    onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, circulatorPump: checked } } }); handleSave() }}
                                   />
                                   <Label className="text-sm">Circulator pump</Label>
                                 </div>
@@ -3204,7 +3316,7 @@ const newDoor: DoorItem = {
                                     <Switch
                                       checked={foundation.hvac.boiler.oilTankReplacement}
                                       onCheckedChange={(checked) => {
-                                        setFoundation({
+                                        setValue("foundation",{
                                           ...foundation,
                                           hvac: {
                                             ...foundation.hvac,
@@ -3224,7 +3336,7 @@ const newDoor: DoorItem = {
                                     <Switch
                                       checked={foundation.hvac.boiler.oilReplacement}
                                       onCheckedChange={(checked) => {
-                                        setFoundation({
+                                        setValue("foundation",{
                                           ...foundation,
                                           hvac: {
                                             ...foundation.hvac,
@@ -3251,7 +3363,7 @@ const newDoor: DoorItem = {
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={foundation.hvac.baseboardHeat.enabled}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, enabled: checked } } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, enabled: checked } } }); handleSave() }}
                             />
                             <Label className="text-sm">Baseboard Heat</Label>
                           </div>
@@ -3259,7 +3371,7 @@ const newDoor: DoorItem = {
                             <div className="flex flex-wrap items-end gap-4 pl-6">
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Type</Label>
-                                <Select value={foundation.hvac.baseboardHeat.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, type: value, size: "" } } }); handleSave() }}>
+                                <Select value={foundation.hvac.baseboardHeat.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, type: value, size: "" } } }); handleSave() }}>
                                   <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select type" />
                                   </SelectTrigger>
@@ -3272,7 +3384,7 @@ const newDoor: DoorItem = {
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Size</Label>
-                                <Select value={foundation.hvac.baseboardHeat.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, size: value } } }); handleSave() }}>
+                                <Select value={foundation.hvac.baseboardHeat.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, size: value } } }); handleSave() }}>
                                   <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
@@ -3290,7 +3402,7 @@ const newDoor: DoorItem = {
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Action</Label>
-                                <Select value={foundation.hvac.baseboardHeat.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, action: value } } }); handleSave() }}>
+                                <Select value={foundation.hvac.baseboardHeat.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, action: value } } }); handleSave() }}>
                                   <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
@@ -3334,14 +3446,14 @@ const newDoor: DoorItem = {
                               onChange={(e) => {
                                 const v = e.target.value
                                 if (v === "") {
-                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: "" } })
+                                  setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, outlets110: "" } })
                                   handleSave()
                                   return
                                 }
                                 const n = parseInt(v, 10)
                                 if (Number.isNaN(n)) return
                                 const clamped = Math.min(10, Math.max(0, n))
-                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets110: String(clamped) } })
+                                setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, outlets110: String(clamped) } })
                                 handleSave()
                               }}
                               className="w-20 border-border/60 bg-secondary/50"
@@ -3359,14 +3471,14 @@ const newDoor: DoorItem = {
                               onChange={(e) => {
                                 const v = e.target.value
                                 if (v === "") {
-                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: "" } })
+                                  setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, outlets220: "" } })
                                   handleSave()
                                   return
                                 }
                                 const n = parseInt(v, 10)
                                 if (Number.isNaN(n)) return
                                 const clamped = Math.min(5, Math.max(0, n))
-                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, outlets220: String(clamped) } })
+                                setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, outlets220: String(clamped) } })
                                 handleSave()
                               }}
                               className="w-20 border-border/60 bg-secondary/50"
@@ -3384,14 +3496,14 @@ const newDoor: DoorItem = {
                               onChange={(e) => {
                                 const v = e.target.value
                                 if (v === "") {
-                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: "" } })
+                                  setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: "" } })
                                   handleSave()
                                   return
                                 }
                                 const n = parseInt(v, 10)
                                 if (Number.isNaN(n)) return
                                 const clamped = Math.min(5, Math.max(0, n))
-                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: String(clamped) } })
+                                setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, gfiOutlets: String(clamped) } })
                                 handleSave()
                               }}
                               className="w-20 border-border/60 bg-secondary/50"
@@ -3409,14 +3521,14 @@ const newDoor: DoorItem = {
                               onChange={(e) => {
                                 const v = e.target.value
                                 if (v === "") {
-                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: "" } })
+                                  setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, lightSwitch: "" } })
                                   handleSave()
                                   return
                                 }
                                 const n = parseInt(v, 10)
                                 if (Number.isNaN(n)) return
                                 const clamped = Math.min(8, Math.max(0, n))
-                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, lightSwitch: String(clamped) } })
+                                setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, lightSwitch: String(clamped) } })
                                 handleSave()
                               }}
                               className="w-20 border-border/60 bg-secondary/50"
@@ -3434,14 +3546,14 @@ const newDoor: DoorItem = {
                               onChange={(e) => {
                                 const v = e.target.value
                                 if (v === "") {
-                                  setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: "" } })
+                                  setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, junctionBox: "" } })
                                   handleSave()
                                   return
                                 }
                                 const n = parseInt(v, 10)
                                 if (Number.isNaN(n)) return
                                 const clamped = Math.min(5, Math.max(0, n))
-                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, junctionBox: String(clamped) } })
+                                setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, junctionBox: String(clamped) } })
                                 handleSave()
                               }}
                               className="w-20 border-border/60 bg-secondary/50"
@@ -3454,7 +3566,7 @@ const newDoor: DoorItem = {
                             <div className="flex items-center gap-3">
                               <Switch
                                 checked={foundation.electrical.breakerPanel.enabled}
-                                onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
+                                onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, enabled: checked } } }); handleSave() }}
                               />
                               <Label>Enable Breaker Panel</Label>
                             </div>
@@ -3466,7 +3578,7 @@ const newDoor: DoorItem = {
                                   <Switch
                                     checked={foundation.electrical.breakerPanel.panelReplacement ?? false}
                                     onCheckedChange={(checked) => {
-                                      setFoundation({
+                                      setValue("foundation",{
                                         ...foundation,
                                         electrical: {
                                           ...foundation.electrical,
@@ -3489,7 +3601,7 @@ const newDoor: DoorItem = {
                                   <Switch
                                     checked={foundation.electrical.breakerPanel.circuitReplacement ?? false}
                                     onCheckedChange={(checked) => {
-                                      setFoundation({
+                                      setValue("foundation",{
                                         ...foundation,
                                         electrical: {
                                           ...foundation.electrical,
@@ -3509,7 +3621,7 @@ const newDoor: DoorItem = {
                               {(foundation.electrical.breakerPanel.panelReplacement ?? false) && (
                                 <div className="flex flex-wrap items-end gap-2">
                                   <Label className="text-sm whitespace-nowrap">Replacement type</Label>
-                                  <Select value={foundation.electrical.breakerPanel.panelType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, panelType: value } } }); handleSave() }}>
+                                  <Select value={foundation.electrical.breakerPanel.panelType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, panelType: value } } }); handleSave() }}>
                                     <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
@@ -3532,7 +3644,7 @@ const newDoor: DoorItem = {
                                       size="sm"
                                       className="gap-1 border-border/60"
                                       onClick={() => {
-                                        setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: [...foundation.electrical.breakerPanel.circuits, { id: Date.now(), type: "", qty: "" }] } } })
+                                        setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: [...foundation.electrical.breakerPanel.circuits, { id: Date.now(), type: "", qty: "" }] } } })
                                         handleSave()
                                       }}
                                     >
@@ -3549,7 +3661,7 @@ const newDoor: DoorItem = {
                                               const value = __v === "__none__" ? "" : __v;
                                               const updated = [...foundation.electrical.breakerPanel.circuits];
                                               updated[index] = { ...circuit, type: value };
-                                              setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: updated } } })
+                                              setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: updated } } })
                                               handleSave()
                                             }}>
                                               <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
@@ -3573,7 +3685,7 @@ const newDoor: DoorItem = {
                                               onChange={(e) => {
                                                 const updated = [...foundation.electrical.breakerPanel.circuits];
                                                 updated[index] = { ...circuit, qty: e.target.value };
-                                                setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: updated } } })
+                                                setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: updated } } })
                                                 handleSave()
                                               }}
                                               placeholder="--"
@@ -3586,7 +3698,7 @@ const newDoor: DoorItem = {
                                             size="sm"
                                             className="h-9 w-9 p-0 text-destructive hover:text-destructive"
                                             onClick={() => {
-                                              setFoundation({ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: foundation.electrical.breakerPanel.circuits.filter(c => c.id !== circuit.id) } } })
+                                              setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, circuits: foundation.electrical.breakerPanel.circuits.filter(c => c.id !== circuit.id) } } })
                                               handleSave()
                                             }}
                                           >
@@ -3605,7 +3717,7 @@ const newDoor: DoorItem = {
                         <div className="flex items-center gap-3">
                           <Switch
                             checked={foundation.electrical.meterBox}
-                            onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, meterBox: checked } }); handleSave() }}
+                            onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, meterBox: checked } }); handleSave() }}
                           />
                           <Label>Enable Meter Box</Label>
                           {foundation.electrical.meterBox && (
@@ -3616,7 +3728,7 @@ const newDoor: DoorItem = {
                               placeholder="QTY"
                               value={foundation.electrical.meterBoxQty}
                               onChange={(e) => {
-                                setFoundation({
+                                setValue("foundation",{
                                   ...foundation,
                                   electrical: { ...foundation.electrical, meterBoxQty: e.target.value.replace(/^0+/, "") || "" },
                                 })
@@ -3631,7 +3743,7 @@ const newDoor: DoorItem = {
                         <div className="flex items-center gap-3">
                           <Switch
                             checked={foundation.electrical.houseRewire.enabled}
-                            onCheckedChange={(checked) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, houseRewire: { ...foundation.electrical.houseRewire, enabled: checked } } }); handleSave() }}
+                            onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, houseRewire: { ...foundation.electrical.houseRewire, enabled: checked } } }); handleSave() }}
                           />
                           <Label>House Rewire</Label>
                           {foundation.electrical.houseRewire.enabled && (
@@ -3639,7 +3751,7 @@ const newDoor: DoorItem = {
                               type="number"
                               min={0}
                               value={foundation.electrical.houseRewire.homeSf}
-                              onChange={(e) => { setFoundation({ ...foundation, electrical: { ...foundation.electrical, houseRewire: { ...foundation.electrical.houseRewire, homeSf: e.target.value } } }); handleSave() }}
+                              onChange={(e) => { setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, houseRewire: { ...foundation.electrical.houseRewire, homeSf: e.target.value } } }); handleSave() }}
                               placeholder="enter home SF"
                               className="w-36 border-border/60 bg-secondary/50"
                             />
@@ -3669,14 +3781,14 @@ const newDoor: DoorItem = {
                               type="number"
                               min={0}
                               value={foundation.stairs.stairsForReplacement}
-                              onChange={(e) => { setFoundation({ ...foundation, stairs: { ...foundation.stairs, stairsForReplacement: e.target.value } }); handleSave() }}
+                              onChange={(e) => { setValue("foundation",{ ...foundation, stairs: { ...foundation.stairs, stairsForReplacement: e.target.value } }); handleSave() }}
                               placeholder="--"
                               className="w-16 border-border/60 bg-secondary/50"
                             />
                           </div>
                           <div className="flex items-center gap-2">
                             <Label className="text-sm whitespace-nowrap">Size of Treads</Label>
-                            <Select value={foundation.stairs.sizeOfTreads} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setFoundation({ ...foundation, stairs: { ...foundation.stairs, sizeOfTreads: value } }); handleSave() }}>
+                            <Select value={foundation.stairs.sizeOfTreads} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, stairs: { ...foundation.stairs, sizeOfTreads: value } }); handleSave() }}>
                               <SelectTrigger className="w-56 border-border/60 bg-secondary/50">
                                 <SelectValue placeholder="Select size" />
                               </SelectTrigger>
@@ -3694,7 +3806,7 @@ const newDoor: DoorItem = {
                           <div className="flex flex-wrap items-center gap-2">
                             <Switch
                               checked={foundation.stairs.risers}
-                              onCheckedChange={(checked) => { setFoundation({ ...foundation, stairs: { ...foundation.stairs, risers: checked } }); handleSave() }}
+                              onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, stairs: { ...foundation.stairs, risers: checked } }); handleSave() }}
                             />
                             <Label className="text-sm">Risers</Label>
                             {foundation.stairs.risers && (
@@ -3705,7 +3817,7 @@ const newDoor: DoorItem = {
                                 inputMode="numeric"
                                 placeholder="QTY"
                                 value={foundation.stairs.risersQty ?? ""}
-                                onChange={(e) => { setFoundation({ ...foundation, stairs: { ...foundation.stairs, risersQty: e.target.value } }); handleSave() }}
+                                onChange={(e) => { setValue("foundation",{ ...foundation, stairs: { ...foundation.stairs, risersQty: e.target.value } }); handleSave() }}
                                 className="w-20 border-border/60 bg-secondary/50"
                               />
                             )}
@@ -3720,7 +3832,7 @@ const newDoor: DoorItem = {
                               type="number"
                               min={0}
                               value={foundation.stairs.stringersLength}
-                              onChange={(e) => { setFoundation({ ...foundation, stairs: { ...foundation.stairs, stringersLength: e.target.value } }); handleSave() }}
+                              onChange={(e) => { setValue("foundation",{ ...foundation, stairs: { ...foundation.stairs, stringersLength: e.target.value } }); handleSave() }}
                               placeholder="--"
                               className="w-20 border-border/60 bg-secondary/50 pr-7"
                             />
@@ -3733,7 +3845,7 @@ const newDoor: DoorItem = {
                           <Label className="text-sm">Landing Replacement</Label>
                           <Switch
                             checked={foundation.stairs.landingReplacement}
-                            onCheckedChange={(checked) => { setFoundation({ ...foundation, stairs: { ...foundation.stairs, landingReplacement: checked } }); handleSave() }}
+                            onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, stairs: { ...foundation.stairs, landingReplacement: checked } }); handleSave() }}
                           />
                           {foundation.stairs.landingReplacement && <span className="text-sm text-foreground">Yes</span>}
                         </div>
@@ -3749,7 +3861,7 @@ const newDoor: DoorItem = {
                     <div className="flex items-center gap-3">
                       <Switch
                         checked={foundation.elevator}
-                        onCheckedChange={(checked) => { setFoundation({ ...foundation, elevator: checked }); handleSave() }}
+                        onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, elevator: checked }); handleSave() }}
                       />
                       <Label>Elevator</Label>
                     </div>
@@ -8027,12 +8139,29 @@ const newDoor: DoorItem = {
                 <div className="rounded-lg bg-secondary/50 p-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Your balance</span>
-                    <Badge variant="secondary">12 EE</Badge>
+                    <Badge variant="secondary">
+                      {eeBalanceDisplay === "—" ? "—" : `${eeBalanceDisplay} EE`}
+                    </Badge>
                   </div>
                 </div>
               </div>
-              <Button className="w-full shadow-md shadow-primary/20">
-                Review & Generate ESX
+              {insufficientEe ? (
+                <p className="text-xs text-destructive">Not enough Express Estimate tokens.</p>
+              ) : null}
+              <Button
+                type="button"
+                className="w-full shadow-md shadow-primary/20"
+                disabled={isSubmitting || insufficientEe}
+                onClick={() => void handleSubmit(onContinueToPreview, onInvalidExpressEstimate)()}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Checking…
+                  </>
+                ) : (
+                  "Continue to preview"
+                )}
               </Button>
               <Link href="/express-estimate">
                 <Button variant="ghost" className="w-full">Cancel</Button>
@@ -8059,5 +8188,6 @@ const newDoor: DoorItem = {
         </div>
       </div>
     </div>
+    </Form>
   )
 }

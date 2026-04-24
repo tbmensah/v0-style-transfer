@@ -1,9 +1,34 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { Suspense, useEffect, useState } from "react"
 import Link from "next/link"
+import { toast } from "sonner"
+import { getApiErrorMessage } from "@/lib/api/parse-api-error"
+import { DEFAULT_FF_PDF_TYPE } from "@/lib/constants/ff-pdf-type-default"
+import {
+  fetchFastFillSampleUpload,
+  initFastFillUpload,
+  submitFastFillJobDetails,
+} from "@/lib/api/requests/fast-fill"
+import { uploadFileToSignedUrl } from "@/lib/api/upload-signed-url"
+import { queryKeys } from "@/lib/api/query-keys"
+import { useFastFillUploadInit } from "@/lib/api/hooks/use-fast-fill-upload-init"
+import { useMetricsContext } from "@/components/metrics-context"
+import { hasApiBase } from "@/lib/environment/public-env"
+import { formatMetricCount } from "@/lib/utilities/metrics-display"
+import type { FastFillUploadInitData } from "@/lib/types/fast-fill"
+import { parallelWithRetry } from "@/lib/utilities/parallel-retry"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
@@ -27,19 +52,67 @@ interface FilePair {
   pdf: File | null
   esx: File | null
   selected: boolean
+  /** Presigned upload slot from API — one per row. */
+  uploadSession?: FastFillUploadInitData | null
   status?: "pending" | "processing" | "completed" | "failed"
   progress?: number
 }
 
 type WorkflowStep = "upload" | "confirm" | "processing" | "complete"
 
-export default function NewFastFillPage() {
+function NewFastFillPageContent() {
+  const queryClient = useQueryClient()
+  const { dashboard: dashboardMetrics } = useMetricsContext()
+  const ffBalance = dashboardMetrics.data?.fast_fill_tokens
+  const balanceDisplay = formatMetricCount(ffBalance, {
+    isError: dashboardMetrics.isError,
+    isLoading: dashboardMetrics.isLoading,
+  })
+
+  const {
+    data: firstUploadInit,
+    isLoading: initLoading,
+    error: initError,
+    isError: initFailed,
+    resetDraft,
+  } = useFastFillUploadInit()
+
+  const addPairInit = useMutation({
+    mutationFn: initFastFillUpload,
+  })
+
   const [step, setStep] = useState<WorkflowStep>("upload")
-  const [filePairs, setFilePairs] = useState<FilePair[]>([{ id: 1, pdf: null, esx: null, selected: true }])
+  const [filePairs, setFilePairs] = useState<FilePair[]>([
+    { id: 1, pdf: null, esx: null, selected: true, uploadSession: null },
+  ])
   const [processingProgress, setProcessingProgress] = useState(0)
+  const [submittingDetails, setSubmittingDetails] = useState(false)
+  const [sampleDialogOpen, setSampleDialogOpen] = useState(false)
+  const [sampleFile, setSampleFile] = useState<File | null>(null)
+  const [sampleUploading, setSampleUploading] = useState(false)
+
+  useEffect(() => {
+    if (!firstUploadInit) return
+    setFilePairs((prev) =>
+      prev.map((p, i) => (i === 0 ? { ...p, uploadSession: firstUploadInit } : p)),
+    )
+  }, [firstUploadInit])
+
+  useEffect(() => {
+    if (!initFailed || !initError) return
+    toast.error(getApiErrorMessage(initError), { id: "fast-fill-upload-init" })
+  }, [initFailed, initError])
 
   const addFilePair = () => {
-    setFilePairs([...filePairs, { id: Date.now(), pdf: null, esx: null, selected: true }])
+    const id = Date.now()
+    setFilePairs((prev) => [...prev, { id, pdf: null, esx: null, selected: true, uploadSession: null }])
+    addPairInit.mutate(undefined, {
+      onSuccess: (session) => {
+        setFilePairs((prev) =>
+          prev.map((p) => (p.id === id ? { ...p, uploadSession: session } : p)),
+        )
+      },
+    })
   }
 
   const removeFilePair = (id: number) => {
@@ -60,50 +133,132 @@ export default function NewFastFillPage() {
   const selectedPairs = validPairs.filter((pair) => pair.selected)
   const tokenCost = selectedPairs.length
 
-  const handleProceedToConfirm = () => {
-    if (validPairs.length > 0) {
-      setStep("confirm")
+  const insufficientFfUpload =
+    hasApiBase &&
+    !dashboardMetrics.isLoading &&
+    !dashboardMetrics.isError &&
+    ffBalance !== undefined &&
+    validPairs.length > ffBalance
+
+  const insufficientFfConfirm =
+    hasApiBase &&
+    !dashboardMetrics.isLoading &&
+    !dashboardMetrics.isError &&
+    ffBalance !== undefined &&
+    tokenCost > ffBalance
+
+  const afterBalance =
+    ffBalance !== undefined && hasApiBase && !dashboardMetrics.isLoading && !dashboardMetrics.isError
+      ? Math.max(0, ffBalance - tokenCost)
+      : undefined
+  const afterDisplay = formatMetricCount(afterBalance, {
+    isError: dashboardMetrics.isError,
+    isLoading: dashboardMetrics.isLoading,
+  })
+
+  async function handleSamplePdfUpload() {
+    if (!sampleFile) {
+      toast.error("Choose a PDF file.", { id: "ff-sample-pdf" })
+      return
+    }
+    setSampleUploading(true)
+    try {
+      const { upload_url } = await fetchFastFillSampleUpload()
+      await uploadFileToSignedUrl(sampleFile, upload_url)
+      toast.success(`Sample uploaded: ${sampleFile.name}`, { id: "ff-sample-pdf" })
+      setSampleDialogOpen(false)
+      setSampleFile(null)
+    } catch (e) {
+      toast.error(getApiErrorMessage(e), { id: "ff-sample-pdf" })
+    } finally {
+      setSampleUploading(false)
     }
   }
 
-  const handleStartProcessing = useCallback(() => {
-    setStep("processing")
-    setProcessingProgress(0)
-    
-    // Update all selected pairs to processing status
-    setFilePairs(prev => prev.map(pair => 
-      pair.selected && pair.pdf 
-        ? { ...pair, status: "processing", progress: 0 } 
-        : pair
-    ))
-
-    // Simulate processing with progress
-    let progress = 0
-    const interval = setInterval(() => {
-      progress += Math.random() * 15
-      if (progress >= 100) {
-        progress = 100
-        clearInterval(interval)
-        
-        // Mark all as completed
-        setFilePairs(prev => prev.map(pair => 
-          pair.status === "processing" 
-            ? { ...pair, status: "completed", progress: 100 } 
-            : pair
-        ))
-        
-        setTimeout(() => setStep("complete"), 500)
+  const handleProceedToConfirm = () => {
+    if (validPairs.length === 0) return
+    for (const pair of filePairs) {
+      if (!pair.pdf) continue
+      if (!pair.uploadSession) {
+        toast.error("Upload slot not ready for one or more rows. Wait for init or try again.", {
+          id: "fast-fill-continue",
+        })
+        return
       }
-      setProcessingProgress(Math.min(progress, 100))
-      
-      // Update individual progress
-      setFilePairs(prev => prev.map(pair => 
-        pair.status === "processing" 
-          ? { ...pair, progress: Math.min((pair.progress || 0) + Math.random() * 20, progress) } 
-          : pair
-      ))
-    }, 500)
-  }, [])
+    }
+    setStep("confirm")
+  }
+
+  const handleStartProcessing = async () => {
+    const toProcess = filePairs.filter((p) => p.pdf && p.selected)
+    setSubmittingDetails(true)
+    try {
+      const uploadAndDetails = async (pair: FilePair) => {
+        if (!pair.pdf || !pair.uploadSession) {
+          throw new Error("Missing PDF or upload session for a job row.")
+        }
+        await uploadFileToSignedUrl(pair.pdf, pair.uploadSession.upload_url)
+        await submitFastFillJobDetails(pair.uploadSession.job_id, {
+          ff_pdf_type: DEFAULT_FF_PDF_TYPE,
+          pdf_file_key: pair.uploadSession.storage_path,
+          original_filename: pair.pdf.name,
+          esx_file_key: pair.esx?.name ?? "",
+        })
+      }
+
+      await parallelWithRetry(toProcess, uploadAndDetails, {
+        maxAttempts: 3,
+        delayMs: 500,
+      })
+
+      void queryClient.invalidateQueries({ queryKey: queryKeys.metrics })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.tokensLifetime })
+
+      setStep("processing")
+      setProcessingProgress(0)
+
+      setFilePairs((prev) =>
+        prev.map((pair) =>
+          pair.selected && pair.pdf ? { ...pair, status: "processing", progress: 0 } : pair,
+        ),
+      )
+
+      let progress = 0
+      const interval = setInterval(() => {
+        progress += Math.random() * 15
+        if (progress >= 100) {
+          progress = 100
+          clearInterval(interval)
+
+          setFilePairs((prev) =>
+            prev.map((pair) =>
+              pair.status === "processing"
+                ? { ...pair, status: "completed", progress: 100 }
+                : pair,
+            ),
+          )
+
+          setTimeout(() => setStep("complete"), 500)
+        }
+        setProcessingProgress(Math.min(progress, 100))
+
+        setFilePairs((prev) =>
+          prev.map((pair) =>
+            pair.status === "processing"
+              ? {
+                  ...pair,
+                  progress: Math.min((pair.progress || 0) + Math.random() * 20, progress),
+                }
+              : pair,
+          ),
+        )
+      }, 500)
+    } catch (e) {
+      toast.error(getApiErrorMessage(e), { id: "fast-fill-process" })
+    } finally {
+      setSubmittingDetails(false)
+    }
+  }
 
   const handleDownloadAll = () => {
     // Simulate download
@@ -111,8 +266,9 @@ export default function NewFastFillPage() {
   }
 
   const handleStartNew = () => {
+    resetDraft()
     setStep("upload")
-    setFilePairs([{ id: 1, pdf: null, esx: null, selected: true }])
+    setFilePairs([{ id: 1, pdf: null, esx: null, selected: true, uploadSession: null }])
     setProcessingProgress(0)
   }
 
@@ -171,9 +327,18 @@ export default function NewFastFillPage() {
                   </p>
                   <p className="mt-2 text-xs text-muted-foreground">
                     {"Don't see your format? "}
-                    <button 
+                    <button
                       type="button"
-                      onClick={() => alert("Upload form for training would open here")}
+                      onClick={() => {
+                        if (!hasApiBase) {
+                          toast.error(
+                            "Set NEXT_PUBLIC_API_BASE_URL in .env.local to upload a sample.",
+                            { id: "ff-sample-pdf" },
+                          )
+                          return
+                        }
+                        setSampleDialogOpen(true)
+                      }}
                       className="font-medium text-primary hover:underline"
                     >
                       Upload a sample PDF
@@ -254,9 +419,14 @@ export default function NewFastFillPage() {
                     )}
                   </div>
                 ))}
-                <Button variant="outline" onClick={addFilePair} className="w-full gap-2 border-border/60">
+                <Button
+                  variant="outline"
+                  onClick={addFilePair}
+                  disabled={addPairInit.isPending || initLoading}
+                  className="w-full gap-2 border-border/60"
+                >
                   <Plus className="h-4 w-4" />
-                  Add Another File Pair
+                  {addPairInit.isPending ? "Reserving upload slot…" : "Add Another File Pair"}
                 </Button>
               </CardContent>
             </Card>
@@ -285,16 +455,26 @@ export default function NewFastFillPage() {
                   <div className="rounded-lg bg-secondary/50 p-3">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Your balance</span>
-                      <Badge variant="secondary">24 FF</Badge>
+                      <Badge variant="secondary">
+                        {balanceDisplay === "—" ? "—" : `${balanceDisplay} FF`}
+                      </Badge>
                     </div>
                   </div>
                 </div>
-                <Button 
-                  className="w-full gap-2 shadow-md shadow-primary/20" 
-                  disabled={validPairs.length === 0}
+                {insufficientFfUpload ? (
+                  <p className="text-xs text-destructive">Not enough Fast Fill tokens for this many pairs.</p>
+                ) : null}
+                <Button
+                  className="w-full gap-2 shadow-md shadow-primary/20"
+                  disabled={
+                    validPairs.length === 0 ||
+                    initLoading ||
+                    filePairs.some((p) => p.pdf && !p.uploadSession) ||
+                    insufficientFfUpload
+                  }
                   onClick={handleProceedToConfirm}
                 >
-                  Continue
+                  {initLoading ? "Preparing upload…" : "Continue"}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
                 <Link href="/fast-fill">
@@ -385,25 +565,32 @@ export default function NewFastFillPage() {
                   <div className="rounded-lg bg-secondary/50 p-3">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Current balance</span>
-                      <Badge variant="secondary">24 FF</Badge>
+                      <Badge variant="secondary">
+                        {balanceDisplay === "—" ? "—" : `${balanceDisplay} FF`}
+                      </Badge>
                     </div>
                     <div className="mt-2 flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">After processing</span>
-                      <span className="font-medium text-foreground">{24 - tokenCost} FF</span>
+                      <span className="font-medium text-foreground">
+                        {afterDisplay === "—" ? "—" : `${afterDisplay} FF`}
+                      </span>
                     </div>
                   </div>
                 </div>
+                {insufficientFfConfirm ? (
+                  <p className="text-xs text-destructive">Not enough Fast Fill tokens for the selected pairs.</p>
+                ) : null}
                 <div className="flex gap-3">
                   <Button variant="outline" onClick={() => setStep("upload")} className="flex-1 gap-2 border-border/60">
                     <ArrowLeft className="h-4 w-4" />
                     Back
                   </Button>
-                  <Button 
-                    className="flex-1 gap-2 shadow-md shadow-primary/20" 
-                    disabled={selectedPairs.length === 0}
-                    onClick={handleStartProcessing}
+                  <Button
+                    className="flex-1 gap-2 shadow-md shadow-primary/20"
+                    disabled={selectedPairs.length === 0 || submittingDetails || insufficientFfConfirm}
+                    onClick={() => void handleStartProcessing()}
                   >
-                    Process
+                    {submittingDetails ? "Submitting…" : "Process"}
                   </Button>
                 </div>
               </CardContent>
@@ -473,19 +660,21 @@ export default function NewFastFillPage() {
             <CardContent className="space-y-6">
               <div className="space-y-3">
                 {selectedPairs.map((pair, index) => (
-                  <div key={pair.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20">
+                  <div key={pair.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-secondary/30 p-4 transition-colors hover:bg-secondary/50">
+                    <div className="flex min-w-0 flex-1 items-center gap-4">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20">
                         <CheckCircle className="h-5 w-5 text-primary" />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-sm font-medium text-foreground">Job {index + 1}: {pair.pdf?.name?.replace(".pdf", "_prelim.esx")}</p>
                         <p className="text-xs text-muted-foreground">Ready for download</p>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/20">
-                      <Download className="h-4 w-4" />
-                    </Button>
+                    <div className="flex shrink-0 items-center gap-1 border-l border-border/60 pl-3" aria-label="Actions">
+                      <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/20" title="Download">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -510,6 +699,79 @@ export default function NewFastFillPage() {
           </Card>
         </div>
       )}
+
+      <Dialog
+        open={sampleDialogOpen}
+        onOpenChange={(open) => {
+          setSampleDialogOpen(open)
+          if (!open) setSampleFile(null)
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Upload a sample PDF</DialogTitle>
+            <DialogDescription>
+              Use this when our pipeline cannot process your claim PDF format. The file is stored as a reference sample
+              (not attached to a Fast Fill job).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-2">
+            <label className="block text-sm font-medium text-foreground">PDF</label>
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              className="w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border file:border-border/60 file:bg-secondary file:px-3 file:py-1.5 file:text-sm file:text-foreground"
+              disabled={sampleUploading}
+              onChange={(e) => setSampleFile(e.target.files?.[0] ?? null)}
+            />
+            {sampleFile ? (
+              <p className="truncate text-xs text-foreground" title={sampleFile.name}>
+                {sampleFile.name}
+              </p>
+            ) : null}
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={sampleUploading}
+              onClick={() => setSampleDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="gap-2 shadow-md shadow-primary/20"
+              disabled={sampleUploading || !sampleFile}
+              onClick={() => void handleSamplePdfUpload()}
+            >
+              {sampleUploading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Uploading…
+                </>
+              ) : (
+                "Upload"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+  )
+}
+
+export default function NewFastFillPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[40vh] items-center justify-center gap-2 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+          <span>Loading…</span>
+        </div>
+      }
+    >
+      <NewFastFillPageContent />
+    </Suspense>
   )
 }
