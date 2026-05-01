@@ -20,7 +20,11 @@ export function getSupabaseBrowserClient(): SupabaseClient | null {
   }
 
   if (!browserClient) {
-    browserClient = createBrowserClient(url, anonKey)
+    browserClient = createBrowserClient(url, anonKey, {
+      auth: {
+        detectSessionInUrl: false,
+      },
+    })
   }
 
   return browserClient

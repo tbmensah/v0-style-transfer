@@ -48,9 +48,10 @@ export default function ForgotPasswordPage() {
     }
 
     const redirectTo = getAuthConfirmRedirectUrl()
+    console.log(redirectTo)
     if (!redirectTo) {
       form.setError("root", {
-        message: "Could not build reset link. Set NEXT_PUBLIC_APP_URL.",
+        message: "Could not build reset link.",
       })
       return
     }
