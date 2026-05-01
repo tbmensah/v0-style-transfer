@@ -50,7 +50,6 @@ export default function SignupPage() {
     }
 
     const emailRedirectTo = getSupabaseRedirectUrl()
-
     const { data, error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,

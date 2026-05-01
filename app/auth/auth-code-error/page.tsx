@@ -19,7 +19,6 @@ function AuthCodeErrorContent() {
         }
       })()
     : null
-
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />

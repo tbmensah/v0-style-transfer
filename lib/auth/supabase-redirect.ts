@@ -30,9 +30,10 @@ export function getSupabaseRedirectUrl(): string {
 export function getAuthConfirmRedirectUrl(
   afterConfirmPath = "/reset-password",
 ): string {
-  const origin = getAppOrigin()
-  if (!origin) return ""
-  const u = new URL("/auth/confirm", origin)
-  u.searchParams.set("next", afterConfirmPath)
-  return u.toString()
+  const fromEnv = process.env.NEXT_PUBLIC_AUTH_CONFIRM_REDIRECT_URL?.trim()
+  if (fromEnv) return `${fromEnv}`
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}/auth/confirm?next=${afterConfirmPath}`
+  }
+  return ""
 }
