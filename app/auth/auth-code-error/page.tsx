@@ -10,7 +10,6 @@ import { Suspense } from "react"
 function AuthCodeErrorContent() {
   const searchParams = useSearchParams()
   const raw = searchParams.get("message")
-  console.log(raw)
   const message = raw
   ? (() => {
     try {
@@ -20,7 +19,7 @@ function AuthCodeErrorContent() {
     }
   })()
   : null
-  console.log("There was an error", message)
+  ("There was an error", message)
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />

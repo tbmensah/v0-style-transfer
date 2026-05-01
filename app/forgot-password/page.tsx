@@ -48,7 +48,6 @@ export default function ForgotPasswordPage() {
     }
 
     const redirectTo = getAuthConfirmRedirectUrl()
-    console.log(redirectTo)
     if (!redirectTo) {
       form.setError("root", {
         message: "Could not build reset link.",
