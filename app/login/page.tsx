@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { safeAppPath } from "@/lib/utilities/safe-redirect"
 import {
   loginDefaultValues,
@@ -208,8 +209,7 @@ function LoginPageContent() {
                         </Link>
                       </div>
                       <FormControl>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           autoComplete="current-password"
                           className="border-border/60 bg-secondary/50"
                           {...field}

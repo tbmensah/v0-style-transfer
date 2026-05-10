@@ -8,6 +8,7 @@ import { useAuthStore } from "@/lib/stores/auth-store"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -159,8 +160,7 @@ export default function AccountPage() {
                       <FormItem>
                         <FormLabel className="text-foreground">Current password</FormLabel>
                         <FormControl>
-                          <Input
-                            type="password"
+                          <PasswordInput
                             autoComplete="current-password"
                             className="border-border/60 bg-secondary/50"
                             {...field}
@@ -177,8 +177,7 @@ export default function AccountPage() {
                       <FormItem>
                         <FormLabel className="text-foreground">New password</FormLabel>
                         <FormControl>
-                          <Input
-                            type="password"
+                          <PasswordInput
                             autoComplete="new-password"
                             className="border-border/60 bg-secondary/50"
                             {...field}
@@ -195,8 +194,7 @@ export default function AccountPage() {
                       <FormItem>
                         <FormLabel className="text-foreground">Confirm new password</FormLabel>
                         <FormControl>
-                          <Input
-                            type="password"
+                          <PasswordInput
                             autoComplete="new-password"
                             className="border-border/60 bg-secondary/50"
                             {...field}

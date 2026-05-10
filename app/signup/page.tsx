@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { getSupabaseRedirectUrl } from "@/lib/auth/supabase-redirect"
 import {
   signupDefaultValues,
@@ -168,8 +169,7 @@ export default function SignupPage() {
                     <FormItem>
                       <FormLabel className="text-foreground">Password</FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           autoComplete="new-password"
                           className="border-border/60 bg-secondary/50"
                           {...field}
@@ -186,8 +186,7 @@ export default function SignupPage() {
                     <FormItem>
                       <FormLabel className="text-foreground">Confirm Password</FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           autoComplete="new-password"
                           className="border-border/60 bg-secondary/50"
                           {...field}
