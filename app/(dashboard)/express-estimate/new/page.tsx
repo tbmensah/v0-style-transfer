@@ -13,7 +13,11 @@ import { useMetricsContext } from "@/components/metrics-context"
 import { formatMetricCount } from "@/lib/utilities/metrics-display"
 import { hasApiBase } from "@/lib/environment/public-env"
 import {
+  clearExpressEstimateLocalDraft,
+  clearExpressEstimatePreviewDraft,
+  readExpressEstimateLocalDraft,
   readExpressEstimatePreviewDraft,
+  writeExpressEstimateLocalDraft,
   writeExpressEstimatePreviewDraft,
 } from "@/lib/constants/express-estimate-preview-draft"
 import { Form } from "@/components/ui/form"
@@ -567,24 +571,63 @@ export default function NewExpressEstimatePage() {
     resolver: zodResolver(expressEstimatePageSchema),
     defaultValues: defaultExpressEstimatePageValues,
   })
-  const { control, setValue, handleSubmit, formState: { errors, isSubmitting } } = form
+  const { control, setValue, getValues, handleSubmit, formState: { errors, isSubmitting } } = form
   const projectDetailsErrors = errors.projectDetails as ProjectDetailsFieldErrors | undefined
 
+  const formRef = useRef(form)
+  formRef.current = form
+
   const rehydratedRef = useRef(false)
+  const skipNextAutosaveRef = useRef(false)
   useEffect(() => {
     if (rehydratedRef.current) return
-    rehydratedRef.current = true
-    const raw = readExpressEstimatePreviewDraft()
-    if (!raw) return
+    const raw = readExpressEstimateLocalDraft() ?? readExpressEstimatePreviewDraft()
+    if (!raw) {
+      rehydratedRef.current = true
+      return
+    }
     try {
-      const parsed = expressEstimatePageSchema.safeParse(JSON.parse(raw))
-      if (parsed.success) {
-        form.reset(parsed.data)
+      const parsed = JSON.parse(raw) as Partial<ExpressEstimatePageValues>
+      if (parsed && typeof parsed === "object") {
+        formRef.current.reset({
+          ...defaultExpressEstimatePageValues,
+          ...parsed,
+          activeTab: typeof parsed.activeTab === "string" ? parsed.activeTab : "exterior",
+          isSaved: true,
+          projectDetails: {
+            ...defaultProjectDetails,
+            ...(parsed.projectDetails ?? {}),
+          },
+          exterior: {
+            ...defaultExterior,
+            ...(parsed.exterior ?? {}),
+          },
+          foundation: {
+            ...defaultFoundation,
+            ...(parsed.foundation ?? {}),
+          },
+          rooms: Array.isArray(parsed.rooms) ? parsed.rooms : [],
+        })
       }
     } catch {
       // ignore corrupt storage
+    } finally {
+      rehydratedRef.current = true
     }
-  }, [form])
+  }, [])
+
+  useEffect(() => {
+    const subscription = formRef.current.watch((values) => {
+      if (!rehydratedRef.current) return
+      if (skipNextAutosaveRef.current) {
+        skipNextAutosaveRef.current = false
+        return
+      }
+      writeExpressEstimateLocalDraft(JSON.stringify(values))
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   const onInvalidExpressEstimate: SubmitErrorHandler<ExpressEstimatePageValues> = (errs) => {
     const pd = errs.projectDetails as ProjectDetailsFieldErrors | undefined
@@ -642,7 +685,21 @@ export default function NewExpressEstimatePage() {
   // Handlers
   const handleSave = () => {
     setValue("isSaved", false)
+    if (!writeExpressEstimateLocalDraft(JSON.stringify(getValues()))) {
+      toast.error(
+        "Could not save draft in the browser. Storage may be full or disabled.",
+        { id: "ee-local-draft" },
+      )
+    }
     setTimeout(() => setValue("isSaved", true), 1000)
+  }
+
+  const handleResetDraft = () => {
+    skipNextAutosaveRef.current = true
+    form.reset(defaultExpressEstimatePageValues)
+    clearExpressEstimateLocalDraft()
+    clearExpressEstimatePreviewDraft()
+    toast.success("Draft reset.")
   }
 
   const addRoom = (type: string = "room", name: string = "") => {
@@ -907,7 +964,13 @@ const newDoor: DoorItem = {
           {/* Damage Details Tabs */}
           <Card className="border-border/60 bg-card/80 shadow-md">
             <CardContent className="pt-6">
-              <Tabs value={activeTab} onValueChange={(v) => setValue("activeTab", v)}>
+              <Tabs
+                value={activeTab}
+                onValueChange={(v) => {
+                  setValue("activeTab", v)
+                  handleSave()
+                }}
+              >
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="exterior" className="gap-2">
                     <Home className="h-4 w-4" />
@@ -8162,6 +8225,9 @@ const newDoor: DoorItem = {
                 ) : (
                   "Continue to preview"
                 )}
+              </Button>
+              <Button type="button" variant="outline" className="w-full" onClick={handleResetDraft}>
+                Reset
               </Button>
               <Link href="/express-estimate">
                 <Button variant="ghost" className="w-full">Cancel</Button>
