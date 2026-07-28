@@ -11,6 +11,8 @@ export const FAST_FILL_JOB_ID_QUERY = "job_id" as const
 export const API_ENDPOINTS = {
   health: "/health",
   me: "/me",
+  /** `POST` — stamp backend app session after fresh Supabase sign-in. */
+  sessionStart: "/session/start",
   /** `GET` — dashboard token balances + job bucket counts (relative to same base as `/jobs`). */
   metrics: "/metrics",
   /** `GET` — per-user job counts by UI bucket (submitted, processing, completed, failed, needs_review). */
