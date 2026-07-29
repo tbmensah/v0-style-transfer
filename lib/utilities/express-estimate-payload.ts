@@ -46,7 +46,7 @@ export function pruneExpressEstimatePayload(
   if (!pruned || typeof pruned !== "object") {
     return {
       projectDetails: {
-        projectName: body.projectDetails.projectName,
+        insuredName: body.projectDetails.insuredName,
         claimNumber: body.projectDetails.claimNumber,
       },
     } as ExpressEstimateJobPayload
@@ -56,7 +56,7 @@ export function pruneExpressEstimatePayload(
     ...pruned,
     projectDetails: {
       ...pd,
-      projectName: body.projectDetails.projectName.trim(),
+      insuredName: body.projectDetails.insuredName.trim(),
       claimNumber: body.projectDetails.claimNumber.trim(),
     },
   } as ExpressEstimateJobPayload

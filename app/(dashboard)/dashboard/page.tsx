@@ -28,8 +28,9 @@ import type { ApiJob } from "@/lib/types/jobs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { JobStatusBadge } from "@/components/jobs/job-status-badge"
-import { Upload, ClipboardList, Coins, Clock, AlertCircle, Download, Eye } from "lucide-react"
+import { Upload, ClipboardList, Coins, Clock, AlertCircle, Download, Eye, HelpCircle } from "lucide-react"
 
 type DashboardJobsTab = "all" | "fast-fill" | "express-estimate"
 
@@ -399,14 +400,39 @@ function DashboardPageContent() {
           ) : statusSummaryError ? (
             <p className="text-sm text-destructive">{getApiErrorMessage(statusSummaryErr)}</p>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
               {(
                 [
-                  { label: "Submitted", key: "submitted" as const, color: "bg-blue-950/50" },
-                  { label: "Processing", key: "processing" as const, color: "bg-yellow-950/50" },
-                  { label: "Completed", key: "completed" as const, color: "bg-primary/20" },
-                  { label: "Failed", key: "failed" as const, color: "bg-red-950/50" },
-                  { label: "Needs Review", key: "needs_review" as const, color: "bg-orange-950/50" },
+                  {
+                    label: "Submitted",
+                    key: "submitted" as const,
+                    color: "bg-blue-950/50",
+                    description: "Jobs that have been submitted and are waiting to start processing.",
+                  },
+                  {
+                    label: "Processing",
+                    key: "processing" as const,
+                    color: "bg-yellow-950/50",
+                    description: "Jobs currently being processed by the system.",
+                  },
+                  {
+                    label: "Completed",
+                    key: "completed" as const,
+                    color: "bg-primary/20",
+                    description: "Jobs that finished successfully and are ready to download.",
+                  },
+                  {
+                    label: "Failed",
+                    key: "failed" as const,
+                    color: "bg-red-950/50",
+                    description: "Jobs that encountered an error and did not complete.",
+                  },
+                  // {
+                  //   label: "Needs Review",
+                  //   key: "needs_review" as const,
+                  //   color: "bg-orange-950/50",
+                  //   description: "Jobs that require your attention before they can be finalized.",
+                  // },
                 ] as const
               ).map((status) => (
                 <div
@@ -416,7 +442,23 @@ function DashboardPageContent() {
                   <div className="text-2xl font-bold tabular-nums text-foreground">
                     {statusCountValue(statusSummary?.[status.key])}
                   </div>
-                  <div className="text-sm text-muted-foreground">{status.label}</div>
+                  <div className="mt-1 flex items-center justify-center gap-1 text-sm text-muted-foreground">
+                    <span>{status.label}</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="inline-flex rounded-full text-muted-foreground/80 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          aria-label={`What ${status.label} means`}
+                        >
+                          <HelpCircle className="h-3.5 w-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-55">
+                        {status.description}
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                 </div>
               ))}
             </div>

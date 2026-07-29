@@ -73,6 +73,7 @@ function roomImportantSummary(room: RoomRow): string {
     parts.push("Plumbing")
   }
   if (room.appliances?.enabled) parts.push("Appliances")
+  if (room.notes?.trim()) parts.push("Room note")
   if (parts.length === 0) return "No trade checklists expanded — open for full checklist."
   return parts.join(" · ")
 }
@@ -285,7 +286,6 @@ function ProjectOtherDetailsCollapsible({ values }: { values: ExpressEstimatePag
   const [open, setOpen] = useState(false)
   const pd = values.projectDetails
   const summaryParts = [
-    pd.propertyType?.trim() ? "Property type" : null,
     pd.adjusterName?.trim() ? "Adjuster" : null,
     pd.notes?.trim() ? "Notes" : null,
   ].filter(Boolean)
@@ -309,7 +309,7 @@ function ProjectOtherDetailsCollapsible({ values }: { values: ExpressEstimatePag
                 <span className="mt-1 block text-xs text-muted-foreground">
                   {summaryParts.length > 0
                     ? `${summaryParts.join(" · ")}. Tap to expand.`
-                    : "Property type, adjuster, and notes. Tap to expand."}
+                    : "Adjuster and notes. Tap to expand."}
                 </span>
               ) : null}
             </span>
@@ -317,12 +317,6 @@ function ProjectOtherDetailsCollapsible({ values }: { values: ExpressEstimatePag
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="space-y-2.5 border-t border-border/60 px-3 pb-4 pt-3">
-            {pd.propertyType?.trim() ? (
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-                <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">Property type</dt>
-                <dd className="text-foreground">{pd.propertyType}</dd>
-              </div>
-            ) : null}
             {pd.adjusterName?.trim() ? (
               <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
                 <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">Adjuster name</dt>
@@ -348,7 +342,8 @@ function RoomPreviewCard({ room }: { room: RoomRow }) {
   const [open, setOpen] = useState(false)
   const title = room.name?.trim() || "Untitled space"
   const subtitle = room.type ? room.type.replace(/-/g, " ") : ""
-  const { id: _id, name: _name, type: _type, sqft: _sqft, ...roomDetails } = room
+  const roomNote = room.notes?.trim() ?? ""
+  const { id: _id, name: _name, type: _type, sqft: _sqft, notes: _notes, ...roomDetails } = room
   const summary = roomImportantSummary(room)
   const hasDetails = !isEmptyValue(roomDetails)
 
@@ -380,6 +375,11 @@ function RoomPreviewCard({ room }: { room: RoomRow }) {
             ) : (
               <p className="py-2 text-sm text-muted-foreground">No extra details for this space.</p>
             )}
+            {roomNote ? (
+              <p className="mt-3 whitespace-pre-wrap border-t border-border/40 pt-3 text-sm text-muted-foreground">
+                (room note: {roomNote})
+              </p>
+            ) : null}
           </div>
         </CollapsibleContent>
       </div>
@@ -394,7 +394,6 @@ export function ExpressEstimatePreviewSummary({ values }: Props) {
   const foundation = values.foundation
 
   const hasOtherProject =
-    Boolean(pd.propertyType?.trim()) ||
     Boolean(pd.adjusterName?.trim()) ||
     Boolean(pd.notes?.trim())
 
@@ -403,28 +402,40 @@ export function ExpressEstimatePreviewSummary({ values }: Props) {
       <Card className="border-border/60 bg-card/80 shadow-md">
         <CardHeader>
           <CardTitle>Project details</CardTitle>
-          <CardDescription>Name, claim, and where the inspection took place</CardDescription>
+          <CardDescription>Insured, claim, and property location</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
           <dl className="space-y-2.5">
             <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-              <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">Project name</dt>
-              <dd className="font-medium text-foreground">{pd.projectName}</dd>
+              <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">Insured name</dt>
+              <dd className="font-medium text-foreground">{pd.insuredName}</dd>
             </div>
             <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-              <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">Claim number</dt>
+              <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">Claim number/ file number</dt>
               <dd className="font-medium text-foreground">{pd.claimNumber}</dd>
             </div>
-            {pd.propertyAddress?.trim() ? (
+            {pd.street?.trim() ? (
               <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-                <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">Property address</dt>
-                <dd className="text-foreground">{pd.propertyAddress}</dd>
+                <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">Street</dt>
+                <dd className="text-foreground">{pd.street}</dd>
               </div>
             ) : null}
-            {pd.inspectionDate?.trim() ? (
+            {pd.city?.trim() ? (
               <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-                <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">Inspection date</dt>
-                <dd className="text-foreground">{pd.inspectionDate}</dd>
+                <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">City</dt>
+                <dd className="text-foreground">{pd.city}</dd>
+              </div>
+            ) : null}
+            {pd.zipCode?.trim() ? (
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
+                <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">Zip code</dt>
+                <dd className="text-foreground">{pd.zipCode}</dd>
+              </div>
+            ) : null}
+            {pd.depreciationRange?.trim() ? (
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
+                <dt className="shrink-0 text-muted-foreground sm:w-[11rem]">Depreciation range</dt>
+                <dd className="text-foreground capitalize">{pd.depreciationRange}</dd>
               </div>
             ) : null}
             <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
