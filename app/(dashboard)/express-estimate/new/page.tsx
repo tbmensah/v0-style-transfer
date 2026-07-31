@@ -6138,8 +6138,8 @@ export default function NewExpressEstimatePage() {
                                                 if (value === "tile") {
                                                   nextAction = "replace"
                                                 }
-                                                // Vanity tops: Base/High only (no Premium)
-                                                if (prev.grade === "premium") nextGrade = ""
+                                                // Vanity tops: Base/High only (no Premium); butcher block has no grade in Xactimate
+                                                if (value === "butcher-block" || prev.grade === "premium") nextGrade = ""
                                                 updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...prev, type: value, sink: nextSink, action: nextAction, grade: nextGrade } } })
                                               }}
                                               >
@@ -6157,6 +6157,7 @@ export default function NewExpressEstimatePage() {
                                                 </SelectContent>
                                               </Select>
                                             </div>
+                                            {room.vanity.countertop.type !== "butcher-block" && (
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Grade</Label>
                                               <Select value={room.vanity.countertop.grade === "premium" ? "" : room.vanity.countertop.grade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, grade: value } } }) }}>
@@ -6170,6 +6171,7 @@ export default function NewExpressEstimatePage() {
                                                 </SelectContent>
                                               </Select>
                                             </div>
+                                            )}
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">
                                                 Size ({room.vanity.countertop.type === "cultured-marble" ? "LF" : "SF"})
