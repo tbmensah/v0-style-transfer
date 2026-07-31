@@ -64,7 +64,8 @@ function roomImportantSummary(room: RoomRow): string {
   const dr =
     room.doors?.filter((d: (typeof room.doors)[number]) => !isEmptyValue(d))?.length ?? 0
   if (dr > 0) parts.push(`${dr} door${dr === 1 ? "" : "s"}`)
-  if (room.vanity?.enabled) parts.push("Vanity")
+  if (room.vanity?.enabled) parts.push("Vanity/Sink")
+  if (room.pedestalSink?.enabled) parts.push("Pedestal sink")
   if (room.toilet?.enabled) parts.push("Toilet")
   if (room.shower?.enabled) parts.push("Shower/tub")
   if (room.cabinets?.enabled) parts.push("Cabinets")

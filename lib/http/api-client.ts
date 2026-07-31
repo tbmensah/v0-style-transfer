@@ -48,7 +48,6 @@ axiosRetry(apiClient, {
   retryCondition: (error: AxiosError) => {
     if (!isAxiosError(error)) return false
     const status = error.response?.status
-    console.log("status", status)
     // Auth / authorization: do not retry here (handle refresh or sign-out in app code)
     if (status === 401 || status === 403) return false
 
@@ -74,6 +73,8 @@ apiClient.interceptors.response.use(
     if (isAxiosError(error) && error.response?.status === 401) {
       if (isAppSessionExpiredError(error.response.data)) {
         void handleAppSessionExpired()
+        // Hang until hard redirect — rejecting would paint "Session expired" in RQ/UI first.
+        return new Promise(() => {})
       }
     }
     return Promise.reject(error)

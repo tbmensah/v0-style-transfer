@@ -46,7 +46,8 @@ import {
   Loader2,
   X,
   Layers,
-  Square
+  Square,
+  FileClock,
 } from "lucide-react"
 
 // Types
@@ -79,6 +80,7 @@ interface Room {
   doors: DoorItem[]
   // Bathroom specific
   vanity?: VanityOptions
+  pedestalSink?: PedestalSinkOptions
   toilet?: ToiletOptions
   shower?: ShowerOptions
   // Kitchen specific
@@ -176,6 +178,9 @@ interface DoorItem {
   peepHole: boolean
   mailSlot: boolean
   nonCased: boolean
+  casedOpening: boolean
+  casingOpeningSize: string
+  casingFinish: string
   sidelites: boolean
   sidelitesQty: string
   sidelitesSize: string
@@ -186,7 +191,7 @@ interface DoorItem {
   retrofitInStucco: boolean
   cleanSensor: boolean
   replaceSensor: boolean
-  }
+}
 
 interface VanityOptions {
   enabled: boolean
@@ -205,6 +210,11 @@ interface VanityOptions {
   }
   backsplashUnattached: boolean
   backsplashAction: string
+}
+
+interface PedestalSinkOptions {
+  enabled: boolean
+  action: string
 }
 
 interface ToiletOptions {
@@ -264,6 +274,8 @@ interface CountertopOptions {
   grade: string
   size: string
   detachAndReset: boolean
+  /** Used for butcher-block (remove-replace | detach-reset). */
+  action: string
 }
 
 interface PlumbingOptions {
@@ -356,6 +368,7 @@ vanity: {
   backsplashUnattached: false,
   backsplashAction: ""
   },
+  pedestalSink: { enabled: false, action: "" },
   toilet: { enabled: false, action: "", seatReplacement: false, supplyLine: false },
 shower: {
   enabled: false,
@@ -369,6 +382,8 @@ shower: {
   tubShowerFaucet: "",
   mortarBedReplace: false,
   mortarBedSize: "",
+  tileCurb: false,
+  tileCurbSize: "",
   walls: "",
   tileBench: false,
   tileNiche: false,
@@ -409,7 +424,7 @@ const defaultAppliancesExtras = {
 
 const defaultKitchenExtras = {
   cabinets: { enabled: false, size: "", grade: "", detachAndReset: false, toeKick: { size: "", backSplash: "", grade: "", glass: false, diagonalInstallation: false } },
-  countertop: { enabled: false, type: "", grade: "", size: "", detachAndReset: false },
+  countertop: { enabled: false, type: "", grade: "", size: "", detachAndReset: false, action: "" },
   plumbing: { replaceFaucetSink: false, drFaucetSink: false, waterSupplyLine: { enabled: false, qty: "" }, reverseOsmosis: { enabled: false, action: "", f9Note: "" }, garbageDisposal: { enabled: false, action: "", f9Note: "" } },
   ...defaultAppliancesExtras,
 }
@@ -448,6 +463,7 @@ const defaultExterior = {
     },
     meterBox: false,
     meterBoxQty: "",
+    meterBoxSize: "",
   },
   finishes: {
     exteriorPaint: { enabled: false },
@@ -581,6 +597,7 @@ const defaultFoundation = {
     },
     meterBox: false,
     meterBoxQty: "",
+    meterBoxSize: "",
     houseRewire: { enabled: false, homeSf: "" },
   },
   stairs: {
@@ -639,6 +656,9 @@ export default function NewExpressEstimatePage() {
 
   const rehydratedRef = useRef(false)
   const skipNextAutosaveRef = useRef(false)
+  /** Snapshot of local draft when opening Create New blank — used by "Use draft". */
+  const pendingLocalDraftRef = useRef<string | null>(null)
+  const [draftAvailable, setDraftAvailable] = useState(false)
   /** Only one room panel open at a time — create/copy expands the new room and collapses the rest. */
   const [expandedRoomId, setExpandedRoomId] = useState<number | null>(null)
   const pendingRoomScrollIdRef = useRef<number | null>(null)
@@ -648,106 +668,128 @@ export default function NewExpressEstimatePage() {
     setExpandedRoomId(roomId)
   }
 
+  const applyDraftJson = (raw: string): boolean => {
+    try {
+      const parsed = JSON.parse(raw) as Partial<ExpressEstimatePageValues>
+      if (!parsed || typeof parsed !== "object") return false
+      const restoredRooms = Array.isArray(parsed.rooms) ? parsed.rooms : []
+      formRef.current.reset({
+        ...defaultExpressEstimatePageValues,
+        ...parsed,
+        activeTab: typeof parsed.activeTab === "string" ? parsed.activeTab : "exterior",
+        isSaved: true,
+        projectDetails: (() => {
+          const rawPd = (parsed.projectDetails ?? {}) as Partial<typeof defaultProjectDetails> & {
+            projectName?: string
+          }
+          return {
+            ...defaultProjectDetails,
+            insuredName: rawPd.insuredName?.trim() || rawPd.projectName?.trim() || "",
+            claimNumber: rawPd.claimNumber ?? "",
+            street: rawPd.street ?? "",
+            city: rawPd.city ?? "",
+            zipCode: rawPd.zipCode ?? "",
+            preFirm: rawPd.preFirm ?? false,
+            adjusterName: rawPd.adjusterName ?? "",
+            notes: rawPd.notes ?? "",
+          }
+        })(),
+        exterior: {
+          ...defaultExterior,
+          ...(parsed.exterior ?? {}),
+        },
+        foundation: {
+          ...defaultFoundation,
+          ...(parsed.foundation ?? {}),
+          hvac: {
+            ...defaultFoundation.hvac,
+            ...((parsed.foundation as Partial<typeof defaultFoundation> | undefined)?.hvac ?? {}),
+            airHandlers: (
+              (parsed.foundation as Partial<typeof defaultFoundation> | undefined)?.hvac?.airHandlers ??
+              defaultFoundation.hvac.airHandlers
+            ).map((h) => ({
+              ...h,
+              aCoil: {
+                enabled: h.aCoil?.enabled ?? false,
+                detachAndReset: h.aCoil?.detachAndReset ?? false,
+              },
+            })),
+            boiler: {
+              ...defaultFoundation.hvac.boiler,
+              ...((parsed.foundation as Partial<typeof defaultFoundation> | undefined)?.hvac?.boiler ?? {}),
+            },
+            furnace: {
+              ...defaultFoundation.hvac.furnace,
+              ...((parsed.foundation as Partial<typeof defaultFoundation> | undefined)?.hvac?.furnace ?? {}),
+            },
+            baseboardHeat: {
+              ...defaultFoundation.hvac.baseboardHeat,
+              ...((parsed.foundation as Partial<typeof defaultFoundation> | undefined)?.hvac?.baseboardHeat ?? {}),
+            },
+          },
+        },
+        rooms: restoredRooms.map((room) => {
+          const r = room as Room
+          const withDefaults: Room = {
+            ...r,
+            notes: r.notes ?? "",
+            doors: (r.doors ?? []).map((d) => ({
+              ...d,
+              casedOpening: d.casedOpening ?? false,
+              casingOpeningSize: d.casingOpeningSize ?? "",
+              casingFinish: d.casingFinish ?? "",
+            })),
+          }
+          if (!r.appliances) return withDefaults
+          return {
+            ...withDefaults,
+            appliances: {
+              ...defaultAppliancesExtras.appliances,
+              ...r.appliances,
+              airHandler: {
+                ...defaultAppliancesExtras.appliances.airHandler,
+                ...(r.appliances.airHandler ?? {}),
+                aCoil: {
+                  ...defaultAppliancesExtras.appliances.airHandler.aCoil,
+                  ...(r.appliances.airHandler?.aCoil ?? {}),
+                },
+              },
+              furnace: {
+                ...defaultFurnace,
+                ...(r.appliances.furnace ?? {}),
+              },
+            },
+          }
+        }),
+      })
+      if (restoredRooms.length > 0) {
+        const last = restoredRooms[restoredRooms.length - 1] as { id?: number }
+        if (typeof last?.id === "number") setExpandedRoomId(last.id)
+      } else {
+        setExpandedRoomId(null)
+      }
+      return true
+    } catch {
+      return false
+    }
+  }
+
   useEffect(() => {
     if (rehydratedRef.current) return
-    const raw = readExpressEstimateLocalDraft() ?? readExpressEstimatePreviewDraft()
-    if (!raw) {
+    // Returning from preview: restore that session draft automatically.
+    const previewRaw = readExpressEstimatePreviewDraft()
+    if (previewRaw) {
+      applyDraftJson(previewRaw)
       rehydratedRef.current = true
       return
     }
-    try {
-      const parsed = JSON.parse(raw) as Partial<ExpressEstimatePageValues>
-      if (parsed && typeof parsed === "object") {
-        const restoredRooms = Array.isArray(parsed.rooms) ? parsed.rooms : []
-        formRef.current.reset({
-          ...defaultExpressEstimatePageValues,
-          ...parsed,
-          activeTab: typeof parsed.activeTab === "string" ? parsed.activeTab : "exterior",
-          isSaved: true,
-          projectDetails: (() => {
-            const rawPd = (parsed.projectDetails ?? {}) as Partial<typeof defaultProjectDetails> & {
-              projectName?: string
-            }
-            return {
-              ...defaultProjectDetails,
-              insuredName: rawPd.insuredName?.trim() || rawPd.projectName?.trim() || "",
-              claimNumber: rawPd.claimNumber ?? "",
-              street: rawPd.street ?? "",
-              city: rawPd.city ?? "",
-              zipCode: rawPd.zipCode ?? "",
-              preFirm: rawPd.preFirm ?? false,
-              adjusterName: rawPd.adjusterName ?? "",
-              notes: rawPd.notes ?? "",
-            }
-          })(),
-          exterior: {
-            ...defaultExterior,
-            ...(parsed.exterior ?? {}),
-          },
-          foundation: {
-            ...defaultFoundation,
-            ...(parsed.foundation ?? {}),
-            hvac: {
-              ...defaultFoundation.hvac,
-              ...((parsed.foundation as Partial<typeof defaultFoundation> | undefined)?.hvac ?? {}),
-              airHandlers: (
-                (parsed.foundation as Partial<typeof defaultFoundation> | undefined)?.hvac?.airHandlers ??
-                defaultFoundation.hvac.airHandlers
-              ).map((h) => ({
-                ...h,
-                aCoil: {
-                  enabled: h.aCoil?.enabled ?? false,
-                  detachAndReset: h.aCoil?.detachAndReset ?? false,
-                },
-              })),
-              boiler: {
-                ...defaultFoundation.hvac.boiler,
-                ...((parsed.foundation as Partial<typeof defaultFoundation> | undefined)?.hvac?.boiler ?? {}),
-              },
-              furnace: {
-                ...defaultFoundation.hvac.furnace,
-                ...((parsed.foundation as Partial<typeof defaultFoundation> | undefined)?.hvac?.furnace ?? {}),
-              },
-              baseboardHeat: {
-                ...defaultFoundation.hvac.baseboardHeat,
-                ...((parsed.foundation as Partial<typeof defaultFoundation> | undefined)?.hvac?.baseboardHeat ?? {}),
-              },
-            },
-          },
-          rooms: restoredRooms.map((room) => {
-            const r = room as Room
-            if (!r.appliances) return r
-            return {
-              ...r,
-              appliances: {
-                ...defaultAppliancesExtras.appliances,
-                ...r.appliances,
-                airHandler: {
-                  ...defaultAppliancesExtras.appliances.airHandler,
-                  ...(r.appliances.airHandler ?? {}),
-                  aCoil: {
-                    ...defaultAppliancesExtras.appliances.airHandler.aCoil,
-                    ...(r.appliances.airHandler?.aCoil ?? {}),
-                  },
-                },
-                furnace: {
-                  ...defaultFurnace,
-                  ...(r.appliances.furnace ?? {}),
-                },
-              },
-            }
-          }),
-        })
-        if (restoredRooms.length > 0) {
-          const last = restoredRooms[restoredRooms.length - 1] as { id?: number }
-          if (typeof last?.id === "number") setExpandedRoomId(last.id)
-        }
-      }
-    } catch {
-      // ignore corrupt storage
-    } finally {
-      rehydratedRef.current = true
+    // Create New: start blank. Offer local draft via "Use draft" if one exists.
+    const localRaw = readExpressEstimateLocalDraft()
+    if (localRaw) {
+      pendingLocalDraftRef.current = localRaw
+      setDraftAvailable(true)
     }
+    rehydratedRef.current = true
   }, [])
 
   useEffect(() => {
@@ -847,9 +889,29 @@ export default function NewExpressEstimatePage() {
     skipNextAutosaveRef.current = true
     form.reset(defaultExpressEstimatePageValues)
     setExpandedRoomId(null)
+    pendingLocalDraftRef.current = null
+    setDraftAvailable(false)
     clearExpressEstimateLocalDraft()
     clearExpressEstimatePreviewDraft()
     toast.success("Draft reset.")
+  }
+
+  const handleUseDraft = () => {
+    const raw = pendingLocalDraftRef.current ?? readExpressEstimateLocalDraft()
+    if (!raw) {
+      setDraftAvailable(false)
+      toast.error("No draft found.", { id: "ee-use-draft" })
+      return
+    }
+    skipNextAutosaveRef.current = true
+    if (!applyDraftJson(raw)) {
+      toast.error("Could not restore draft.", { id: "ee-use-draft" })
+      return
+    }
+    pendingLocalDraftRef.current = null
+    setDraftAvailable(false)
+    writeExpressEstimateLocalDraft(JSON.stringify(formRef.current.getValues()))
+    toast.success("Draft restored.")
   }
 
   const addRoom = (type: string = "room", name: string = "") => {
@@ -990,6 +1052,9 @@ const newDoor: DoorItem = {
   peepHole: false,
   mailSlot: false,
   nonCased: false,
+  casedOpening: false,
+  casingOpeningSize: "",
+  casingFinish: "",
   sidelites: false,
   sidelitesQty: "",
   sidelitesSize: "",
@@ -1023,9 +1088,34 @@ const newDoor: DoorItem = {
           ) : (
             <Badge variant="outline">Saving...</Badge>
           )}
-          <Button variant="outline" className="border-border/60">Save Draft</Button>
+          {draftAvailable && (
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2 border-border/60"
+              onClick={handleUseDraft}
+            >
+              <FileClock className="h-4 w-4" />
+              Use draft
+            </Button>
+          )}
+          <Button type="button" variant="outline" className="border-border/60" onClick={handleSave}>
+            Save Draft
+          </Button>
         </div>
       </div>
+
+      {draftAvailable && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border/60 bg-secondary/30 px-4 py-3">
+          <p className="text-sm text-muted-foreground">
+            You have a saved draft from a previous session. This page started blank — restore it if you want to continue that work.
+          </p>
+          <Button type="button" size="sm" className="gap-2 shrink-0" onClick={handleUseDraft}>
+            <FileClock className="h-4 w-4" />
+            Use draft
+          </Button>
+        </div>
+      )}
 
       <div className="grid gap-8 lg:grid-cols-4">
         {/* Main Form */}
@@ -1820,28 +1910,42 @@ const newDoor: DoorItem = {
                           )}
                         </div>
                         {/* Meter Box — matches Foundation Electrical */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                           <Switch
                             checked={exterior.electrical.meterBox}
-                            onCheckedChange={(checked) => { setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, meterBox: checked } }); handleSave() }}
+                            onCheckedChange={(checked) => {
+                              setValue("exterior",{
+                                ...exterior,
+                                electrical: {
+                                  ...exterior.electrical,
+                                  meterBox: checked,
+                                  ...(checked ? {} : { meterBoxSize: "", meterBoxQty: "" }),
+                                },
+                              })
+                              handleSave()
+                            }}
                           />
                           <Label>Enable Meter Box</Label>
                           {exterior.electrical.meterBox && (
-                            <Input
-                              type="number"
-                              min={0}
-                              inputMode="numeric"
-                              placeholder="QTY"
-                              value={exterior.electrical.meterBoxQty}
-                              onChange={(e) => {
-                                setValue("exterior",{
-                                  ...exterior,
-                                  electrical: { ...exterior.electrical, meterBoxQty: e.target.value.replace(/^0+/, "") || "" },
-                                })
+                            <Select
+                              value={exterior.electrical.meterBoxSize || "__none__"}
+                              onValueChange={(__v) => {
+                                const value = __v === "__none__" ? "" : __v
+                                setValue("exterior",{ ...exterior, electrical: { ...exterior.electrical, meterBoxSize: value } })
                                 handleSave()
                               }}
-                              className="w-20 border-border/60 bg-secondary/50"
-                            />
+                            >
+                              <SelectTrigger className="w-[240px] border-border/60 bg-secondary/50">
+                                <SelectValue placeholder="Size" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                <SelectItem value="200">Meter base - 200 AMP</SelectItem>
+                                <SelectItem value="100-200">Meter base - 100- 200 AMP</SelectItem>
+                                <SelectItem value="250-320">Meter base - 250- 320 AMP</SelectItem>
+                                <SelectItem value="400-2000">Meter base - 400- 2000 AMP</SelectItem>
+                              </SelectContent>
+                            </Select>
                           )}
                         </div>
                       </div>
@@ -1960,7 +2064,6 @@ const newDoor: DoorItem = {
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     <SelectItem value="1/2">1/2</SelectItem>
                                     <SelectItem value="3/4">3/4</SelectItem>
-                                    <SelectItem value="3/8">3/8</SelectItem>
                                     <SelectItem value="5/8">5/8</SelectItem>
                                   </SelectContent>
                                 </Select>
@@ -2684,12 +2787,22 @@ const newDoor: DoorItem = {
                                 <Label className="text-xs text-muted-foreground">Type</Label>
                                 <Select value={foundation.waterHeater.type} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v
+                                  const clearTanklessSize = foundation.waterHeater.tankless
+                                  const clearElectricOnlySize =
+                                    !foundation.waterHeater.tankless &&
+                                    value === "gas" &&
+                                    foundation.waterHeater.size === "80gal"
+                                  const clearGas75Rating =
+                                    !foundation.waterHeater.tankless &&
+                                    value === "gas" &&
+                                    foundation.waterHeater.size === "75gal"
                                   setValue("foundation",{
                                     ...foundation,
                                     waterHeater: {
                                       ...foundation.waterHeater,
                                       type: value,
-                                      ...(foundation.waterHeater.tankless ? { size: "" } : {}),
+                                      ...((clearTanklessSize || clearElectricOnlySize) ? { size: "" } : {}),
+                                      ...(clearGas75Rating ? { rating: "" } : {}),
                                     },
                                   })
                                   handleSave()
@@ -2699,7 +2812,9 @@ const newDoor: DoorItem = {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="gas">Gas</SelectItem>
+                                    {foundation.waterHeater.size !== "80gal" && (
+                                      <SelectItem value="gas">Gas</SelectItem>
+                                    )}
                                     <SelectItem value="electric">Electric</SelectItem>
                                   </SelectContent>
                                 </Select>
@@ -2708,7 +2823,21 @@ const newDoor: DoorItem = {
                                 <Label className="text-xs text-muted-foreground">
                                   {foundation.waterHeater.tankless && foundation.waterHeater.type === "electric" ? "Capacity" : "Size"}
                                 </Label>
-                                <Select value={foundation.waterHeater.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, size: value } }); handleSave() }}>
+                                <Select value={foundation.waterHeater.size} onValueChange={(__v) => {
+                                  const value = __v === "__none__" ? "" : __v
+                                  const clearGas75Rating =
+                                    foundation.waterHeater.type === "gas" && value === "75gal"
+                                  setValue("foundation",{
+                                    ...foundation,
+                                    waterHeater: {
+                                      ...foundation.waterHeater,
+                                      size: value,
+                                      ...(value === "80gal" ? { type: "electric" } : {}),
+                                      ...(clearGas75Rating ? { rating: "" } : {}),
+                                    },
+                                  })
+                                  handleSave()
+                                }}>
                                   <SelectTrigger className={`border-border/60 bg-secondary/50 ${foundation.waterHeater.tankless && (foundation.waterHeater.type === "gas" || foundation.waterHeater.type === "electric") ? "min-w-[200px] w-[min(100%,240px)]" : "w-24"}`}>
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
@@ -2721,6 +2850,9 @@ const newDoor: DoorItem = {
                                         <SelectItem value="40gal">40 gal</SelectItem>
                                         <SelectItem value="50gal">50 gal</SelectItem>
                                         <SelectItem value="75gal">75 gal</SelectItem>
+                                        {foundation.waterHeater.type === "electric" && (
+                                          <SelectItem value="80gal">80 gal</SelectItem>
+                                        )}
                                       </>
                                     )}
                                     {foundation.waterHeater.tankless && foundation.waterHeater.type === "gas" && (
@@ -2740,6 +2872,9 @@ const newDoor: DoorItem = {
                                   </SelectContent>
                                 </Select>
                               </div>
+                              {!foundation.waterHeater.tankless &&
+                              foundation.waterHeater.type === "gas" &&
+                              foundation.waterHeater.size === "75gal" ? null : (
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Rating</Label>
                                 <Select value={foundation.waterHeater.rating} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, rating: value } }); handleSave() }}>
@@ -2754,6 +2889,7 @@ const newDoor: DoorItem = {
                                   </SelectContent>
                                 </Select>
                               </div>
+                              )}
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Action</Label>
                                 <Select value={foundation.waterHeater.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, action: value } }); handleSave() }}>
@@ -3037,7 +3173,14 @@ const newDoor: DoorItem = {
                                   <Select value={window.type} onValueChange={(__v) => {
                                     const value = __v === "__none__" ? "" : __v;
                                     const newWindows = [...foundation.subgradeAreaCoverage.foundationalWindows]
-                                    newWindows[idx] = { ...window, type: value, size: "", grade: "" }
+                                    const clearAluminum = value === "double-hung" && window.material === "aluminum"
+                                    newWindows[idx] = {
+                                      ...window,
+                                      type: value,
+                                      size: "",
+                                      grade: "",
+                                      ...(clearAluminum ? { material: "" } : {}),
+                                    }
                                     setValue("foundation",{
                                       ...foundation,
                                       subgradeAreaCoverage: {
@@ -3081,7 +3224,9 @@ const newDoor: DoorItem = {
                                     <SelectContent>
                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                       <SelectItem value="vinyl">Vinyl</SelectItem>
-                                      <SelectItem value="aluminum">Aluminum</SelectItem>
+                                      {window.type !== "double-hung" && (
+                                        <SelectItem value="aluminum">Aluminum</SelectItem>
+                                      )}
                                       <SelectItem value="wood">Wood</SelectItem>
                                     </SelectContent>
                                   </Select>
@@ -3168,15 +3313,6 @@ const newDoor: DoorItem = {
                                             <SelectItem value="20-28">20-28 SF</SelectItem>
                                           </>
                                         )}
-                                        {/* Aluminum - Double Hung */}
-                                        {window.material === "aluminum" && window.type === "double-hung" && (
-                                          <>
-                                            <SelectItem value="4-8">4-8 SF</SelectItem>
-                                            <SelectItem value="9-12">9-12 SF</SelectItem>
-                                            <SelectItem value="13-19">13-19 SF</SelectItem>
-                                            <SelectItem value="20-28">20-28 SF</SelectItem>
-                                          </>
-                                        )}
                                         {/* Wood - Casement */}
                                         {window.material === "wood" && window.type === "casement" && (
                                           <>
@@ -3256,7 +3392,7 @@ const newDoor: DoorItem = {
                                             <SelectItem value="premium">Premium Grade</SelectItem>
                                           </>
                                         )}
-                                        {/* Aluminum - Horizontal Slider, Fixed, Single Hung, Double Hung */}
+                                        {/* Aluminum - Horizontal Slider, Fixed */}
                                         {window.material === "aluminum" && (window.type === "horizontal-slider" || window.type === "fixed") && (
                                           <>
                                             <SelectItem value="base">Base</SelectItem>
@@ -3264,8 +3400,8 @@ const newDoor: DoorItem = {
                                             <SelectItem value="2-pane-thermal">2 Pane w/Thermal</SelectItem>
                                           </>
                                         )}
-                                        {/* Aluminum - Casement, Single Hung, Double Hung */}
-                                        {window.material === "aluminum" && (window.type === "casement" || window.type === "single-hung" || window.type === "double-hung") && (
+                                        {/* Aluminum - Casement, Single Hung */}
+                                        {window.material === "aluminum" && (window.type === "casement" || window.type === "single-hung") && (
                                           <>
                                             <SelectItem value="base">Base</SelectItem>
                                             <SelectItem value="high">High Grade</SelectItem>
@@ -4209,28 +4345,42 @@ const newDoor: DoorItem = {
                           )}
                         </div>
                         {/* Meter Box */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                           <Switch
                             checked={foundation.electrical.meterBox}
-                            onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, meterBox: checked } }); handleSave() }}
+                            onCheckedChange={(checked) => {
+                              setValue("foundation",{
+                                ...foundation,
+                                electrical: {
+                                  ...foundation.electrical,
+                                  meterBox: checked,
+                                  ...(checked ? {} : { meterBoxSize: "", meterBoxQty: "" }),
+                                },
+                              })
+                              handleSave()
+                            }}
                           />
                           <Label>Enable Meter Box</Label>
                           {foundation.electrical.meterBox && (
-                            <Input
-                              type="number"
-                              min={0}
-                              inputMode="numeric"
-                              placeholder="QTY"
-                              value={foundation.electrical.meterBoxQty}
-                              onChange={(e) => {
-                                setValue("foundation",{
-                                  ...foundation,
-                                  electrical: { ...foundation.electrical, meterBoxQty: e.target.value.replace(/^0+/, "") || "" },
-                                })
+                            <Select
+                              value={foundation.electrical.meterBoxSize || "__none__"}
+                              onValueChange={(__v) => {
+                                const value = __v === "__none__" ? "" : __v
+                                setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, meterBoxSize: value } })
                                 handleSave()
                               }}
-                              className="w-20 border-border/60 bg-secondary/50"
-                            />
+                            >
+                              <SelectTrigger className="w-[240px] border-border/60 bg-secondary/50">
+                                <SelectValue placeholder="Size" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                <SelectItem value="200">Meter base - 200 AMP</SelectItem>
+                                <SelectItem value="100-200">Meter base - 100- 200 AMP</SelectItem>
+                                <SelectItem value="250-320">Meter base - 250- 320 AMP</SelectItem>
+                                <SelectItem value="400-2000">Meter base - 400- 2000 AMP</SelectItem>
+                              </SelectContent>
+                            </Select>
                           )}
                         </div>
 
@@ -5411,7 +5561,14 @@ const newDoor: DoorItem = {
                                         <Select value={window.type} onValueChange={(__v) => {
                                           const value = __v === "__none__" ? "" : __v;
                                           const newWindows = [...room.windows]
-                                          newWindows[idx] = { ...window, type: value, size: "", grade: "" }
+                                          const clearAluminum = value === "double-hung" && window.material === "aluminum"
+                                          newWindows[idx] = {
+                                            ...window,
+                                            type: value,
+                                            size: "",
+                                            grade: "",
+                                            ...(clearAluminum ? { material: "" } : {}),
+                                          }
                                           updateRoom(room.id, { windows: newWindows })
                                         }}>
                                           <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
@@ -5441,7 +5598,9 @@ const newDoor: DoorItem = {
                                           <SelectContent>
                                             <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                             <SelectItem value="vinyl">Vinyl</SelectItem>
-                                            <SelectItem value="aluminum">Aluminum</SelectItem>
+                                            {window.type !== "double-hung" && (
+                                              <SelectItem value="aluminum">Aluminum</SelectItem>
+                                            )}
                                             <SelectItem value="wood">Wood</SelectItem>
                                           </SelectContent>
                                         </Select>
@@ -5521,15 +5680,6 @@ const newDoor: DoorItem = {
                                                   <SelectItem value="20-28">20-28 SF</SelectItem>
                                                 </>
                                               )}
-                                              {/* Aluminum - Double Hung */}
-                                              {window.material === "aluminum" && window.type === "double-hung" && (
-                                                <>
-                                                  <SelectItem value="4-8">4-8 SF</SelectItem>
-                                                  <SelectItem value="9-12">9-12 SF</SelectItem>
-                                                  <SelectItem value="13-19">13-19 SF</SelectItem>
-                                                  <SelectItem value="20-28">20-28 SF</SelectItem>
-                                                </>
-                                              )}
                                               {/* Wood - Casement */}
                                               {window.material === "wood" && window.type === "casement" && (
                                                 <>
@@ -5602,7 +5752,7 @@ const newDoor: DoorItem = {
                                                   <SelectItem value="premium">Premium Grade</SelectItem>
                                                 </>
                                               )}
-                                              {/* Aluminum - Horizontal Slider, Fixed, Single Hung, Double Hung */}
+                                              {/* Aluminum - Horizontal Slider, Fixed */}
                                               {window.material === "aluminum" && (window.type === "horizontal-slider" || window.type === "fixed") && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
@@ -5610,8 +5760,8 @@ const newDoor: DoorItem = {
                                                   <SelectItem value="2-pane-thermal">2 Pane w/Thermal</SelectItem>
                                                 </>
                                               )}
-                                              {/* Aluminum - Casement, Single Hung, Double Hung */}
-                                              {window.material === "aluminum" && (window.type === "casement" || window.type === "single-hung" || window.type === "double-hung") && (
+                                              {/* Aluminum - Casement, Single Hung */}
+                                              {window.material === "aluminum" && (window.type === "casement" || window.type === "single-hung") && (
                                                 <>
                                                   <SelectItem value="base">Base</SelectItem>
                                                   <SelectItem value="high">High Grade</SelectItem>
@@ -5905,14 +6055,27 @@ const newDoor: DoorItem = {
                               {/* BATHROOM SPECIFIC SECTIONS */}
                               {room.type === "bathroom" && room.vanity && room.toilet && room.shower && (
                                 <>
-                                  {/* Vanity */}
+                                  {/* Vanity/Sink */}
                                   <div className="space-y-3 rounded-lg border border-border/40 p-4">
                                     <div className="flex items-center gap-3">
                                       <Switch
                                         checked={room.vanity.enabled}
-                                        onCheckedChange={(checked) => updateRoom(room.id, { vanity: { ...room.vanity!, enabled: checked } })}
+                                        onCheckedChange={(checked) =>
+                                          updateRoom(room.id, {
+                                            vanity: { ...room.vanity!, enabled: checked },
+                                            ...(checked
+                                              ? {
+                                                  pedestalSink: {
+                                                    ...(room.pedestalSink ?? { enabled: false, action: "" }),
+                                                    enabled: false,
+                                                    action: "",
+                                                  },
+                                                }
+                                              : {}),
+                                          })
+                                        }
                                       />
-                                      <Label className="font-medium">Vanity</Label>
+                                      <Label className="font-medium">Vanity/Sink</Label>
                                     </div>
                                     {room.vanity.enabled && (
                                       <div className="space-y-3 pl-2">
@@ -5943,14 +6106,16 @@ const newDoor: DoorItem = {
                                               </SelectContent>
                                             </Select>
                                           </div>
-                                          <div className="flex items-center gap-2 pb-1">
-                                            <Switch
-                                              checked={room.vanity.detachAndReset}
-                                              onCheckedChange={(checked) => updateRoom(room.id, { vanity: { ...room.vanity!, detachAndReset: checked } })}
-                                            />
-                                            <Label className="text-xs whitespace-nowrap">Detach and Reset</Label>
+                                          <div className="flex flex-col gap-1 pb-1">
+                                            <div className="flex items-center gap-2">
+                                              <Switch
+                                                checked={room.vanity.detachAndReset}
+                                                onCheckedChange={(checked) => updateRoom(room.id, { vanity: { ...room.vanity!, detachAndReset: checked } })}
+                                              />
+                                              <Label className="text-xs whitespace-nowrap">Detach and Reset</Label>
+                                            </div>
+                                            <span className="text-xs text-orange-400">Note: Cabinets are put in for replacement unless D/R is selected</span>
                                           </div>
-                                          <span className="text-xs text-orange-400 pb-1">Note: Cabinets are put in for replacement unless D/R is selected</span>
                                         </div>
                                         {/* Countertop section */}
                                         <div className="rounded-md border border-border/30 bg-secondary/20 p-3 space-y-3">
@@ -5963,8 +6128,10 @@ const newDoor: DoorItem = {
                                                 const prev = room.vanity!.countertop
                                                 let nextSink = prev.sink
                                                 let nextAction = prev.action
+                                                let nextGrade = prev.grade
                                                 if (value === "cultured-marble") {
                                                   if (!["", "sink", "single", "double"].includes(prev.sink)) nextSink = ""
+                                                  if (prev.grade === "premium") nextGrade = ""
                                                 } else if (value === "laminate") {
                                                   if (!["", "sink", "undermount-single", "undermount-double"].includes(prev.sink)) nextSink = ""
                                                 } else if (prev.type === "cultured-marble" && prev.sink === "single") {
@@ -5973,7 +6140,7 @@ const newDoor: DoorItem = {
                                                 if (value === "tile") {
                                                   nextAction = "replace"
                                                 }
-                                                updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...prev, type: value, sink: nextSink, action: nextAction } } })
+                                                updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...prev, type: value, sink: nextSink, action: nextAction, grade: nextGrade } } })
                                               }}
                                               >
                                                 <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
@@ -6000,7 +6167,9 @@ const newDoor: DoorItem = {
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="base">Base</SelectItem>
                                                   <SelectItem value="high">High</SelectItem>
-                                                  <SelectItem value="premium">Premium</SelectItem>
+                                                  {room.vanity.countertop.type !== "cultured-marble" && (
+                                                    <SelectItem value="premium">Premium</SelectItem>
+                                                  )}
                                                 </SelectContent>
                                               </Select>
                                             </div>
@@ -6133,6 +6302,56 @@ const newDoor: DoorItem = {
                                         </div>
                                       </div>
                                     )}
+
+                                    {/* Pedestal Sink */}
+                                    <div className="space-y-3 border-t border-border/20 pt-3">
+                                      <div className="flex items-center gap-3">
+                                        <Switch
+                                          checked={room.pedestalSink?.enabled ?? false}
+                                          onCheckedChange={(checked) =>
+                                            updateRoom(room.id, {
+                                              pedestalSink: {
+                                                ...(room.pedestalSink ?? { enabled: false, action: "" }),
+                                                enabled: checked,
+                                                action: checked ? (room.pedestalSink?.action ?? "") : "",
+                                              },
+                                              ...(checked
+                                                ? { vanity: { ...room.vanity!, enabled: false } }
+                                                : {}),
+                                            })
+                                          }
+                                        />
+                                        <Label className="font-medium">Pedestal Sink</Label>
+                                      </div>
+                                      {room.pedestalSink?.enabled && (
+                                        <div className="flex flex-wrap items-end gap-x-3 gap-y-2 pl-2">
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Action</Label>
+                                            <Select
+                                              value={room.pedestalSink.action}
+                                              onValueChange={(__v) => {
+                                                const value = nv(__v)
+                                                updateRoom(room.id, {
+                                                  pedestalSink: {
+                                                    ...(room.pedestalSink ?? { enabled: true, action: "" }),
+                                                    action: value,
+                                                  },
+                                                })
+                                              }}
+                                            >
+                                              <SelectTrigger className="w-[160px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                <SelectItem value="replace">Replace</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
 
                                   {/* Toilet */}
@@ -6202,6 +6421,7 @@ const newDoor: DoorItem = {
                                                 <SelectItem value="tub-cultured-marble">Tub With Cultured Marble</SelectItem>
                                                 <SelectItem value="tile-shower">Tiled Shower</SelectItem>
                                                 <SelectItem value="fiberglass-shower-base">Fiberglass Shower Base</SelectItem>
+                                                <SelectItem value="cultured-marble-shower-base">Cultured Marble Shower Base</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           </div>
@@ -6234,36 +6454,77 @@ const newDoor: DoorItem = {
 
                                           {/* Tiled Shower: Action Mortar Bed (tile-shower only) */}
                                           {room.shower.type === "tile-shower" && (
-                                            <div className="space-y-1">
-                                              <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
-                                              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 min-h-9">
-                                                <div className="flex items-center gap-2">
-                                                  <Switch
-                                                    checked={room.shower.mortarBedReplace}
-                                                    onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedReplace: checked, mortarBedSize: checked ? room.shower!.mortarBedSize : "" } })}
-                                                  />
-                                                  <Label className="text-sm whitespace-nowrap">Replace</Label>
-                                                </div>
-                                                {room.shower.mortarBedReplace && (
+                                            <>
+                                              <div className="space-y-1">
+                                                <Label className="text-xs text-muted-foreground">Action Mortar Bed</Label>
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 min-h-9">
                                                   <div className="flex items-center gap-2">
-                                                    <Label className="text-xs text-muted-foreground whitespace-nowrap">SF to replace</Label>
-                                                    <Input
-                                                      type="number"
-                                                      min={0}
-                                                      step="0.01"
-                                                      inputMode="decimal"
-                                                      placeholder="SF"
-                                                      value={room.shower.mortarBedSize}
-                                                      onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedSize: e.target.value } })}
-                                                      className="w-[100px] border-border/60 bg-secondary/50"
+                                                    <Switch
+                                                      checked={room.shower.mortarBedReplace}
+                                                      onCheckedChange={(checked) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedReplace: checked, mortarBedSize: checked ? room.shower!.mortarBedSize : "" } })}
                                                     />
+                                                    <Label className="text-sm whitespace-nowrap">Replace</Label>
                                                   </div>
-                                                )}
+                                                  {room.shower.mortarBedReplace && (
+                                                    <div className="flex items-center gap-2">
+                                                      <Label className="text-xs text-muted-foreground whitespace-nowrap">SF to replace</Label>
+                                                      <Input
+                                                        type="number"
+                                                        min={0}
+                                                        step="0.01"
+                                                        inputMode="decimal"
+                                                        placeholder="SF"
+                                                        value={room.shower.mortarBedSize}
+                                                        onChange={(e) => updateRoom(room.id, { shower: { ...room.shower!, mortarBedSize: e.target.value } })}
+                                                        className="w-[100px] border-border/60 bg-secondary/50"
+                                                      />
+                                                    </div>
+                                                  )}
+                                                </div>
                                               </div>
-                                            </div>
+                                              <div className="space-y-1">
+                                                <Label className="text-xs text-muted-foreground">Tile Curb</Label>
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 min-h-9">
+                                                  <div className="flex items-center gap-2">
+                                                    <Switch
+                                                      checked={room.shower.tileCurb ?? false}
+                                                      onCheckedChange={(checked) =>
+                                                        updateRoom(room.id, {
+                                                          shower: {
+                                                            ...room.shower!,
+                                                            tileCurb: checked,
+                                                            tileCurbSize: checked ? (room.shower!.tileCurbSize ?? "") : "",
+                                                          },
+                                                        })
+                                                      }
+                                                    />
+                                                    <Label className="text-sm whitespace-nowrap">Tile Curb</Label>
+                                                  </div>
+                                                  {room.shower.tileCurb && (
+                                                    <div className="flex items-center gap-2">
+                                                      <Label className="text-xs text-muted-foreground whitespace-nowrap">LF</Label>
+                                                      <Input
+                                                        type="number"
+                                                        min={0}
+                                                        step="0.01"
+                                                        inputMode="decimal"
+                                                        placeholder="LF"
+                                                        value={room.shower.tileCurbSize ?? ""}
+                                                        onChange={(e) =>
+                                                          updateRoom(room.id, {
+                                                            shower: { ...room.shower!, tileCurbSize: e.target.value },
+                                                          })
+                                                        }
+                                                        className="w-[100px] border-border/60 bg-secondary/50"
+                                                      />
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              </div>
+                                            </>
                                           )}
-                                          {/* Tiled Shower & Fiberglass Shower Base: Walls + Shower Faucet (same options) */}
-                                          {(room.shower.type === "tile-shower" || room.shower.type === "fiberglass-shower-base") && (
+                                          {/* Tiled Shower, Fiberglass Shower Base & Cultured Marble Shower Base: Walls + Shower Faucet (same options) */}
+                                          {(room.shower.type === "tile-shower" || room.shower.type === "fiberglass-shower-base" || room.shower.type === "cultured-marble-shower-base") && (
                                             <>
                                               <div className="space-y-1">
                                                 <Label className="text-xs text-muted-foreground">Walls</Label>
@@ -6673,7 +6934,33 @@ const newDoor: DoorItem = {
                                       <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Type</Label>
-                                          <Select value={room.countertop.type} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { countertop: { ...room.countertop!, type: value } }) }}>
+                                          <Select value={room.countertop.type} onValueChange={(__v) => {
+                                            const value = nv(__v)
+                                            const prev = room.countertop!
+                                            const nextGrade =
+                                              value === "cultured-marble" && (prev.grade === "premium" || prev.grade === "standard")
+                                                ? ""
+                                                : prev.grade
+                                            let nextAction = prev.action
+                                            let nextDetach = prev.detachAndReset
+                                            if (value === "butcher-block") {
+                                              if (prev.action !== "remove-replace" && prev.action !== "detach-reset") {
+                                                nextAction = prev.detachAndReset ? "detach-reset" : "remove-replace"
+                                              }
+                                              nextDetach = nextAction === "detach-reset"
+                                            } else if (prev.type === "butcher-block") {
+                                              nextAction = ""
+                                            }
+                                            updateRoom(room.id, {
+                                              countertop: {
+                                                ...prev,
+                                                type: value,
+                                                grade: nextGrade,
+                                                action: nextAction,
+                                                detachAndReset: nextDetach,
+                                              },
+                                            })
+                                          }}>
                                             <SelectTrigger className="w-[130px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
@@ -6684,6 +6971,7 @@ const newDoor: DoorItem = {
                                               <SelectItem value="tile">Tile</SelectItem>
                                               <SelectItem value="granite">Granite</SelectItem>
                                               <SelectItem value="marble">Marble</SelectItem>
+                                              <SelectItem value="butcher-block">Butcher Block</SelectItem>
                                             </SelectContent>
                                           </Select>
                                         </div>
@@ -6696,8 +6984,14 @@ const newDoor: DoorItem = {
                                             <SelectContent>
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               <SelectItem value="base">Base</SelectItem>
-                                              <SelectItem value="standard">Standard</SelectItem>
-                                              <SelectItem value="premium">Premium</SelectItem>
+                                              {room.countertop.type === "cultured-marble" ? (
+                                                <SelectItem value="high">High</SelectItem>
+                                              ) : (
+                                                <>
+                                                  <SelectItem value="standard">Standard</SelectItem>
+                                                  <SelectItem value="premium">Premium</SelectItem>
+                                                </>
+                                              )}
                                             </SelectContent>
                                           </Select>
                                         </div>
@@ -6716,13 +7010,41 @@ const newDoor: DoorItem = {
                                             className="w-[100px] border-border/60 bg-secondary/50"
                                           />
                                         </div>
-                                        <div className="flex items-center gap-2 pb-1">
-                                          <Switch
-                                            checked={room.countertop.detachAndReset}
-                                            onCheckedChange={(checked) => updateRoom(room.id, { countertop: { ...room.countertop!, detachAndReset: checked } })}
-                                          />
-                                          <Label className="text-xs whitespace-nowrap">Detach and reset</Label>
-                                        </div>
+                                        {room.countertop.type === "butcher-block" ? (
+                                          <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground">Action</Label>
+                                            <Select
+                                              value={room.countertop.action || "__none__"}
+                                              onValueChange={(__v) => {
+                                                const value = nv(__v)
+                                                updateRoom(room.id, {
+                                                  countertop: {
+                                                    ...room.countertop!,
+                                                    action: value,
+                                                    detachAndReset: value === "detach-reset",
+                                                  },
+                                                })
+                                              }}
+                                            >
+                                              <SelectTrigger className="w-[160px] border-border/60 bg-secondary/50">
+                                                <SelectValue placeholder="Select" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                <SelectItem value="remove-replace">Remove &amp; Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                        ) : (
+                                          <div className="flex items-center gap-2 pb-1">
+                                            <Switch
+                                              checked={room.countertop.detachAndReset}
+                                              onCheckedChange={(checked) => updateRoom(room.id, { countertop: { ...room.countertop!, detachAndReset: checked } })}
+                                            />
+                                            <Label className="text-xs whitespace-nowrap">Detach and reset</Label>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
 
@@ -7169,17 +7491,50 @@ const newDoor: DoorItem = {
                                           </div>
                                           {room.appliances.waterHeater.enabled && (
                                             <div className="flex flex-wrap items-center gap-3">
-                                              <Select value={room.appliances.waterHeater.type} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, type: value } } }) }}>
+                                              <Select
+                                                value={room.appliances.waterHeater.type}
+                                                onValueChange={(__v) => {
+                                                  const value = nv(__v)
+                                                  const clearElectricOnlySize = value === "gas" && room.appliances!.waterHeater.size === "80"
+                                                  updateRoom(room.id, {
+                                                    appliances: {
+                                                      ...room.appliances!,
+                                                      waterHeater: {
+                                                        ...room.appliances!.waterHeater,
+                                                        type: value,
+                                                        ...(clearElectricOnlySize ? { size: "" } : {}),
+                                                      },
+                                                    },
+                                                  })
+                                                }}
+                                              >
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="gas">Gas</SelectItem>
+                                                  {room.appliances.waterHeater.size !== "80" && (
+                                                    <SelectItem value="gas">Gas</SelectItem>
+                                                  )}
                                                   <SelectItem value="electric">Electric</SelectItem>
                                                 </SelectContent>
                                               </Select>
-                                              <Select value={room.appliances.waterHeater.size} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, size: value } } }) }}>
+                                              <Select
+                                                value={room.appliances.waterHeater.size}
+                                                onValueChange={(__v) => {
+                                                  const value = nv(__v)
+                                                  updateRoom(room.id, {
+                                                    appliances: {
+                                                      ...room.appliances!,
+                                                      waterHeater: {
+                                                        ...room.appliances!.waterHeater,
+                                                        size: value,
+                                                        ...(value === "80" ? { type: "electric" } : {}),
+                                                      },
+                                                    },
+                                                  })
+                                                }}
+                                              >
                                                 <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                   <SelectValue placeholder="Size" />
                                                 </SelectTrigger>
@@ -7191,7 +7546,9 @@ const newDoor: DoorItem = {
                                                   <SelectItem value="50">50 gal</SelectItem>
                                                   <SelectItem value="60">60 gal</SelectItem>
                                                   <SelectItem value="75">75 gal</SelectItem>
-                                                  <SelectItem value="80">80 gal</SelectItem>
+                                                  {room.appliances.waterHeater.type === "electric" && (
+                                                    <SelectItem value="80">80 gal</SelectItem>
+                                                  )}
                                                 </SelectContent>
                                               </Select>
                                               <Select value={room.appliances.waterHeater.rating} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, rating: value } } }) }}>
@@ -7592,18 +7949,6 @@ const newDoor: DoorItem = {
                                             </div>
                                           )}
                                         </div>
-                                        
-                                        {/* Complete Button */}
-                                        <div className="flex justify-end pt-3 border-t border-border/40">
-                                          <Button 
-                                            type="button" 
-                                            onClick={() => { handleSave(); }}
-                                            className="gap-2"
-                                          >
-                                            <CheckCircle className="h-4 w-4" />
-                                            Complete
-                                          </Button>
-                                        </div>
                                       </div>
                                     )}
                                   </div>
@@ -7894,17 +8239,55 @@ const newDoor: DoorItem = {
                                         </div>
                                         {room.appliances.waterHeater.enabled && (
                                           <div className="flex flex-wrap items-center gap-3">
-                                            <Select value={room.appliances.waterHeater.type} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, type: value } } }) }}>
+                                            <Select
+                                              value={room.appliances.waterHeater.type}
+                                              onValueChange={(__v) => {
+                                                const value = nv(__v)
+                                                const clearElectricOnlySize = value === "gas" && room.appliances!.waterHeater.size === "80"
+                                                const clearGas75Rating = value === "gas" && room.appliances!.waterHeater.size === "75"
+                                                updateRoom(room.id, {
+                                                  appliances: {
+                                                    ...room.appliances!,
+                                                    waterHeater: {
+                                                      ...room.appliances!.waterHeater,
+                                                      type: value,
+                                                      ...(clearElectricOnlySize ? { size: "" } : {}),
+                                                      ...(clearGas75Rating ? { rating: "" } : {}),
+                                                    },
+                                                  },
+                                                })
+                                              }}
+                                            >
                                               <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                 <SelectValue placeholder="Type" />
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="gas">Gas</SelectItem>
+                                                {room.appliances.waterHeater.size !== "80" && (
+                                                  <SelectItem value="gas">Gas</SelectItem>
+                                                )}
                                                 <SelectItem value="electric">Electric</SelectItem>
                                               </SelectContent>
                                             </Select>
-                                            <Select value={room.appliances.waterHeater.size} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, size: value } } }) }}>
+                                            <Select
+                                              value={room.appliances.waterHeater.size}
+                                              onValueChange={(__v) => {
+                                                const value = nv(__v)
+                                                const clearGas75Rating =
+                                                  room.appliances!.waterHeater.type === "gas" && value === "75"
+                                                updateRoom(room.id, {
+                                                  appliances: {
+                                                    ...room.appliances!,
+                                                    waterHeater: {
+                                                      ...room.appliances!.waterHeater,
+                                                      size: value,
+                                                      ...(value === "80" ? { type: "electric" } : {}),
+                                                      ...(clearGas75Rating ? { rating: "" } : {}),
+                                                    },
+                                                  },
+                                                })
+                                              }}
+                                            >
                                               <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                 <SelectValue placeholder="Size" />
                                               </SelectTrigger>
@@ -7916,9 +8299,15 @@ const newDoor: DoorItem = {
                                                 <SelectItem value="50">50 gal</SelectItem>
                                                 <SelectItem value="60">60 gal</SelectItem>
                                                 <SelectItem value="75">75 gal</SelectItem>
-                                                <SelectItem value="80">80 gal</SelectItem>
+                                                {room.appliances.waterHeater.type === "electric" && (
+                                                  <SelectItem value="80">80 gal</SelectItem>
+                                                )}
                                               </SelectContent>
                                             </Select>
+                                            {!(
+                                              room.appliances.waterHeater.type === "gas" &&
+                                              room.appliances.waterHeater.size === "75"
+                                            ) && (
                                             <Select value={room.appliances.waterHeater.rating} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, rating: value } } }) }}>
                                               <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
                                                 <SelectValue placeholder="Rating" />
@@ -7930,6 +8319,7 @@ const newDoor: DoorItem = {
                                                 <SelectItem value="12">12 yr</SelectItem>
                                               </SelectContent>
                                             </Select>
+                                            )}
                                             <Select value={room.appliances.waterHeater.action} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { appliances: { ...room.appliances!, waterHeater: { ...room.appliances!.waterHeater, action: value } } }) }}>
                                               <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
                                                 <SelectValue placeholder="Action" />
@@ -8481,16 +8871,76 @@ const newDoor: DoorItem = {
                                               <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                             </SelectContent>
                                           </Select>
-                                          <div className="flex items-center gap-2">
-                                            <Switch
-                                              checked={door.nonCased}
-                                              onCheckedChange={(checked) => {
-                                                const newDoors = [...room.doors]
-                                                newDoors[idx] = { ...door, nonCased: checked }
-                                                updateRoom(room.id, { doors: newDoors })
-                                              }}
-                                            />
-                                            <Label className="text-sm whitespace-nowrap">Non-Cased</Label>
+                                          <div className="flex flex-col gap-2">
+                                            <div className="flex items-center gap-2">
+                                              <Switch
+                                                checked={door.nonCased}
+                                                onCheckedChange={(checked) => {
+                                                  const newDoors = [...room.doors]
+                                                  newDoors[idx] = { ...door, nonCased: checked }
+                                                  updateRoom(room.id, { doors: newDoors })
+                                                }}
+                                              />
+                                              <Label className="text-sm whitespace-nowrap">Non-Cased</Label>
+                                            </div>
+                                            <div className="flex flex-wrap items-center gap-2">
+                                              <div className="flex items-center gap-2">
+                                                <Switch
+                                                  checked={door.casedOpening ?? false}
+                                                  onCheckedChange={(checked) => {
+                                                    const newDoors = [...room.doors]
+                                                    newDoors[idx] = {
+                                                      ...door,
+                                                      casedOpening: checked,
+                                                      casingOpeningSize: checked ? door.casingOpeningSize : "",
+                                                      casingFinish: checked ? door.casingFinish : "",
+                                                    }
+                                                    updateRoom(room.id, { doors: newDoors })
+                                                  }}
+                                                />
+                                                <Label className="text-sm whitespace-nowrap">Cased Opening</Label>
+                                              </div>
+                                              {(door.casedOpening ?? false) && (
+                                                <>
+                                                  <Select
+                                                    value={door.casingOpeningSize || "__none__"}
+                                                    onValueChange={(__v) => {
+                                                      const value = __v === "__none__" ? "" : __v
+                                                      const newDoors = [...room.doors]
+                                                      newDoors[idx] = { ...door, casingOpeningSize: value }
+                                                      updateRoom(room.id, { doors: newDoors })
+                                                    }}
+                                                  >
+                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[110px]">
+                                                      <SelectValue placeholder="Opening Size" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                      <SelectItem value="3ft">3 ft</SelectItem>
+                                                      <SelectItem value="5ft">5 ft</SelectItem>
+                                                    </SelectContent>
+                                                  </Select>
+                                                  <Select
+                                                    value={door.casingFinish || "__none__"}
+                                                    onValueChange={(__v) => {
+                                                      const value = __v === "__none__" ? "" : __v
+                                                      const newDoors = [...room.doors]
+                                                      newDoors[idx] = { ...door, casingFinish: value }
+                                                      updateRoom(room.id, { doors: newDoors })
+                                                    }}
+                                                  >
+                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
+                                                      <SelectValue placeholder="Finish" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                      <SelectItem value="paint">Paint</SelectItem>
+                                                      <SelectItem value="stain">Stain</SelectItem>
+                                                    </SelectContent>
+                                                  </Select>
+                                                </>
+                                              )}
+                                            </div>
                                           </div>
                                           <div className="flex-1"></div>
                                           <div className="flex items-center gap-1">

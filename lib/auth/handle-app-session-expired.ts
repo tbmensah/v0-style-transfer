@@ -29,18 +29,17 @@ export async function handleAppSessionExpired(): Promise<void> {
   if (handlingUnauthorized) return
   handlingUnauthorized = true
 
+  const pathname = window.location.pathname
+  const search = window.location.search
+  const loginUrl = new URL("/login", window.location.origin)
+
+  if (!isPublicPath(pathname)) {
+    loginUrl.searchParams.set("next", pathname + search)
+  }
+
   try {
     await signOut()
   } finally {
-    const pathname = window.location.pathname
-    const search = window.location.search
-    const loginUrl = new URL("/login", window.location.origin)
-
-    if (!isPublicPath(pathname)) {
-      const next = pathname + search
-      loginUrl.searchParams.set("next", next)
-    }
-
-    window.location.assign(loginUrl.toString())
+    window.location.replace(loginUrl.toString())
   }
 }

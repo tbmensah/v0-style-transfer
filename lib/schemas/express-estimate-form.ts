@@ -67,6 +67,9 @@ export const doorItemSchema = z.object({
   peepHole: bool,
   mailSlot: bool,
   nonCased: bool,
+  casedOpening: bool,
+  casingOpeningSize: str,
+  casingFinish: str,
   sidelites: bool,
   sidelitesQty: str,
   sidelitesSize: str,
@@ -170,6 +173,11 @@ export const vanityOptionsSchema = z.object({
   backsplashAction: str,
 })
 
+export const pedestalSinkOptionsSchema = z.object({
+  enabled: bool,
+  action: str,
+})
+
 export const toiletOptionsSchema = z.object({
   enabled: bool,
   action: str,
@@ -189,6 +197,8 @@ export const showerOptionsSchema = z.object({
   tubShowerFaucet: str,
   mortarBedReplace: bool,
   mortarBedSize: str,
+  tileCurb: bool,
+  tileCurbSize: str,
   walls: str,
   tileBench: bool,
   tileNiche: bool,
@@ -223,6 +233,7 @@ export const countertopOptionsSchema = z.object({
   grade: str,
   size: str,
   detachAndReset: bool,
+  action: str,
 })
 
 export const plumbingOptionsSchema = z.object({
@@ -302,6 +313,7 @@ export const roomSchema = z.object({
   doorsEnabled: bool,
   doors: z.array(doorItemSchema),
   vanity: vanityOptionsSchema.optional(),
+  pedestalSink: pedestalSinkOptionsSchema.optional(),
   toilet: toiletOptionsSchema.optional(),
   shower: showerOptionsSchema.optional(),
   cabinets: cabinetOptionsSchema.optional(),
@@ -385,6 +397,7 @@ export const exteriorSchema = z.object({
     }),
     meterBox: bool,
     meterBoxQty: str,
+    meterBoxSize: str,
   }),
   finishes: z.object({
     exteriorPaint: z.object({ enabled: bool }),
@@ -584,6 +597,7 @@ export const foundationSchema = z.object({
     }),
     meterBox: bool,
     meterBoxQty: str,
+    meterBoxSize: str,
     houseRewire: z.object({
       enabled: bool,
       homeSf: str,
