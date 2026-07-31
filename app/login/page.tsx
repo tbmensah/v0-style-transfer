@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
+import { startAppSession } from "@/lib/api/requests/session"
 import { safeAppPath } from "@/lib/utilities/safe-redirect"
 import {
   loginDefaultValues,
@@ -98,6 +99,14 @@ function LoginPageContent() {
     if (error) {
       form.setError("root", { message: error.message })
       return
+    }
+
+    try {
+      await startAppSession()
+    } catch (sessionError) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[login] startAppSession failed", sessionError)
+      }
     }
 
     const destination = safeAppPath(searchParams.get("next"))

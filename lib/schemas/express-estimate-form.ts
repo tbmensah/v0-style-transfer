@@ -1,7 +1,7 @@
 /**
  * Zod schemas for Express Estimate (`job_type: ee`) wizard.
  * Mirrors interfaces + top-level state in `app/(dashboard)/express-estimate/new/page.tsx`.
- * `projectDetails.projectName` and `projectDetails.claimNumber` are required (UI *). Other wizard
+ * `projectDetails.insuredName` and `projectDetails.claimNumber` are required (UI *). Other wizard
  * fields stay deep-partial; backend may enforce additional rules on submit.
  */
 import { z } from "zod"
@@ -67,6 +67,9 @@ export const doorItemSchema = z.object({
   peepHole: bool,
   mailSlot: bool,
   nonCased: bool,
+  casedOpening: bool,
+  casingOpeningSize: str,
+  casingFinish: str,
   sidelites: bool,
   sidelitesQty: str,
   sidelitesSize: str,
@@ -128,6 +131,8 @@ export const wallCoveringOptionsSchema = z.object({
   material: str,
   type: str,
   replacementHeight: str,
+  fullWall: bool,
+  ceilingReplacementAddon: bool,
   texture: bool,
   textureType: str,
   panelingStyle: str,
@@ -168,6 +173,11 @@ export const vanityOptionsSchema = z.object({
   backsplashAction: str,
 })
 
+export const pedestalSinkOptionsSchema = z.object({
+  enabled: bool,
+  action: str,
+})
+
 export const toiletOptionsSchema = z.object({
   enabled: bool,
   action: str,
@@ -187,6 +197,8 @@ export const showerOptionsSchema = z.object({
   tubShowerFaucet: str,
   mortarBedReplace: bool,
   mortarBedSize: str,
+  tileCurb: bool,
+  tileCurbSize: str,
   walls: str,
   tileBench: bool,
   tileNiche: bool,
@@ -221,6 +233,7 @@ export const countertopOptionsSchema = z.object({
   grade: str,
   size: str,
   detachAndReset: bool,
+  action: str,
 })
 
 export const plumbingOptionsSchema = z.object({
@@ -260,7 +273,14 @@ export const applianceOptionsSchema = z.object({
     f9Note: str,
   }),
   wallOven: z.object({ enabled: bool, type: str, grade: str, action: str, f9Note: str }),
-  airHandler: z.object({ enabled: bool, type: str, options: str, action: str, f9Note: str }),
+  airHandler: z.object({
+    enabled: bool,
+    type: str,
+    options: str,
+    action: str,
+    f9Note: str,
+    aCoil: z.object({ enabled: bool, detachAndReset: bool }),
+  }),
   boiler: z.object({
     enabled: bool,
     type: str,
@@ -268,6 +288,12 @@ export const applianceOptionsSchema = z.object({
     f9Note: str,
     expansionTank: bool,
     circulatorPump: bool,
+  }),
+  furnace: z.object({
+    enabled: bool,
+    type: str,
+    btu: str,
+    highEfficiency: bool,
   }),
   baseboardHeat: z.object({ enabled: bool, type: str, size: str, action: str }),
 })
@@ -287,21 +313,26 @@ export const roomSchema = z.object({
   doorsEnabled: bool,
   doors: z.array(doorItemSchema),
   vanity: vanityOptionsSchema.optional(),
+  pedestalSink: pedestalSinkOptionsSchema.optional(),
   toilet: toiletOptionsSchema.optional(),
   shower: showerOptionsSchema.optional(),
   cabinets: cabinetOptionsSchema.optional(),
   countertop: countertopOptionsSchema.optional(),
   plumbing: plumbingOptionsSchema.optional(),
   appliances: applianceOptionsSchema.optional(),
+  /** Free-text note shown at the bottom of this room on the estimate for reference. */
+  notes: str,
 })
 
 /** --- Project / exterior / foundation --- */
 export const projectDetailsSchema = z.object({
-  projectName: str,
+  insuredName: str,
   claimNumber: str,
-  inspectionDate: str,
-  propertyAddress: str,
-  propertyType: str,
+  street: str,
+  city: str,
+  zipCode: str,
+  /** Whole-building estimate: light | medium | heavy */
+  depreciationRange: str,
   preFirm: bool,
   adjusterName: str,
   notes: str,
@@ -366,6 +397,7 @@ export const exteriorSchema = z.object({
     }),
     meterBox: bool,
     meterBoxQty: str,
+    meterBoxSize: str,
   }),
   finishes: z.object({
     exteriorPaint: z.object({ enabled: bool }),
@@ -391,6 +423,10 @@ export const exteriorSchema = z.object({
     wallInsulation: z.object({
       enabled: bool,
       type: str,
+      /** When type is batt: r13-4 | r19-6 | r21 */
+      battRating: str,
+      /** When type is spray-foam: open-cell | closed-cell */
+      sprayFoamCellType: str,
       replacementHeight: str,
     }),
   }),
@@ -414,6 +450,7 @@ export const foundationAirHandlerSchema = z.object({
   heatElementCount: str,
   action: str,
   f9Note: str,
+  aCoil: z.object({ enabled: bool, detachAndReset: bool }),
 })
 
 export const foundationSchema = z.object({
@@ -459,6 +496,7 @@ export const foundationSchema = z.object({
     bellyPaper: bool,
     floorInsulation: bool,
     floorInsulationType: str,
+    floorInsulationReplacementHeight: str,
     confinedSpace: bool,
   }),
   subgradeAreaCoverage: z.object({
@@ -515,6 +553,12 @@ export const foundationSchema = z.object({
       oilTankReplacement: bool,
       oilReplacement: bool,
     }),
+    furnace: z.object({
+      enabled: bool,
+      type: str,
+      btu: str,
+      highEfficiency: bool,
+    }),
     baseboardHeat: z.object({
       enabled: bool,
       type: str,
@@ -553,6 +597,7 @@ export const foundationSchema = z.object({
     }),
     meterBox: bool,
     meterBoxQty: str,
+    meterBoxSize: str,
     houseRewire: z.object({
       enabled: bool,
       homeSf: str,
@@ -569,12 +614,12 @@ export const foundationSchema = z.object({
   elevator: bool,
 })
 
-/** Project details: `projectName` and `claimNumber` are required (marked * in the wizard); other keys deep-partial. */
+/** Project details: `insuredName` and `claimNumber` are required (marked * in the wizard); other keys deep-partial. */
 export const projectDetailsExpressEstimateSchema = z.intersection(
-  deepPartialSchema(projectDetailsSchema.omit({ projectName: true, claimNumber: true })),
+  deepPartialSchema(projectDetailsSchema.omit({ insuredName: true, claimNumber: true })),
   z.object({
-    projectName: z.string().trim().min(1, "Project name is required"),
-    claimNumber: z.string().trim().min(1, "Claim number is required"),
+    insuredName: z.string().trim().min(1, "Insured name is required"),
+    claimNumber: z.string().trim().min(1, "Claim number/file number is required"),
   }),
 )
 

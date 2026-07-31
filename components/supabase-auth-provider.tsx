@@ -1,6 +1,7 @@
 "use client"
 
 import { useLayoutEffect, type ReactNode } from "react"
+import { startAppSession } from "@/lib/api/requests/session"
 import { mapSupabaseUser } from "@/lib/auth/map-supabase-user"
 import { setApiAccessTokenGetter } from "@/lib/http/api-client"
 import { useAuthStore } from "@/lib/stores/auth-store"
@@ -47,11 +48,20 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = client.auth.onAuthStateChange((_event, session) => {
+    } = client.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         useAuthStore.getState().setUser(mapSupabaseUser(session.user))
       } else {
         useAuthStore.getState().clearUser()
+      }
+
+      // Stamp backend app session only on fresh sign-in — not TOKEN_REFRESHED / INITIAL_SESSION.
+      if (event === "SIGNED_IN" && session) {
+        void startAppSession().catch((err) => {
+          if (process.env.NODE_ENV === "development") {
+            console.warn("[SupabaseAuthProvider] startAppSession failed", err)
+          }
+        })
       }
     })
 

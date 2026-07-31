@@ -1,6 +1,11 @@
 import axios, { type AxiosError, isAxiosError } from "axios"
 import axiosRetry, { exponentialDelay, isNetworkOrIdempotentRequestError } from "axios-retry"
 
+import {
+  handleAppSessionExpired,
+  isAppSessionExpiredError,
+} from "@/lib/auth/handle-app-session-expired"
+
 /** Resolves the current Supabase JWT for `Authorization: Bearer …` on each request. */
 export type AccessTokenGetter = () => Promise<string | null>
 
@@ -43,7 +48,6 @@ axiosRetry(apiClient, {
   retryCondition: (error: AxiosError) => {
     if (!isAxiosError(error)) return false
     const status = error.response?.status
-
     // Auth / authorization: do not retry here (handle refresh or sign-out in app code)
     if (status === 401 || status === 403) return false
 
@@ -62,3 +66,17 @@ apiClient.interceptors.request.use(async (config) => {
   }
   return config
 })
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error: unknown) => {
+    if (isAxiosError(error) && error.response?.status === 401) {
+      if (isAppSessionExpiredError(error.response.data)) {
+        void handleAppSessionExpired()
+        // Hang until hard redirect — rejecting would paint "Session expired" in RQ/UI first.
+        return new Promise(() => {})
+      }
+    }
+    return Promise.reject(error)
+  },
+)

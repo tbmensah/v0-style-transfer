@@ -18,4 +18,8 @@ export type SuccessEnvelopeStringMap = SuccessEnvelope<Record<string, string>>
 export type ApiErrorBody = Record<string, unknown> & {
   message?: string
   detail?: string
+  error?: {
+    code?: string
+    details?: unknown
+  }
 }
