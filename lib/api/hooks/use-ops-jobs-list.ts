@@ -20,5 +20,6 @@ export function useOpsJobsList(params: JobsListParams, options?: UseOpsJobsListO
     queryFn: () => fetchOpsJobsList(params),
     enabled: hasApiBase && (options?.enabled ?? true),
     refetchInterval: options?.refetchInterval !== undefined ? options.refetchInterval : JOBS_REFETCH_MS,
+    retry: false,
   })
 }
