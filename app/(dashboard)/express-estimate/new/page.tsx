@@ -168,7 +168,7 @@ interface WindowItem {
 
 interface DoorItem {
   id: number
-  category: "interior" | "exterior"
+  category: "interior" | "exterior" | "cased-opening"
   type: string
   size: string
   grade: string
@@ -1037,35 +1037,36 @@ export default function NewExpressEstimatePage() {
     handleSave()
   }
 
-  const addDoor = (roomId: number, category: "interior" | "exterior") => {
+  const addDoor = (roomId: number, category: "interior" | "exterior" | "cased-opening") => {
     const room = rooms.find(r => r.id === roomId)
     if (room) {
-const newDoor: DoorItem = {
-  id: Date.now(),
-  category,
-  type: "",
-  size: "",
-  grade: "",
-  finish: "",
-  handleAction: "",
-  misc: "",
-  peepHole: false,
-  mailSlot: false,
-  nonCased: false,
-  casedOpening: false,
-  casingOpeningSize: "",
-  casingFinish: "",
-  sidelites: false,
-  sidelitesQty: "",
-  sidelitesSize: "",
-  sidelitesGrade: "",
-  panelSize: "",
-  panelGrade: "",
-  stormdoorAssembly: false,
-  retrofitInStucco: false,
-  cleanSensor: false,
-  replaceSensor: false,
-  }
+      const isCasedOpening = category === "cased-opening"
+      const newDoor: DoorItem = {
+        id: Date.now(),
+        category,
+        type: "",
+        size: "",
+        grade: "",
+        finish: "",
+        handleAction: "",
+        misc: "",
+        peepHole: false,
+        mailSlot: false,
+        nonCased: false,
+        casedOpening: isCasedOpening,
+        casingOpeningSize: "",
+        casingFinish: "",
+        sidelites: false,
+        sidelitesQty: "",
+        sidelitesSize: "",
+        sidelitesGrade: "",
+        panelSize: "",
+        panelGrade: "",
+        stormdoorAssembly: false,
+        retrofitInStucco: false,
+        cleanSensor: false,
+        replaceSensor: false,
+      }
       updateRoom(roomId, { doors: [...room.doors, newDoor] })
     }
   }
@@ -6131,13 +6132,14 @@ const newDoor: DoorItem = {
                                                 let nextGrade = prev.grade
                                                 if (value === "cultured-marble") {
                                                   if (!["", "sink", "double"].includes(prev.sink)) nextSink = ""
-                                                  if (prev.grade === "premium") nextGrade = ""
                                                 } else if (value === "laminate") {
                                                   if (!["", "sink", "undermount-single", "undermount-double"].includes(prev.sink)) nextSink = ""
                                                 }
                                                 if (value === "tile") {
                                                   nextAction = "replace"
                                                 }
+                                                // Vanity tops: Base/High only (no Premium)
+                                                if (prev.grade === "premium") nextGrade = ""
                                                 updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...prev, type: value, sink: nextSink, action: nextAction, grade: nextGrade } } })
                                               }}
                                               >
@@ -6157,7 +6159,7 @@ const newDoor: DoorItem = {
                                             </div>
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Grade</Label>
-                                              <Select value={room.vanity.countertop.grade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, grade: value } } }) }}>
+                                              <Select value={room.vanity.countertop.grade === "premium" ? "" : room.vanity.countertop.grade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, grade: value } } }) }}>
                                                 <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
@@ -6165,9 +6167,6 @@ const newDoor: DoorItem = {
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="base">Base</SelectItem>
                                                   <SelectItem value="high">High</SelectItem>
-                                                  {room.vanity.countertop.type !== "cultured-marble" && (
-                                                    <SelectItem value="premium">Premium</SelectItem>
-                                                  )}
                                                 </SelectContent>
                                               </Select>
                                             </div>
@@ -8729,6 +8728,10 @@ const newDoor: DoorItem = {
                                         <Plus className="h-3 w-3" />
                                         Exterior
                                       </Button>
+                                      <Button variant="outline" size="sm" className="gap-2 border-border/60" onClick={() => addDoor(room.id, "cased-opening")}>
+                                        <Plus className="h-3 w-3" />
+                                        Cased Opening
+                                      </Button>
                                     </div>
                                   )}
                                 </div>
@@ -8870,76 +8873,16 @@ const newDoor: DoorItem = {
                                               <SelectItem value="detach-reset">Detach & Reset</SelectItem>
                                             </SelectContent>
                                           </Select>
-                                          <div className="flex flex-col gap-2">
-                                            <div className="flex items-center gap-2">
-                                              <Switch
-                                                checked={door.nonCased}
-                                                onCheckedChange={(checked) => {
-                                                  const newDoors = [...room.doors]
-                                                  newDoors[idx] = { ...door, nonCased: checked }
-                                                  updateRoom(room.id, { doors: newDoors })
-                                                }}
-                                              />
-                                              <Label className="text-sm whitespace-nowrap">Non-Cased</Label>
-                                            </div>
-                                            <div className="flex flex-wrap items-center gap-2">
-                                              <div className="flex items-center gap-2">
-                                                <Switch
-                                                  checked={door.casedOpening ?? false}
-                                                  onCheckedChange={(checked) => {
-                                                    const newDoors = [...room.doors]
-                                                    newDoors[idx] = {
-                                                      ...door,
-                                                      casedOpening: checked,
-                                                      casingOpeningSize: checked ? door.casingOpeningSize : "",
-                                                      casingFinish: checked ? door.casingFinish : "",
-                                                    }
-                                                    updateRoom(room.id, { doors: newDoors })
-                                                  }}
-                                                />
-                                                <Label className="text-sm whitespace-nowrap">Cased Opening</Label>
-                                              </div>
-                                              {(door.casedOpening ?? false) && (
-                                                <>
-                                                  <Select
-                                                    value={door.casingOpeningSize || "__none__"}
-                                                    onValueChange={(__v) => {
-                                                      const value = __v === "__none__" ? "" : __v
-                                                      const newDoors = [...room.doors]
-                                                      newDoors[idx] = { ...door, casingOpeningSize: value }
-                                                      updateRoom(room.id, { doors: newDoors })
-                                                    }}
-                                                  >
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[110px]">
-                                                      <SelectValue placeholder="Opening Size" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      <SelectItem value="3ft">3 ft</SelectItem>
-                                                      <SelectItem value="5ft">5 ft</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                  <Select
-                                                    value={door.casingFinish || "__none__"}
-                                                    onValueChange={(__v) => {
-                                                      const value = __v === "__none__" ? "" : __v
-                                                      const newDoors = [...room.doors]
-                                                      newDoors[idx] = { ...door, casingFinish: value }
-                                                      updateRoom(room.id, { doors: newDoors })
-                                                    }}
-                                                  >
-                                                    <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[100px]">
-                                                      <SelectValue placeholder="Finish" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      <SelectItem value="paint">Paint</SelectItem>
-                                                      <SelectItem value="stain">Stain</SelectItem>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </>
-                                              )}
-                                            </div>
+                                          <div className="flex items-center gap-2">
+                                            <Switch
+                                              checked={door.nonCased}
+                                              onCheckedChange={(checked) => {
+                                                const newDoors = [...room.doors]
+                                                newDoors[idx] = { ...door, nonCased: checked }
+                                                updateRoom(room.id, { doors: newDoors })
+                                              }}
+                                            />
+                                            <Label className="text-sm whitespace-nowrap">Non-Cased</Label>
                                           </div>
                                           <div className="flex-1"></div>
                                           <div className="flex items-center gap-1">
@@ -8970,6 +8913,79 @@ const newDoor: DoorItem = {
                                       </div>
                                     ))}
                                     <p className="text-xs text-muted-foreground mt-2">Note: All doors include a standard casing unless marked non-cased</p>
+                                  </div>
+                                )}
+                                {/* Casings / Cased Openings */}
+                                {room.doorsEnabled && room.doors.filter(d => d.category === "cased-opening").length > 0 && (
+                                  <div className="space-y-2">
+                                    <Label className="text-sm font-medium text-muted-foreground">Casings</Label>
+                                    {room.doors.map((door, idx) => door.category === "cased-opening" && (
+                                      <div key={door.id} className="rounded-lg bg-secondary/30 p-3">
+                                        <div className="flex flex-wrap items-center gap-3">
+                                          <Select
+                                            value={door.casingOpeningSize || "__none__"}
+                                            onValueChange={(__v) => {
+                                              const value = __v === "__none__" ? "" : __v
+                                              const newDoors = [...room.doors]
+                                              newDoors[idx] = { ...door, casingOpeningSize: value }
+                                              updateRoom(room.id, { doors: newDoors })
+                                            }}
+                                          >
+                                            <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[140px]">
+                                              <SelectValue placeholder="Opening Size" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                              <SelectItem value="3ft">3 ft</SelectItem>
+                                              <SelectItem value="5ft">5 ft</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                          <Select
+                                            value={door.casingFinish || "__none__"}
+                                            onValueChange={(__v) => {
+                                              const value = __v === "__none__" ? "" : __v
+                                              const newDoors = [...room.doors]
+                                              newDoors[idx] = { ...door, casingFinish: value }
+                                              updateRoom(room.id, { doors: newDoors })
+                                            }}
+                                          >
+                                            <SelectTrigger className="border-border/60 bg-secondary/50 text-sm w-[120px]">
+                                              <SelectValue placeholder="Finish" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                              <SelectItem value="paint">Paint</SelectItem>
+                                              <SelectItem value="stain">Stain</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                          <div className="flex-1"></div>
+                                          <div className="flex items-center gap-1">
+                                            <Button
+                                              variant="ghost"
+                                              size="icon"
+                                              className="h-9 w-9 text-muted-foreground hover:text-primary"
+                                              onClick={() => {
+                                                const newDoor = { ...door, id: Date.now() }
+                                                updateRoom(room.id, { doors: [...room.doors, newDoor] })
+                                              }}
+                                            >
+                                              <Copy className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                              variant="ghost"
+                                              size="icon"
+                                              className="h-9 w-9 text-destructive hover:bg-destructive/20"
+                                              onClick={() => {
+                                                const newDoors = room.doors.filter(d => d.id !== door.id)
+                                                updateRoom(room.id, { doors: newDoors })
+                                              }}
+                                            >
+                                              <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
                                   </div>
                                 )}
                                 {/* Exterior Doors */}
