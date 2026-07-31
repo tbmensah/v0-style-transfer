@@ -6130,12 +6130,10 @@ const newDoor: DoorItem = {
                                                 let nextAction = prev.action
                                                 let nextGrade = prev.grade
                                                 if (value === "cultured-marble") {
-                                                  if (!["", "sink", "single", "double"].includes(prev.sink)) nextSink = ""
+                                                  if (!["", "sink", "double"].includes(prev.sink)) nextSink = ""
                                                   if (prev.grade === "premium") nextGrade = ""
                                                 } else if (value === "laminate") {
                                                   if (!["", "sink", "undermount-single", "undermount-double"].includes(prev.sink)) nextSink = ""
-                                                } else if (prev.type === "cultured-marble" && prev.sink === "single") {
-                                                  nextSink = ""
                                                 }
                                                 if (value === "tile") {
                                                   nextAction = "replace"
@@ -6206,7 +6204,6 @@ const newDoor: DoorItem = {
                                                     <>
                                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                       <SelectItem value="sink">Sink</SelectItem>
-                                                      <SelectItem value="single">Single</SelectItem>
                                                       <SelectItem value="double">Double</SelectItem>
                                                     </>
                                                   ) : room.vanity.countertop.type === "laminate" ? (
@@ -6955,7 +6952,7 @@ const newDoor: DoorItem = {
                                               countertop: {
                                                 ...prev,
                                                 type: value,
-                                                grade: nextGrade,
+                                                grade: value === "butcher-block" ? "" : nextGrade,
                                                 action: nextAction,
                                                 detachAndReset: nextDetach,
                                               },
@@ -6975,6 +6972,7 @@ const newDoor: DoorItem = {
                                             </SelectContent>
                                           </Select>
                                         </div>
+                                        {room.countertop.type !== "butcher-block" && (
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Grade</Label>
                                           <Select value={room.countertop.grade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { countertop: { ...room.countertop!, grade: value } }) }}>
@@ -6995,6 +6993,7 @@ const newDoor: DoorItem = {
                                             </SelectContent>
                                           </Select>
                                         </div>
+                                        )}
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">
                                             Size ({room.countertop.type === "cultured-marble" || room.countertop.type === "laminate" ? "LF" : "SF"})
