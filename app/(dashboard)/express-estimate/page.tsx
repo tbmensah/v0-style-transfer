@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import { getApiErrorMessage } from "@/lib/api/parse-api-error"
 import { useJobsList } from "@/lib/api/hooks/use-jobs-list"
+import { useOpsJobsList } from "@/lib/api/hooks/use-ops-jobs-list"
 import { ListPagination } from "@/components/list-pagination"
 import { JobsDataTable } from "@/components/jobs/jobs-data-table"
-import { expressJobColumns } from "@/components/jobs/job-table-columns"
+import { createExpressJobColumns } from "@/components/jobs/job-table-columns"
 import { useMetricsContext } from "@/components/metrics-context"
 import { hasApiBase } from "@/lib/environment/public-env"
 import { formatMetricCount } from "@/lib/utilities/metrics-display"
@@ -28,6 +29,15 @@ export default function ExpressEstimatePage() {
     page,
     page_size: LIST_PAGE_SIZE,
   })
+  /** Probe ops access so back-office users get Open next to each EE job. */
+  const opsAccess = useOpsJobsList(
+    { job_type: "ee", page: 1, page_size: 1 },
+    { enabled: hasApiBase, refetchInterval: false },
+  )
+  const columns = useMemo(
+    () => createExpressJobColumns({ showBackOfficeOpen: opsAccess.isSuccess }),
+    [opsAccess.isSuccess],
+  )
 
   const items = data?.items ?? []
   const total = data?.total ?? 0
@@ -83,7 +93,7 @@ export default function ExpressEstimatePage() {
           ) : (
             <>
               <JobsDataTable
-                columns={expressJobColumns}
+                columns={columns}
                 data={items}
                 isLoading={isLoading}
                 emptyMessage="No Express Estimate jobs yet."

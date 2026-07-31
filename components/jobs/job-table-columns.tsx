@@ -7,13 +7,19 @@ import { getApiErrorMessage } from "@/lib/api/parse-api-error"
 import { JobStatusBadge } from "@/components/jobs/job-status-badge"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { formatJobTableDate } from "@/lib/utilities/format-job-table-date"
 import { jobDisplayTitle } from "@/lib/utilities/job-display-title"
 import { downloadFromApiJob } from "@/lib/utilities/job-download"
 import { jobDownloadInteractionDisabled, jobIsCompleted, jobMatchesStatus } from "@/lib/utilities/job-status"
 import type { ApiJob } from "@/lib/types/jobs"
 import type { JobTableColumnMeta } from "@/components/jobs/jobs-data-table"
-import { ClipboardList, Download, Eye, Upload } from "lucide-react"
+import { ClipboardList, Download, Eye, MoreHorizontal, Upload } from "lucide-react"
 
 const meta = (m: JobTableColumnMeta): JobTableColumnMeta => m
 
@@ -46,6 +52,44 @@ function downloadButton(job: ApiJob, titleFn: (j: ApiJob) => string = jobDownloa
     >
       <Download className="h-4 w-4" />
     </Button>
+  )
+}
+
+function expressEeBackOfficeActionsMenu(job: ApiJob) {
+  const downloadDisabled = jobDownloadInteractionDisabled(job)
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" title="Actions" aria-label="Job actions">
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-44">
+        <DropdownMenuItem
+          disabled={downloadDisabled}
+          title={jobDownloadTitle(job)}
+          onSelect={() => {
+            if (downloadDisabled) return
+            void (async () => {
+              try {
+                await downloadFromApiJob(job)
+              } catch (e) {
+                toast.error(getApiErrorMessage(e))
+              }
+            })()
+          }}
+        >
+          <Download className="h-4 w-4" />
+          Download
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href={backOfficeEePath(job.id)}>
+            <Eye className="h-4 w-4" />
+            View info
+          </Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
@@ -131,68 +175,96 @@ const backOfficeEeActionCell = (job: ApiJob) => (
   </div>
 )
 
-export const expressJobColumns: ColumnDef<ApiJob, unknown>[] = [
-  {
-    id: "job",
-    header: "Job",
-    cell: ({ row }) => (
-      <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20">
-          <ClipboardList className="h-4 w-4 text-primary" />
+/** Field Express Estimate list (+ optional back-office View info in Actions). */
+export function createExpressJobColumns(options?: {
+  showBackOfficeOpen?: boolean
+}): ColumnDef<ApiJob, unknown>[] {
+  const showBackOfficeOpen = options?.showBackOfficeOpen ?? false
+  return [
+    {
+      id: "job",
+      header: "Job",
+      cell: ({ row }) => (
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20">
+            <ClipboardList className="h-4 w-4 text-primary" />
+          </div>
+          <span className="min-w-0 truncate font-medium text-foreground">{jobDisplayTitle(row.original)}</span>
         </div>
-        <span className="min-w-0 truncate font-medium text-foreground">{jobDisplayTitle(row.original)}</span>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "created_at",
-    header: "Created",
-    cell: ({ row }) => (
-      <span className="text-muted-foreground">{formatJobTableDate(row.original.created_at)}</span>
-    ),
-    meta: meta({ cellClassName: "text-muted-foreground" }),
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => <JobStatusBadge status={row.original.status} />,
-  },
-  {
-    accessorKey: "token_cost",
-    header: "Tokens",
-    cell: ({ row }) => (
-      <span className="tabular-nums text-muted-foreground">{row.original.token_cost}</span>
-    ),
-    meta: meta({
-      headerClassName: "text-center",
-      cellClassName: "text-center tabular-nums text-muted-foreground",
-    }),
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: ({ row }) => {
-      return expressEeFieldActionCell(row.original)
+      ),
     },
-    meta: meta({ headerClassName: "text-right", cellClassName: "text-right" }),
-  },
-]
+    {
+      accessorKey: "created_at",
+      header: "Created",
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">{formatJobTableDate(row.original.created_at)}</span>
+      ),
+      meta: meta({ cellClassName: "text-muted-foreground" }),
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => <JobStatusBadge status={row.original.status} />,
+    },
+    {
+      accessorKey: "token_cost",
+      header: "Tokens",
+      cell: ({ row }) => (
+        <span className="tabular-nums text-muted-foreground">{row.original.token_cost}</span>
+      ),
+      meta: meta({
+        headerClassName: "text-center",
+        cellClassName: "text-center tabular-nums text-muted-foreground",
+      }),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const job = row.original
+        if (showBackOfficeOpen) {
+          return (
+            <div className="flex items-center justify-end">
+              {expressEeBackOfficeActionsMenu(job)}
+            </div>
+          )
+        }
+        return expressEeFieldActionCell(job)
+      },
+      meta: meta({ headerClassName: "text-right", cellClassName: "text-right" }),
+    },
+  ]
+}
+
+export const expressJobColumns: ColumnDef<ApiJob, unknown>[] = createExpressJobColumns()
 
 /** Express Estimate operator queue: no Tokens column; actions are Process only. */
 export const backOfficeEeJobColumns: ColumnDef<ApiJob, unknown>[] = [
   {
     id: "job",
     header: "Job",
-    cell: ({ row }) => (
-      <div className="flex min-w-0 items-center gap-3 pl-0.5">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-border/50">
-          <ClipboardList className="h-4 w-4 text-primary" />
+    cell: ({ row }) => {
+      const job = row.original
+      return (
+        <div className="flex min-w-0 items-center gap-3 pl-0.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-border/50">
+            <ClipboardList className="h-4 w-4 text-primary" />
+          </div>
+          <span className="min-w-0 truncate text-sm font-medium leading-snug text-foreground">
+            {jobDisplayTitle(job)}
+          </span>
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="ml-auto shrink-0 border-border/60"
+            title="Open job workspace"
+          >
+            <Link href={backOfficeEePath(job.id)}>Open</Link>
+          </Button>
         </div>
-        <span className="min-w-0 truncate text-sm font-medium leading-snug text-foreground">
-          {jobDisplayTitle(row.original)}
-        </span>
-      </div>
-    ),
+      )
+    },
     meta: meta({ headerClassName: "min-w-0", cellClassName: "min-w-0" }),
   },
   {
