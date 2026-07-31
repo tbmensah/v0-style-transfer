@@ -57,7 +57,7 @@ export const windowItemSchema = z.object({
 
 export const doorItemSchema = z.object({
   id: num,
-  category: z.enum(["interior", "exterior"]),
+  category: z.enum(["interior", "exterior", "cased-opening"]),
   type: str,
   size: str,
   grade: str,
