@@ -429,6 +429,40 @@ const defaultKitchenExtras = {
   ...defaultAppliancesExtras,
 }
 
+/** Rebuild a room for a new type: keep shared fields only, drop exclusives, seed new-type defaults. */
+function roomForType(prev: Room, nextType: string): Room {
+  const shared: Room = {
+    id: prev.id,
+    name: prev.name,
+    type: nextType,
+    sqft: prev.sqft,
+    nfipCleaning: prev.nfipCleaning,
+    flooring: prev.flooring,
+    trim: prev.trim,
+    wallCovering: prev.wallCovering,
+    electrical: prev.electrical,
+    windowsEnabled: prev.windowsEnabled,
+    windows: prev.windows,
+    doorsEnabled: prev.doorsEnabled,
+    doors: prev.doors,
+    notes: prev.notes,
+    appliances: prev.appliances ?? defaultAppliancesExtras.appliances,
+  }
+
+  if (nextType === "bathroom") {
+    return { ...shared, ...defaultBathroomExtras }
+  }
+  if (nextType === "kitchen") {
+    return {
+      ...shared,
+      cabinets: defaultKitchenExtras.cabinets,
+      countertop: defaultKitchenExtras.countertop,
+      plumbing: defaultKitchenExtras.plumbing,
+    }
+  }
+  return shared
+}
+
 const defaultProjectDetails = {
   insuredName: "",
   claimNumber: "",
@@ -4592,16 +4626,12 @@ export default function NewExpressEstimatePage() {
                                   <Label>Room Type</Label>
                                   <Select value={room.type} onValueChange={(__v) => {
                                     const value = __v === "__none__" ? "" : __v;
-                                    const updates: Partial<Room> = { type: value }
-                                    // Add bathroom-specific fields when changing to bathroom
-                                    if (value === "bathroom" && !room.vanity) {
-                                      Object.assign(updates, defaultBathroomExtras)
-                                    }
-                                    // Add kitchen-specific fields when changing to kitchen
-                                    if (value === "kitchen" && !room.cabinets) {
-                                      Object.assign(updates, defaultKitchenExtras)
-                                    }
-                                    updateRoom(room.id, updates)
+                                    if (value === room.type) return
+                                    setValue(
+                                      "rooms",
+                                      rooms.map((r) => (r.id === room.id ? roomForType(r, value) : r))
+                                    )
+                                    handleSave()
                                   }}>
                                     <SelectTrigger className="border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select" />
@@ -6131,9 +6161,22 @@ export default function NewExpressEstimatePage() {
                                                 let nextAction = prev.action
                                                 let nextGrade = prev.grade
                                                 if (value === "cultured-marble") {
-                                                  if (!["", "sink", "double"].includes(prev.sink)) nextSink = ""
+                                                  if (!["", "single", "double"].includes(prev.sink) && prev.sink !== "sink") nextSink = ""
+                                                  if (nextSink === "sink") nextSink = "single"
                                                 } else if (value === "laminate") {
-                                                  if (!["", "sink", "undermount-single", "undermount-double"].includes(prev.sink)) nextSink = ""
+                                                  if (prev.action === "detach-reset") {
+                                                    if (!["", "single", "double"].includes(prev.sink) && prev.sink !== "sink") nextSink = ""
+                                                    if (nextSink === "sink") nextSink = "single"
+                                                  } else if (!["", "single", "undermount-single", "undermount-double"].includes(prev.sink) && prev.sink !== "sink") {
+                                                    nextSink = ""
+                                                  } else if (prev.sink === "sink") {
+                                                    nextSink = "single"
+                                                  }
+                                                } else if (prev.action === "detach-reset") {
+                                                  if (!["", "single", "double"].includes(prev.sink) && prev.sink !== "sink") nextSink = ""
+                                                  if (nextSink === "sink") nextSink = "single"
+                                                } else if (prev.sink === "sink") {
+                                                  nextSink = "single"
                                                 }
                                                 if (value === "tile") {
                                                   nextAction = "replace"
@@ -6196,28 +6239,34 @@ export default function NewExpressEstimatePage() {
                                             </div>
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Sink</Label>
-                                              <Select value={room.vanity.countertop.sink} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, sink: value } } }) }}>
+                                              <Select value={room.vanity.countertop.sink === "sink" ? "single" : room.vanity.countertop.sink} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, sink: value } } }) }}>
                                                 <SelectTrigger className="w-[150px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                  {room.vanity.countertop.type === "cultured-marble" ? (
+                                                  {room.vanity.countertop.action === "detach-reset" ? (
                                                     <>
                                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      <SelectItem value="sink">Sink</SelectItem>
+                                                      <SelectItem value="single">Single</SelectItem>
+                                                      <SelectItem value="double">Double</SelectItem>
+                                                    </>
+                                                  ) : room.vanity.countertop.type === "cultured-marble" ? (
+                                                    <>
+                                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                      <SelectItem value="single">Single</SelectItem>
                                                       <SelectItem value="double">Double</SelectItem>
                                                     </>
                                                   ) : room.vanity.countertop.type === "laminate" ? (
                                                     <>
                                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      <SelectItem value="sink">Sink</SelectItem>
+                                                      <SelectItem value="single">Single</SelectItem>
                                                       <SelectItem value="undermount-single">Undermount - Single</SelectItem>
                                                       <SelectItem value="undermount-double">Undermount - Double</SelectItem>
                                                     </>
                                                   ) : (
                                                     <>
                                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      <SelectItem value="sink">Sink</SelectItem>
+                                                      <SelectItem value="single">Single</SelectItem>
                                                       <SelectItem value="double">Double</SelectItem>
                                                       <SelectItem value="undermount-single">Undermount - Single</SelectItem>
                                                       <SelectItem value="undermount-double">Undermount - Double</SelectItem>
@@ -6228,7 +6277,19 @@ export default function NewExpressEstimatePage() {
                                             </div>
                                             <div className="space-y-1">
                                               <Label className="text-xs text-muted-foreground">Action</Label>
-                                              <Select value={room.vanity.countertop.action} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...room.vanity!.countertop, action: value } } }) }}>
+                                              <Select value={room.vanity.countertop.action} onValueChange={(__v) => {
+                                                const value = nv(__v)
+                                                const prev = room.vanity!.countertop
+                                                let nextSink = prev.sink === "sink" ? "single" : prev.sink
+                                                if (value === "detach-reset") {
+                                                  if (!["", "single", "double"].includes(nextSink)) nextSink = ""
+                                                } else if (prev.type === "laminate") {
+                                                  if (!["", "single", "undermount-single", "undermount-double"].includes(nextSink)) nextSink = ""
+                                                } else if (prev.type === "cultured-marble") {
+                                                  if (!["", "single", "double"].includes(nextSink)) nextSink = ""
+                                                }
+                                                updateRoom(room.id, { vanity: { ...room.vanity!, countertop: { ...prev, action: value, sink: nextSink } } })
+                                              }}>
                                                 <SelectTrigger className="w-[140px] border-border/60 bg-secondary/50">
                                                   <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
