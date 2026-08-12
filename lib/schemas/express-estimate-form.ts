@@ -294,6 +294,7 @@ export const applianceOptionsSchema = z.object({
     type: str,
     btu: str,
     highEfficiency: bool,
+    action: str,
   }),
   baseboardHeat: z.object({ enabled: bool, type: str, size: str, action: str }),
 })
@@ -410,6 +411,7 @@ export const exteriorSchema = z.object({
     sheathing: z.object({
       enabled: bool,
       type: str,
+      tongueAndGroove: bool,
       replacementHeight: str,
     }),
     houseWrap: z.object({
@@ -552,12 +554,15 @@ export const foundationSchema = z.object({
       circulatorPump: bool,
       oilTankReplacement: bool,
       oilReplacement: bool,
+      btu: str,
+      mbh: str,
     }),
     furnace: z.object({
       enabled: bool,
       type: str,
       btu: str,
       highEfficiency: bool,
+      action: str,
     }),
     baseboardHeat: z.object({
       enabled: bool,

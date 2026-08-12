@@ -302,8 +302,8 @@ interface ApplianceOptions {
     f9Note: string
     aCoil: { enabled: boolean; detachAndReset: boolean }
   }
-  boiler: { enabled: boolean; type: string; action: string; f9Note: string; expansionTank: boolean; circulatorPump: boolean }
-  furnace: { enabled: boolean; type: string; btu: string; highEfficiency: boolean }
+  boiler: { enabled: boolean; type: string; action: string; f9Note: string; expansionTank: boolean; circulatorPump: boolean; btu: string; mbh: string; oilTankReplacement?: boolean; oilReplacement?: boolean }
+  furnace: { enabled: boolean; type: string; btu: string; highEfficiency: boolean; action: string }
   baseboardHeat: { enabled: boolean; type: string; size: string; action: string }
 }
 
@@ -312,6 +312,7 @@ const defaultFurnace = {
   type: "",
   btu: "",
   highEfficiency: false,
+  action: "",
 }
 
 const FURNACE_FLOOR_BTU_OPTIONS = [
@@ -334,10 +335,52 @@ const FURNACE_FORCED_AIR_BTU_OPTIONS = [
   { value: "140000", label: "140,000 BTU" },
 ] as const
 
+const FURNACE_FORCED_AIR_HORIZONTAL_BTU_OPTIONS = [
+  { value: "48-75000", label: "48-75,000 BTU" },
+  { value: "80000", label: "80,000 BTU" },
+  { value: "100000", label: "100,000 BTU" },
+  { value: "135000", label: "135,000 BTU" },
+  { value: "150000", label: "150,000 BTU" },
+] as const
+
+const FURNACE_FORCED_AIR_HORIZONTAL_HE_BTU_OPTIONS = [
+  { value: "60000", label: "60,000 BTU" },
+  { value: "80000", label: "80,000 BTU" },
+  { value: "95000", label: "95,000 BTU" },
+  { value: "120000", label: "120,000 BTU" },
+  { value: "135000", label: "135,000 BTU" },
+] as const
+
+const BOILER_NATURAL_GAS_BTU_OPTIONS = [
+  { value: "62000", label: "62,000" },
+  { value: "90000-95000", label: "90,000 to 95,000" },
+  { value: "130000", label: "130,000" },
+  { value: "165000", label: "165,000" },
+  { value: "200000", label: "200,000" },
+] as const
+
+const BOILER_OIL_BTU_OPTIONS = [
+  { value: "62000", label: "62,000" },
+  { value: "90000-97000", label: "90,000 to 97,000" },
+  { value: "130000", label: "130,000" },
+  { value: "165000", label: "165,000" },
+  { value: "200000", label: "200,000" },
+] as const
+
+const BOILER_ELECTRIC_MBH_OPTIONS = [
+  { value: "55", label: "55 MBH" },
+  { value: "109", label: "109 MBH" },
+  { value: "218", label: "218 MBH" },
+  { value: "328", label: "328 MBH" },
+] as const
+
 function furnaceBtuOptions(type: string, highEfficiency: boolean) {
   if (type === "floor") return FURNACE_FLOOR_BTU_OPTIONS
   if (type === "forced-air") {
     return highEfficiency ? FURNACE_FORCED_AIR_HE_BTU_OPTIONS : FURNACE_FORCED_AIR_BTU_OPTIONS
+  }
+  if (type === "forced-air-horizontal") {
+    return highEfficiency ? FURNACE_FORCED_AIR_HORIZONTAL_HE_BTU_OPTIONS : FURNACE_FORCED_AIR_HORIZONTAL_BTU_OPTIONS
   }
   return [] as const
 }
@@ -502,7 +545,7 @@ const defaultExterior = {
   finishes: {
     exteriorPaint: { enabled: false },
     siding: { enabled: false, perimeterFeet: "", squareFeetEnabled: false, squareFeet: "" },
-    sheathing: { enabled: false, type: "", replacementHeight: "" },
+    sheathing: { enabled: false, type: "", tongueAndGroove: false, replacementHeight: "" },
     houseWrap: { enabled: false, replacementHeight: "" },
     backerBoard: { enabled: false, replacementHeight: "" },
     wallInsulation: { enabled: false, type: "", battRating: "", sprayFoamCellType: "", replacementHeight: "" },
@@ -585,6 +628,8 @@ const defaultFoundation = {
       circulatorPump: false,
       oilTankReplacement: false,
       oilReplacement: false,
+      btu: "",
+      mbh: "",
     },
     furnace: { ...defaultFurnace },
     baseboardHeat: {
@@ -2104,6 +2149,16 @@ export default function NewExpressEstimatePage() {
                                 </Select>
                               </div>
                               <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={exterior.finishes.sheathing.tongueAndGroove ?? false}
+                                  onCheckedChange={(checked) => {
+                                    setValue("exterior",{ ...exterior, finishes: { ...exterior.finishes, sheathing: { ...exterior.finishes.sheathing, tongueAndGroove: checked } } })
+                                    handleSave()
+                                  }}
+                                />
+                                <Label className="text-sm whitespace-nowrap">Tongue and Groove</Label>
+                              </div>
+                              <div className="flex items-center gap-2">
                                 <Label className="text-xs text-muted-foreground">Replacement Height (PF)</Label>
                                 <Input
                                   type="number"
@@ -2233,7 +2288,6 @@ export default function NewExpressEstimatePage() {
                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                   <SelectItem value="spray-foam">Spray foam</SelectItem>
                                   <SelectItem value="batt">Paperface Batt</SelectItem>
-                                  <SelectItem value="blown-in">Blown-in</SelectItem>
                                   <SelectItem value="rigid-foam">Rigid foam</SelectItem>
                                   <SelectItem value="foil-vapor-barrier-aluminum-single-sided">Foil Vapor Barrier - Aluminum - Single Sided</SelectItem>
                                 </SelectContent>
@@ -2334,31 +2388,22 @@ export default function NewExpressEstimatePage() {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 rounded-lg border border-border/60 bg-secondary/20 p-4">
                       <div className="space-y-4">
-                        {/* Row 1: Heavy Clean Area and AC Controlled Space */}
-                        <div className="flex flex-wrap items-center gap-6">
-                          <div className="flex items-center gap-2">
+                        {/* Row 1: Heavy Clean / AC Controlled / Foundation Wall Clean (PF) */}
+                        <div className="flex flex-wrap items-end gap-6">
+                          <div className="flex items-center gap-2 pb-1">
                             <Switch
                               checked={foundation.crawlspace.heavyCleanArea}
                               onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, heavyCleanArea: checked } }); handleSave() }}
                             />
                             <Label className="text-sm">Heavy Clean Area</Label>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 pb-1">
                             <Switch
                               checked={foundation.crawlspace.acControlledSpace}
                               onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, acControlledSpace: checked } }); handleSave() }}
                             />
                             <Label className="text-sm">AC Controlled Space</Label>
                           </div>
-                        </div>
-
-                        {/* Heavy Clean Note - only shows when Heavy Clean Area is toggled on */}
-                        {foundation.crawlspace.heavyCleanArea && (
-                          <p className="text-xs text-amber-500">Note: Heavy clean will be applied to all cleaning items below</p>
-                        )}
-
-                        {/* Row 2: Foundation Wall Clean (PF) and # of Piers */}
-                        <div className="flex flex-wrap items-end gap-4">
                           <div className="space-y-1">
                             <Label className="text-xs text-muted-foreground">Foundation Wall Clean (PF)</Label>
                             <Input
@@ -2370,6 +2415,15 @@ export default function NewExpressEstimatePage() {
                               className="border-border/60 bg-secondary/50 w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:appearance-auto"
                             />
                           </div>
+                        </div>
+
+                        {/* Heavy Clean Note - only shows when Heavy Clean Area is toggled on */}
+                        {foundation.crawlspace.heavyCleanArea && (
+                          <p className="text-xs text-amber-500">Note: Heavy clean will be applied to all cleaning items below</p>
+                        )}
+
+                        {/* Row 2: # of Piers + Short/Tall Piers + Clean Joist */}
+                        <div className="flex flex-wrap items-end gap-4">
                           <div className="space-y-1">
                             <Label className="text-xs text-muted-foreground"># of Piers</Label>
                             <Input
@@ -2380,26 +2434,22 @@ export default function NewExpressEstimatePage() {
                               className="border-border/60 bg-secondary/50 w-16"
                             />
                           </div>
-                        </div>
-
-                        {/* Row 3: Short Piers / Tall Piers / Clean Joist */}
-                        <div className="flex flex-wrap items-center gap-4">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 pb-1">
                             <Switch
                               checked={foundation.crawlspace.piersType === "short"}
                               onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, piersType: checked ? "short" : "" } }); handleSave() }}
                             />
                             <Label className="text-sm">Short Piers</Label>
                           </div>
-                          <span className="text-xs text-muted-foreground">or</span>
-                          <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground pb-1">or</span>
+                          <div className="flex items-center gap-2 pb-1">
                             <Switch
                               checked={foundation.crawlspace.piersType === "tall"}
                               onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, piersType: checked ? "tall" : "" } }); handleSave() }}
                             />
                             <Label className="text-sm">Tall Piers</Label>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 pb-1">
                             <Switch
                               checked={foundation.crawlspace.cleanJoist}
                               onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, cleanJoist: checked } }); handleSave() }}
@@ -2460,23 +2510,6 @@ export default function NewExpressEstimatePage() {
                               />
                             </div>
                             <div className="flex items-center gap-2">
-                              <Label className="text-sm whitespace-nowrap">Width of Treads</Label>
-                              <Select value={foundation.crawlspace.treadWidth} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, crawlspace: { ...foundation.crawlspace, treadWidth: value } }); handleSave() }}>
-                                <SelectTrigger className="w-56 border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select size" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                  <SelectItem value="up-to-4ft">Up to 4ft</SelectItem>
-                                  <SelectItem value="up-to-4ft-stain-grade">Up to 4ft Stain Grade</SelectItem>
-                                  <SelectItem value="greater-4-up-to-8">{"Greater than 4' up to 8'"}</SelectItem>
-                                  <SelectItem value="hardwood-up-to-4ft">Hardwood - up to 4ft</SelectItem>
-                                  <SelectItem value="hardwood-up-to-4ft-high-grade">Hardwood - up to 4ft High Grade</SelectItem>
-                                  <SelectItem value="hardwood-greater-4-up-to-8">{"Hardwood - Greater than 4' up to 8'"}</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div className="flex items-center gap-2">
                               <Label className="text-xs text-muted-foreground">Total Length of Stringers Submerged (ft)</Label>
                               <Input
                                 type="number"
@@ -2530,9 +2563,16 @@ export default function NewExpressEstimatePage() {
                           {foundation.insulation.floorInsulation && (
                             <>
                               <Select
-                                value={foundation.insulation.floorInsulationType}
+                                value={
+                                  foundation.insulation.floorInsulationType === "6in-r21-paper-foil-faced"
+                                    ? "r21"
+                                    : foundation.insulation.floorInsulationType === "r13"
+                                      ? ""
+                                      : foundation.insulation.floorInsulationType
+                                }
                                 onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v
+                                  const isBatt = value === "r19" || value === "r21"
                                   setValue("foundation", {
                                     ...foundation,
                                     insulation: {
@@ -2542,6 +2582,7 @@ export default function NewExpressEstimatePage() {
                                         value === "spray-foam"
                                           ? foundation.insulation.floorInsulationReplacementHeight
                                           : "",
+                                      confinedSpace: isBatt ? foundation.insulation.confinedSpace : false,
                                     },
                                   })
                                   handleSave()
@@ -2553,9 +2594,8 @@ export default function NewExpressEstimatePage() {
                                 <SelectContent>
                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                   <SelectItem value="spray-foam">Spray Foam</SelectItem>
-                                  <SelectItem value="r13">R-13</SelectItem>
                                   <SelectItem value="r19">R-19</SelectItem>
-                                  <SelectItem value="6in-r21-paper-foil-faced">{"6\" R21 - Paper/Foil Faced"}</SelectItem>
+                                  <SelectItem value="r21">R-21</SelectItem>
                                 </SelectContent>
                               </Select>
                               {foundation.insulation.floorInsulationType === "spray-foam" && (
@@ -2585,6 +2625,13 @@ export default function NewExpressEstimatePage() {
                             </>
                           )}
                         </div>
+                        <p className="text-xs text-muted-foreground">
+                          Note: Wall insulation for crawlspace/basement is under Subgrade Area Coverage Items.
+                        </p>
+                        {(foundation.insulation.floorInsulation &&
+                          (foundation.insulation.floorInsulationType === "r19" ||
+                            foundation.insulation.floorInsulationType === "r21" ||
+                            foundation.insulation.floorInsulationType === "6in-r21-paper-foil-faced")) && (
                         <div className="flex items-center gap-2">
                           <Switch
                             checked={foundation.insulation.confinedSpace}
@@ -2592,6 +2639,7 @@ export default function NewExpressEstimatePage() {
                           />
                           <Label className="text-sm">Confined Space</Label>
                         </div>
+                        )}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -2776,7 +2824,7 @@ export default function NewExpressEstimatePage() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="replace">Replace</SelectItem>
+                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                     <SelectItem value="service-call">Service Call</SelectItem>
                                     <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                   </SelectContent>
@@ -2823,21 +2871,22 @@ export default function NewExpressEstimatePage() {
                                 <Select value={foundation.waterHeater.type} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v
                                   const clearTanklessSize = foundation.waterHeater.tankless
-                                  const clearElectricOnlySize =
-                                    !foundation.waterHeater.tankless &&
-                                    value === "gas" &&
-                                    foundation.waterHeater.size === "80gal"
-                                  const clearGas75Rating =
-                                    !foundation.waterHeater.tankless &&
-                                    value === "gas" &&
-                                    foundation.waterHeater.size === "75gal"
+                                  const clearInvalidSize =
+                                    !foundation.waterHeater.tankless && (
+                                      (value === "gas" && (foundation.waterHeater.size === "80gal" || foundation.waterHeater.size === "60gal" || foundation.waterHeater.size === "20gal")) ||
+                                      (value === "electric" && foundation.waterHeater.size === "75gal")
+                                    )
+                                  const clearRating =
+                                    (!foundation.waterHeater.tankless && value === "gas" && foundation.waterHeater.size === "75gal") ||
+                                    (!foundation.waterHeater.tankless && value === "electric" && ["20gal", "60gal", "80gal"].includes(foundation.waterHeater.size)) ||
+                                    (foundation.waterHeater.tankless && value === "gas")
                                   setValue("foundation",{
                                     ...foundation,
                                     waterHeater: {
                                       ...foundation.waterHeater,
                                       type: value,
-                                      ...((clearTanklessSize || clearElectricOnlySize) ? { size: "" } : {}),
-                                      ...(clearGas75Rating ? { rating: "" } : {}),
+                                      ...((clearTanklessSize || clearInvalidSize) ? { size: "" } : {}),
+                                      ...(clearRating ? { rating: "" } : {}),
                                     },
                                   })
                                   handleSave()
@@ -2847,7 +2896,7 @@ export default function NewExpressEstimatePage() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    {foundation.waterHeater.size !== "80gal" && (
+                                    {foundation.waterHeater.size !== "80gal" && foundation.waterHeater.size !== "60gal" && (
                                       <SelectItem value="gas">Gas</SelectItem>
                                     )}
                                     <SelectItem value="electric">Electric</SelectItem>
@@ -2860,15 +2909,17 @@ export default function NewExpressEstimatePage() {
                                 </Label>
                                 <Select value={foundation.waterHeater.size} onValueChange={(__v) => {
                                   const value = __v === "__none__" ? "" : __v
-                                  const clearGas75Rating =
-                                    foundation.waterHeater.type === "gas" && value === "75gal"
+                                  const clearRating =
+                                    (foundation.waterHeater.type === "gas" && value === "75gal") ||
+                                    (foundation.waterHeater.type === "electric" && ["20gal", "60gal", "80gal"].includes(value)) ||
+                                    (foundation.waterHeater.tankless && foundation.waterHeater.type === "gas")
                                   setValue("foundation",{
                                     ...foundation,
                                     waterHeater: {
                                       ...foundation.waterHeater,
                                       size: value,
-                                      ...(value === "80gal" ? { type: "electric" } : {}),
-                                      ...(clearGas75Rating ? { rating: "" } : {}),
+                                      ...((value === "80gal" || value === "60gal") ? { type: "electric" } : {}),
+                                      ...(clearRating ? { rating: "" } : {}),
                                     },
                                   })
                                   handleSave()
@@ -2878,16 +2929,32 @@ export default function NewExpressEstimatePage() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    {!foundation.waterHeater.tankless && (
+                                    {!foundation.waterHeater.tankless && foundation.waterHeater.type === "electric" && (
                                       <>
                                         <SelectItem value="20gal">20 gal</SelectItem>
                                         <SelectItem value="30gal">30 gal</SelectItem>
                                         <SelectItem value="40gal">40 gal</SelectItem>
                                         <SelectItem value="50gal">50 gal</SelectItem>
+                                        <SelectItem value="60gal">60 gal</SelectItem>
+                                        <SelectItem value="80gal">80 gal</SelectItem>
+                                      </>
+                                    )}
+                                    {!foundation.waterHeater.tankless && foundation.waterHeater.type === "gas" && (
+                                      <>
+                                        <SelectItem value="30gal">30 gal</SelectItem>
+                                        <SelectItem value="40gal">40 gal</SelectItem>
+                                        <SelectItem value="50gal">50 gal</SelectItem>
                                         <SelectItem value="75gal">75 gal</SelectItem>
-                                        {foundation.waterHeater.type === "electric" && (
-                                          <SelectItem value="80gal">80 gal</SelectItem>
-                                        )}
+                                      </>
+                                    )}
+                                    {!foundation.waterHeater.tankless && !foundation.waterHeater.type && (
+                                      <>
+                                        <SelectItem value="30gal">30 gal</SelectItem>
+                                        <SelectItem value="40gal">40 gal</SelectItem>
+                                        <SelectItem value="50gal">50 gal</SelectItem>
+                                        <SelectItem value="60gal">60 gal</SelectItem>
+                                        <SelectItem value="75gal">75 gal</SelectItem>
+                                        <SelectItem value="80gal">80 gal</SelectItem>
                                       </>
                                     )}
                                     {foundation.waterHeater.tankless && foundation.waterHeater.type === "gas" && (
@@ -2907,9 +2974,30 @@ export default function NewExpressEstimatePage() {
                                   </SelectContent>
                                 </Select>
                               </div>
-                              {!foundation.waterHeater.tankless &&
-                              foundation.waterHeater.type === "gas" &&
-                              foundation.waterHeater.size === "75gal" ? null : (
+                              {(() => {
+                                const wh = foundation.waterHeater
+                                const hideStandardRating =
+                                  (!wh.tankless && wh.type === "gas" && wh.size === "75gal") ||
+                                  (!wh.tankless && wh.type === "electric" && ["20gal", "60gal", "80gal"].includes(wh.size))
+                                if (hideStandardRating) return null
+                                if (wh.tankless && wh.type === "gas") {
+                                  return (
+                                    <div className="space-y-1">
+                                      <Label className="text-xs text-muted-foreground">Rating</Label>
+                                      <Select value={wh.rating} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, rating: value } }); handleSave() }}>
+                                        <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                          <SelectValue placeholder="--" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="__none__" className="italic text-muted-foreground">--</SelectItem>
+                                          <SelectItem value="regular">Regular</SelectItem>
+                                          <SelectItem value="powervent">Powervent</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                  )
+                                }
+                                return (
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Rating</Label>
                                 <Select value={foundation.waterHeater.rating} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, rating: value } }); handleSave() }}>
@@ -2924,16 +3012,17 @@ export default function NewExpressEstimatePage() {
                                   </SelectContent>
                                 </Select>
                               </div>
-                              )}
+                                )
+                              })()}
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Action</Label>
                                 <Select value={foundation.waterHeater.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, waterHeater: { ...foundation.waterHeater, action: value } }); handleSave() }}>
-                                  <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                  <SelectTrigger className="w-40 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="replace">Replace</SelectItem>
+                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                     <SelectItem value="service-call">Service Call</SelectItem>
                                     <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                   </SelectContent>
@@ -3001,7 +3090,7 @@ export default function NewExpressEstimatePage() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="replace">Replace</SelectItem>
+                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                     <SelectItem value="service-call">Service Call</SelectItem>
                                     <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                   </SelectContent>
@@ -3051,22 +3140,22 @@ export default function NewExpressEstimatePage() {
                                       </SelectTrigger>
                                       <SelectContent>
                                         <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        {['1/2"', '1/4"', '3/8"', '5/8"'].map((t) => (
-                                          <SelectItem key={t} value={t}>{t}</SelectItem>
-                                        ))}
+                                        <SelectItem value='1/2"'>1/2&quot;</SelectItem>
+                                        <SelectItem value='3/8"'>3/8&quot;</SelectItem>
                                       </SelectContent>
                                     </Select>
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <Label className="text-xs text-muted-foreground">Replacement height</Label>
                                     <Select value={foundation.subgradeAreaCoverage.drywall.replacementHeight} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, drywall: { ...foundation.subgradeAreaCoverage.drywall, replacementHeight: value } } }); handleSave() }}>
-                                      <SelectTrigger className="w-20 border-border/60 bg-secondary/50">
+                                      <SelectTrigger className="w-24 border-border/60 bg-secondary/50">
                                         <SelectValue placeholder="--" />
                                       </SelectTrigger>
                                       <SelectContent>
                                         <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                        <SelectItem value="0.5">0.5</SelectItem>
-                                        <SelectItem value="W">W</SelectItem>
+                                        <SelectItem value="4ft">4 ft</SelectItem>
+                                        <SelectItem value="8ft">8 ft</SelectItem>
+                                        <SelectItem value="12ft">12 ft</SelectItem>
                                       </SelectContent>
                                     </Select>
                                   </div>
@@ -3159,13 +3248,13 @@ export default function NewExpressEstimatePage() {
                             </div>
                             {foundation.subgradeAreaCoverage.foundationalDoor.enabled && (
                               <Select value={foundation.subgradeAreaCoverage.foundationalDoor.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, subgradeAreaCoverage: { ...foundation.subgradeAreaCoverage, foundationalDoor: { ...foundation.subgradeAreaCoverage.foundationalDoor, action: value } } }); handleSave() }}>
-                                <SelectTrigger className="w-56 border-border/60 bg-secondary/50">
-                                  <SelectValue placeholder="Select action" />
+                                <SelectTrigger className="w-64 border-border/60 bg-secondary/50">
+                                  <SelectValue placeholder="Select action for door handle" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                   <SelectItem value="detach-reset-handle">Detach &amp; Reset Handle</SelectItem>
-                                  <SelectItem value="replace">Replace</SelectItem>
+                                  <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                 </SelectContent>
                               </Select>
                             )}
@@ -3233,6 +3322,7 @@ export default function NewExpressEstimatePage() {
                                       <SelectItem value="single-hung">Single Hung</SelectItem>
                                       <SelectItem value="double-hung">Double Hung</SelectItem>
                                       <SelectItem value="casement">Casement</SelectItem>
+                                      <SelectItem value="hopper">Hopper</SelectItem>
                                       <SelectItem value="fixed">Fixed</SelectItem>
                                       <SelectItem value="horizontal-slider">Horizontal Slider</SelectItem>
                                     </SelectContent>
@@ -3305,8 +3395,8 @@ export default function NewExpressEstimatePage() {
                                             <SelectItem value="20-28">20-28 SF</SelectItem>
                                           </>
                                         )}
-                                        {/* Vinyl - Casement */}
-                                        {window.material === "vinyl" && window.type === "casement" && (
+                                        {/* Vinyl - Casement / Hopper */}
+                                        {window.material === "vinyl" && (window.type === "casement" || window.type === "hopper") && (
                                           <>
                                             <SelectItem value="3-5">3-5 SF</SelectItem>
                                             <SelectItem value="6-8">6-8 SF</SelectItem>
@@ -3322,8 +3412,8 @@ export default function NewExpressEstimatePage() {
                                             <SelectItem value="33-40">33-40 SF</SelectItem>
                                           </>
                                         )}
-                                        {/* Aluminum - Casement */}
-                                        {window.material === "aluminum" && window.type === "casement" && (
+                                        {/* Aluminum - Casement / Hopper */}
+                                        {window.material === "aluminum" && (window.type === "casement" || window.type === "hopper") && (
                                           <>
                                             <SelectItem value="3-5">3-5 SF</SelectItem>
                                             <SelectItem value="6-8">6-8 SF</SelectItem>
@@ -3718,9 +3808,9 @@ export default function NewExpressEstimatePage() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="air-handler">Air Handler</SelectItem>
-                                    <SelectItem value="with-heat-element">With heat Element</SelectItem>
-                                    <SelectItem value="with-heat-element-a-coil">With Heat Element & A-coil</SelectItem>
+                                    <SelectItem value="with-heat-element">AH - with heat element</SelectItem>
+                                    <SelectItem value="with-a-coil">AH - with A-coil</SelectItem>
+                                    <SelectItem value="with-heat-element-a-coil">AH with heat element and A/C coil</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -3736,7 +3826,7 @@ export default function NewExpressEstimatePage() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    {["2", "2.5", "3", "4", "5"].map(t => (
+                                    {["2", "3", "4", "5"].map(t => (
                                       <SelectItem key={t} value={t}>{t} Ton</SelectItem>
                                     ))}
                                   </SelectContent>
@@ -3749,13 +3839,13 @@ export default function NewExpressEstimatePage() {
                                   setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, airHandlers: foundation.hvac.airHandlers.map((h, i) => i === 0 ? { ...h, action: value } : h) } })
                                   handleSave()
                                 }}>
-                                  <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                  <SelectTrigger className="w-44 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="replace">Replace</SelectItem>
-                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                    <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                     <SelectItem value="service-call">Service Call</SelectItem>
                                   </SelectContent>
                                 </Select>
@@ -3838,33 +3928,67 @@ export default function NewExpressEstimatePage() {
                                         boiler: {
                                           ...foundation.hvac.boiler,
                                           type: value,
+                                          btu: "",
+                                          mbh: "",
                                           ...(value !== "oil" ? { oilTankReplacement: false, oilReplacement: false } : {}),
                                         },
                                       },
                                     })
                                     handleSave()
                                   }}>
-                                    <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                    <SelectTrigger className="w-40 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                       <SelectItem value="natural-gas">Natural Gas</SelectItem>
-                                      <SelectItem value="electric">Electric</SelectItem>
-                                      <SelectItem value="oil">Oil</SelectItem>
+                                      <SelectItem value="electric">Electric-Steam</SelectItem>
+                                      <SelectItem value="oil">Oil Fired</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
+                                {(foundation.hvac.boiler.type === "natural-gas" || foundation.hvac.boiler.type === "oil") && (
+                                  <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground">BTU</Label>
+                                    <Select value={foundation.hvac.boiler.btu} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, btu: value } } }); handleSave() }}>
+                                      <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="Select BTU" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                        {(foundation.hvac.boiler.type === "natural-gas" ? BOILER_NATURAL_GAS_BTU_OPTIONS : BOILER_OIL_BTU_OPTIONS).map((opt) => (
+                                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                )}
+                                {foundation.hvac.boiler.type === "electric" && (
+                                  <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground">MBH</Label>
+                                    <Select value={foundation.hvac.boiler.mbh} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, mbh: value } } }); handleSave() }}>
+                                      <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
+                                        <SelectValue placeholder="Select MBH" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                        {BOILER_ELECTRIC_MBH_OPTIONS.map((opt) => (
+                                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                )}
                                 <div className="space-y-1">
                                   <Label className="text-xs text-muted-foreground">Action</Label>
                                   <Select value={foundation.hvac.boiler.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, boiler: { ...foundation.hvac.boiler, action: value } } }); handleSave() }}>
-                                    <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
+                                    <SelectTrigger className="w-44 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select action" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                      <SelectItem value="replace">Replace</SelectItem>
-                                      <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                      <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                      <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                       <SelectItem value="service-call">Service Call</SelectItem>
                                     </SelectContent>
                                   </Select>
@@ -3965,23 +4089,38 @@ export default function NewExpressEstimatePage() {
                                           ...foundation.hvac.furnace,
                                           type: value,
                                           btu: "",
-                                          ...(value !== "forced-air" ? { highEfficiency: false } : {}),
+                                          ...(value !== "forced-air" && value !== "forced-air-horizontal" ? { highEfficiency: false } : {}),
                                         },
                                       },
                                     })
                                     handleSave()
                                   }}>
-                                    <SelectTrigger className="w-36 border-border/60 bg-secondary/50">
+                                    <SelectTrigger className="w-52 border-border/60 bg-secondary/50">
                                       <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                       <SelectItem value="floor">Floor</SelectItem>
                                       <SelectItem value="forced-air">Forced Air</SelectItem>
+                                      <SelectItem value="forced-air-horizontal">Forced Air Horizontal</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
-                                {foundation.hvac.furnace.type === "forced-air" && (
+                                <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">Action</Label>
+                                  <Select value={foundation.hvac.furnace.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, furnace: { ...foundation.hvac.furnace, action: value } } }); handleSave() }}>
+                                    <SelectTrigger className="w-44 border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select action" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                      <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                      <SelectItem value="service-call">Service Call</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                {(foundation.hvac.furnace.type === "forced-air" || foundation.hvac.furnace.type === "forced-air-horizontal") && (
                                   <div className="flex items-center gap-2 pb-2">
                                     <Switch
                                       checked={foundation.hvac.furnace.highEfficiency}
@@ -4003,7 +4142,7 @@ export default function NewExpressEstimatePage() {
                                     <Label className="text-sm">High Efficiency</Label>
                                   </div>
                                 )}
-                                {(foundation.hvac.furnace.type === "floor" || foundation.hvac.furnace.type === "forced-air") && (
+                                {(foundation.hvac.furnace.type === "floor" || foundation.hvac.furnace.type === "forced-air" || foundation.hvac.furnace.type === "forced-air-horizontal") && (
                                   <div className="space-y-1">
                                     <Label className="text-xs text-muted-foreground">BTU</Label>
                                     <Select value={foundation.hvac.furnace.btu} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, furnace: { ...foundation.hvac.furnace, btu: value } } }); handleSave() }}>
@@ -4061,6 +4200,7 @@ export default function NewExpressEstimatePage() {
                                     <SelectItem value="4">4&apos;</SelectItem>
                                     <SelectItem value="5">5&apos;</SelectItem>
                                     <SelectItem value="6">6&apos;</SelectItem>
+                                    <SelectItem value="7">7&apos;</SelectItem>
                                     <SelectItem value="8">8&apos;</SelectItem>
                                     <SelectItem value="10">10&apos;</SelectItem>
                                   </SelectContent>
@@ -4069,13 +4209,13 @@ export default function NewExpressEstimatePage() {
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Action</Label>
                                 <Select value={foundation.hvac.baseboardHeat.action} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, action: value } } }); handleSave() }}>
-                                  <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
+                                  <SelectTrigger className="w-44 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="replace">Replace</SelectItem>
-                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                    <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                     <SelectItem value="service-call">Service Call</SelectItem>
                                   </SelectContent>
                                 </Select>
@@ -4996,7 +5136,7 @@ export default function NewExpressEstimatePage() {
                                                   <SelectContent>
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                     <SelectItem value="remove">Remove</SelectItem>
-                                                    <SelectItem value="remove-replace">Remove & Replace</SelectItem>
+                                                    <SelectItem value="remove-replace">Remove &amp; Replace</SelectItem>
                                                   </SelectContent>
                                                 </Select>
                                               </div>
@@ -5435,8 +5575,8 @@ export default function NewExpressEstimatePage() {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
-                                                <SelectItem value="detach-reset">Detach & reset</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           </div>
@@ -5524,8 +5664,8 @@ export default function NewExpressEstimatePage() {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
-                                                <SelectItem value="detach-reset">Detach & reset</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           </div>
@@ -6297,12 +6437,12 @@ export default function NewExpressEstimatePage() {
                                                   {room.vanity.countertop.type === "tile" ? (
                                                     <>
                                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      <SelectItem value="replace">Replace</SelectItem>
+                                                      <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                     </>
                                                   ) : (
                                                     <>
                                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      <SelectItem value="replace">Replace</SelectItem>
+                                                      <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                       <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                                     </>
                                                   )}
@@ -6327,8 +6467,8 @@ export default function NewExpressEstimatePage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                  <SelectItem value="replace">Replace</SelectItem>
+                                                  <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                  <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                 </SelectContent>
                                               </Select>
                                             </div>
@@ -6351,7 +6491,7 @@ export default function NewExpressEstimatePage() {
                                                   </SelectTrigger>
                                                   <SelectContent>
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                     <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                                   </SelectContent>
                                                 </Select>
@@ -6404,7 +6544,7 @@ export default function NewExpressEstimatePage() {
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                 <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           </div>
@@ -6432,8 +6572,8 @@ export default function NewExpressEstimatePage() {
                                             </SelectTrigger>
                                             <SelectContent>
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                              <SelectItem value="replace">Replace</SelectItem>
-                                              <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                              <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                              <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                             </SelectContent>
                                           </Select>
                                         </div>
@@ -6503,8 +6643,8 @@ export default function NewExpressEstimatePage() {
                                                   </SelectTrigger>
                                                   <SelectContent>
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                   </SelectContent>
                                                 </Select>
                                               </div>
@@ -6612,8 +6752,8 @@ export default function NewExpressEstimatePage() {
                                                   </SelectTrigger>
                                                   <SelectContent>
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                   </SelectContent>
                                                 </Select>
                                               </div>
@@ -6673,8 +6813,8 @@ export default function NewExpressEstimatePage() {
                                                   </SelectTrigger>
                                                   <SelectContent>
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                   </SelectContent>
                                                 </Select>
                                               </div>
@@ -6768,8 +6908,8 @@ export default function NewExpressEstimatePage() {
                                                   </SelectTrigger>
                                                   <SelectContent>
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                   </SelectContent>
                                                 </Select>
                                               </div>
@@ -6904,7 +7044,7 @@ export default function NewExpressEstimatePage() {
                                                       </SelectTrigger>
                                                       <SelectContent>
                                                         <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                        <SelectItem value="replace">Replace</SelectItem>
+                                                        <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                         <SelectItem value="clean">Clean</SelectItem>
                                                       </SelectContent>
                                                     </Select>
@@ -7222,8 +7362,8 @@ export default function NewExpressEstimatePage() {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           </div>
@@ -7254,8 +7394,8 @@ export default function NewExpressEstimatePage() {
                                             </SelectTrigger>
                                             <SelectContent>
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                              <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                              <SelectItem value="replace">Replace</SelectItem>
+                                              <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                              <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                             </SelectContent>
                                           </Select>
                                           <Input
@@ -7362,8 +7502,8 @@ export default function NewExpressEstimatePage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                  <SelectItem value="replace">Replace</SelectItem>
+                                                  <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                  <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
                                                 </SelectContent>
                                               </Select>
@@ -7406,8 +7546,8 @@ export default function NewExpressEstimatePage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                  <SelectItem value="replace">Replace</SelectItem>
+                                                  <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                  <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
                                                 </SelectContent>
                                               </Select>
@@ -7472,8 +7612,8 @@ export default function NewExpressEstimatePage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                  <SelectItem value="replace">Replace</SelectItem>
+                                                  <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                  <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
                                                 </SelectContent>
                                               </Select>
@@ -7526,8 +7666,8 @@ export default function NewExpressEstimatePage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                  <SelectItem value="replace">Replace</SelectItem>
+                                                  <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                  <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
                                                 </SelectContent>
                                               </Select>
@@ -7629,8 +7769,8 @@ export default function NewExpressEstimatePage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                  <SelectItem value="replace">Replace</SelectItem>
+                                                  <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                  <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
                                                 </SelectContent>
                                               </Select>
@@ -7687,8 +7827,8 @@ export default function NewExpressEstimatePage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                  <SelectItem value="replace">Replace</SelectItem>
+                                                  <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                  <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
                                                 </SelectContent>
                                               </Select>
@@ -7743,8 +7883,8 @@ export default function NewExpressEstimatePage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                  <SelectItem value="replace">Replace</SelectItem>
+                                                  <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                  <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                   <SelectItem value="service-call">Service Call</SelectItem>
                                                 </SelectContent>
                                               </Select>
@@ -7842,8 +7982,8 @@ export default function NewExpressEstimatePage() {
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                       <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                      <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                      <SelectItem value="replace">Replace</SelectItem>
+                                                      <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                      <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                       <SelectItem value="service-call">Service Call</SelectItem>
                                                     </SelectContent>
                                                   </Select>
@@ -8002,8 +8142,8 @@ export default function NewExpressEstimatePage() {
                                                   </SelectTrigger>
                                                   <SelectContent>
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                                    <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                                   </SelectContent>
                                                 </Select>
                                               </div>
@@ -8110,8 +8250,8 @@ export default function NewExpressEstimatePage() {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                 <SelectItem value="service-call">Service Call</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -8154,8 +8294,8 @@ export default function NewExpressEstimatePage() {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                 <SelectItem value="service-call">Service Call</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -8220,8 +8360,8 @@ export default function NewExpressEstimatePage() {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                 <SelectItem value="service-call">Service Call</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -8274,8 +8414,8 @@ export default function NewExpressEstimatePage() {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                 <SelectItem value="service-call">Service Call</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -8387,8 +8527,8 @@ export default function NewExpressEstimatePage() {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                 <SelectItem value="service-call">Service Call</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -8445,8 +8585,8 @@ export default function NewExpressEstimatePage() {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                 <SelectItem value="service-call">Service Call</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -8501,8 +8641,8 @@ export default function NewExpressEstimatePage() {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                 <SelectItem value="service-call">Service Call</SelectItem>
                                               </SelectContent>
                                             </Select>
@@ -8600,8 +8740,8 @@ export default function NewExpressEstimatePage() {
                                                   </SelectTrigger>
                                                   <SelectContent>
                                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                    <SelectItem value="detach-reset">Detach and reset</SelectItem>
-                                                    <SelectItem value="replace">Replace</SelectItem>
+                                                    <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
+                                                    <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                                     <SelectItem value="service-call">Service Call</SelectItem>
                                                   </SelectContent>
                                                 </Select>
@@ -8760,8 +8900,8 @@ export default function NewExpressEstimatePage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                  <SelectItem value="replace">Replace</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach and reset</SelectItem>
+                                                  <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                                  <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                                 </SelectContent>
                                               </Select>
                                             </div>
@@ -8932,8 +9072,8 @@ export default function NewExpressEstimatePage() {
                                             </SelectTrigger>
                                             <SelectContent>
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                              <SelectItem value="replace">Replace</SelectItem>
-                                              <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                              <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                              <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                             </SelectContent>
                                           </Select>
                                           <div className="flex items-center gap-2">
@@ -9176,8 +9316,8 @@ export default function NewExpressEstimatePage() {
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               {door.type === "overhead" ? (
                                                 <>
-                                                  <SelectItem value="replace">Replace</SelectItem>
-                                                  <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                  <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                                  <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                                   <SelectItem value="clean">Clean</SelectItem>
                                                 </>
                                               ) : (
@@ -9201,8 +9341,8 @@ export default function NewExpressEstimatePage() {
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="replace">Replace</SelectItem>
-                                                <SelectItem value="detach-reset">Detach & Reset</SelectItem>
+                                                <SelectItem value="replace">Remove &amp; Replace</SelectItem>
+                                                <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           )}
