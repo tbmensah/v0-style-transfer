@@ -124,6 +124,10 @@ export const trimOptionsSchema = z.object({
   shoe: bool,
   shoeFinish: str,
   subtractCabinetry: bool,
+  vinylCoveEnabled: bool,
+  vinylCoveSize: str,
+  tileBaseEnabled: bool,
+  tileBaseGrade: str,
 })
 
 export const wallCoveringOptionsSchema = z.object({
@@ -149,7 +153,7 @@ export const electricalRoomOptionsSchema = z.object({
   gfiOutlets: num,
   lightSwitches: num,
   ceilingLights: num,
-  ceilingFans: num,
+  ceilingFans: str,
   bathroomLightBar: str,
   bathroomLightBarQty: num,
 })
@@ -158,6 +162,7 @@ export const vanityOptionsSchema = z.object({
   enabled: bool,
   size: str,
   grade: str,
+  custom: bool,
   detachAndReset: bool,
   countertop: z.object({
     type: str,
@@ -225,6 +230,11 @@ export const cabinetOptionsSchema = z.object({
     glass: bool,
     diagonalInstallation: bool,
   }),
+  fullHeight: z.object({
+    type: str,
+    grade: str,
+    size: str,
+  }),
 })
 
 export const countertopOptionsSchema = z.object({
@@ -234,6 +244,7 @@ export const countertopOptionsSchema = z.object({
   size: str,
   detachAndReset: bool,
   action: str,
+  subdeckReplacement: bool,
 })
 
 export const plumbingOptionsSchema = z.object({
@@ -595,6 +606,8 @@ export const foundationSchema = z.object({
     junctionBox: str,
     breakerPanel: z.object({
       enabled: bool,
+      amps: str,
+      arcFaults: bool,
       panelReplacement: bool,
       circuitReplacement: bool,
       panelType: str,
