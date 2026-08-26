@@ -122,6 +122,10 @@ interface TrimOptions {
   shoe: boolean
   shoeFinish: string
   subtractCabinetry: boolean
+  vinylCoveEnabled: boolean
+  vinylCoveSize: string
+  tileBaseEnabled: boolean
+  tileBaseGrade: string
   }
 
 interface WallCoveringOptions {
@@ -147,7 +151,7 @@ interface ElectricalOptions {
   gfiOutlets: number
   lightSwitches: number
   ceilingLights: number
-  ceilingFans: number
+  ceilingFans: string
   bathroomLightBar: string
   bathroomLightBarQty: number
 }
@@ -197,6 +201,7 @@ interface VanityOptions {
   enabled: boolean
   size: string
   grade: string
+  custom: boolean
   detachAndReset: boolean
   countertop: {
     type: string
@@ -266,6 +271,11 @@ interface CabinetOptions {
     glass: boolean
     diagonalInstallation: boolean
   }
+  fullHeight: {
+    type: string
+    grade: string
+    size: string
+  }
 }
 
 interface CountertopOptions {
@@ -276,6 +286,7 @@ interface CountertopOptions {
   detachAndReset: boolean
   /** Used for butcher-block (remove-replace | detach-reset). */
   action: string
+  subdeckReplacement: boolean
 }
 
 interface PlumbingOptions {
@@ -391,9 +402,9 @@ const defaultRoom: Omit<Room, "id" | "name"> = {
   sqft: "",
   nfipCleaning: { enabled: false, wall: { height: "", wallType: "", ceilingAffected: false }, floor: { type: "", areaOnCrawlspace: false } },
   flooring: { enabled: false, multipleLayers: false, layers: [{ id: Date.now(), type: "", grade: "", application: "", action: "", vaporBarrier: false, subfloorReplacement: false }], vaporBarrier: false, subfloorReplacement: false, f9Note: "" },
-  trim: { enabled: false, baseboardHeight: "", material: "", detail: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false },
+  trim: { enabled: false, baseboardHeight: "", material: "", detail: "", finish: "", cap: false, shoe: false, shoeFinish: "", subtractCabinetry: false, vinylCoveEnabled: false, vinylCoveSize: "", tileBaseEnabled: false, tileBaseGrade: "" },
   wallCovering: { enabled: false, material: "", type: "", replacementHeight: "", fullWall: false, ceilingReplacementAddon: false, texture: false, textureType: "", panelingStyle: "", panelingFinish: "", panelingGrade: "", chairRailAction: "", chairRailFinish: "" },
-  electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: 0, bathroomLightBar: "", bathroomLightBarQty: 0 },
+  electrical: { enabled: false, outlets110: 0, outlets220: 0, gfiOutlets: 0, lightSwitches: 0, ceilingLights: 0, ceilingFans: "", bathroomLightBar: "", bathroomLightBarQty: 0 },
   windowsEnabled: false,
   windows: [],
   doorsEnabled: false,
@@ -406,6 +417,7 @@ vanity: {
   enabled: false,
   size: "",
   grade: "",
+  custom: false,
   detachAndReset: false,
   countertop: { type: "", grade: "", size: "", pStop: "", sink: "", action: "", faucet: "", faucetAction: "" },
   backsplashUnattached: false,
@@ -466,8 +478,8 @@ const defaultAppliancesExtras = {
 }
 
 const defaultKitchenExtras = {
-  cabinets: { enabled: false, size: "", grade: "", detachAndReset: false, toeKick: { size: "", backSplash: "", grade: "", glass: false, diagonalInstallation: false } },
-  countertop: { enabled: false, type: "", grade: "", size: "", detachAndReset: false, action: "" },
+  cabinets: { enabled: false, size: "", grade: "", detachAndReset: false, toeKick: { size: "", backSplash: "", grade: "", glass: false, diagonalInstallation: false }, fullHeight: { type: "", grade: "", size: "" } },
+  countertop: { enabled: false, type: "", grade: "", size: "", detachAndReset: false, action: "", subdeckReplacement: false },
   plumbing: { replaceFaucetSink: false, drFaucetSink: false, waterSupplyLine: { enabled: false, qty: "" }, reverseOsmosis: { enabled: false, action: "", f9Note: "" }, garbageDisposal: { enabled: false, action: "", f9Note: "" } },
   ...defaultAppliancesExtras,
 }
@@ -669,6 +681,8 @@ const defaultFoundation = {
     junctionBox: "",
     breakerPanel: {
       enabled: false,
+      amps: "",
+      arcFaults: false,
       panelReplacement: false,
       circuitReplacement: false,
       panelType: "",
@@ -4176,7 +4190,7 @@ export default function NewExpressEstimatePage() {
                             <div className="flex flex-wrap items-end gap-4 pl-6">
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Type</Label>
-                                <Select value={foundation.hvac.baseboardHeat.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, type: value, size: "" } } }); handleSave() }}>
+                                <Select value={foundation.hvac.baseboardHeat.type} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, type: value, size: "", action: value === "steam-hot-water" && foundation.hvac.baseboardHeat.action === "service-call" ? "" : foundation.hvac.baseboardHeat.action } } }); handleSave() }}>
                                   <SelectTrigger className="w-32 border-border/60 bg-secondary/50">
                                     <SelectValue placeholder="Select type" />
                                   </SelectTrigger>
@@ -4188,23 +4202,36 @@ export default function NewExpressEstimatePage() {
                                 </Select>
                               </div>
                               <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground">Size</Label>
-                                <Select value={foundation.hvac.baseboardHeat.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, size: value } } }); handleSave() }}>
-                                  <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
-                                    <SelectValue placeholder="Select" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                    <SelectItem value="2">2&apos;</SelectItem>
-                                    <SelectItem value="3">3&apos;</SelectItem>
-                                    <SelectItem value="4">4&apos;</SelectItem>
-                                    <SelectItem value="5">5&apos;</SelectItem>
-                                    <SelectItem value="6">6&apos;</SelectItem>
-                                    <SelectItem value="7">7&apos;</SelectItem>
-                                    <SelectItem value="8">8&apos;</SelectItem>
-                                    <SelectItem value="10">10&apos;</SelectItem>
-                                  </SelectContent>
-                                </Select>
+                                <Label className="text-xs text-muted-foreground">{foundation.hvac.baseboardHeat.type === "steam-hot-water" ? "Size (LF)" : "Size"}</Label>
+                                {foundation.hvac.baseboardHeat.type === "steam-hot-water" ? (
+                                  <Input
+                                    type="number"
+                                    min={0}
+                                    step="any"
+                                    inputMode="decimal"
+                                    placeholder="LF"
+                                    value={foundation.hvac.baseboardHeat.size}
+                                    onChange={(e) => { setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, size: e.target.value } } }); handleSave() }}
+                                    className="w-[120px] border-border/60 bg-secondary/50"
+                                  />
+                                ) : (
+                                  <Select value={foundation.hvac.baseboardHeat.size} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, hvac: { ...foundation.hvac, baseboardHeat: { ...foundation.hvac.baseboardHeat, size: value } } }); handleSave() }}>
+                                    <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      <SelectItem value="2">2&apos;</SelectItem>
+                                      <SelectItem value="3">3&apos;</SelectItem>
+                                      <SelectItem value="4">4&apos;</SelectItem>
+                                      <SelectItem value="5">5&apos;</SelectItem>
+                                      <SelectItem value="6">6&apos;</SelectItem>
+                                      <SelectItem value="7">7&apos;</SelectItem>
+                                      <SelectItem value="8">8&apos;</SelectItem>
+                                      <SelectItem value="10">10&apos;</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                )}
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-xs text-muted-foreground">Action</Label>
@@ -4216,7 +4243,9 @@ export default function NewExpressEstimatePage() {
                                     <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                     <SelectItem value="replace">Remove &amp; Replace</SelectItem>
                                     <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
-                                    <SelectItem value="service-call">Service Call</SelectItem>
+                                    {foundation.hvac.baseboardHeat.type !== "steam-hot-water" && (
+                                      <SelectItem value="service-call">Service Call</SelectItem>
+                                    )}
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -4379,6 +4408,29 @@ export default function NewExpressEstimatePage() {
                           </div>
                           {foundation.electrical.breakerPanel.enabled && (
                             <div className="space-y-4">
+                              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:gap-x-8 sm:gap-y-2">
+                                <div className="space-y-2 min-w-[120px]">
+                                  <Label className="text-xs text-muted-foreground">Amperage</Label>
+                                  <Select value={foundation.electrical.breakerPanel.amps} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, amps: value } } }); handleSave() }}>
+                                    <SelectTrigger className="border-border/60 bg-secondary/50">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                      {["70", "100", "125", "150", "200", "300"].map(a => (
+                                        <SelectItem key={a} value={a}>{a} Amp</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="flex items-center gap-3 pb-0.5">
+                                  <Switch
+                                    checked={foundation.electrical.breakerPanel.arcFaults}
+                                    onCheckedChange={(checked) => { setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, arcFaults: checked } } }); handleSave() }}
+                                  />
+                                  <Label>w/arc fault breakers</Label>
+                                </div>
+                              </div>
                               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-2">
                                 <div className="flex items-center gap-3">
                                   <Switch
@@ -4425,21 +4477,7 @@ export default function NewExpressEstimatePage() {
                                 </div>
                               </div>
                               {(foundation.electrical.breakerPanel.panelReplacement ?? false) && (
-                                <div className="flex flex-wrap items-end gap-2">
-                                  <Label className="text-sm whitespace-nowrap">Replacement type</Label>
-                                  <Select value={foundation.electrical.breakerPanel.panelType} onValueChange={(__v) => { const value = __v === "__none__" ? "" : __v; setValue("foundation",{ ...foundation, electrical: { ...foundation.electrical, breakerPanel: { ...foundation.electrical.breakerPanel, panelType: value } } }); handleSave() }}>
-                                    <SelectTrigger className="w-48 border-border/60 bg-secondary/50">
-                                      <SelectValue placeholder="Select type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                      <SelectItem value="110v-single">110 V - Single Pole</SelectItem>
-                                      <SelectItem value="220v-double">220 V - Double Pole</SelectItem>
-                                      <SelectItem value="arc-fault-afci">Arc Fault - AFCI</SelectItem>
-                                      <SelectItem value="ground-fault-gfi">Ground Fault - GFI</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
+                                <p className="text-xs text-muted-foreground">Panel replacement uses the amperage and arc-fault selections above.</p>
                               )}
                               {(foundation.electrical.breakerPanel.circuitReplacement ?? false) && (
                                 <div className="space-y-3">
@@ -4630,16 +4668,31 @@ export default function NewExpressEstimatePage() {
                             />
                             <Label className="text-sm">Risers</Label>
                             {foundation.stairs.risers && (
-                              <Input
-                                type="number"
-                                min={0}
-                                step={1}
-                                inputMode="numeric"
-                                placeholder="QTY"
-                                value={foundation.stairs.risersQty ?? ""}
-                                onChange={(e) => { setValue("foundation",{ ...foundation, stairs: { ...foundation.stairs, risersQty: e.target.value } }); handleSave() }}
-                                className="w-20 border-border/60 bg-secondary/50"
-                              />
+                              <>
+                                <Input
+                                  type="number"
+                                  min={0}
+                                  step={1}
+                                  inputMode="numeric"
+                                  placeholder="QTY"
+                                  value={foundation.stairs.risersQty ?? ""}
+                                  onChange={(e) => { setValue("foundation",{ ...foundation, stairs: { ...foundation.stairs, risersQty: e.target.value } }); handleSave() }}
+                                  className="w-20 border-border/60 bg-secondary/50"
+                                />
+                                <div className="flex items-center gap-2">
+                                  <Label className="text-xs text-muted-foreground whitespace-nowrap">Size</Label>
+                                  <span className="inline-flex h-9 min-w-[10rem] items-center rounded-md border border-border/60 bg-secondary/50 px-3 text-sm text-foreground">
+                                    {{
+                                      "up-to-4ft": "Up to 4ft",
+                                      "up-to-4ft-stain-grade": "Up to 4ft Stain Grade",
+                                      "greater-4-up-to-8": "Greater than 4' up to 8'",
+                                      "hardwood-up-to-4ft": "Hardwood - up to 4ft",
+                                      "hardwood-up-to-4ft-high-grade": "Hardwood - up to 4ft High Grade",
+                                      "hardwood-greater-4-up-to-8": "Hardwood - Greater than 4' up to 8'",
+                                    }[foundation.stairs.sizeOfTreads] ?? "Select tread size"}
+                                  </span>
+                                </div>
+                              </>
                             )}
                           </div>
                         </div>
@@ -5327,6 +5380,59 @@ export default function NewExpressEstimatePage() {
                                     )}
                                   </div>
                                 )}
+                                {/* Non-wood baseboard */}
+                                <div className="mt-3 space-y-3 border-t border-border/40 pt-3">
+                                  <Label className="text-xs font-medium text-muted-foreground">Non-wood Baseboard</Label>
+                                  <div className="flex flex-wrap items-end gap-4">
+                                    <div className="flex items-center gap-2 pb-1">
+                                      <Switch
+                                        checked={room.trim.vinylCoveEnabled}
+                                        onCheckedChange={(checked) => updateRoom(room.id, { trim: { ...room.trim, vinylCoveEnabled: checked, vinylCoveSize: checked ? room.trim.vinylCoveSize : "" } })}
+                                      />
+                                      <Label className="text-sm">Vinyl Cove</Label>
+                                    </div>
+                                    {room.trim.vinylCoveEnabled && (
+                                      <div className="space-y-1 min-w-[120px]">
+                                        <Label className="text-xs text-muted-foreground">Size</Label>
+                                        <Select value={room.trim.vinylCoveSize} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { trim: { ...room.trim, vinylCoveSize: value } }) }}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="4-wrap">4&apos; wrap</SelectItem>
+                                            <SelectItem value="6-wrap">6&apos; wrap</SelectItem>
+                                            <SelectItem value="8-wrap">8&apos; wrap</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                    )}
+                                    <div className="flex items-center gap-2 pb-1">
+                                      <Switch
+                                        checked={room.trim.tileBaseEnabled}
+                                        onCheckedChange={(checked) => updateRoom(room.id, { trim: { ...room.trim, tileBaseEnabled: checked, tileBaseGrade: checked ? room.trim.tileBaseGrade : "" } })}
+                                      />
+                                      <Label className="text-sm">Tile Base</Label>
+                                    </div>
+                                    {room.trim.tileBaseEnabled && (
+                                      <div className="space-y-1 min-w-[140px]">
+                                        <Label className="text-xs text-muted-foreground">Grade</Label>
+                                        <Select value={room.trim.tileBaseGrade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { trim: { ...room.trim, tileBaseGrade: value } }) }}>
+                                          <SelectTrigger className="border-border/60 bg-secondary/50">
+                                            <SelectValue placeholder="Select" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                            <SelectItem value="base">Base</SelectItem>
+                                            <SelectItem value="standard">Standard Grade</SelectItem>
+                                            <SelectItem value="high">High Grade</SelectItem>
+                                            <SelectItem value="premium">Premium Grade</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
 
                               {/* Wall Coverings */}
@@ -5544,14 +5650,13 @@ export default function NewExpressEstimatePage() {
                                           </div>
                                           <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Finish</Label>
-                                            <Select value={room.wallCovering.panelingFinish === "none" ? "" : room.wallCovering.panelingFinish} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingFinish: value } }) }}>
+                                            <Select value={room.wallCovering.panelingFinish === "none" || room.wallCovering.panelingFinish === "stain" ? "" : room.wallCovering.panelingFinish} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { wallCovering: { ...room.wallCovering, panelingFinish: value } }) }}>
                                               <SelectTrigger className="w-[100px] border-border/60 bg-secondary/50">
                                                 <SelectValue placeholder="Select" />
                                               </SelectTrigger>
                                               <SelectContent>
                                                 <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                 <SelectItem value="paint">Paint</SelectItem>
-                                                <SelectItem value="stain">Stain</SelectItem>
                                               </SelectContent>
                                             </Select>
                                           </div>
@@ -6045,8 +6150,6 @@ export default function NewExpressEstimatePage() {
                                             <SelectItem value="pvc">PVC</SelectItem>
                                             <SelectItem value="wood">Wood</SelectItem>
                                             <SelectItem value="metal">Metal</SelectItem>
-                                            <SelectItem value="cloth">Cloth</SelectItem>
-                                            <SelectItem value="shutters">Shutters</SelectItem>
                                           </SelectContent>
                                         </Select>
                                       </div>
@@ -6169,17 +6272,21 @@ export default function NewExpressEstimatePage() {
                                         className="h-9 w-full border-border/60 bg-secondary/50"
                                       />
                                     </div>
-                                    <div className="flex w-[80px] flex-col gap-1">
-                                      <Label className="text-xs text-muted-foreground">Ceiling Fans</Label>
-                                      <Input
-                                        type="number"
-                                        min="0"
-                                        step={1}
-                                        placeholder="QTY"
-                                        value={room.electrical.ceilingFans || ""}
-                                        onChange={(e) => updateRoom(room.id, { electrical: { ...room.electrical, ceilingFans: parseInt(e.target.value) || 0 } })}
-                                        className="h-9 w-full border-border/60 bg-secondary/50"
-                                      />
+                                    <div className="flex w-[160px] flex-col gap-1">
+                                      <Label className="text-xs text-muted-foreground">Ceiling Fan</Label>
+                                      <Select value={room.electrical.ceilingFans} onValueChange={(__v) => {
+                                        const value = nv(__v)
+                                        updateRoom(room.id, { electrical: { ...room.electrical, ceilingFans: value } })
+                                      }}>
+                                        <SelectTrigger className="h-9 w-full border-border/60 bg-secondary/50">
+                                          <SelectValue placeholder="Select" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                          <SelectItem value="fan-without-light">Fan without light</SelectItem>
+                                          <SelectItem value="fan-with-light">Fan with light</SelectItem>
+                                        </SelectContent>
+                                      </Select>
                                     </div>
                                     <div className="flex flex-nowrap items-end gap-0">
                                       <div className="flex w-fit flex-col gap-1">
@@ -6200,9 +6307,12 @@ export default function NewExpressEstimatePage() {
                                           </SelectTrigger>
                                           <SelectContent>
                                             <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                            <SelectItem value="1">1 light</SelectItem>
-                                            <SelectItem value="2">2 light</SelectItem>
-                                            <SelectItem value="3">3 light</SelectItem>
+                                            <SelectItem value="2">2 Lights</SelectItem>
+                                            <SelectItem value="3">3 Lights</SelectItem>
+                                            <SelectItem value="4">4 Lights</SelectItem>
+                                            <SelectItem value="5">5 Lights</SelectItem>
+                                            <SelectItem value="6">6 Lights</SelectItem>
+                                            <SelectItem value="8">8 Lights</SelectItem>
                                           </SelectContent>
                                         </Select>
                                       </div>
@@ -6251,42 +6361,50 @@ export default function NewExpressEstimatePage() {
                                     {room.vanity.enabled && (
                                       <div className="space-y-3 pl-2">
                                         {/* Vanity Cabinet row */}
-                                        <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
-                                          <div className="space-y-1">
-                                            <Label className="text-xs text-muted-foreground">Size (LF)</Label>
-                                            <Input
-                                              type="text"
-                                              value={room.vanity.size}
-                                              onChange={(e) => updateRoom(room.id, { vanity: { ...room.vanity!, size: e.target.value } })}
-                                              placeholder="Qty"
-                                              className="w-[80px] border-border/60 bg-secondary/50"
-                                            />
-                                          </div>
-                                          <div className="space-y-1">
-                                            <Label className="text-xs text-muted-foreground">Grade</Label>
-                                            <Select value={room.vanity.grade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { vanity: { ...room.vanity!, grade: value } }) }}>
-                                              <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
-                                                <SelectValue placeholder="Select" />
-                                              </SelectTrigger>
-                                              <SelectContent>
-                                                <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
-                                                <SelectItem value="base">Base</SelectItem>
-                                                <SelectItem value="high">High</SelectItem>
-                                                <SelectItem value="premium">Premium</SelectItem>
-                                                <SelectItem value="custom">Custom</SelectItem>
-                                              </SelectContent>
-                                            </Select>
-                                          </div>
-                                          <div className="flex flex-col gap-1 pb-1">
-                                            <div className="flex items-center gap-2">
+                                        <div className="space-y-1.5">
+                                          <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
+                                            <div className="space-y-1">
+                                              <Label className="text-xs text-muted-foreground">Size (LF)</Label>
+                                              <Input
+                                                type="text"
+                                                value={room.vanity.size}
+                                                onChange={(e) => updateRoom(room.id, { vanity: { ...room.vanity!, size: e.target.value } })}
+                                                placeholder="Qty"
+                                                className="w-[80px] border-border/60 bg-secondary/50"
+                                              />
+                                            </div>
+                                            <div className="space-y-1">
+                                              <Label className="text-xs text-muted-foreground">Grade</Label>
+                                              <Select value={room.vanity.grade === "custom" ? "" : room.vanity.grade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { vanity: { ...room.vanity!, grade: value } }) }}>
+                                                <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                                  <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                                  <SelectItem value="base">Base</SelectItem>
+                                                  <SelectItem value="standard">Standard</SelectItem>
+                                                  <SelectItem value="high">High</SelectItem>
+                                                  <SelectItem value="premium">Premium</SelectItem>
+                                                  <SelectItem value="deluxe">Deluxe</SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                            <div className="flex items-center gap-2 pb-1">
+                                              <Switch
+                                                checked={room.vanity.custom}
+                                                onCheckedChange={(checked) => updateRoom(room.id, { vanity: { ...room.vanity!, custom: checked, grade: checked && room.vanity!.grade === "custom" ? "" : room.vanity!.grade } })}
+                                              />
+                                              <Label className="text-xs whitespace-nowrap">Custom</Label>
+                                            </div>
+                                            <div className="flex items-center gap-2 pb-1">
                                               <Switch
                                                 checked={room.vanity.detachAndReset}
                                                 onCheckedChange={(checked) => updateRoom(room.id, { vanity: { ...room.vanity!, detachAndReset: checked } })}
                                               />
                                               <Label className="text-xs whitespace-nowrap">Detach and Reset</Label>
                                             </div>
-                                            <span className="text-xs text-orange-400">Note: Cabinets are put in for replacement unless D/R is selected</span>
                                           </div>
+                                          <span className="text-xs text-orange-400">Note: Cabinets are put in for replacement unless D/R is selected</span>
                                         </div>
                                         {/* Countertop section */}
                                         <div className="rounded-md border border-border/30 bg-secondary/20 p-3 space-y-3">
@@ -6332,7 +6450,6 @@ export default function NewExpressEstimatePage() {
                                                 <SelectContent>
                                                   <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                                   <SelectItem value="cultured-marble">Cultured Marble</SelectItem>
-                                                  <SelectItem value="laminate">Laminate</SelectItem>
                                                   <SelectItem value="tile">Tile</SelectItem>
                                                   <SelectItem value="granite">Granite</SelectItem>
                                                   <SelectItem value="marble">Marble</SelectItem>
@@ -7127,6 +7244,55 @@ export default function NewExpressEstimatePage() {
                                       </div>
                                     </div>
 
+                                    {/* Full Height Cabinetry */}
+                                    <div className="rounded-md border border-border/30 bg-secondary/20 p-3 space-y-2">
+                                      <Label className="text-xs font-medium text-muted-foreground">Full Height Cabinetry</Label>
+                                      <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                                        <div className="space-y-1">
+                                          <Label className="text-xs text-muted-foreground">Type</Label>
+                                          <Select value={room.cabinets.fullHeight.type} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { cabinets: { ...room.cabinets!, fullHeight: { ...room.cabinets!.fullHeight, type: value } } }) }}>
+                                            <SelectTrigger className="w-[180px] border-border/60 bg-secondary/50">
+                                              <SelectValue placeholder="Select" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                              <SelectItem value="cab-full-height">Cab - full height</SelectItem>
+                                              <SelectItem value="custom-cab-full-height">Custom cab full height</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                        <div className="space-y-1">
+                                          <Label className="text-xs text-muted-foreground">Grade</Label>
+                                          <Select value={room.cabinets.fullHeight.grade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { cabinets: { ...room.cabinets!, fullHeight: { ...room.cabinets!.fullHeight, grade: value } } }) }}>
+                                            <SelectTrigger className="w-[110px] border-border/60 bg-secondary/50">
+                                              <SelectValue placeholder="Select" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
+                                              <SelectItem value="base">Base</SelectItem>
+                                              <SelectItem value="standard">Standard</SelectItem>
+                                              <SelectItem value="high">High</SelectItem>
+                                              <SelectItem value="premium">Premium</SelectItem>
+                                              <SelectItem value="custom">Custom</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                        <div className="space-y-1">
+                                          <Label className="text-xs text-muted-foreground">Size (LF)</Label>
+                                          <Input
+                                            type="number"
+                                            min={0}
+                                            step="any"
+                                            inputMode="decimal"
+                                            placeholder="LF"
+                                            value={room.cabinets.fullHeight.size}
+                                            onChange={(e) => updateRoom(room.id, { cabinets: { ...room.cabinets!, fullHeight: { ...room.cabinets!.fullHeight, size: e.target.value } } })}
+                                            className="w-[100px] border-border/60 bg-secondary/50"
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+
                                     {/* Countertop section */}
                                     <div className="rounded-md border border-border/30 bg-secondary/20 p-3 space-y-2">
                                       <Label className="text-xs font-medium text-muted-foreground">Countertop</Label>
@@ -7139,6 +7305,8 @@ export default function NewExpressEstimatePage() {
                                             const nextGrade =
                                               value === "cultured-marble" && (prev.grade === "premium" || prev.grade === "standard")
                                                 ? ""
+                                                : value === "tile" && prev.grade === ""
+                                                ? prev.grade
                                                 : prev.grade
                                             let nextAction = prev.action
                                             let nextDetach = prev.detachAndReset
@@ -7150,6 +7318,9 @@ export default function NewExpressEstimatePage() {
                                             } else if (prev.type === "butcher-block") {
                                               nextAction = ""
                                             }
+                                            if (value === "tile") {
+                                              nextDetach = false
+                                            }
                                             updateRoom(room.id, {
                                               countertop: {
                                                 ...prev,
@@ -7157,6 +7328,7 @@ export default function NewExpressEstimatePage() {
                                                 grade: value === "butcher-block" ? "" : nextGrade,
                                                 action: nextAction,
                                                 detachAndReset: nextDetach,
+                                                subdeckReplacement: value === "tile" ? true : prev.subdeckReplacement,
                                               },
                                             })
                                           }}>
@@ -7189,6 +7361,9 @@ export default function NewExpressEstimatePage() {
                                               ) : (
                                                 <>
                                                   <SelectItem value="standard">Standard</SelectItem>
+                                                  {room.countertop.type === "tile" && (
+                                                    <SelectItem value="high">High</SelectItem>
+                                                  )}
                                                   <SelectItem value="premium">Premium</SelectItem>
                                                 </>
                                               )}
@@ -7237,7 +7412,7 @@ export default function NewExpressEstimatePage() {
                                               </SelectContent>
                                             </Select>
                                           </div>
-                                        ) : (
+                                        ) : room.countertop.type !== "tile" ? (
                                           <div className="flex items-center gap-2 pb-1">
                                             <Switch
                                               checked={room.countertop.detachAndReset}
@@ -7245,7 +7420,14 @@ export default function NewExpressEstimatePage() {
                                             />
                                             <Label className="text-xs whitespace-nowrap">Detach and reset</Label>
                                           </div>
-                                        )}
+                                        ) : null}
+                                        <div className="flex items-center gap-2 pb-1">
+                                          <Switch
+                                            checked={room.countertop.subdeckReplacement}
+                                            onCheckedChange={(checked) => updateRoom(room.id, { countertop: { ...room.countertop!, subdeckReplacement: checked } })}
+                                          />
+                                          <Label className="text-xs whitespace-nowrap">Subdeck replacement</Label>
+                                        </div>
                                       </div>
                                     </div>
 
@@ -7255,7 +7437,21 @@ export default function NewExpressEstimatePage() {
                                       <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Type</Label>
-                                          <Select value={room.cabinets.toeKick.backSplash} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, backSplash: value } } }) }}>
+                                          <Select value={room.cabinets.toeKick.backSplash === "unattached" ? "" : room.cabinets.toeKick.backSplash} onValueChange={(__v) => {
+                                            const value = nv(__v)
+                                            updateRoom(room.id, {
+                                              cabinets: {
+                                                ...room.cabinets!,
+                                                toeKick: {
+                                                  ...room.cabinets!.toeKick,
+                                                  backSplash: value,
+                                                  ...(value === "solid-surface"
+                                                    ? { grade: "", glass: false, diagonalInstallation: false }
+                                                    : {}),
+                                                },
+                                              },
+                                            })
+                                          }}>
                                             <SelectTrigger className="w-[120px] border-border/60 bg-secondary/50">
                                               <SelectValue placeholder="Select" />
                                             </SelectTrigger>
@@ -7263,10 +7459,11 @@ export default function NewExpressEstimatePage() {
                                               <SelectItem value="__none__" className="italic text-muted-foreground">None</SelectItem>
                                               <SelectItem value="tile">Tile</SelectItem>
                                               <SelectItem value="solid-surface">Solid surface</SelectItem>
-                                              <SelectItem value="unattached">Unattached</SelectItem>
                                             </SelectContent>
                                           </Select>
                                         </div>
+                                        {room.cabinets.toeKick.backSplash !== "solid-surface" && (
+                                        <>
                                         <div className="space-y-1">
                                           <Label className="text-xs text-muted-foreground">Grade</Label>
                                           <Select value={room.cabinets.toeKick.grade} onValueChange={(__v) => { const value = nv(__v); updateRoom(room.id, { cabinets: { ...room.cabinets!, toeKick: { ...room.cabinets!.toeKick, grade: value } } }) }}>
@@ -7296,6 +7493,8 @@ export default function NewExpressEstimatePage() {
                                           />
                                           <Label className="text-xs whitespace-nowrap">Diagonal installation</Label>
                                         </div>
+                                        </>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -8963,8 +9162,10 @@ export default function NewExpressEstimatePage() {
                                               <SelectItem value="bifold">Bifold</SelectItem>
                                               <SelectItem value="bypass">Bypass</SelectItem>
                                               <SelectItem value="pocket">Pocket</SelectItem>
+                                              <SelectItem value="slab-only-refit">Slab only - refit</SelectItem>
                                             </SelectContent>
                                           </Select>
+                                          {door.type !== "slab-only-refit" && (
                                           <Select value={door.grade} onValueChange={(__v) => {
                                             const value = __v === "__none__" ? "" : __v;
                                             const newDoors = [...room.doors]
@@ -9046,6 +9247,7 @@ export default function NewExpressEstimatePage() {
                                               )}
                                             </SelectContent>
                                           </Select>
+                                          )}
                                           <Select value={door.finish} onValueChange={(__v) => {
                                             const value = __v === "__none__" ? "" : __v;
                                             const newDoors = [...room.doors]
@@ -9076,17 +9278,6 @@ export default function NewExpressEstimatePage() {
                                               <SelectItem value="detach-reset">Detach &amp; Reset</SelectItem>
                                             </SelectContent>
                                           </Select>
-                                          <div className="flex items-center gap-2">
-                                            <Switch
-                                              checked={door.nonCased}
-                                              onCheckedChange={(checked) => {
-                                                const newDoors = [...room.doors]
-                                                newDoors[idx] = { ...door, nonCased: checked }
-                                                updateRoom(room.id, { doors: newDoors })
-                                              }}
-                                            />
-                                            <Label className="text-sm whitespace-nowrap">Non-Cased</Label>
-                                          </div>
                                           <div className="flex-1"></div>
                                           <div className="flex items-center gap-1">
                                             <Button
